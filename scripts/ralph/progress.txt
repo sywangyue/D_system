@@ -383,3 +383,71 @@
   - New codebase patterns added: client-only library import pattern, Supabase embedded select for joins
 ---
 
+## 2026-05-06 20:57 - US-4-06-02
+- Created `app/api/map/markers/route.ts` — GET endpoint aggregating exhibition_edition by city
+  - Joins exhibition_brand for name_cn + is_international
+  - Static city→lat/lng mapping (50+ cities, Chinese + international) with substring fallback
+  - Returns `{ markers: CityMarker[] }` sorted by count descending
+- Created `app/map/page.tsx` — server component wrapper with `<Suspense>` + `MapFallback` skeleton
+- Created `app/map/map-content.tsx` — "use client" component with data fetching from /api/map/markers
+  - 4 states: loading (skeleton), error (retry button), empty ("暂无展会地理数据"), populated
+  - Dynamic import of MapView with `ssr: false`
+  - Legend overlay positioned bottom-right
+- Created `app/map/map-view.tsx` — react-leaflet MapContainer with CircleMarkers
+  - Initial view: China-centered [35, 105], zoom 4
+  - China markers: blue (#3B82F6), International: orange (#F97316)
+  - Radius: `6 + Math.min(count * 1.5, 20)` — min 6px, max 26px
+  - Popup: city name + count + top 3 exhibition names + domestic/international badge
+  - OpenStreetMap tiles (free, no API key)
+  - Imports `leaflet/dist/leaflet.css` inside the wrapper (SSR-safe)
+- Created `components/map/Legend.tsx` — absolute-positioned legend showing color meanings + size scale
+- Created `tests/api/map.test.ts` — 8 tests (valid JSON, empty, 200, aggregation, intl detection, null brand, lat/lng, 500 error)
+- Added codebase pattern: static city coordinate mapping for server-side geocoding
+- Files changed: app/api/map/markers/route.ts (new), app/map/page.tsx (new), app/map/map-content.tsx (new), app/map/map-view.tsx (new), components/map/Legend.tsx (new), tests/api/map.test.ts (new), scripts/ralph/prd.json (modified), scripts/ralph/progress.txt (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (7 files, 37 tests, 0 failures)
+  - npm run build: PASS (compiled successfully; /map route listed as ○ static, /api/map/markers as ƒ dynamic)
+- Browser verification: deferred (requires real Supabase credentials + exhibition_edition data with city values). Manual verification recommended when Supabase is connected.
+- **Learnings for future iterations:**
+  - Map page follows same 3-file pattern as Calendar: server wrapper → client content → dynamically-imported view
+  - react-leaflet CircleMarker `pathOptions` prop sets fillColor/fillOpacity/color/weight — use computed objects per marker
+  - react-leaflet Popup renders children as React components (no special popup API needed)
+  - Static geocoding is sufficient when known locations are finite (exhibition cities) — no external API needed
+  - Legend must be outside MapContainer (in the parent div with `relative` positioning) to avoid Leaflet DOM conflicts
+---
+
+## 2026-05-06 21:05 - US-4-06-03
+- Created `app/api/setting/status/route.ts` — GET endpoint (admin-only) returning data_status + system_info
+  - Data status: total_brands, total_editions (via `count: "exact", head: true`), last_crawl info
+  - System info: node_version, next_version, supabase_project_ref, build_time
+  - Auth + RBAC: 401 for no session, 403 for non-admin
+  - Parallel Supabase queries via Promise.all
+- Created `app/setting/page.tsx` — server component wrapper with `<Suspense>` + `SettingFallback` skeleton
+- Created `app/setting/setting-content.tsx` — "use client" component with:
+  - Admin RBAC check via Supabase browser client → redirect to /dashboard for non-admin
+  - Data fetched from `/api/users` and `/api/setting/status` in parallel
+  - User list table: email, role badge (color-coded: admin=red, manager=blue, readonly=gray), status badge (活跃/未活跃/未验证), last login
+  - Data status panel: brand count, edition count, last crawl status+time, crawl duration
+  - System info block: Node.js, Next.js, Supabase project ref, build time
+  - Loading state: auth spinner → DataStatusCard skeleton + UsersTableSkeleton + SystemInfoBlock skeleton
+  - Error state: per-section ErrorCard with retry button, partial error tolerance
+  - Empty state: "暂无用户数据" for empty user list
+- Created `tests/api/setting.test.ts` — 6 tests (admin success, 401, manager 403, readonly 403, null crawl, system_info shape)
+  - Uses module-level `mockUser`/`mockBrandCount`/`mockEditionCount`/`mockCrawlData` state variables (same pattern as tags/users tests)
+  - `from(table, args?)` mock distinguishes count vs data queries by table name
+- Files changed: app/api/setting/status/route.ts (new), app/setting/page.tsx (new), app/setting/setting-content.tsx (new), tests/api/setting.test.ts (new), scripts/ralph/prd.json (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (8 files, 43 tests, 0 failures)
+  - npm run build: PASS (compiled successfully; /setting route listed as ○ static, /api/setting/status as ƒ dynamic)
+- Browser verification: deferred (requires real Supabase credentials + Auth with admin user). Manual verification recommended when Supabase is connected.
+- **Learnings for future iterations:**
+  - Setting page follows same 2-file pattern: server wrapper (`page.tsx`) with `<Suspense>` + client content (`setting-content.tsx`)
+  - Admin RBAC on pages uses Supabase browser client `auth.getUser()` pattern (same as Sidebar) — redirect if role !== "admin"
+  - Supabase `select("*", { count: "exact", head: true })` returns `{ count, error }` without data — efficient for COUNT queries
+  - Three parallel Supabase queries in API route via Promise.all + destructured results
+  - User status derived from `confirmed_at` + `last_sign_in_at`: confirmed + recent login → "活跃", confirmed + stale/null login → "未活跃", unconfirmed → "未验证"
+  - Setting page tolerates partial fetch failures — userError and statusError handled independently, retry re-fetches both
+---
+
