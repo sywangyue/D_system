@@ -767,7 +767,7 @@ CREATE TABLE IF NOT EXISTS crawl_log (
 
 ---
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **D-02 精化：Cloudflare Workers vs Cloudflare Pages**
    - What we know: @cloudflare/next-on-pages 已废弃；@opennextjs/cloudflare 部署到 Cloudflare Workers（不是 Pages）
@@ -783,6 +783,7 @@ CREATE TABLE IF NOT EXISTS crawl_log (
    - What we know: D-20 允许前端开发初期连接本地 SQLite（约3.4K条），迁移后切换
    - What's unclear: 本地 SQLite 访问方式在 Next.js API Routes 中（edge 环境无法访问本地文件）
    - Recommendation: 跳过 SQLite 中间态，直接用 Supabase PostgreSQL 从 Wave 1 开始；用现有 mwlab.db 数据做一次性 pgloader/pg_dump 导入作为 seed data
+   - **RESOLVED: 计划采用直接迁移方案，Wave 1 直接连接 Supabase**
 
 ---
 

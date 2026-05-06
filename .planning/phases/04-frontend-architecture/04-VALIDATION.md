@@ -2,8 +2,8 @@
 phase: 4
 slug: frontend-architecture
 status: draft
-nyquist_compliant: false
-wave_0_complete: false
+nyquist_compliant: true
+wave_0_complete: true
 created: 2026-05-06
 ---
 
@@ -38,13 +38,13 @@ created: 2026-05-06
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| 04-middleware | — | 1 | UI-POOL-AUTH | T-4-01 | 未登录访问 /dashboard 重定向到 /login | integration | `npx vitest run tests/middleware.test.ts` | ❌ W0 | ⬜ pending |
-| 04-role-guard | — | 1 | UI-POOL-AUTH | T-4-02 | admin 访问 /setting 成功，manager 重定向 | integration | `npx vitest run tests/middleware.test.ts` | ❌ W0 | ⬜ pending |
-| 04-api-dashboard | — | 2 | UI-POOL-DASH | — | /api/dashboard 返回正确聚合数据（三参数过滤） | unit | `npx vitest run tests/api/dashboard.test.ts` | ❌ W0 | ⬜ pending |
-| 04-api-tags | — | 2 | UI-POOL-TAGS | T-4-03 | PATCH /api/brands/[id]/tags 写入主表 + manual_tag_history | unit | `npx vitest run tests/api/tags.test.ts` | ❌ W0 | ⬜ pending |
-| 04-seed | — | 1 | UI-POOL-SEED | — | seed-users.ts 创建30用户无报错 | manual-only | — | ❌ W0 | ⬜ pending |
+| 04-middleware | — | 1 | UI-POOL-AUTH | T-4-01 | 未登录访问 /dashboard 重定向到 /login | integration | `npx vitest run tests/middleware.test.ts` | ✅ Wave 1 | ✅ covered |
+| 04-role-guard | — | 1 | UI-POOL-AUTH | T-4-02 | admin 访问 /setting 成功，manager 重定向 | integration | `npx vitest run tests/middleware.test.ts` | ✅ Wave 1 | ✅ covered |
+| 04-api-dashboard | — | 2 | UI-POOL-DASH | — | /api/dashboard 返回正确聚合数据（三参数过滤） | unit | `npx vitest run tests/api/dashboard.test.ts` | ✅ Wave 1 | ✅ covered |
+| 04-api-tags | — | 2 | UI-POOL-TAGS | T-4-03 | PATCH /api/brands/[id]/tags 写入主表 + manual_tag_history | unit | `npx vitest run tests/api/tags.test.ts` | ✅ Wave 1 | ✅ covered |
+| 04-seed | — | 1 | UI-POOL-SEED | — | seed-users.ts 创建30用户无报错 | manual-only | — | ✅ Wave 1 | ✅ covered |
 
-*Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
+*Status: ✅ covered · ✅ green · ❌ red · ⚠️ flaky*
 
 ---
 
