@@ -166,8 +166,8 @@
         "npx vitest run — dashboard and brand API tests pass"
       ],
       "priority": 10,
-      "passes": false,
-      "notes": "Wave 3 (CC). Replaces Phase 3 FastAPI dashboard endpoint. Requires Supabase credentials for real data."
+      "passes": true,
+      "notes": "Wave 3 (CC). Replaces Phase 3 FastAPI dashboard endpoint. API routes built with mocked Supabase client for tests. Runtime requires real Supabase credentials."
     },
     {
       "id": "US-4-04-02",

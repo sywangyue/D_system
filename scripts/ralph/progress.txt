@@ -14,6 +14,9 @@
 - When adding a new table, update BOTH the migration file AND the Database type in lib/types.ts
 - Next.js 16 warns that "middleware" file convention is deprecated in favor of "proxy" — but both work for now
 - The Database type in lib/types.ts is the single source of truth for TypeScript ↔ PostgreSQL schema mapping
+- supabase-js `GenericSchema` constraint requires `Tables` entries to have `Relationships` field AND the schema must include `Views` + `Functions` fields. Manually-defined types don't satisfy this unless all fields are present. Workaround: omit the Database generic from createClient and use explicit type assertions on query results. Once a Supabase project is connected, run `supabase gen types typescript` to auto-generate a compatible Database type.
+- Next.js API route handlers should use `Request` (not `NextRequest`) as parameter type for testability. Use `new URL(request.url).searchParams` instead of `request.nextUrl.searchParams`.
+- Mock `next/headers` and `@supabase/ssr` in tests using `vi.mock()` BEFORE importing route handlers.
 
 ---
 
@@ -188,4 +191,35 @@
   - recharts is a "use client" component — the library accesses `getBoundingClientRect()` internally
   - The `isAnimationActive={false}` flag prevents SSR→client hydration mismatches from recharts animations
   - Pie donut chart label positioning uses `innerRadius + (outerRadius - innerRadius) * 1.5` for outside labels pointing from donut
+---
+
+## 2026-05-06 20:08 - US-4-04-01
+- Created `app/api/dashboard/route.ts` — GET endpoint with 3 query params:
+  - `industry_l2`: exact match filter
+  - `competition_relation`: comma-separated IN filter
+  - `mds_related`: single-select IN filter
+  - Returns `{ kpis, brands, industryDistribution }` matching DashboardResponse type
+- Created `app/api/brands/[id]/route.ts` — GET brand detail endpoint:
+  - Returns `{ brand, editions }` with editions ordered by year DESC
+  - Returns 404 for non-existent brand_id
+- Both routes compute KPIs server-side: total_area, total_exhibitors, total_visitors, total_organizers
+- Industry L2 distribution computed from filtered brand results
+- Updated tests with proper Supabase + next/headers mocking:
+  - `tests/api/dashboard.test.ts` — 5 tests (empty response, 3 filter combos, combined filters)
+  - `tests/api/brands.test.ts` — 5 tests (404, valid brand, JSON content type, error message, year ordering)
+- Fixed lib/types.ts — added `Relationships`, `Views`, `Functions` fields, converted to type alias
+- Removed Database generic from server.ts and client.ts (supabase-js GenericSchema constraint mismatch with manual types)
+- Updated lib/CLAUDE.md — documented workaround for manual Database types
+- Files changed: app/api/dashboard/route.ts (new), app/api/brands/[id]/route.ts (new), tests/api/dashboard.test.ts (modified), tests/api/brands.test.ts (new), lib/types.ts (modified), lib/supabase/server.ts (modified), lib/supabase/client.ts (modified), lib/CLAUDE.md (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (4 files, 21 tests, 0 failures)
+  - npm run build: PASS (compiled successfully)
+- Browser verification: deferred (Supabase credentials needed for runtime API testing; routes compile and tests pass with mocks)
+- **Learnings for future iterations:**
+  - supabase-js's `GenericSchema` type requires `Tables` entries to have `Relationships`, and the schema must include `Views` + `Functions`. Manual types won't satisfy this without all fields. Workaround: omit Database generic and use type assertions.
+  - Once Supabase is connected, run `supabase gen types typescript` to get a compatible Database type, then re-enable the generic on all clients.
+  - Next.js API route handlers should use `Request` type (not `NextRequest`) with `new URL(request.url)` for searchParams — more testable.
+  - Mock `vi.mock("next/headers")` and `vi.mock("@supabase/ssr")` before importing route handlers in tests.
+  - Supabase query builder mock: use a chainable object with `then()` method for promise resolution.
 ---
