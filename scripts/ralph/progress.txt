@@ -6,6 +6,14 @@
 - Supabase migration files go in `supabase/migrations/` named `YYYYMMDDHHMMSS_init.sql`
 - RLS policies use a `get_user_role()` helper function reading `auth.jwt() -> 'app_metadata' ->> 'role'`
 - SQLite→PostgreSQL: `AUTOINCREMENT`→`BIGSERIAL`, `datetime('now')`→`NOW()`, date fields→`DATE` type
+- Supabase SSR v0.10+ uses `getAll`/`setAll` cookie methods — `get`/`set`/`remove` are deprecated
+- Server client: `createServerClient(url, key, { cookies: { getAll, setAll } })` with `cookies()` from `next/headers`
+- Middleware client: same API but `getAll` reads from `request.cookies` and `setAll` writes to response
+- Browser client: `createBrowserClient(url, key)` — cookies are handled automatically
+- Database type structure: `{ public: { Tables: { table_name: { Row, Insert, Update } } } }` for use with `supabase.from<"table">()`
+- When adding a new table, update BOTH the migration file AND the Database type in lib/types.ts
+- Next.js 16 warns that "middleware" file convention is deprecated in favor of "proxy" — but both work for now
+- The Database type in lib/types.ts is the single source of truth for TypeScript ↔ PostgreSQL schema mapping
 
 ---
 
@@ -86,4 +94,28 @@
   - manager can UPDATE exhibition_brand (for tagging) but not INSERT/DELETE; API layer enforces which fields are taggable
   - crawl_log write access is admin-only via RLS; crawler will use service_role key which bypasses RLS entirely
   - `IF NOT EXISTS` works identically in PostgreSQL for both CREATE TABLE and CREATE INDEX
+---
+
+## 2026-05-06 19:23 - US-4-02-03
+- Created 5 new files for Supabase integration:
+  - `lib/types.ts` — Database, Brand, Edition, DataProvenance, CrawlLog, ManualTagHistory, DashboardResponse, ApiError, TagUpdateRequest types
+  - `lib/supabase/server.ts` — server client with `createServerClient` + `cookies()` from `next/headers`
+  - `lib/supabase/client.ts` — browser client with `createBrowserClient`
+  - `lib/supabase/middleware.ts` — session refresh handler using request/response cookies
+  - `middleware.ts` — root middleware guarding `/dashboard`, `/calendar`, `/map`, `/setting` (redirects to `/login` if no session)
+- All TypeScript types match the PostgreSQL schema exactly (5 tables, all columns)
+- Database type follows Supabase's `Tables<>` generic structure for type-safe queries
+- US-4-02-02 marked as SKIPPED — .env.local has placeholder credentials (cannot push migration)
+- Files changed: lib/types.ts (new), lib/supabase/server.ts (new), lib/supabase/client.ts (new), lib/supabase/middleware.ts (new), middleware.ts (new), scripts/ralph/prd.json (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (3 files, 16 tests, 0 failures)
+  - npm run build: PASS (compiled successfully — Next.js 16 notes "middleware" → "proxy" deprecation but still functional)
+- **Learnings for future iterations:**
+  - @supabase/ssr v0.10+ uses `getAll`/`setAll` cookie pattern — the older `get`/`set`/`remove` are deprecated
+  - Server client `setAll` can throw in Server Components (cookies read-only after render) — wrapped in try/catch
+  - Middleware client `setAll` receives both cookies and response headers (Cache-Control, Pragma, Expires for no-cache)
+  - Next.js 15+ `cookies()` is async — must `await` before calling `.getAll()` / `.set()`
+  - Database type must export `{ public: { Tables: { table: { Row, Insert, Update } } } }` for `supabase.from<"table">()` to type-check
+  - `TagUpdateRequest` type defines which brand fields are taggable — matches PRD §3.3 field definitions
 ---
