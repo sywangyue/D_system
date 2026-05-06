@@ -8,7 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "test": "vitest run",
-    "seed-users": "tsx scripts/seed-users.ts",
+    "seed-users": "tsx --env-file=.env.local scripts/seed-users.ts",
     "migrate-data": "tsx scripts/migrate-data.ts"
   },
   "dependencies": {

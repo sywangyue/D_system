@@ -257,3 +257,32 @@
   - When tests mock both regular and admin Supabase clients, mock admin via `vi.mock("@/lib/supabase/admin", ...)` separately — do NOT use `createServerClient` call counters to distinguish
   - Test mock state vars (mockUser, mockBrand) must be module-level so they can be mutated between tests; reset in beforeEach
 ---
+
+## 2026-05-06 20:25 - US-4-04-03
+- Created `scripts/seed-users.ts` — idempotent seed script creating 30 Supabase Auth users
+  - 2 admin (user00–user01), 8 manager (user02–user09), 20 readonly (user10–user29)
+  - Email format: `userNN@mwlab.internal`, password: `mwlab2026!`
+  - `email_confirm: true` skips email verification
+  - `app_metadata: { role }` for RBAC
+  - Idempotent: checks `auth.admin.listUsers()` before creating, skips existing
+  - Manual .env.local parsing as fallback (tsx `--env-file` handles it at runtime)
+  - Prints admin credentials to stdout after seeding
+- Created `wrangler.jsonc` — Cloudflare Workers config
+  - Worker name: `mwlab-dashboard`, main: `.open-next/worker.js`
+  - `compatibility_flags`: `nodejs_compat`, `global_fetch_strictly_public`
+  - ASSETS binding, WORKER_SELF_REFERENCE service binding, R2 bucket for incremental cache, IMAGES binding
+  - vars placeholder for `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- Created `open-next.config.ts` — Cloudflare adapter with R2 incremental cache
+- Updated `package.json` — seed-users script now uses `tsx --env-file=.env.local`
+- Files changed: scripts/seed-users.ts (new), wrangler.jsonc (new), open-next.config.ts (new), package.json (modified), scripts/ralph/prd.json (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (5 files, 24 tests, 0 failures)
+  - npm run build: PASS (compiled successfully)
+- **Learnings for future iterations:**
+  - tsx 4.19+ supports `--env-file=.env.local` flag for auto-loading env vars at script runtime
+  - Seed scripts should be idempotent — check existence before creating to allow safe re-runs
+  - Supabase Admin API `auth.admin.createUser()` accepts `app_metadata` directly in the create call (email_confirm: true avoids verification flow)
+  - wrangler.jsonc `compatibility_flags` needs `global_fetch_strictly_public` for Cloudflare Workers fetch behavior
+  - open-next.config.ts uses `defineCloudflareConfig()` from `@opennextjs/cloudflare` — minimal config with just incremental cache override
+---
