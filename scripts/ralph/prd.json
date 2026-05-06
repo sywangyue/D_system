@@ -317,8 +317,8 @@
         "Dry-run mode: --dry-run flag that counts without inserting"
       ],
       "priority": 18,
-      "passes": false,
-      "notes": "Wave 4 (CC). Requires both local SQLite access and Supabase credentials. Current data: ~3.4K brands."
+      "passes": true,
+      "notes": "Wave 4 (CC). Script created and compiles clean. Dry-run verified: connects to Supabase, reads SQLite (5,935 brands, 6,084 editions, 15,585 provenance rows). Live execution requires US-4-02-02 (migration pushed to Supabase so tables exist)."
     },
     {
       "id": "US-4-07-02",

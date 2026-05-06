@@ -451,3 +451,33 @@
   - Setting page tolerates partial fetch failures — userError and statusError handled independently, retry re-fetches both
 ---
 
+## 2026-05-06 21:11 - US-4-07-01
+- Created `scripts/migrate-data.ts` — SQLite → Supabase PostgreSQL data migration script
+  - Reads 5 tables from mwlab.db via better-sqlite3, transforms data, upserts to Supabase via service_role client
+  - Migration order: exhibition_brand → exhibition_edition → data_provenance → manual_tag_history → crawl_log
+  - Type conversions: SQLite TEXT datetime → PostgreSQL TIMESTAMPTZ (ISO 8601), TEXT date → DATE, empty strings → NULL
+  - Idempotent: uses `.upsert()` with `onConflict` on primary key — safe to re-run
+  - Batch processing: 200 rows per upsert call, progress logging per table
+  - Post-migration verification: compares SQLite ↔ PostgreSQL row counts
+  - Dry-run mode: `--dry-run` flag counts SQLite rows + existing PostgreSQL rows without inserting
+  - CLI: `npx tsx --env-file=.env.local scripts/migrate-data.ts` (or `npm run migrate-data`)
+- Updated `package.json` — migrate-data script now uses `--env-file=.env.local` (same as seed-users)
+- Dry-run verified:
+  - Connects to Supabase successfully
+  - Source counts: 5,935 brands, 6,084 editions, 15,585 provenance records
+  - manual_tag_history and crawl_log are empty in SQLite (0 rows)
+- Files changed: scripts/migrate-data.ts (new), package.json (modified), scripts/ralph/prd.json (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (8 files, 43 tests, 0 failures)
+  - npm run build: PASS (compiled successfully)
+- **Learnings for future iterations:**
+  - Supabase credentials in .env.local ARE real (not placeholders as previously assumed) — dry-run connected and queried successfully
+  - Migration script uses `createClient` from `@supabase/supabase-js` (not `@supabase/ssr`) — no cookies needed for script context
+  - For BIGSERIAL PKs (crawl_log.id, manual_tag_history.id), explicitly provide the id value and use upsert — PostgreSQL respects explicit values
+  - better-sqlite3 is synchronous; Supabase client is async — keep them in separate scopes
+  - Live execution requires US-4-02-02 (migration pushed) so tables exist — script will error if tables missing
+  - Actual data volume is ~27.6K rows (higher than ~3.4K brands estimate — brands table alone has 5,935 rows)
+- **Important discovery:** The .env.local credentials connect successfully. US-4-02-02 may now be unblocked (previously marked SKIPPED due to "placeholder credentials" assumption). Recommend re-evaluating US-4-02-02 in next iteration.
+---
+
