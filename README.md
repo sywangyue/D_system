@@ -1,6 +1,6 @@
 <!-- 内容聚合自：MWLAB-2026-PRD-v1.1-merged.md、.planning/PROJECT.md、.planning/ROADMAP.md、AGENTS.md -->
 
-![MDS — Messe Düsseldorf Shanghai | 手册网格标识 + 像素字重 · MD Orange #fe5c00](docs/readme-hero-mds.png)
+![MDS — 细颗粒像素字 · MD Orange #fe5c00](docs/readme-hero-mds.png)
 
 # MWLAB-2026 · Exhibition Competitive Dashboard
 
@@ -100,14 +100,9 @@ python3 tools/import_tags.py --file exports/tagging_batch_YYYYMMDD.xlsx --change
 
 ## 首图说明
 
-首图由 `scripts/generate_readme_hero.py` 生成，**像素块对齐**杜塞尔多夫展览《Corporate Design Manual》**第 6 页「Main Logo」**约定：
+`docs/readme-hero-mds.png` 由 `scripts/generate_readme_hero.py` 生成：**直接像素化三个大写字母 M、D、S**，逻辑栅格约 **25×8**，每格在画面上仅 **3×3 物理像素**（颗粒较细，接近 GSD 类 README 头图）；背景 **RGB(20,20,22)** 近黑；字色 **#fe5c00**（MD Orange, RGB 254, 92, 0）。
 
-- **标识（首字母轮廓）**：官方 **「m」signet** 的 **8×5 方形模数网格**（顶栏两行满宽、下方三腿各宽 2 格、缝 1 格），再像素化渲染；**不是**自拟的花体拉丁 M。
-- **D / S**：与标识同一模数 **U**、同一笔画厚度（2 格），保持与手册 **“based on a square module grid”** 一致的块面字重。
-- **色**：**MD Orange**，**CMYK** C0 M72 Y100 K0；**Pantone** Orange 021 C；**Hex** `#fe5c00`，**RGB** (254, 92, 0)。
-- **副标**：黑字全称 *Messe Düsseldorf Shanghai*（字标在手册中为 Inter Medium；此处用系统无衬线尽量接近；本仓库未内置 Inter 字体文件）。
-
-权威 PDF：`3_Messe Düsseldorf_Corporate Design Manual.pdf`（2024-11，brand-messe-duesseldorf.com）。输出文件：`docs/readme-hero-mds.png`。
+企业 VI 全文见仓库根目录 `3_Messe Düsseldorf_Corporate Design Manual.pdf`。
 
 ---
 

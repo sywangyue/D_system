@@ -1,116 +1,102 @@
 #!/usr/bin/env python3
 """
-Generate docs/readme-hero-mds.png — pixel banner aligned with
-Messe Düsseldorf Corporate Design Manual (Nov 2024):
-- Signet: 8×5 square module grid (primary m shape)
-- MD Orange #fe5c00 (Pantone Orange 021 C)
-- D / S: same module size and stroke weight (2 modules)
-- Subtitle: Inter-style black label (Messe Düsseldorf Shanghai) as raster text
+Generate docs/readme-hero-mds.png — fine-grid pixel lettering “MDS”
+(GSD-style: small pixel blocks, dark canvas), MD Orange #fe5c00.
 """
 from __future__ import annotations
 
 from pathlib import Path
 
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "docs" / "readme-hero-mds.png"
 
 ORANGE = (254, 92, 0)
-BLACK = (0, 0, 0)
-BG = (252, 252, 252)
+BG = (20, 20, 22)  # near-black, common dev / GSD readme heroes
 
-U = 22  # module edge length in pixels
+# Physical pixels per logical “pixel” (keep small for GSD-like look)
+PIX = 3
+
+# Extra physical padding — wide strip so the header reads on GitHub
+PAD_X = 48
+PAD_Y = 18
+
+# Gap between letters (logical pixels)
+LETTER_GAP = 2
+
+# Each string: one row, '#' = pixel on. Same height per glyph.
+_GLYPHS: dict[str, list[str]] = {
+    "M": [
+        "#.....#",
+        "##...##",
+        "#.#.#.#",
+        "#..#..#",
+        "#.....#",
+        "#.....#",
+        "#.....#",
+        "#.....#",
+    ],
+    "D": [
+        "#####..",
+        "#....#.",
+        "#....#.",
+        "#....#.",
+        "#....#.",
+        "#....#.",
+        "#....#.",
+        "#####..",
+    ],
+    "S": [
+        ".#####.",
+        "#.....#",
+        "#......",
+        ".####..",
+        ".....#.",
+        "#....#.",
+        "#....#.",
+        ".####..",
+    ],
+}
 
 
-def draw_cell(im: Image.Image, ox: int, oy: int, c: int, r: int, fill: tuple[int, int, int]) -> None:
-    x0, y0 = ox + c * U, oy + r * U
-    ImageDraw.Draw(im).rectangle([x0, y0, x0 + U - 1, y0 + U - 1], fill=fill)
-
-
-def draw_signet(im: Image.Image, ox: int, oy: int) -> None:
-    """Manual primary m: top 2 rows full 8 wide; rows 2–4 three legs 2 wide, gap 1."""
-    for r in range(5):
-        for c in range(8):
-            if r < 2:
-                draw_cell(im, ox, oy, c, r, ORANGE)
-            elif c in (0, 1, 3, 4, 6, 7):
-                draw_cell(im, ox, oy, c, r, ORANGE)
-
-
-def draw_D(im: Image.Image, ox: int, oy: int) -> None:
-    """6×5 cells, 2-cell stroke, closed counter."""
-    for r in range(5):
-        for c in range(6):
-            if c <= 1:
-                draw_cell(im, ox, oy, c, r, ORANGE)
-            elif r <= 1 or r >= 3:
-                draw_cell(im, ox, oy, c, r, ORANGE)
-            elif c >= 4:
-                draw_cell(im, ox, oy, c, r, ORANGE)
-
-
-def draw_S(im: Image.Image, ox: int, oy: int) -> None:
-    """6×5 thick S (manual stroke weight)."""
-    for r in range(5):
-        for c in range(6):
-            if r in (0, 2, 4):
-                draw_cell(im, ox, oy, c, r, ORANGE)
-            elif r == 1 and c <= 1:
-                draw_cell(im, ox, oy, c, r, ORANGE)
-            elif r == 3 and c >= 4:
-                draw_cell(im, ox, oy, c, r, ORANGE)
+def rasterize(text: str) -> list[list[bool]]:
+    glyphs = [_GLYPHS[ch] for ch in text]
+    h = len(glyphs[0])
+    if not all(len(g) == h for g in glyphs):
+        raise ValueError("glyph heights must match")
+    rows: list[list[bool]] = []
+    for r in range(h):
+        parts: list[list[bool]] = []
+        for i, g in enumerate(glyphs):
+            parts.append([c == "#" for c in g[r]])
+            if i < len(glyphs) - 1:
+                parts.append([False] * LETTER_GAP)
+        rows.append([cell for part in parts for cell in part])
+    return rows
 
 
 def main() -> None:
-    gap = 2 * U
-    w_signet, h_signet = 8 * U, 5 * U
-    w_d, h_d = 6 * U, 5 * U
-    w_s, h_s = 6 * U, 5 * U
+    grid = rasterize("MDS")
+    gh, gw = len(grid), len(grid[0])
 
-    content_w = w_signet + gap + w_d + gap + w_s
-    pad_x, pad_y = 3 * U, 3 * U
-    sub_h = 40
-    W = content_w + 2 * pad_x
-    H = h_signet + 2 * pad_y + sub_h + 16
+    W = gw * PIX + 2 * PAD_X
+    H = gh * PIX + 2 * PAD_Y
 
     im = Image.new("RGB", (W, H), BG)
-    y0 = pad_y
-    x0 = pad_x
+    dr = ImageDraw.Draw(im)
 
-    draw_signet(im, x0, y0)
-    x0 += w_signet + gap
-    draw_D(im, x0, y0)
-    x0 += w_d + gap
-    draw_S(im, x0, y0)
-
-    subtitle = "Messe Düsseldorf Shanghai · MWLAB-2026"
-    draw = ImageDraw.Draw(im)
-    font = None
-    for fn in (
-        "/System/Library/Fonts/Supplemental/Arial Unicode.ttf",
-        "/System/Library/Fonts/Helvetica.ttc",
-        "/Library/Fonts/Arial.ttf",
-    ):
-        p = Path(fn)
-        if p.exists():
-            try:
-                font = ImageFont.truetype(str(p), 22)
-                break
-            except OSError:
+    for r in range(gh):
+        for c in range(gw):
+            if not grid[r][c]:
                 continue
-    if font is None:
-        font = ImageFont.load_default()
-
-    bbox = draw.textbbox((0, 0), subtitle, font=font)
-    tw = bbox[2] - bbox[0]
-    tx = (W - tw) // 2
-    ty = pad_y + h_signet + 12
-    draw.text((tx, ty), subtitle, fill=BLACK, font=font)
+            x0 = PAD_X + c * PIX
+            y0 = PAD_Y + r * PIX
+            dr.rectangle([x0, y0, x0 + PIX - 1, y0 + PIX - 1], fill=ORANGE)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
     im.save(OUT, format="PNG", optimize=True)
-    print(f"Wrote {OUT} ({W}×{H})")
+    print(f"Wrote {OUT} ({W}×{H}), logical {gw}×{gh}, PIX={PIX}")
 
 
 if __name__ == "__main__":
