@@ -10,7 +10,12 @@ venv/
 # Local databases & runtime
 *.db
 *.db-journal
+*.db-wal
+*.db-shm
 *.sqlite3
+
+# Crawler / local run logs (regenerable)
+cnexpo_crawl_progress.log
 
 # OS / IDE
 .DS_Store
