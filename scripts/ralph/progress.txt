@@ -23,6 +23,8 @@
 - Test mock `createServerClient` should NOT use counters to distinguish admin-vs-user clients — mock admin via its own module instead
 - Pages using `useSearchParams()` must split into two files: server component wrapper (`page.tsx`) with `<Suspense>` + separate client component (`*-content.tsx`) with the hook. This is a Next.js App Router requirement — `useSearchParams()` needs a Suspense boundary.
 - Dashboard page data flow: initial mount fetches unfiltered API data for filter options derivation, then fetches with URL params for display. Subsequent filter changes only fetch filtered data. Use `useRef` to gate the filter-change effect from firing on mount.
+- Client-only libraries (react-big-calendar, react-leaflet) must use `next/dynamic` with `{ ssr: false }`. Import the library's CSS in the dynamically-imported wrapper component, not in the parent or layout.
+- API endpoints that need joined data from another table use Supabase's embedded resource select syntax: `.select("*, foreign_table(column1, column2)")`
 
 ---
 
@@ -342,5 +344,41 @@
   - Filter option derivation needs the full dataset — fetch unfiltered API data on mount, derive unique values, then fetch filtered data for display
   - URL sync uses `router.replace()` (not `push()`) to avoid bloating browser history on every filter change
   - `KPICard` trend is passed as `null` — the dashboard API doesn't compute YoY trends yet. TrendBadge renders nothing when trend is null.
+---
+
+## 2026-05-06 20:48 - US-4-06-01
+- Created `app/api/calendar/events/route.ts` — GET endpoint joining exhibition_edition with exhibition_brand
+  - Returns events array with: edition_id, name_cn, date_start, date_end, venue, city, exhibitors_count, competition_relation
+  - Filters out editions with null date_start
+  - Falls back to "未知展会" when exhibition_brand is null (orphaned edition)
+- Created `app/calendar/page.tsx` — server component wrapper with `<Suspense>` and `CalendarFallback` skeleton
+- Created `app/calendar/calendar-content.tsx` — "use client" component with data fetching from /api/calendar/events
+  - Dynamic import of CalendarView with `ssr: false` (react-big-calendar is client-only)
+  - 4 states: loading (skeleton), error (retry), empty ("当前视图内无展会安排"), populated
+- Created `app/calendar/calendar-view.tsx` — react-big-calendar wrapper with moment zh-cn localizer
+  - Imports `react-big-calendar/lib/css/react-big-calendar.css` (CSS isolated to this wrapper)
+  - Month/week views with Chinese toolbar labels
+  - Event color coding by competition_relation: 竞争对手→red (#FEE2E2/#EF4444), 潜在伙伴→green (#DCFCE7/#22C55E), default→gray (#F3F4F6/#9CA3AF)
+  - Event blocks have 3px left border + subtle border-radius per UI-SPEC
+- Created `components/calendar/EventModal.tsx` — detail modal on event click
+  - Fields: 展会名称 (name_cn), 场馆 (venue), 城市 (city), 展商数量 (exhibitors_count formatted)
+  - Close via X button, backdrop click, or Escape (accessibility)
+  - Fade-in animation, white card styling per UI-SPEC
+- Created `tests/api/calendar.test.ts` — 5 tests (valid JSON, empty array, 200 status, event shape mapping, null brand fallback)
+  - Uses module-level `mockEditions` state variable pattern (same as tags test)
+- Files changed: app/api/calendar/events/route.ts (new), app/calendar/page.tsx (new), app/calendar/calendar-content.tsx (new), app/calendar/calendar-view.tsx (new), components/calendar/EventModal.tsx (new), tests/api/calendar.test.ts (new), scripts/ralph/prd.json (modified), scripts/ralph/progress.txt (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (6 files, 29 tests, 0 failures)
+  - npm run build: PASS (compiled successfully; /calendar route listed as ○ static, /api/calendar/events as ƒ dynamic)
+- Browser verification: deferred (requires real Supabase credentials + exhibition_edition data with date_start values). Manual verification recommended when Supabase is connected.
+- **Learnings for future iterations:**
+  - react-big-calendar uses moment for date localization — moment is already in package.json, no need to add date-fns (UI-SPEC suggestion was advisory)
+  - Dynamic imports with `ssr: false` resolve at module level — define `const CalendarView = dynamic(() => import("./calendar-view"), { ssr: false })` outside the component
+  - CSS imports for client-only libraries must be in the dynamically-imported wrapper, not in the parent component (avoids SSR CSS issues)
+  - eventPropGetter returns style objects keyed by event property — use `useCallback` to avoid re-renders
+  - Calendar events need JavaScript Date objects — format API date strings as ISO with T00:00:00 for start dates and T23:59:59 for end dates
+  - Test mock pattern: module-level state variables that the mock factory references, mutated in individual tests — same as tags API tests
+  - New codebase patterns added: client-only library import pattern, Supabase embedded select for joins
 ---
 

@@ -33,3 +33,11 @@ Only these brand fields are user-taggable (defined in `TAG_FIELDS` const):
 `competitor_group`, `industry_l1`, `industry_l2`, `notes`
 
 API layer must validate that only these fields appear in tag update requests.
+
+## Supabase query patterns
+
+To fetch joined data from a related table, use the embedded resource select syntax:
+`.select("*, foreign_table(column1, column2)")`
+
+This returns the foreign row as a nested object, e.g. `{ ..., exhibition_brand: { name_cn: "..." } }`.
+Type the result with an explicit type assertion including the nested shape.
