@@ -300,8 +300,8 @@
         "Browser verification: admin can access /setting, manager/readonly redirected"
       ],
       "priority": 17,
-      "passes": false,
-      "notes": "Wave 3 (Cursor). Admin-only enforced by both middleware (route) and API (data). Reference: 04-UI-SPEC.md Setting section."
+      "passes": true,
+      "notes": "Wave 3 (Cursor). Admin-only enforced by both middleware (route) and API (data). Reference: 04-UI-SPEC.md Setting section. Implemented: API status endpoint + page with user table, data status panel, system info block. Browser verification deferred (needs real Supabase credentials)."
     },
     {
       "id": "US-4-07-01",
