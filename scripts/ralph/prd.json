@@ -63,7 +63,7 @@
         "SQL syntax valid PostgreSQL (no SQLite-isms)"
       ],
       "priority": 4,
-      "passes": false,
+      "passes": true,
       "notes": "Wave 2 (CC). Users table handled by Supabase Auth automatically. Reference: schema/init_db.sql and 04-RESEARCH.md for conversion rules."
     },
     {

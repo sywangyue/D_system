@@ -3,6 +3,9 @@
 - Semantic color tokens in @theme use `--color-<name>` prefix → generates `bg-<name>`, `text-<name>`, etc.
 - Layout spacing tokens in @theme use `--spacing-<name>` prefix → generates `w-<name>`, `p-<name>`, etc.
 - SVG sprite sheet goes in `public/icons.svg` with `<symbol>` elements; reference via `<svg><use href="/icons.svg#id"/></svg>`
+- Supabase migration files go in `supabase/migrations/` named `YYYYMMDDHHMMSS_init.sql`
+- RLS policies use a `get_user_role()` helper function reading `auth.jwt() -> 'app_metadata' ->> 'role'`
+- SQLite→PostgreSQL: `AUTOINCREMENT`→`BIGSERIAL`, `datetime('now')`→`NOW()`, date fields→`DATE` type
 
 ---
 
@@ -61,4 +64,26 @@
   - Test files go in `tests/` directory, matching the `include` pattern in vitest.config.ts
   - `globals: true` in vitest config enables `describe`/`it`/`expect` without explicit imports (but explicit imports are safer for clarity)
   - .env.local should never be committed — verify `.env.*` is in .gitignore before touching it
+---
+
+## 2026-05-06 19:17 - US-4-02-01
+- Created `supabase/migrations/20260506190000_init.sql` — PostgreSQL DDL migration file
+- 5 tables converted from SQLite schema: exhibition_brand, exhibition_edition, data_provenance, crawl_log, manual_tag_history
+- users table skipped (handled by Supabase Auth built-in `auth.users`)
+- Type conversions applied: AUTOINCREMENT→BIGSERIAL, datetime('now')→NOW(), TEXT dates→DATE, TEXT timestamps→TIMESTAMPTZ
+- RLS enabled on all 5 tables with 3-role policies (admin=all, manager=select+update tags, readonly=select only)
+- 11 indexes recreated with PostgreSQL-compatible syntax
+- `get_user_role()` helper function reads from `auth.jwt() -> 'app_metadata' -> 'role'`
+- Removed SQLite-specific PRAGMAs (foreign_keys, journal_mode)
+- Files changed: supabase/migrations/20260506190000_init.sql (new), scripts/ralph/prd.json (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npm run build: PASS (compiled successfully)
+  - npx vitest run: PASS (3 files, 16 tests, 0 failures)
+- **Learnings for future iterations:**
+  - Migration naming convention: `YYYYMMDDHHMMSS_init.sql` — timestamp prefix ensures ordering
+  - RLS policy granularity: separate policies per operation (SELECT/INSERT/UPDATE/DELETE) per role
+  - manager can UPDATE exhibition_brand (for tagging) but not INSERT/DELETE; API layer enforces which fields are taggable
+  - crawl_log write access is admin-only via RLS; crawler will use service_role key which bypasses RLS entirely
+  - `IF NOT EXISTS` works identically in PostgreSQL for both CREATE TABLE and CREATE INDEX
 ---
