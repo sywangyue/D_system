@@ -260,7 +260,7 @@
         "Browser verification: calendar renders and events are clickable"
       ],
       "priority": 15,
-      "passes": false,
+      "passes": true,
       "notes": "Wave 3 (Cursor). react-big-calendar CSS import required. Reference: 04-UI-SPEC.md Calendar section."
     },
     {
