@@ -148,7 +148,7 @@
         "npx tsc --noEmit passes"
       ],
       "priority": 9,
-      "passes": false,
+      "passes": true,
       "notes": "Wave 2 (Cursor). Reference: 04-UI-SPEC.md chart section. Image #2 'Application by Department' for style reference."
     },
     {

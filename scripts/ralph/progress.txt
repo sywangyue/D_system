@@ -167,3 +167,25 @@
   - "全部" option handled internally in FilterTabs; parent receives null/[] when "全部" is selected
   - Lucide-react icons available at 0.532.0 — use for small dynamic icons (12px), SVG sprite for larger static nav icons
 ---
+
+## 2026-05-06 19:43 - US-4-03-03
+- Created `components/charts/IndustryPieChart.tsx` — donut pie chart using recharts PieChart
+  - 8-color palette matching UI-SPEC spec exactly: green→blue→amber→violet→red→cyan→orange→gray
+  - Donut style: outerRadius 100px, innerRadius 50px
+  - Custom label renders industry_l2 name on segments >= 5%
+  - Custom tooltip: white bg, shows name + count + percentage
+  - Legend below chart with name + formatted count
+  - `isAnimationActive={false}` — avoids SSR/hydration animation mismatch
+  - 4 states: populated (chart), loading (skeleton circle + 3 legend placeholders), empty ("暂无数据"), error (message + retry button)
+- Files changed: components/charts/IndustryPieChart.tsx (new)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (3 files, 16 tests, 0 failures)
+  - npm run build: PASS (compiled successfully)
+- Browser verification: deferred (component needs parent Dashboard page to render in context; will verify in US-4-05-02)
+- **Learnings for future iterations:**
+  - recharts Legend formatter has strict payload type (`{ strokeDasharray, value? }`) — use optional chaining on entry payload to avoid TS errors
+  - recharts is a "use client" component — the library accesses `getBoundingClientRect()` internally
+  - The `isAnimationActive={false}` flag prevents SSR→client hydration mismatches from recharts animations
+  - Pie donut chart label positioning uses `innerRadius + (outerRadius - innerRadius) * 1.5` for outside labels pointing from donut
+---
