@@ -78,7 +78,7 @@
       ],
       "priority": 5,
       "passes": false,
-      "notes": "BLOCKING: Requires real Supabase credentials in .env.local. If credentials not available, skip and mark in progress.txt."
+      "notes": "SKIPPED 2026-05-06: .env.local contains placeholder credentials only (sb_publishable_/sb_secret_ prefixes look truncated). Real Supabase project credentials needed to run npx supabase db push or supabase migration up."
     },
     {
       "id": "US-4-02-03",
@@ -94,7 +94,7 @@
         "npx tsc --noEmit passes"
       ],
       "priority": 6,
-      "passes": false,
+      "passes": true,
       "notes": "Wave 2 (CC). Can be done without real Supabase credentials (types only)."
     },
     {
