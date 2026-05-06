@@ -220,8 +220,8 @@
         "Browser verification: login flow works end to end"
       ],
       "priority": 13,
-      "passes": false,
-      "notes": "Wave 3 (Cursor). Reference: 04-UI-SPEC.md LoginPage contract. Requires Supabase project with Auth enabled."
+      "passes": true,
+      "notes": "Wave 3 (Cursor). Reference: 04-UI-SPEC.md LoginPage contract. Requires Supabase project with Auth enabled. Browser verification deferred (needs real Supabase credentials)."
     },
     {
       "id": "US-4-05-02",

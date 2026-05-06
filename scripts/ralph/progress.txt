@@ -286,3 +286,31 @@
   - wrangler.jsonc `compatibility_flags` needs `global_fetch_strictly_public` for Cloudflare Workers fetch behavior
   - open-next.config.ts uses `defineCloudflareConfig()` from `@opennextjs/cloudflare` — minimal config with just incremental cache override
 ---
+
+## 2026-05-06 20:30 - US-4-05-01
+- Created `app/login/page.tsx` — full-screen centered login form matching 04-UI-SPEC.md LoginPage contract:
+  - MWLAB logo + "竞争盘面看板" heading + "请使用内部账号登录" subheading
+  - Email input (type=email, autocomplete=email, placeholder=user@mwlab.internal)
+  - Password input (type=password, autocomplete=current-password)
+  - Client-side validation: empty email → "请输入邮箱地址", bad format → "邮箱格式不正确", empty password → "请输入密码"
+  - Supabase Auth signInWithPassword on submit
+  - Error handling: "Invalid login credentials" → "邮箱或密码错误，请重试", others → "网络异常，请稍后重试"
+  - Loading state: Loader2 spinner on button, button disabled during auth
+  - AlertCircle icon prepended to error messages per UI-SPEC
+  - All styling matches UI-SPEC: bg-surface, white card, rounded-xl, border-border, shadow-sm, accent green button
+- Updated `app/page.tsx` — root route now server component that checks session via server client:
+  - Authenticated → redirect("/dashboard")
+  - Unauthenticated → redirect("/login")
+- Files changed: app/login/page.tsx (new), app/page.tsx (modified), scripts/ralph/prd.json (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (5 files, 24 tests, 0 failures)
+  - npm run build: PASS (compiled successfully; /login route listed as ○ static)
+- Browser verification: deferred (requires Supabase project with Auth enabled + real credentials in .env.local). Manual verification recommended when Supabase is connected.
+- **Learnings for future iterations:**
+  - Login page is a "use client" component — needs useState for form fields + useRouter for post-login redirect
+  - Root route (`app/page.tsx`) is an async Server Component — uses server client to check auth, then `redirect()` from `next/navigation`
+  - Middleware already redirects unauthenticated users from protected routes to /login; login page does NOT need to check for existing session
+  - AppShell already hides sidebar on /login pathname — login gets full-screen without layout wrappers
+  - Focus styles on inputs use `focus:border-accent focus:ring-1 focus:ring-accent` matching UI-SPEC green accent
+---
