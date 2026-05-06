@@ -110,7 +110,7 @@
         "npx tsc --noEmit passes"
       ],
       "priority": 7,
-      "passes": false,
+      "passes": true,
       "notes": "Wave 2 (Cursor). Can develop with mock user context before Supabase Auth is wired. Reference: 04-UI-SPEC.md Sidebar section."
     },
     {
@@ -130,7 +130,7 @@
         "npx tsc --noEmit passes"
       ],
       "priority": 8,
-      "passes": false,
+      "passes": true,
       "notes": "Wave 2 (Cursor). Reference: 04-UI-SPEC.md KPI card and FilterTabs sections. PRD §5 for filter spec."
     },
     {

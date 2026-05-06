@@ -119,3 +119,51 @@
   - Database type must export `{ public: { Tables: { table: { Row, Insert, Update } } } }` for `supabase.from<"table">()` to type-check
   - `TagUpdateRequest` type defines which brand fields are taggable — matches PRD §3.3 field definitions
 ---
+
+## 2026-05-06 19:30 - US-4-03-01
+- Created components/layout/Sidebar.tsx — client component with 4 nav items
+  - Nav items: Dashboard, 日历, 地图, 设置 (Setting admin-only)
+  - Active route detection via usePathname() → green left border + accent-surface bg
+  - SVG icons via sprite sheet (<use href="/icons.svg#id" />)
+  - Admin role check via Supabase browser client (app_metadata.role)
+  - User email display + 退出 (logout) button in bottom area
+  - All styling matches 04-UI-SPEC.md SidebarNav contract
+- Created components/layout/AppShell.tsx — client layout wrapper
+  - Conditionally hides sidebar on /login route (full-screen login)
+  - On authenticated routes: sidebar + main content area
+  - Main area: flex-1 overflow-y-auto bg-surface, max-w-[1200px] mx-auto px-8 py-8
+- Updated app/layout.tsx to use AppShell wrapping children
+- Files changed: components/layout/Sidebar.tsx (new), components/layout/AppShell.tsx (new), app/layout.tsx (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (3 files, 16 tests, 0 failures)
+  - npm run build: PASS (compiled successfully)
+- Browser verification: deferred (requires Supabase Auth + real credentials; Sidebar is client-rendered and needs user session). Manual verification recommended when Supabase project is connected.
+- **Learnings for future iterations:**
+  - Next.js root layout is a Server Component — client-side route awareness (usePathname) requires wrapping in a "use client" component (AppShell pattern)
+  - Sidebar also must be "use client" for usePathname + Supabase browser client session fetch
+  - The `useEffect(() => { supabase.auth.getUser()... })` pattern provides user context client-side without relying on server props
+  - usePathname().startsWith() works safely for all nav items since routes are unique prefixes (no overlap)
+  - UI-SPEC SidebarNav contract specifies #F4F6F8 bg (light gray), not "dark background" as acceptance criteria states — followed UI-SPEC as source of truth
+---
+
+## 2026-05-06 19:37 - US-4-03-02
+- Created 3 UI components:
+  - `components/ui/TrendBadge.tsx` — pure presentational, lucide-react arrow/minus icons, null-safe (renders nothing if trend undefined)
+  - `components/ui/KpiCard.tsx` — 4 states: populated (number + unit + TrendBadge), loading skeleton (pulsing gray), error (red message), empty ("--"). Two variants: highlight (green bg, no border) and standard (white bg, border, shadow)
+  - `components/ui/FilterTabs.tsx` — 3-row filter with "全部" exclusive logic. Row 1: industry_l1 single-select → cascades to l2 sub-row. Row 2: competition_relation multi-select with 全部 exclusive. Row 3: mds_related single-select. Controlled component — all state from parent props + callbacks
+- KpiCard formatNumber uses toLocaleString("en-US") for comma-separated thousands
+- FilterTabs Pill: 32px height, rounded-full, green accent when selected per UI-SPEC
+- Files changed: components/ui/TrendBadge.tsx (new), components/ui/KpiCard.tsx (new), components/ui/FilterTabs.tsx (new)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (3 files, 16 tests, 0 failures)
+  - npm run build: PASS (compiled successfully)
+- Browser verification: deferred (components need parent pages to render in context; will verify when Dashboard page is built in US-4-05-02)
+- **Learnings for future iterations:**
+  - "use client" needed for any component with onClick/event handlers (FilterTabs has button onClick)
+  - TrendBadge and KpiCard are pure presentational — no "use client" needed, safe in Server Components
+  - FilterTabs uses controlled component pattern — all filter state lives in parent, FilterTabs just renders and fires callbacks
+  - "全部" option handled internally in FilterTabs; parent receives null/[] when "全部" is selected
+  - Lucide-react icons available at 0.532.0 — use for small dynamic icons (12px), SVG sprite for larger static nav icons
+---
