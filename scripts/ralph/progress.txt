@@ -21,6 +21,8 @@
 - API routes MUST do their own auth/RBAC via `supabase.auth.getUser()` — middleware only protects page routes, not `/api/*` paths
 - When a route uses both server (anon) and admin (service_role) clients, mock `@/lib/supabase/admin` separately with `vi.mock("@/lib/supabase/admin", ...)`
 - Test mock `createServerClient` should NOT use counters to distinguish admin-vs-user clients — mock admin via its own module instead
+- Pages using `useSearchParams()` must split into two files: server component wrapper (`page.tsx`) with `<Suspense>` + separate client component (`*-content.tsx`) with the hook. This is a Next.js App Router requirement — `useSearchParams()` needs a Suspense boundary.
+- Dashboard page data flow: initial mount fetches unfiltered API data for filter options derivation, then fetches with URL params for display. Subsequent filter changes only fetch filtered data. Use `useRef` to gate the filter-change effect from firing on mount.
 
 ---
 
@@ -314,3 +316,31 @@
   - AppShell already hides sidebar on /login pathname — login gets full-screen without layout wrappers
   - Focus styles on inputs use `focus:border-accent focus:ring-1 focus:ring-accent` matching UI-SPEC green accent
 ---
+
+## 2026-05-06 20:39 - US-4-05-02
+- Created `app/dashboard/page.tsx` — server component wrapper with `<Suspense>` boundary and `DashboardFallback` skeleton
+- Created `app/dashboard/dashboard-content.tsx` — "use client" component composing FilterTabs + 4 KpiCards + IndustryPieChart
+  - Filter state managed via React state, initialized from URL `searchParams` (`industry_l2`, `competition_relation`, `mds_related`)
+  - `selectedL1` is UI-only (not synced to URL, not sent to API) — narrows L2 pill options via `l2ByL1` map
+  - URL sync: `router.replace()` updates URL on every filter change — bookmarkable/shareable URLs
+  - Data fetching: initial mount fetches all data (no filters) for filter option derivation; if URL has filters, also fetches filtered data. Subsequent filter changes fetch filtered data only.
+  - `useRef(mountedRef)` gates filter-change effect from firing on mount
+  - 4 render states handled: initial loading (skeleton), error (retry button), empty ("没有匹配的展会数据" + clear filters), populated (all components with data)
+  - Error banner above data when refetch fails but prior data exists
+  - Industry options derived via `deriveIndustryOptions()`: extracts unique L1, L2-by-L1 map, and all L2 from brand list
+  - Competition relation options: hardcoded ["竞争对手", "潜在伙伴", "新进入者"] per PRD §5
+  - MDS related options: hardcoded ["MFC", "Reha China", "无"] per PRD §5
+- Files changed: app/dashboard/page.tsx (new), app/dashboard/dashboard-content.tsx (new), scripts/ralph/prd.json (modified), scripts/ralph/progress.txt (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (5 files, 24 tests, 0 failures)
+  - npm run build: PASS (compiled successfully; /dashboard route listed as ○ static)
+- Browser verification: deferred (requires real Supabase credentials + data in PostgreSQL for API to return non-empty results). Manual verification recommended when Supabase is connected.
+- **Learnings for future iterations:**
+  - Pages using `useSearchParams()` MUST split into two files: server component with `<Suspense>` + client component with the hook. Next.js enforces this at runtime.
+  - `useRef` pattern to gate `useEffect` from firing on mount — set `mountedRef.current = true` after init, check it in subsequent effects
+  - Filter option derivation needs the full dataset — fetch unfiltered API data on mount, derive unique values, then fetch filtered data for display
+  - URL sync uses `router.replace()` (not `push()`) to avoid bloating browser history on every filter change
+  - `KPICard` trend is passed as `null` — the dashboard API doesn't compute YoY trends yet. TrendBadge renders nothing when trend is null.
+---
+
