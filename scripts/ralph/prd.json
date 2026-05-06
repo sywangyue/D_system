@@ -78,7 +78,7 @@
       ],
       "priority": 5,
       "passes": false,
-      "notes": "SKIPPED 2026-05-06: .env.local contains placeholder credentials only (sb_publishable_/sb_secret_ prefixes look truncated). Real Supabase project credentials needed to run npx supabase db push or supabase migration up."
+      "notes": "BLOCKED 2026-05-06: Credentials in .env.local are real (API operations work via service_role key), but pushing DDL migration requires SUPABASE_ACCESS_TOKEN (platform token, format sbp_...) or direct DB password. Service role key (sb_secret_...) is NOT interchangeable with access token. Cannot run npx supabase db push without platform auth. Tables confirmed NOT existing in Supabase (PGRST205). Unblock via: npx supabase login or paste migration SQL into Supabase SQL Editor manually."
     },
     {
       "id": "US-4-02-03",

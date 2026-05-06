@@ -481,3 +481,27 @@
 - **Important discovery:** The .env.local credentials connect successfully. US-4-02-02 may now be unblocked (previously marked SKIPPED due to "placeholder credentials" assumption). Recommend re-evaluating US-4-02-02 in next iteration.
 ---
 
+## 2026-05-06 21:24 - US-4-02-02 (BLOCKER investigation)
+- **Investigated**: Re-evaluated US-4-02-02 per previous iteration's recommendation
+- **Confirmed**: Tables do NOT exist in Supabase (PostgREST returns PGRST205 for all 5 tables)
+- **Attempted approaches to push migration**:
+  1. `npx supabase link --project-ref wygoisahqwggklccuuig` → needs SUPABASE_ACCESS_TOKEN
+  2. `SUPABASE_ACCESS_TOKEN=$SERVICE_ROLE_KEY` → invalid format (needs `sbp_...` token, not `sb_secret_...` key)
+  3. Direct PostgreSQL connection via `pg` module → pooler: "Tenant or user not found", direct: "Connection terminated unexpectedly"
+  4. Supabase Management API via service_role key → 401 Unauthorized
+  5. Checked ~/.supabase/, ~/.config/supabase/, .supabase/ → no cached credentials
+  6. No ~/.pgpass or PG env vars available
+- **Root cause**: The `.env.local` contains working API credentials (anon key + service_role key) for data operations via PostgREST/Auth API, but DDL (CREATE TABLE) execution requires EITHER:
+  - `SUPABASE_ACCESS_TOKEN` (platform-level personal access token, format `sbp_...`) for `npx supabase db push`, OR
+  - Direct PostgreSQL database password for `psql`/`pg` module connection
+- **Blocker status**: STILL BLOCKED. Cannot push migration programmatically without additional credentials.
+- **Quality checks**: npx tsc --noEmit: PASS (0 errors), npx vitest run: PASS (8 files, 43 tests, 0 failures), npm run build: PASS
+- **Remaining stories**: US-4-02-02 (blocked), US-4-07-02 (depends on US-4-02-02 + real Supabase)
+- **Learnings for future iterations:**
+  - Service role key (sb_secret_...) grants DB API access but NOT platform CLI access — these are separate auth scopes
+  - `npx supabase db push` and `npx supabase link` require `SUPABASE_ACCESS_TOKEN` (format `sbp_...`)
+  - Data operations (SELECT/INSERT/UPDATE via supabase-js) work with service_role key, but DDL (CREATE TABLE) does not
+  - The migration SQL file is ready at `supabase/migrations/20260506190000_init.sql` — it CAN be copied into Supabase SQL Editor manually if automated push is unavailable
+  - To unblock: obtain SUPABASE_ACCESS_TOKEN from Supabase dashboard → Account → Access Tokens, or run `npx supabase login` interactively
+---
+
