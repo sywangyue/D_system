@@ -6,7 +6,7 @@ jufair.com 聚展网展会数据爬虫
 输出：写入 SQLite raw_jufair 表
 字段输出严格遵循 exhibition_editions schema（PRD §3.1 表B）
 
-适用环境：Mac Mini 北京办公室节点（中国大陆IP可直接访问，无需代理）
+适用环境：Mac Mini 北京办公室节点（中国大陆IP可直接访问；添加 --proxy 支持 Tor SOCKS5）
 """
 
 import argparse
@@ -24,6 +24,7 @@ BASE_DELAY = 3.0   # 基础请求间隔（秒）
 MAX_RETRIES = 3
 TARGET_YEAR = 2026
 RATE_LIMIT_BACKOFF = 15.0  # 触发反爬后的额外等待（秒）
+PROXY_URL = "socks5h://127.0.0.1:9050"  # Tor 默认 SOCKS5 端口
 # ============================
 
 USER_AGENTS = [
@@ -39,6 +40,8 @@ SESSION.headers.update({
     "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
     "Referer": "https://www.jufair.com/",
 })
+
+_proxy_enabled = False
 
 
 # ====================================================================
@@ -62,13 +65,15 @@ def _jitter_delay(base=BASE_DELAY):
 
 
 def fetch_page(url, label="", timeout=25):
-    """HTTP GET + 自动重试 + 反爬缓解。"""
+    """HTTP GET + 自动重试 + 反爬缓解。支持 --proxy 走 Tor。"""
     global _consecutive_403
-
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             SESSION.headers.update({"User-Agent": _rotate_ua()})
-            resp = SESSION.get(url, timeout=timeout)
+            kwargs = {"timeout": timeout}
+            if _proxy_enabled:
+                kwargs["proxies"] = {"http": PROXY_URL, "https": PROXY_URL}
+            resp = SESSION.get(url, **kwargs)
 
             if resp.status_code == 200:
                 _consecutive_403 = 0
@@ -527,6 +532,8 @@ def main():
                         help="同时爬取详情页（补爬主办方/城市/行业等）")
     parser.add_argument("--batch-id", type=str, default=None,
                         help="爬取批次标识")
+    parser.add_argument("--proxy", action="store_true",
+                        help="通过 Tor SOCKS5 代理请求（需提前启动 Tor）")
     parser.add_argument("--all", action="store_true",
                         help="爬取全部12个月")
     parser.add_argument("--stats", action="store_true",
@@ -552,6 +559,23 @@ def main():
 
     if args.all:
         args.months = list(range(1, 13))
+
+    global _proxy_enabled
+    if args.proxy:
+        _proxy_enabled = True
+        # Verify proxy works
+        try:
+            r = requests.get("https://check.torproject.org/api/ip",
+                           proxies={"http": PROXY_URL, "https": PROXY_URL},
+                           timeout=10)
+            result = r.json()
+            if result.get("IsTor"):
+                print(f"🔒 Tor 代理已启用 (IP: {result.get('IP', 'unknown')})")
+            else:
+                print("⚠️ 代理未通过 Tor 验证，继续但可能不可靠")
+        except Exception as e:
+            print(f"⚠️ 代理连接失败: {e}，回退到直连")
+            _proxy_enabled = False
 
     total, batch_id = crawl_all(
         args.db,
