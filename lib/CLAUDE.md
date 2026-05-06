@@ -10,7 +10,11 @@ Three client factories, all from `@supabase/ssr`:
 | `client.ts` | Browser | Automatic (document.cookie) | Client Components ("use client") |
 | `middleware.ts` | Middleware | `request.cookies` → response | Root `middleware.ts` (session refresh) |
 
-All clients are typed via `Database` from `@/lib/types`.
+Clients do not use the `Database` generic at this stage (manually-defined types
+don't satisfy supabase-js's `GenericSchema` constraint without `Relationships`,
+`Views`, and `Functions` fields). Instead, use explicit type assertions on query
+results. Once Supabase CLI is connected, run `supabase gen types typescript` to
+generate a compatible Database type and re-enable the generic.
 
 ## Database types (lib/types.ts)
 
