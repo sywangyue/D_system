@@ -31,7 +31,7 @@
         "npx tsc --noEmit passes"
       ],
       "priority": 2,
-      "passes": false,
+      "passes": true,
       "notes": "Wave 1. Reference: 04-UI-SPEC.md for exact color values and spacing scale."
     },
     {

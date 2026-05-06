@@ -1,5 +1,8 @@
 ## Codebase Patterns
-- No patterns discovered yet (first iteration)
+- Tailwind CSS 4.x uses CSS-based config: `@theme` block in `globals.css`, NOT `tailwind.config.js`
+- Semantic color tokens in @theme use `--color-<name>` prefix → generates `bg-<name>`, `text-<name>`, etc.
+- Layout spacing tokens in @theme use `--spacing-<name>` prefix → generates `w-<name>`, `p-<name>`, etc.
+- SVG sprite sheet goes in `public/icons.svg` with `<symbol>` elements; reference via `<svg><use href="/icons.svg#id"/></svg>`
 
 ---
 
@@ -21,4 +24,23 @@
   - Next.js build auto-modifies tsconfig.json (jsx → react-jsx, adds .next/dev/types to include)
   - @types/react-dom@^19.2.9 didn't exist — used ^19.1.0 instead
   - PostCSS config needed for Tailwind CSS 4.x: use `@tailwindcss/postcss` plugin (not `tailwindcss` directly)
+---
+
+## 2026-05-06 19:12 - US-4-01-02
+- Created app/globals.css with Tailwind CSS 4.x @import and @theme block
+  - 11 semantic color tokens: surface, accent, accent-dark, accent-surface, purple-surface, purple-text, destructive, trend-neutral, border, text-primary, text-secondary
+  - 2 layout spacing tokens: --spacing-sidebar (220px), --spacing-nav-item (44px)
+  - @layer base with Inter font stack, body defaults, and focus-visible ring
+- Created public/icons.svg SVG sprite sheet with 4 nav icons (dashboard, calendar, map, settings) matching lucide-react paths
+- Updated app/layout.tsx to import globals.css and load Inter font via next/font/google
+- Files changed: app/globals.css (new), public/icons.svg (new), app/layout.tsx (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npm run build: PASS (compiled successfully)
+  - npx vitest run: SKIPPED (no test files yet — US-4-01-03 creates them)
+- **Learnings for future iterations:**
+  - Tailwind CSS 4.x PostCSS config uses `@tailwindcss/postcss` plugin (not `tailwindcss` directly)
+  - @theme block uses standard CSS property syntax; color tokens → `bg-<name>`/`text-<name>`, spacing → `w-<name>`/`p-<name>`
+  - All UI-SPEC colors map to existing Tailwind defaults (green-500, gray-900, etc.) — semantic tokens in @theme provide named aliases
+  - Inter font loaded via next/font with CSS variable for easy Tailwind integration
 ---
