@@ -1,6 +1,6 @@
 <!-- 内容聚合自：MWLAB-2026-PRD-v1.1-merged.md、.planning/PROJECT.md、.planning/ROADMAP.md、AGENTS.md -->
 
-![MDS — 细颗粒像素字 · MD Orange #fe5c00](docs/readme-hero-mds.png)
+![MDS + BD Database · 透明底细像素 · #fe5c00](docs/readme-hero-mds.png)
 
 # MWLAB-2026 · Exhibition Competitive Dashboard
 
@@ -100,9 +100,9 @@ python3 tools/import_tags.py --file exports/tagging_batch_YYYYMMDD.xlsx --change
 
 ## 首图说明
 
-`docs/readme-hero-mds.png` 由 `scripts/generate_readme_hero.py` 生成：**直接像素化三个大写字母 M、D、S**，逻辑栅格约 **25×8**，每格在画面上仅 **3×3 物理像素**（颗粒较细，接近 GSD 类 README 头图）；背景 **RGB(20,20,22)** 近黑；字色 **#fe5c00**（MD Orange, RGB 254, 92, 0）。
+`docs/readme-hero-mds.png` 由 `scripts/generate_readme_hero.py` 生成：**透明背景**（PNG alpha，无填充底色）；主标 **MDS** 为 **2×2 物理像素/逻辑格**；副标 **BD Database** 为 **1×1 物理像素/逻辑格**（更细）；字色 **#fe5c00**（RGBA 不透明）。
 
-企业 VI 全文见仓库根目录 `3_Messe Düsseldorf_Corporate Design Manual.pdf`。
+企业 VI 见 `3_Messe Düsseldorf_Corporate Design Manual.pdf`。
 
 ---
 
