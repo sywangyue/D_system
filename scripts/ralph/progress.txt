@@ -1,0 +1,24 @@
+## Codebase Patterns
+- No patterns discovered yet (first iteration)
+
+---
+
+## 2026-05-06 18:57 - US-4-01-01
+- Initialized Next.js 16.2.4 App Router project with TypeScript
+- Created package.json with all dependencies: next, react 19, @supabase/ssr, @opennextjs/cloudflare, recharts, react-leaflet, react-big-calendar, lucide-react, tailwindcss 4.x, vitest, better-sqlite3
+- Created tsconfig.json with strict mode, bundler module resolution, path alias (@/*)
+- Created next.config.ts with reactStrictMode
+- Created postcss.config.mjs for Tailwind CSS 4.x
+- Updated .gitignore to include node_modules, .next, .env.local
+- Created minimal app/layout.tsx and app/page.tsx for compilation verification
+- Files changed: package.json, package-lock.json, tsconfig.json, next.config.ts, postcss.config.mjs, .gitignore, app/layout.tsx, app/page.tsx
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npm run build: PASS (compiled successfully)
+  - npx vitest run: SKIPPED (no test files yet — tests come in US-4-01-03)
+- **Learnings for future iterations:**
+  - Next.js 16 is the current stable (PRD says "15" but research verified 16.2.4)
+  - Next.js build auto-modifies tsconfig.json (jsx → react-jsx, adds .next/dev/types to include)
+  - @types/react-dom@^19.2.9 didn't exist — used ^19.1.0 instead
+  - PostCSS config needed for Tailwind CSS 4.x: use `@tailwindcss/postcss` plugin (not `tailwindcss` directly)
+---
