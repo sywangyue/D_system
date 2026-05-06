@@ -8,7 +8,7 @@
 
 本 Phase 交付完整的可访问前端系统：技术栈从 FastAPI+SQLite 全面迁移至 Next.js+Supabase，实现用户登录、Dashboard数据可视化、Calendar展会日历、Map地理分布四个模块，并部署至 Cloudflare Pages（域名已购）。
 
-Phase 1b（全集采集）和 Phase 3b（打标工具）与本 Phase 并行推进，不构成前端启动的前置阻塞。
+Phase 1b（全集采集）和 Phase 3b（打标工具，**✅ 工程已交付**）与本 Phase 并行推进，不构成前端启动的前置阻塞。
 
 </domain>
 
@@ -68,7 +68,7 @@ Phase 1b（全集采集）和 Phase 3b（打标工具）与本 Phase 并行推�
 ### Phase 执行顺序
 
 - **D-18:** Phase 1b（Hermes全集采集）与 Phase 4（前端开发）**并行推进**，互不阻塞
-- **D-19:** Phase 3b（Cursor打标工具）与 Phase 4（前端开发）**并行推进**
+- **D-19:** Phase 3b（Cursor 打标工具）**✅ 已交付**；与 Phase 4（前端开发）**并行推进**
 - **D-20:** 前端开发初期可连接现有 SQLite 数据（3.4K条）进行界面开发和验证，Supabase 迁移完成后无缝切换
 
 ### Agent 分工
@@ -124,7 +124,7 @@ Phase 1b（全集采集）和 Phase 3b（打标工具）与本 Phase 并行推�
 
 ### Integration Points
 - Phase 1b 的爬虫（Hermes）直接写入 Supabase PostgreSQL，无需中间层
-- Phase 3b 的 Excel 导入工具（`tools/import_tags.py`）需改为连接 Supabase 而非本地SQLite
+- Phase 3b 的 Excel 导入工具（`tools/import_tags.py`）：**当前连接本地 SQLite**；迁移 Supabase 后改为 PostgreSQL 连接串（或经 API Routes）
 - Supabase Row Level Security（RLS）实现角色权限控制
 
 </code_context>

@@ -51,6 +51,7 @@ Exceptions:
 - Sidebar width: 220px fixed (not on scale — structural constant)
 - KPI card highlight number: display size at 36px (see Typography)
 - Filter pill height: 32px (`h-8`) — chosen for information density on data dashboard
+- KPI card padding: 20px (`p-5`) — information density on data dashboard
 
 ---
 
@@ -59,13 +60,11 @@ Exceptions:
 | Role | Size | Weight | Line Height | Tailwind | Usage |
 |------|------|--------|-------------|----------|-------|
 | Body | 14px | 400 (regular) | 1.5 | `text-sm font-normal leading-6` | Table rows, sidebar labels, general text, filter pill labels |
-| Label | 12px | 500 (medium) | 1.4 | `text-xs font-medium leading-5` | KPI card subtitles, badge text, trend indicator, section labels |
+| Label | 12px | 400 (regular) | 1.4 | `text-xs font-normal leading-5` | KPI card subtitles, badge text, trend indicator, section labels |
 | Heading | 18px | 600 (semibold) | 1.3 | `text-lg font-semibold leading-6` | Page title ("Dashboard"), card section headings, modal titles |
-| Display | 36px | 700 (bold) | 1.1 | `text-4xl font-bold leading-10` | KPI highlight card large number (展览面积, first KPI card) |
+| Display | 36px | 600 (semibold) | 1.1 | `text-4xl font-semibold leading-10` | KPI card large numbers (all 4 KPI cards) |
 
 **Font stack:** `Inter, ui-sans-serif, system-ui, -apple-system, sans-serif`
-
-**Secondary number size:** 28px / weight 700 for KPI cards 2–4 (展商数量, 观众数量, 展览集团). Use `text-3xl font-bold`.
 
 ---
 
@@ -158,12 +157,12 @@ Background: #F4F6F8 (secondary)
 Border-right: 1px solid #E5E7EB
 
 Logo area: h-16, flex items-center px-4
-  - App name: "MWLAB" text-base font-bold text-gray-900
+  - App name: "MWLAB" text-base font-semibold text-gray-900
 
 Nav item (each):
   - Height: min-h-[44px], flex items-center gap-3 px-4
   - Icon: 20px lucide-react icon, text-gray-500
-  - Label: text-sm font-medium text-gray-700
+  - Label: text-sm font-normal text-gray-700
   - Default state: background transparent
   - Hover: background #E5E7EB (gray-200)
   - Selected: left border 4px solid #22C55E, background #DCFCE7
@@ -182,14 +181,14 @@ Container: flex flex-col gap-4 (24px between rows), px-6 py-4
 Row wrapper: flex items-center gap-2 flex-wrap
 
 Row label (行业分类 / 竞争关系 / MDS相关性):
-  - text-xs font-medium text-gray-500, w-20 flex-shrink-0
+  - text-xs font-normal text-gray-500, w-20 flex-shrink-0
 
 Pill (each filter option):
   - Height: 32px (h-8)
   - Horizontal padding: px-3 (12px)
   - Border-radius: 9999px (rounded-full — capsule shape per D-09)
   - Default state: background white, border 1px solid #E5E7EB, text text-sm text-gray-700
-  - Selected state: background #DCFCE7, border 1px solid #22C55E, text text-sm text-green-700 font-medium
+  - Selected state: background #DCFCE7, border 1px solid #22C55E, text text-sm text-green-700 font-semibold
   - Hover: background #F4F6F8
   - Transition: background 100ms ease, border-color 100ms ease
   - Cursor: pointer
@@ -213,9 +212,9 @@ Padding: 20px (p-5)
 Border: none
 
 Layout (vertical stack):
-  - Row 1: label text-xs font-medium text-green-700 uppercase tracking-wide
-  - Row 2: large number text-4xl font-bold text-gray-900, line-height 1.1
-            + unit "㎡" text-sm font-medium text-gray-600 ml-1 self-end pb-1
+  - Row 1: label text-xs font-normal text-green-700 uppercase tracking-wide
+  - Row 2: large number text-4xl font-semibold text-gray-900, line-height 1.1
+            + unit "㎡" text-sm font-normal text-gray-600 ml-1 self-end pb-1
   - Row 3: TrendBadge component (see below)
 
 Hover: box-shadow: 0 4px 12px rgba(34,197,94,0.15), transform translateY(-1px)
@@ -233,19 +232,22 @@ Padding: 20px (p-5)
 Box-shadow: 0 1px 3px rgba(0,0,0,0.06)
 
 Layout (vertical stack):
-  - Row 1: label text-xs font-medium text-gray-500 uppercase tracking-wide
-  - Row 2: number text-3xl font-bold text-gray-900
+  - Row 1: label text-xs font-normal text-gray-500 uppercase tracking-wide
+  - Row 2: number text-4xl font-semibold text-gray-900
   - Row 3: TrendBadge component
 
 Hover: box-shadow: 0 4px 12px rgba(0,0,0,0.10), transform translateY(-1px)
 Transition: box-shadow 150ms ease, transform 150ms ease
+
+Differentiation from Card 1 (Highlight): card background color (white vs green-100),
+not number size. All four KPI cards use text-4xl font-semibold for their main numbers.
 ```
 
 ### TrendBadge
 
 ```
 Inline-flex items-center gap-1, px-2 py-0.5, rounded-full
-Text size: text-xs font-medium
+Text size: text-xs font-normal
 
 Up trend (yoy_trend === '上升'):
   - Icon: lucide ArrowUp, 12px
@@ -311,7 +313,7 @@ Toolbar: month / 周 toggle buttons using pill style matching FilterTabRow selec
 Event block style:
   - Background: #DCFCE7 (accent-surface)
   - Border-left: 3px solid #22C55E
-  - Text color: #16A34A text-xs font-medium
+  - Text color: #16A34A text-xs font-normal
   - Border-radius: 4px
   - Content: name_cn truncated to one line
 
@@ -321,7 +323,8 @@ ExhibitionDetailModal:
   - Overlay: fixed inset-0, bg-black/40, z-50
   - Panel: centered, white, rounded-xl, p-6, max-w-md, shadow-xl
   - Fields displayed: 展会名称 (name_cn), 场馆 (venue), 城市 (city), 展商数量 (exhibitors_count)
-  - Close button: top-right, lucide X icon, text-gray-400 hover:text-gray-700
+  - Close button: top-right, lucide X icon, text-gray-400 hover:text-gray-700,
+                  aria-label="关闭"
   - Animation: fade-in 150ms (opacity 0→1)
 ```
 
@@ -365,19 +368,19 @@ Layout: full-screen centered, background #F4F6F8
 Card: white, rounded-xl, border, p-8, w-full max-w-sm, shadow-sm
 
 Content (vertical stack, gap-6):
-  - App logo / name "MWLAB" text-2xl font-bold text-gray-900
+  - App logo / name "MWLAB" text-2xl font-semibold text-gray-900
   - Heading "竞争盘面看板" text-lg font-semibold text-gray-700
   - Subheading "请使用内部账号登录" text-sm text-gray-500
 
 Form fields:
   Email input:
-    - Label: "邮箱" text-sm font-medium text-gray-700 mb-1
+    - Label: "邮箱" text-sm font-normal text-gray-700 mb-1
     - Input: full-width, h-10, border border-gray-300, rounded-lg, px-3
              text-sm, focus:border-green-500 focus:ring-1 focus:ring-green-500
     - Type: email, autocomplete: email
 
   Password input:
-    - Label: "密码" text-sm font-medium text-gray-700 mb-1
+    - Label: "密码" text-sm font-normal text-gray-700 mb-1
     - Input: full-width, h-10, border border-gray-300, rounded-lg, px-3
              text-sm, focus:border-green-500 focus:ring-1 focus:ring-green-500
     - Type: password, autocomplete: current-password
@@ -387,7 +390,7 @@ Error message (if present):
   - lucide AlertCircle icon 14px prepended
 
 Submit button:
-  - Full width, h-10, background #22C55E, text white font-medium rounded-lg
+  - Full width, h-10, background #22C55E, text white font-semibold rounded-lg
   - Hover: background #16A34A
   - Loading state: disabled + lucide Loader2 icon spinning 16px
   - Label: "登录"
@@ -519,7 +522,7 @@ Root layout:
 
 ```
 Vertical stack:
-  1. Page heading "Dashboard" — text-2xl font-bold text-gray-900, mb-6
+  1. Page heading "Dashboard" — text-2xl font-semibold text-gray-900, mb-6
   2. FilterTabRow component — white card, rounded-xl, border, mb-6
   3. KPI cards row — flex gap-4, mb-6
      [KpiCard highlight] [KpiCard] [KpiCard] [KpiCard]

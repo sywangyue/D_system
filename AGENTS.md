@@ -1,138 +1,97 @@
-# MDS · 聚展网数据调研任务
+# MWLAB-2026 · Exhibition Competitive Dashboard
 
-## 任务目标
+## 项目定位
 
-爬取 https://www.jufair.com/ 上 **2026年全年** 所有展会的基础信息。
-包括国内展会和国际展会两部分，按月份分批拉取，最后合并去重。
+面向中国总经理的展会竞争盘面看板。输入一个目标品类，输出该品类的竞争对手 / 潜在伙伴 / 新进入者三维分析视图。
 
----
-
-## 数据字段需求
-
-| # | 字段 | 说明 | 来源 |
-|---|------|------|------|
-| 1 | 展会中文名 | 展会全称（中文） | 列表页 |
-| 2 | 展会英文名 | 英文名称或缩写代号 | 列表页 |
-| 3 | 举办日期 | YYYY.MM.DD-MM.DD 格式，如 2026.11.05-11.10 | 列表页 |
-| 4 | 展馆名称 | 举办场馆全称 | 列表页 |
-| 5 | 展览面积 | 平方米或万平方米，保留原始格式 | 列表页 |
-| 6 | 观众数量 | 人/万人，保留原始格式 | 列表页 |
-| 7 | 展商数量 | 家数，保留原始格式 | 列表页 |
-
-**不爬额外字段** — 不需要详情页内容、描述、主办方、行业分类等。
-**不模拟、不推理数据** — 所有数据必须来自网站实际返回结果。
+**核心目标**: 三步点选内给出可信的竞争盘面（品牌/展商/观众/面积）。
 
 ---
 
-## 站点结构与URL模式
+## 项目状态（2026-05-06）
+
+| Phase | 内容 | 状态 |
+|-------|------|------|
+| Phase 1 | 数据采集器（Jufair + cnexpo 爬虫 + 调度器） | ✅ 已完成 |
+| Phase 2 | Schema + 合并引擎 + 打标 API（6 表 + merge_engine + tag_api） | ✅ 已完成 |
+| Phase 3 | Dashboard 查询 API + JWT 认证 + Docker + OpenAPI + 部署表 | ✅ 已完成 |
+| **Phase 1b** | **全集采集（Jufair 8.4K + cnexpo 全量）** | **⏳ 当前任务** |
+| **Phase 3b** | **打标批量工具（Excel 导出/导入）** | **✅ 已完成** |
+| Phase 4 | 前端 UI | ⏸ 暂缓 |
+
+---
+
+## 数据架构（六表关系）
 
 ```
-国内展会:  /exhibition-0-0-1-0-0-{月份}-{页码}/
-国际展会:  /exhibition-0-0-0-0-0-{月份}-{页码}/
-月份范围:  01 ~ 12（每月都有独立筛选页）
+exhibition_brand (品牌表) — 主键稳定，变化慢
+  │ brand_id PK, name_cn, name_en, organizer
+  │ industry_l1/l2, competition_relation, mds_related, strategic_relevance
+  │
+  ├── exhibition_edition (届次表) — 时序数据，每年新增
+  │     edition_id PK, brand_id FK
+  │     year, date_start, date_end, venue, city
+  │     area_sqm, exhibitors_count, visitors_count  ← 核心数字
+  │     data_source [jufair/cnexpo/官网/手工]
+  │
+  ├── data_provenance (溯源表)
+  │     source_site, source_url, raw_payload (JSON), crawl_batch_id
+  │
+  └── manual_tag_history (打标历史)
+        field_name, old_value, new_value, tagged_by
+
+crawl_log (爬取日志)           users (用户表)
+  batch_id, source_site          user_id, email, role, is_active
+  records_new/skipped/failed
 ```
 
-**国内展会总共122页，国际展会总共300页**（全量不筛选时）。
-通过月份筛选后，每月的页数会显著减少。
+### 字段来源分类
+
+**自动填充（爬虫）**: name_cn/en, first_year, city, frequency, website, date_start/end, venue, area_sqm, exhibitors_count, visitors_count, organizer（需人工核验）
+
+**必须人工打标（系统无法推断）**: competition_relation, mds_related, strategic_relevance (1-5), ma_potential (1-5), competitor_group, industry_l1/l2, yoy_trend, anomaly_flag
+
+### 双源冲突规则
+
+| 字段类别 | 优先级 |
+|---------|--------|
+| 名称/时间/地点 | jufair 为准 |
+| 展商数/观众数/面积 | 取较大值，记录差异 |
+| 主办方 | 两源都保留，差异人工兜底 |
+| 缺失字段 | 谁有取谁 |
 
 ---
 
-## 执行方案
+## 文件索引
 
-分5个子任务执行，每个任务覆盖2~3个月：
-
-1. 写爬虫脚本，抓取 2026年01月~03月（国内+国际）
-2. 抓取 2026年04月~06月（国内+国际）
-3. 抓取 2026年07月~09月（国内+国际）
-4. 抓取 2026年10月~12月（国内+国际）
-5. 汇总去重，输出完整 JSON / CSV 数据集
-
----
-
-## 输出格式
-
-保存两份文件到项目目录：
-- `jufair_2026_all.json` — 完整结构化数据
-- `jufair_2026_all.csv` — 可导入Excel/Sheet的平面表格
-
----
-
-## 技术栈（已验证）
-
-| 类别 | 选择 | 说明 |
-|------|------|------|
-| 请求库 | `requests` | 直接 HTTP GET，无需浏览器 |
-| HTML 解析 | `BeautifulSoup`（`html.parser`） | 静态 HTML 解析 |
-| 数据提取 | CSS 选择器 + `data-value` 属性 | 列表页直接包含所有所需字段 |
-| 反爬情况 | **无严重反爬** | 测试返回 HTTP 200，未触发验证码或频率限制 |
-
-**关键解析点：**
-- 展会条目位于 `class="exh-info-wrap"` 容器内
-- 数值数据（面积、观众数、展商数）存储在元素的 `data-value` 属性中
-- 所有 7 个字段均可在列表页直接提取，**无需进入详情页**
-- 月份列表中可能混入非 2026 年展会，脚本需加年份过滤
-
----
-
-## 横向对比平台：去展网 qufair.com
-
-用于与 Jufair 数据横向对比验证数据可信度。
-
-### 数据字段需求
-
-与 Jufair 完全一致，7 个字段：展会中文名、英文名、举办日期、展馆名称、展览面积、观众数量、展商数量。
-
-### 站点结构与URL模式
-
-```
-国际展会2026全量:  /fl/0-0-2026/     → 50个展会
-国内展会2026全量:  /fl/0-273-2026/   → 50个展会
-详情页:            https://www.qufair.com/{数字ID}
-```
-
-**关键差异（相比Jufair）：**
-- 列表页（`/fl/...`）**只包含** 名称、日期、详情页链接 — 不包含展馆/面积/观众/展商
-- 展馆/面积/观众/展商 4 个字段**必须进详情页**提取
-- 同个展会可能在多个行业分类下重复出现 → 用 `source_url` 去重
-- 无分页：国内/国际列表各约 50 条，一次性加载在一页内
-
-### 详情页数据提取
-
-所有 7 个字段从详情页提取：
-
-| 字段 | 来源 |
+| 文件 | 说明 |
 |------|------|
-| 中文名 | `h1` 元素 |
-| 英文名 | `h1` 元素中中文后面的英文部分 |
-| 举办日期 | `time` 元素（格式：2026年05月06日~05月08日） |
-| 展馆名称 | `a[href*="pavilion"]` 链接文本 |
-| 展览面积 | `li` 中 `展览面积：X平方米` |
-| 观众数量 | `li` 中 `观众数量：X人` |
-| 展商数量 | `li` 中 `展商数量：X家` |
+| MWLAB-2026-PRD-v1.1-merged.md | **整合 PRD（当前唯一权威文档）** |
+| crawlers/jufair_crawler.py | Jufair 爬虫 |
+| crawlers/cnexpo_crawler.py | cnexpo 爬虫 |
+| merge_engine.py | 双源合并引擎 |
+| tag_api.py | 打标 API（FastAPI） |
+| tools/export_for_tagging.py | Phase 3b · Excel 导出待打标行 |
+| tools/import_tags.py | Phase 3b · Excel 写回 + `manual_tag_history` |
+| scheduler.py | 定时调度器 |
+| schema/init_db.sql | 6 表 Schema |
+| mwlab.db | 主数据库 |
 
-### 执行方案
+---
 
-单步完成（数据量小，无需分批）：
+## 核心技术约束
 
-1. 获取国内列表页 `/fl/0-273-2026/`，提取 50 个展会链接
-2. 获取国际列表页 `/fl/0-0-2026/`，提取 50 个展会链接
-3. 遍历 100 个详情页，提取全部 7 个字段
-4. 写入独立数据库 `qufair_2026.db`
-5. 导出 `qufair_2026_all.json` / `qufair_2026_all.csv`
+- **Jufair 仅限大陆 IP** — 爬虫必须在北京 Mac Mini 节点执行
+- **爬虫与 API 进程分离** — 不同容器/不同进程运行
+- **依赖栈**: Python 3.12+, FastAPI, SQLAlchemy, pandas, requests, BeautifulSoup；Phase 3b 打标工具另需 **openpyxl**
+- **数据库**: SQLite 开发 + 可选云上迁移
 
-### 技术栈
+---
 
-| 类别 | 选择 | 说明 |
-|------|------|------|
-| 请求库 | `requests` | 直接 HTTP GET，无需浏览器 |
-| HTML 解析 | `BeautifulSoup`（`html.parser`） | 静态 HTML 解析 |
-| 数据提取 | CSS 选择器 + 正则表达式 | 详情页提取结构化和非结构化文本 |
-| 反爬情况 | **无严重反爬** | 测试返回 HTTP 200，未触发验证码或频率限制 |
-| 数据库 | SQLite（`qufair_2026.db`） | 独立于 jufair DB |
+## 当前焦点：Phase 1b 全集采集
 
-**关键解析点：**
-- 列表页 `.exh-info-wrap` 不可用 — 用 `ul > li + h3` 定位展会条目
-- 展会名称包含 "推荐"、"热门"、"精选" 前缀标签，需正则清理
-- 中英文名在同一文本中用大写字母分界（中文在前，英文在后）
-- 统计数据在 `<li>` 内一行文本：`举办周期：一年一届 展览面积：X平方米 展商数量：X家 观众数量：X人`
-- 部分展会缺失展馆名称（如台湾地区展会），记为空字符串不影响数据完整性
+Jufair 当前 3.4K 条（约 40%），目标 8.4K 条（国内 122 页 + 国际 300 页）。
+
+执行方式：Ralph 自治循环（Claude Code）或 Hermes 委托任务。
+
+详见 PRD §7 Phase 1b。
