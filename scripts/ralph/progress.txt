@@ -25,6 +25,7 @@
 - Dashboard page data flow: initial mount fetches unfiltered API data for filter options derivation, then fetches with URL params for display. Subsequent filter changes only fetch filtered data. Use `useRef` to gate the filter-change effect from firing on mount.
 - Client-only libraries (react-big-calendar, react-leaflet) must use `next/dynamic` with `{ ssr: false }`. Import the library's CSS in the dynamically-imported wrapper component, not in the parent or layout.
 - API endpoints that need joined data from another table use Supabase's embedded resource select syntax: `.select("*, foreign_table(column1, column2)")`
+- Server-side geocoding without external API: use a static `Record<string, [number, number]>` mapping known location names to lat/lng coordinates. Include substring/contains fallback for partial matches. Return a sensible default (e.g. center of China [35, 105]) for unknown cities.
 
 ---
 

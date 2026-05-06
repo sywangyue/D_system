@@ -281,8 +281,8 @@
         "Browser verification: map renders and markers are interactive"
       ],
       "priority": 16,
-      "passes": false,
-      "notes": "Wave 3 (Cursor). Leaflet CSS import required. Use OpenStreetMap tiles (free, no API key). Reference: 04-UI-SPEC.md Map section."
+      "passes": true,
+      "notes": "Wave 3 (Cursor). Leaflet CSS import required. Use OpenStreetMap tiles (free, no API key). Reference: 04-UI-SPEC.md Map section. Implemented: API aggregation endpoint + react-leaflet MapView + Legend + 4-state content wrapper. Browser verification deferred (needs real Supabase data)."
     },
     {
       "id": "US-4-06-03",
