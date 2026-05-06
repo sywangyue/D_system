@@ -47,7 +47,7 @@
         "npx vitest run executes and reports results"
       ],
       "priority": 3,
-      "passes": false,
+      "passes": true,
       "notes": "Wave 1. Tests are placeholders — real tests come in Wave 3 (04-04)."
     },
     {
