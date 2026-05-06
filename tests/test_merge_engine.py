@@ -1,8 +1,8 @@
 """
 tests/test_merge_engine.py — 合并引擎单元测试 + 93条样本集成验证
 
-运行：
-    cd /Volumes/databoard/AI\ Project/D_dashboard
+运行（在仓库根目录）：
+
     python3 -m unittest tests/test_merge_engine.py -v
 """
 import sys, os

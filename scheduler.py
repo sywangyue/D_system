@@ -19,13 +19,15 @@ import sqlite3
 import subprocess
 import sys
 import time
-from datetime import datetime, date
+from datetime import date, datetime
+from pathlib import Path
 
 # ============ 配置 ============
-PROJECT_DIR = "/Volumes/databoard/AI Project/D_dashboard"
-DB_PATH = f"{PROJECT_DIR}/crawl_scheduler.db"
-JUFAIR_DB = f"{PROJECT_DIR}/jufair_2026.db"
-CNEXPO_DB = f"{PROJECT_DIR}/cnexpo_2026.db"
+_PROJECT_ROOT = Path(__file__).resolve().parent
+PROJECT_DIR = str(_PROJECT_ROOT)
+DB_PATH = str(_PROJECT_ROOT / "crawl_scheduler.db")
+JUFAIR_DB = str(_PROJECT_ROOT / "jufair_2026.db")
+CNEXPO_DB = str(_PROJECT_ROOT / "cnexpo_2026.db")
 MAX_RETRIES = 3
 RETRY_DELAY = 30  # 重试间隔（秒）
 # ============================

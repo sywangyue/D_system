@@ -1,8 +1,8 @@
 """
 tests/test_tag_api.py — 人工打标 API 测试
 
-运行：
-    cd /Volumes/databoard/AI Project/D_dashboard
+运行（在仓库根目录）：
+
     python3 -m unittest tests/test_tag_api.py -v
 """
 import sys, os

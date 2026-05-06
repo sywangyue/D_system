@@ -1,9 +1,14 @@
 """Quick crawl: just Nov international + Dec"""
-import subprocess, time, sqlite3
+import subprocess
+import time
+import sqlite3
+from pathlib import Path
+
 from bs4 import BeautifulSoup
 
 BASE = "https://www.jufair.com"
-DB = "/Volumes/databoard/AI Project/Mds_cc_do/jufair_2026.db"
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+DB = str(_REPO_ROOT / "jufair_2026.db")
 CURL = [
     "curl", "-s", "--socks5-hostname", "127.0.0.1:9050", "--max-time", "25",
     "-A", "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36",

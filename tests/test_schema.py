@@ -1,8 +1,8 @@
 """
 tests/test_schema.py — Schema 完整性测试
 
-运行：
-    cd /Volumes/databoard/AI\ Project/D_dashboard
+运行（在仓库根目录）：
+
     python -m pytest tests/test_schema.py -v
 """
 import sys, os

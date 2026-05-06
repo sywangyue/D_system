@@ -11,9 +11,12 @@ import random
 import re
 import time
 import json
+from pathlib import Path
+
 from bs4 import BeautifulSoup
 
 BASE_URL = "https://www.jufair.com"
+_REPO = Path(__file__).resolve().parent.parent
 HEADERS = {
     "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                   "AppleWebKit/537.36 (KHTML, like Gecko) "
@@ -193,7 +196,7 @@ def main():
     print("=" * 60)
 
     if all_results:
-        output_path = "/Volumes/databoard/AI Project/D_dashboard/test_jufair_detail_result.json"
+        output_path = str(_REPO / "test_jufair_detail_result.json")
         with open(output_path, "w", encoding="utf-8") as f:
             json.dump(all_results, f, ensure_ascii=False, indent=2)
         print(f"\n结果已保存: {output_path}")

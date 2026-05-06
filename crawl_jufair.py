@@ -11,15 +11,17 @@
 """
 
 import sqlite3
-import time
-import re
-import sys
 import subprocess
+import sys
+import time
+from pathlib import Path
+
 from bs4 import BeautifulSoup
 
 # ============ 配置 ============
+_ROOT = Path(__file__).resolve().parent
 BASE_URL = "https://www.jufair.com"
-DB_PATH = "/Volumes/databoard/AI Project/Mds_cc_do/jufair_2026.db"
+DB_PATH = str(_ROOT / "jufair_2026.db")
 REQUEST_DELAY = 3.0
 DOMESTIC_MAX_PAGES = 122
 INTERNATIONAL_MAX_PAGES = 300
@@ -319,7 +321,7 @@ def export_json(conn):
     ).fetchall()
     columns = ["cn_name", "en_name", "date", "venue", "area", "visitors", "exhibitors", "source_type", "source_url"]
     data = [dict(zip(columns, row)) for row in rows]
-    out = "/Volumes/databoard/AI Project/Mds_cc_do/jufair_2026_all.json"
+    out = str(_ROOT / "jufair_2026_all.json")
     with open(out, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
     print(f"\n  📄 JSON: {out} ({len(data)} 条)")
@@ -331,7 +333,7 @@ def export_csv(conn):
         "SELECT cn_name, en_name, date, venue, area, visitors, exhibitors, source_type "
         "FROM exhibitions ORDER BY date, cn_name"
     ).fetchall()
-    out = "/Volumes/databoard/AI Project/Mds_cc_do/jufair_2026_all.csv"
+    out = str(_ROOT / "jufair_2026_all.csv")
     with open(out, "w", encoding="utf-8-sig", newline="") as f:
         w = csv.writer(f)
         w.writerow(["展会中文名", "展会英文名", "举办日期", "展馆名称", "展览面积", "观众数量", "展商数量", "来源类型"])
