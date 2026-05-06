@@ -184,7 +184,7 @@
         "npx vitest run — tags and users API tests pass"
       ],
       "priority": 11,
-      "passes": false,
+      "passes": true,
       "notes": "Wave 3 (CC). Replaces Phase 2 tag_api.py. Reference: tag_api.py for business logic."
     },
     {

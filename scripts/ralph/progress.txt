@@ -17,6 +17,10 @@
 - supabase-js `GenericSchema` constraint requires `Tables` entries to have `Relationships` field AND the schema must include `Views` + `Functions` fields. Manually-defined types don't satisfy this unless all fields are present. Workaround: omit the Database generic from createClient and use explicit type assertions on query results. Once a Supabase project is connected, run `supabase gen types typescript` to auto-generate a compatible Database type.
 - Next.js API route handlers should use `Request` (not `NextRequest`) as parameter type for testability. Use `new URL(request.url).searchParams` instead of `request.nextUrl.searchParams`.
 - Mock `next/headers` and `@supabase/ssr` in tests using `vi.mock()` BEFORE importing route handlers.
+- Admin client (`lib/supabase/admin.ts`) uses service_role key — for `auth.admin.listUsers()` and similar admin-only Supabase calls
+- API routes MUST do their own auth/RBAC via `supabase.auth.getUser()` — middleware only protects page routes, not `/api/*` paths
+- When a route uses both server (anon) and admin (service_role) clients, mock `@/lib/supabase/admin` separately with `vi.mock("@/lib/supabase/admin", ...)`
+- Test mock `createServerClient` should NOT use counters to distinguish admin-vs-user clients — mock admin via its own module instead
 
 ---
 
@@ -222,4 +226,34 @@
   - Next.js API route handlers should use `Request` type (not `NextRequest`) with `new URL(request.url)` for searchParams — more testable.
   - Mock `vi.mock("next/headers")` and `vi.mock("@supabase/ssr")` before importing route handlers in tests.
   - Supabase query builder mock: use a chainable object with `then()` method for promise resolution.
+---
+
+## 2026-05-06 20:17 - US-4-04-02
+- Created `lib/supabase/admin.ts` — admin client factory using SUPABASE_SERVICE_ROLE_KEY for admin-only API calls
+- Created `app/api/brands/[id]/tags/route.ts` — PATCH endpoint for updating brand tags
+  - Auth check via `supabase.auth.getUser()` → 401 if no session
+  - RBAC check: readonly role → 403
+  - Validates request body against TAG_FIELDS whitelist → 422 for invalid fields
+  - Checks brand existence → 404 if not found
+  - Updates each tag field on exhibition_brand + writes old→new to manual_tag_history
+  - Returns updated brand object
+- Created `app/api/users/route.ts` — GET endpoint for listing users (admin-only)
+  - Auth check → 401 if no session
+  - RBAC check: non-admin → 403
+  - Uses admin client (service_role) to call `auth.admin.listUsers()`
+  - Returns formatted user list with role, email, last_sign_in, created_at
+- Rewrote `tests/api/tags.test.ts` — 6 real tests (valid fields, invalid fields, history write, 401, 403, 404)
+- Created `tests/api/users.test.ts` — 4 real tests (admin list, 401, manager 403, readonly 403)
+- Updated `lib/CLAUDE.md` — added admin client to Supabase clients table
+- Files changed: lib/supabase/admin.ts (new), app/api/brands/[id]/tags/route.ts (new), app/api/users/route.ts (new), tests/api/tags.test.ts (modified), tests/api/users.test.ts (new), lib/CLAUDE.md (modified), scripts/ralph/prd.json (modified)
+- Quality check results:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (5 files, 24 tests, 0 failures)
+  - npm run build: PASS (compiled successfully, all API routes listed as ƒ dynamic)
+- **Learnings for future iterations:**
+  - Admin client pattern: `lib/supabase/admin.ts` mirrors `server.ts` but uses `SUPABASE_SERVICE_ROLE_KEY` for admin API calls
+  - API routes MUST do their own auth/RBAC — middleware only protects page routes (not `/api/*`)
+  - Tag update accepts multiple fields in a single PATCH (unlike tag_api.py which updates one field at a time)
+  - When tests mock both regular and admin Supabase clients, mock admin via `vi.mock("@/lib/supabase/admin", ...)` separately — do NOT use `createServerClient` call counters to distinguish
+  - Test mock state vars (mockUser, mockBrand) must be module-level so they can be mutated between tests; reset in beforeEach
 ---

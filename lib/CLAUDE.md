@@ -9,6 +9,7 @@ Three client factories, all from `@supabase/ssr`:
 | `server.ts` | Server | `cookies()` from `next/headers` | API routes, Server Components, page.tsx (server) |
 | `client.ts` | Browser | Automatic (document.cookie) | Client Components ("use client") |
 | `middleware.ts` | Middleware | `request.cookies` → response | Root `middleware.ts` (session refresh) |
+| `admin.ts` | Server | `cookies()` from `next/headers` | Admin API calls (`auth.admin.listUsers`, etc.) with service_role key |
 
 Clients do not use the `Database` generic at this stage (manually-defined types
 don't satisfy supabase-js's `GenericSchema` constraint without `Relationships`,
