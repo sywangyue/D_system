@@ -492,11 +492,159 @@ def cmd_mds(args: argparse.Namespace) -> None:
     conn.close()
 
 
-# ─── jufair-l2 子命令 (stub) ──────────────────────────────────────────────────
+# ─── jufair-l2 子命令 ─────────────────────────────────────────────────────────
 
 def cmd_jufair_l2(args: argparse.Namespace) -> None:
-    """CLEAN-JUFAIR-L2: 爬取 jufair 分类并匹配 L2（stub）。"""
-    print("Not yet implemented: jufair-l2 sub-command")
+    """CLEAN-JUFAIR-L2: 爬取 jufair 分类并匹配 L2。
+
+    --export <path>:  在 Mac Mini（大陆 IP）执行爬取，输出 JSON 分类文件
+    --import <path>:  在本机导入 JSON，模糊匹配到 exhibition_brand 的 industry_l1 + industry_l2
+    """
+    import csv as _csv  # noqa: PLC0415
+    from scripts.data.jufair_l2_crawler import (  # noqa: PLC0415
+        crawl_jufair_categories,
+        export_categories,
+        load_categories,
+    )
+
+    # --export mode: crawl and save JSON
+    if args.export and not args.import_path:
+        log.info("开始爬取 jufair.com 分类...")
+        data = crawl_jufair_categories()
+        export_categories(data, args.export)
+        log.info("爬取完成，已导出到 %s", args.export)
+        print()
+        print("=== Next Steps ===")
+        print(f"1. 将 {args.export} 复制回本机（开发机）")
+        print(f"2. 在本机运行: python scripts/clean_brands.py jufair-l2 "
+              f"--import {args.export} --threshold {args.threshold}")
+        return
+
+    # --import mode: load JSON and fuzzy match to exhibition_brand
+    if args.import_path:
+        import_path = Path(args.import_path)
+        if not import_path.exists():
+            log.error("文件不存在: %s", import_path)
+            return
+
+        data = load_categories(str(import_path))
+        conn = sqlite3.connect(str(args.db))
+        conn.row_factory = sqlite3.Row
+
+        if not args.dry_run:
+            backup_table(conn)
+
+        # Build subcategory list and parent name map
+        subcategories = data.get("subcategories", [])
+        parent_map = {
+            p["parent_id"]: p["name"]
+            for p in data.get("parent_categories", [])
+        }
+        log.info("加载 %d 个子分类，开始模糊匹配...", len(subcategories))
+
+        if not subcategories:
+            log.warning("JSON 中无子分类数据，跳过匹配")
+            conn.close()
+            return
+
+        # Get all brands with name_cn
+        brands = conn.execute(
+            "SELECT brand_id, name_cn FROM exhibition_brand"
+        ).fetchall()
+
+        matched = 0
+        needs_review: list[dict[str, str]] = []
+
+        for brand in brands:
+            name_cn = brand["name_cn"] or ""
+            if not name_cn or len(name_cn) < 4:
+                continue
+
+            # Find best matching jufair subcategory
+            best_match = None
+            best_score = 0.0
+            for sub in subcategories:
+                score = difflib.SequenceMatcher(
+                    None, name_cn, sub["name"]
+                ).ratio()
+                if score > best_score:
+                    best_score = score
+                    best_match = sub
+
+            if best_match is None:
+                continue
+
+            parent_name = parent_map.get(best_match["parent_id"], "")
+
+            if best_score >= args.threshold:
+                # Good match — proceed with UPDATE
+                if args.dry_run:
+                    log.info(
+                        "  [DRY-RUN] %s (%s): "
+                        "industry_l1=%s industry_l2=%s (score=%.2f)",
+                        brand["brand_id"], name_cn,
+                        parent_name, best_match["name"], best_score,
+                    )
+                else:
+                    conn.execute(
+                        "UPDATE exhibition_brand SET industry_l1 = ?, "
+                        "industry_l2 = ? WHERE brand_id = ?",
+                        (parent_name, best_match["name"], brand["brand_id"]),
+                    )
+                matched += 1
+            elif best_score >= 0.50:
+                # Below threshold but worth review
+                needs_review.append({
+                    "brand_id": brand["brand_id"],
+                    "name_cn": name_cn,
+                    "suggested_l1": parent_name,
+                    "suggested_l2": best_match["name"],
+                    "score": f"{best_score:.2f}",
+                })
+
+        log.info(
+            "匹配统计: 总品牌数=%d 已匹配=%d 需人工复核=%d",
+            len(brands), matched, len(needs_review),
+        )
+
+        if needs_review:
+            review_path = "needs_review.csv"
+            with open(review_path, "w", encoding="utf-8-sig", newline="") as f:
+                writer = _csv.DictWriter(
+                    f,
+                    fieldnames=[
+                        "brand_id", "name_cn",
+                        "suggested_l1", "suggested_l2", "score",
+                    ],
+                )
+                writer.writeheader()
+                writer.writerows(needs_review)
+            log.info(
+                "需人工复核的匹配已输出: %s (%d 条)",
+                review_path, len(needs_review),
+            )
+
+        if args.dry_run:
+            log.info("DRY-RUN 模式: 未写库")
+        else:
+            conn.commit()
+            log.info("已提交变更到数据库")
+        conn.close()
+
+        # Print deployment instructions
+        print()
+        print("=== 使用说明 ===")
+        print("jufair-l2 爬取需在大陆 IP 环境执行。")
+        print("请将 clean_brands.py + jufair_l2_crawler.py 复制到 Mac Mini")
+        print("在 Mac Mini 运行:")
+        print("  python scripts/clean_brands.py jufair-l2 --export jufair_cats.json")
+        print("将输出的 jufair_cats.json 复制回本机")
+        print("运行:")
+        print("  python scripts/clean_brands.py jufair-l2 --import jufair_cats.json")
+        return
+
+    # Neither --export nor --import specified
+    log.error("请指定 --export <输出路径> 或 --import <输入路径>")
 
 
 # ─── CLI ──────────────────────────────────────────────────────────────────────
@@ -520,6 +668,22 @@ def main() -> None:
             help="预览模式：不写库，仅打印将要执行的变更",
         )
         p.set_defaults(func=func)
+
+    # jufair-l2 特有参数
+    jufair_parser = sub.choices.get("jufair-l2")
+    if jufair_parser:
+        jufair_parser.add_argument(
+            "--export", default="",
+            help="输出 JSON 文件路径（在 Mac Mini 爬取后保存）",
+        )
+        jufair_parser.add_argument(
+            "--import", dest="import_path", default="",
+            help="输入 JSON 文件路径（从 Mac Mini 复制回本机后导入）",
+        )
+        jufair_parser.add_argument(
+            "--threshold", type=float, default=0.80,
+            help="模糊匹配阈值（默认 0.80）",
+        )
 
     args = parser.parse_args()
     args.func(args)
