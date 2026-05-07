@@ -50,3 +50,4 @@ scripts/ralph/.last-branch
 
 # Supabase local
 supabase/.temp/
+.gstack/

@@ -1,204 +1,211 @@
 #!/usr/bin/env python3
 """
-Generate docs/readme-hero-mds.png — fine pixel “MDS” + subtitle “BD Database”.
-Transparent background; small pixel cells (GSD-like).
+Generate docs/readme-hero-mds.png — 80s terminal pixel style.
+Custom 5×7 bitmap font, drop shadow, terminal brackets, blinking cursor,
+transparent background. GitHub README header (~1200px wide).
 """
 from __future__ import annotations
 
 from pathlib import Path
 
-from PIL import Image, ImageDraw
+from PIL import Image
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "docs" / "readme-hero-mds.png"
 
 ORANGE = (254, 92, 0, 255)
+SHADOW_COLOR = (140, 40, 0, 100)
+DIVIDER_COLOR = (254, 92, 0, 180)
+CURSOR_COLOR = (254, 92, 0, 200)
 TRANSPARENT = (0, 0, 0, 0)
 
-# Main word: physical pixels per logical cell (smaller = finer)
-PIX_MAIN = 2
+CW = 5   # character width (logical px)
+CH = 7   # character height (logical px)
+GAP = 1  # gap between characters (logical px)
 
-# Subtitle: even smaller cells
-PIX_SUB = 1
+SHADOW_X = 1  # shadow offset in logical px
+SHADOW_Y = 1
 
-PAD_X = 40
-PAD_Y = 14
-GAP_MAIN_SUB = 12  # physical px between MDS row and subtitle
-LETTER_GAP_MAIN = 2  # logical px between M, D, S
-
-# ─── Main MDS (7×8 logical grid per letter) ─────────────────────────────
-_GLYPHS_MAIN: dict[str, list[str]] = {
-    "M": [
-        "#.....#",
-        "##...##",
-        "#.#.#.#",
-        "#..#..#",
-        "#.....#",
-        "#.....#",
-        "#.....#",
-        "#.....#",
-    ],
-    "D": [
-        "#####..",
-        "#....#.",
-        "#....#.",
-        "#....#.",
-        "#....#.",
-        "#....#.",
-        "#....#.",
-        "#####..",
-    ],
-    "S": [
-        ".#####.",
-        "#.....#",
-        "#......",
-        ".####..",
-        ".....#.",
-        "#....#.",
-        "#....#.",
-        ".####..",
-    ],
+# ─── 5×7 bitmap font ───────────────────────────────────────────────────
+chars_5x7: dict[str, list[int]] = {
+    'A': [0b01110, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
+    'B': [0b11110, 0b10001, 0b10001, 0b11110, 0b10001, 0b10001, 0b11110],
+    'C': [0b01110, 0b10001, 0b10000, 0b10000, 0b10000, 0b10001, 0b01110],
+    'D': [0b11110, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b11110],
+    'E': [0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b11111],
+    'F': [0b11111, 0b10000, 0b10000, 0b11110, 0b10000, 0b10000, 0b10000],
+    'G': [0b01110, 0b10001, 0b10000, 0b10111, 0b10001, 0b10001, 0b01110],
+    'H': [0b10001, 0b10001, 0b10001, 0b11111, 0b10001, 0b10001, 0b10001],
+    'I': [0b01110, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b01110],
+    'J': [0b00111, 0b00010, 0b00010, 0b00010, 0b00010, 0b10010, 0b01100],
+    'K': [0b10001, 0b10010, 0b10100, 0b11000, 0b10100, 0b10010, 0b10001],
+    'L': [0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b10000, 0b11111],
+    'M': [0b10001, 0b11011, 0b10101, 0b10101, 0b10001, 0b10001, 0b10001],
+    'N': [0b10001, 0b11001, 0b10101, 0b10011, 0b10001, 0b10001, 0b10001],
+    'O': [0b01110, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110],
+    'P': [0b11110, 0b10001, 0b10001, 0b11110, 0b10000, 0b10000, 0b10000],
+    'Q': [0b01110, 0b10001, 0b10001, 0b10001, 0b10101, 0b10010, 0b01101],
+    'R': [0b11110, 0b10001, 0b10001, 0b11110, 0b10100, 0b10010, 0b10001],
+    'S': [0b01111, 0b10000, 0b10000, 0b01110, 0b00001, 0b00001, 0b11110],
+    'T': [0b11111, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100, 0b00100],
+    'U': [0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01110],
+    'V': [0b10001, 0b10001, 0b10001, 0b10001, 0b10001, 0b01010, 0b00100],
+    'W': [0b10001, 0b10001, 0b10001, 0b10101, 0b10101, 0b11011, 0b10001],
+    'X': [0b10001, 0b10001, 0b01010, 0b00100, 0b01010, 0b10001, 0b10001],
+    'Y': [0b10001, 0b10001, 0b01010, 0b00100, 0b00100, 0b00100, 0b00100],
+    'Z': [0b11111, 0b00001, 0b00010, 0b00100, 0b01000, 0b10000, 0b11111],
+    '0': [0b01110, 0b10001, 0b10011, 0b10101, 0b11001, 0b10001, 0b01110],
+    '1': [0b00100, 0b01100, 0b00100, 0b00100, 0b00100, 0b00100, 0b01110],
+    '2': [0b01110, 0b10001, 0b00001, 0b00010, 0b00100, 0b01000, 0b11111],
+    '3': [0b01110, 0b10001, 0b00001, 0b00110, 0b00001, 0b10001, 0b01110],
+    '4': [0b00010, 0b00110, 0b01010, 0b10010, 0b11111, 0b00010, 0b00010],
+    '5': [0b11111, 0b10000, 0b11110, 0b00001, 0b00001, 0b10001, 0b01110],
+    '6': [0b01110, 0b10000, 0b10000, 0b11110, 0b10001, 0b10001, 0b01110],
+    '7': [0b11111, 0b00001, 0b00010, 0b00100, 0b00100, 0b00100, 0b00100],
+    '8': [0b01110, 0b10001, 0b10001, 0b01110, 0b10001, 0b10001, 0b01110],
+    '9': [0b01110, 0b10001, 0b10001, 0b01111, 0b00001, 0b00001, 0b01110],
+    '-': [0b00000, 0b00000, 0b00000, 0b11111, 0b00000, 0b00000, 0b00000],
+    '[': [0b01110, 0b01000, 0b01000, 0b01000, 0b01000, 0b01000, 0b01110],
+    ']': [0b01110, 0b00010, 0b00010, 0b00010, 0b00010, 0b00010, 0b01110],
+    ' ': [0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000, 0b00000],
 }
 
-# ─── Subtitle “BD Database” — compact 5 rows ───────────────────────────
-# Each row same length per glyph; '.' = empty, '#' = ink
-_GLYPHS_SUB: dict[str, list[str]] = {
-    " ": [
-        "..",
-        "..",
-        "..",
-        "..",
-        "..",
-    ],
-    "B": [
-        "####.",
-        "#...#",
-        "####.",
-        "#...#",
-        "####.",
-    ],
-    "D": [
-        "####.",
-        "#...#",
-        "#...#",
-        "#...#",
-        "####.",
-    ],
-    "a": [
-        ".###.",
-        "#...#",
-        "#####",
-        "#...#",
-        "#...#",
-    ],
-    "t": [
-        ".#...",
-        "#####",
-        ".#...",
-        ".#...",
-        ".#...",
-    ],
-    "b": [
-        "#....",
-        "####.",
-        "#...#",
-        "#...#",
-        "####.",
-    ],
-    "s": [
-        ".###.",
-        "#....",
-        ".##..",
-        "...#.",
-        "###..",
-    ],
-    "e": [
-        ".###.",
-        "#...#",
-        "#####",
-        "#....",
-        ".###.",
-    ],
-}
+CURSOR_BM = [0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111, 0b11111]
+DIVIDER_BM = [0b01010, 0b10101, 0b01010, 0b10101, 0b01010, 0b10101, 0b01010]
 
 
-def rasterize_main(text: str) -> list[list[bool]]:
-    glyphs = [_GLYPHS_MAIN[ch] for ch in text]
-    h = len(glyphs[0])
-    rows: list[list[bool]] = []
-    for r in range(h):
-        parts: list[list[bool]] = []
-        for i, g in enumerate(glyphs):
-            parts.append([c == "#" for c in g[r]])
-            if i < len(glyphs) - 1:
-                parts.append([False] * LETTER_GAP_MAIN)
-        rows.append([cell for part in parts for cell in part])
+def text_logical_w(text: str) -> int:
+    return len(text) * (CW + GAP) - GAP
+
+
+def render(text: str) -> list[list[bool]]:
+    rows: list[list[bool]] = [[] for _ in range(CH)]
+    for i, ch in enumerate(text):
+        bm = chars_5x7.get(ch.upper(), chars_5x7[' '])
+        for row in range(CH):
+            bits = bm[row]
+            for col in range(CW):
+                rows[row].append(bool(bits & (1 << (CW - 1 - col))))
+        if i < len(text) - 1:
+            for row in range(CH):
+                rows[row].extend([False] * GAP)
     return rows
 
 
-def rasterize_sub(text: str) -> list[list[bool]]:
-    glyphs = [_GLYPHS_SUB[ch] for ch in text]
-    h = len(glyphs[0])
-    if not all(len(g) == h for g in glyphs):
-        raise ValueError("subtitle glyph height mismatch")
-    rows: list[list[bool]] = []
-    for r in range(h):
-        parts: list[list[bool]] = []
-        for i, g in enumerate(glyphs):
-            parts.append([c == "#" for c in g[r]])
-            if i < len(glyphs) - 1:
-                parts.append([False])  # 1 logical px between sub letters
-        rows.append([cell for part in parts for cell in part])
+def render_divider(length: int) -> list[list[bool]]:
+    rows: list[list[bool]] = [[] for _ in range(CH)]
+    for col in range(length):
+        for row in range(CH):
+            rows[row].append(bool(DIVIDER_BM[row] & (1 << (CW - 1 - (col % CW)))))
     return rows
 
 
-def draw_grid(
-    dr: ImageDraw.ImageDraw,
-    grid: list[list[bool]],
-    ox: int,
-    oy: int,
-    pix: int,
-    fill: tuple[int, int, int, int],
-) -> None:
+def render_cursor() -> list[list[bool]]:
+    return [[bool(CURSOR_BM[row] & (1 << (CW - 1 - col))) for col in range(CW)] for row in range(CH)]
+
+
+def stamp(img: Image.Image, grid: list[list[bool]], ox: int, oy: int, scale: int, color: tuple) -> None:
+    px = img.load()
     gh, gw = len(grid), len(grid[0])
     for r in range(gh):
         for c in range(gw):
             if not grid[r][c]:
                 continue
-            x0 = ox + c * pix
-            y0 = oy + r * pix
-            dr.rectangle([x0, y0, x0 + pix - 1, y0 + pix - 1], fill=fill)
+            x0, y0 = ox + c * scale, oy + r * scale
+            for dy in range(scale):
+                for dx in range(scale):
+                    px[x0 + dx, y0 + dy] = color
 
 
 def main() -> None:
-    main_grid = rasterize_main("MDS")
-    sub_grid = rasterize_sub("BD Database")
+    TITLE_SCALE = 9
+    SUB_SCALE = 6
+    TAG_SCALE = 4
+    DIV_SCALE = 7
 
-    gh_m, gw_m = len(main_grid), len(main_grid[0])
-    gh_s, gw_s = len(sub_grid), len(sub_grid[0])
+    title_text = "MWLAB-2026"
+    sub_text = "BD DATABASE"
+    tag_text = "EXHIBITION COMPETITIVE DASHBOARD"
 
-    main_w = gw_m * PIX_MAIN
-    main_h = gh_m * PIX_MAIN
-    sub_w = gw_s * PIX_SUB
-    sub_h = gh_s * PIX_SUB
+    # Build lines
+    title_full = "[[[  " + title_text + "  ]]]"
+    cursor_text = " "  # gap before cursor
 
-    W = max(main_w, sub_w) + 2 * PAD_X
-    H = PAD_Y + main_h + GAP_MAIN_SUB + sub_h + PAD_Y
+    title_grid = render(title_full)
+    cursor_grid = render_cursor()
+    gap_grid = render(cursor_text)  # 1-char gap before cursor
+    sub_grid = render(sub_text)
+    tag_grid = render(tag_text)
 
-    im = Image.new("RGBA", (W, H), TRANSPARENT)
-    dr = ImageDraw.Draw(im)
+    # Divider — match subtitle width in logical px
+    div_len = text_logical_w(sub_text)
+    div_grid = render_divider(div_len)
 
-    main_x = PAD_X + (W - 2 * PAD_X - main_w) // 2
-    main_y = PAD_Y
-    draw_grid(dr, main_grid, main_x, main_y, PIX_MAIN, ORANGE)
+    # Pixel dimensions
+    title_px_w = text_logical_w(title_full) * TITLE_SCALE
+    gap_px_w = text_logical_w(cursor_text) * TITLE_SCALE
+    cursor_px_w = (CW + GAP) * TITLE_SCALE
+    title_total_w = title_px_w + gap_px_w + cursor_px_w
 
-    sub_x = PAD_X + (W - 2 * PAD_X - sub_w) // 2
-    sub_y = PAD_Y + main_h + GAP_MAIN_SUB
-    draw_grid(dr, sub_grid, sub_x, sub_y, PIX_SUB, ORANGE)
+    sub_px_w = text_logical_w(sub_text) * SUB_SCALE
+    tag_px_w = text_logical_w(tag_text) * TAG_SCALE
+    div_px_w = div_len * DIV_SCALE
+
+    content_max_w = max(title_total_w, sub_px_w, tag_px_w, div_px_w)
+    pad_x = 6 * TITLE_SCALE
+    img_w = content_max_w + 2 * pad_x
+
+    # Vertical
+    title_h = CH * TITLE_SCALE
+    sub_h = CH * SUB_SCALE
+    tag_h = CH * TAG_SCALE
+    div_h = CH * DIV_SCALE
+
+    gap_y = 2 * TITLE_SCALE       # between title and subtitle
+    div_gap = 2 * TITLE_SCALE     # around divider
+    pad_y = 3 * TITLE_SCALE
+
+    img_h = pad_y + title_h + gap_y + sub_h + div_gap + div_h + div_gap + tag_h + pad_y
+
+    img = Image.new("RGBA", (img_w, img_h), TRANSPARENT)
+    y = pad_y
+
+    # ── Title row: [[[ MWLAB-2026 ]]] ■ (with drop shadow) ──
+    title_x = pad_x + (img_w - 2 * pad_x - title_total_w) // 2
+
+    # Drop shadow
+    stamp(img, title_grid,
+          title_x + SHADOW_X * TITLE_SCALE,
+          y + SHADOW_Y * TITLE_SCALE,
+          TITLE_SCALE, SHADOW_COLOR)
+    # Main title
+    stamp(img, title_grid, title_x, y, TITLE_SCALE, ORANGE)
+    # Cursor
+    cursor_x = title_x + title_px_w + gap_px_w
+    stamp(img, cursor_grid, cursor_x, y, TITLE_SCALE, CURSOR_COLOR)
+
+    y += title_h + gap_y
+
+    # ── Subtitle: BD DATABASE ──
+    sub_x = pad_x + (img_w - 2 * pad_x - sub_px_w) // 2
+    stamp(img, sub_grid, sub_x, y, SUB_SCALE, ORANGE)
+    y += sub_h + div_gap
+
+    # ── Divider ──
+    div_x = pad_x + (img_w - 2 * pad_x - div_px_w) // 2
+    stamp(img, div_grid, div_x, y, DIV_SCALE, DIVIDER_COLOR)
+    y += div_h + div_gap
+
+    # ── Tagline: EXHIBITION COMPETITIVE DASHBOARD ──
+    tag_x = pad_x + (img_w - 2 * pad_x - tag_px_w) // 2
+    stamp(img, tag_grid, tag_x, y, TAG_SCALE, ORANGE)
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
-    im.save(OUT, format="PNG", optimize=True)
-    print(f"Wrote {OUT} ({W}×{H}) RGBA; main PIX={PIX_MAIN}, sub PIX={PIX_SUB}")
+    img.save(OUT, format="PNG", optimize=True)
+    print(f"Wrote {OUT} ({img_w}×{img_h}) RGBA")
+    print(f"  Title: {TITLE_SCALE}x scale, {title_px_w}px wide (with shadow + cursor)")
+    print(f"  Sub:   {SUB_SCALE}x scale, {sub_px_w}px wide")
+    print(f"  Tag:   {TAG_SCALE}x scale, {tag_px_w}px wide")
 
 
 if __name__ == "__main__":

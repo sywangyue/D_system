@@ -1,6 +1,6 @@
 <!-- 内容聚合自：MWLAB-2026-PRD-v1.1-merged.md、.planning/PROJECT.md、.planning/ROADMAP.md、AGENTS.md -->
 
-![MDS + BD Database · 透明底细像素 · #fe5c00](docs/readme-hero-mds.png)
+![MWLAB-2026 · BD Database · Exhibition Competitive Dashboard · 80s terminal pixel style](docs/readme-hero-mds.png)
 
 # MWLAB-2026 · Exhibition Competitive Dashboard
 
