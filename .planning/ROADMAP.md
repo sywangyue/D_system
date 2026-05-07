@@ -56,9 +56,23 @@
 
 **Agent assignment:** Hermes（3 个串行子任务）
 
-### Phase 4 · UI/UX（Claude Design）— ⏸ ON HOLD
+### Phase 4 · 前端架构全面迁移（Next.js + Supabase + Cloudflare）
 
-**Goal:** ≤3 点选控件大屏；依赖 Phase 1–3 **全部**签收；Phase 3b 打标工具 ✅；Phase 1b 为数据集扩容，可与本 Phase 并行（见 Phase 4 Context）。
+**Goal:** Next.js 15 + Supabase PostgreSQL 全栈项目；实现 Login/Dashboard/Calendar/Map/Setting 五个模块；部署至 Cloudflare Workers。
+
+**Agent assignments:** CC（架构层)+ Cursor（UI 组件）+ Claude Design（UI 规范已完成）
+
+**Plans:** 7 plans in 4 waves
+
+| Wave | Plan | Agent | Objective |
+|------|------|-------|-----------|
+| 1 | 04-01 | CC | Next.js 项目初始化 + 全部依赖 + 测试框架 |
+| 2 | 04-02 | CC | DB Schema 迁移 + Supabase Auth + 路由守卫 middleware |
+| 2 | 04-03 | Cursor | 根布局 layout + Sidebar + KPI 卡片 + FilterTabs + PieChart 共享组件 |
+| 3 | 04-04 | CC | API Routes（Dashboard/Brands/Tags/Users）+ seed-users + 部署配置 |
+| 3 | 04-05 | Cursor | 登录页 + Dashboard 主页（FilterTabs + KPI 卡片 + PieChart） |
+| 3 | 04-06 | Cursor | Calendar 日历 + Map 地图 + Setting 系统设置 |
+| 4 | 04-07 | CC | SQLite→Supabase 数据迁移 + 全量测试 + Cloudflare 部署验证 |
 
 ---
 
@@ -71,8 +85,8 @@
 | 3 | DSH-01, AUT-01, OPS-01 — OPS-03 | ✅ Done |
 | 1b | FULL-CRAWL, CNEXPO-FULL, MERGE-FULL | ⏳ Pending |
 | 3b | EXPORT-TOOL, IMPORT-TOOL | ✅ Done |
-| 4 | UI-POOL | ⏸ On Hold |
+| 4 | UI-POOL | ✅ 7 plans created |
 
 ---
 
-*Roadmap updated: 2026-05-06 · Phase 3b（打标工具）marked Done*
+*Roadmap updated: 2026-05-06 · Phase 4 规划完成（7 plans in 4 waves）*

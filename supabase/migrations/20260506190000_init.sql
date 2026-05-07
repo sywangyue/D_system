@@ -1,8 +1,8 @@
--- MWLAB-2026 · PostgreSQL DDL v1.0
--- Converted from schema/init_db.sql (SQLite → PostgreSQL)
--- Supabase migration: 20260506190000_init
+/* MWLAB-2026 PostgreSQL DDL v1.0
+   Converted from schema/init_db.sql (SQLite to PostgreSQL)
+   Supabase migration: 20260506190000_init */
 
--- ─── RLS Helper Function ────────────────────────────────────────────
+/* RLS Helper Function */
 -- Reads user role from JWT app_metadata. Requires Supabase
 -- Custom Access Token Hook to inject app_metadata into JWT claims.
 CREATE OR REPLACE FUNCTION get_user_role()

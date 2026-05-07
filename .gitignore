@@ -40,3 +40,13 @@ yarn-error.log*
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts
+
+# Build outputs
+.open-next/
+.wrangler/
+
+# Ralph internal state
+scripts/ralph/.last-branch
+
+# Supabase local
+supabase/.temp/
