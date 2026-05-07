@@ -174,3 +174,88 @@ def test_all_categories_have_rules():
     assert len(MD_CATEGORY_RULES) == 6
     for cat, keywords in MD_CATEGORY_RULES.items():
         assert len(keywords) > 0, f"Category {cat!r} has empty keyword list"
+
+
+# ─── mds ─────────────────────────────────────────────────────────────────────
+
+from scripts.clean_brands import parse_md_excel, match_brand_multistrategy  # noqa: E402, PLC0415
+
+
+def test_parse_md_excel():
+    """读取实际 Excel 文件，验证返回 list 且包含关键字段。"""
+    import openpyxl
+    from pathlib import Path
+
+    excel_path = Path(__file__).parent.parent / "杜塞境外展时间表_for update_2026.xlsx"
+    assert excel_path.exists(), f"Excel 文件不存在: {excel_path}"
+
+    records = parse_md_excel(str(excel_path))
+    assert isinstance(records, list), f"Expected list, got {type(records)}"
+    assert len(records) > 0, "Expected non-empty records"
+
+    # Verify required keys exist in every record
+    for rec in records:
+        assert "category" in rec, f"Missing 'category' in {rec}"
+        assert "parent_cn" in rec
+        assert "parent_en" in rec
+        assert "sat_cn" in rec
+        assert "sat_en" in rec
+        assert "location" in rec
+
+    # Verify categories are from MD 6-class set
+    md_categories = {"机械和设备", "休闲", "生活方式", "科技+", "医疗和健康", "零售贸易和服务"}
+    seen_cats = {r["category"] for r in records if r["category"]}
+    assert seen_cats.issubset(md_categories), f"Unexpected categories: {seen_cats - md_categories}"
+
+    # Verify satellite entries have either CN or EN or both
+    for rec in records:
+        if rec["sat_cn"] or rec["sat_en"]:
+            assert bool(rec["sat_cn"]) or bool(rec["sat_en"])
+
+    # Verify parent_en is extracted (at least some entries should have English)
+    has_parent_en = any(r["parent_en"] for r in records)
+    assert has_parent_en, "No parent_en extracted from any record"
+
+
+def test_match_brand_multistrategy():
+    """测试多策略匹配的精确/子串/无匹配三种场景。"""
+    import sqlite3
+
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.executescript("""
+        CREATE TABLE exhibition_brand (
+            brand_id TEXT PRIMARY KEY,
+            name_cn TEXT NOT NULL,
+            name_en TEXT NOT NULL DEFAULT '',
+            organizer TEXT NOT NULL DEFAULT ''
+        );
+        INSERT INTO exhibition_brand VALUES ('EXPO-TEST1', '上海国际机床展', 'Machine Tool EXPO', '');
+        INSERT INTO exhibition_brand VALUES ('EXPO-TEST2', '中国国际塑料橡胶展', 'CHINAPLAS', '');
+        INSERT INTO exhibition_brand VALUES ('EXPO-TEST3', '杜塞尔多夫包装展-PACK', '', '杜塞尔多夫展览（上海）');
+    """)
+    conn.commit()
+
+    # Strategy 1: Exact name_en match
+    assert match_brand_multistrategy(conn, name_en="Machine Tool EXPO") == "EXPO-TEST1"
+
+    # Strategy 2: Exact name_cn match
+    assert match_brand_multistrategy(conn, name_cn="上海国际机床展") == "EXPO-TEST1"
+
+    # Strategy 2: Exact name_cn match (satellite en)
+    assert match_brand_multistrategy(conn, name_en="CHINAPLAS") == "EXPO-TEST2"
+
+    # Strategy 3: Substring match (first 10 chars)
+    assert match_brand_multistrategy(conn, name_cn="中国国际塑料橡胶展某某") == "EXPO-TEST2"
+
+    # Strategy 4: Organizer match via 杜塞尔 keyword in name
+    assert match_brand_multistrategy(conn, name_cn="杜塞尔多夫包装展-PACK") == "EXPO-TEST3"
+
+    # No match: high threshold prevents fuzzy match
+    assert match_brand_multistrategy(conn, name_cn="完全不存在的展览", threshold=0.90) is None
+
+    # Empty inputs
+    assert match_brand_multistrategy(conn, name_cn="") is None
+    assert match_brand_multistrategy(conn) is None
+
+    conn.close()

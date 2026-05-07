@@ -13,11 +13,14 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import difflib
 import logging
+import re
 import sqlite3
 import sys
 from datetime import datetime
 from pathlib import Path
+from uuid import uuid4
 
 # Ensure project root is on sys.path for imports like scripts.data.*
 BASE_DIR = Path(__file__).parent.parent
@@ -222,11 +225,271 @@ def cmd_industry(args: argparse.Namespace) -> None:
     conn.close()
 
 
-# ─── mds 子命令 (stub) ────────────────────────────────────────────────────────
+# ─── mds 辅助函数 ────────────────────────────────────────────────────────────
+
+def _extract_english_trailing(text: str) -> str:
+    """从中英文混合字符串末尾提取英文部分。
+
+    取最后一个中文字符之后的所有内容。
+    如果字符串不含中文字符，返回原字符串（视为纯英文名）。
+    """
+    if not text:
+        return ""
+    text = text.replace("\n", " ").replace("\r", " ").strip()
+    cjk_matches = list(re.finditer(r'[一-鿿]', text))
+    if cjk_matches:
+        trailing = text[cjk_matches[-1].end():].strip()
+        return trailing
+    # No CJK characters — entire string is likely English
+    return text
+
+
+def parse_md_excel(filepath: str | Path) -> list[dict]:
+    """解析杜塞境外展 Excel 文件。
+
+    处理合并单元格：跟踪当前 category（列 B）和 parent exhibition（列 C）。
+    列布局（verified from actual file）:
+      B: 类别, C: 杜塞全球展会（母展）, E: 卫星展-CN,
+      F: 卫星展-EN, G: 地点, H: 展会日期（下届）
+
+    Returns:
+        list of {category, parent_cn, parent_en, sat_cn, sat_en, location, next_date}
+    """
+    import openpyxl  # noqa: PLC0415 — conditional import, not always needed
+
+    wb = openpyxl.load_workbook(filepath, data_only=True)
+    ws = wb.active
+
+    records = []
+    current_cat = ""
+    current_parent = ""
+
+    for row in range(4, ws.max_row + 1):
+        b_val = ws.cell(row, 2).value  # 类别
+        c_val = ws.cell(row, 3).value  # 母展
+        e_val = ws.cell(row, 5).value  # 卫星展-CN
+        f_val = ws.cell(row, 6).value  # 卫星展-EN
+        g_val = ws.cell(row, 7).value  # 地点
+        h_val = ws.cell(row, 8).value  # 下届日期
+
+        # Update current category if non-empty
+        if b_val and str(b_val).strip():
+            current_cat = str(b_val).strip()
+
+        # Update current parent if non-empty
+        if c_val and str(c_val).strip():
+            current_parent = str(c_val).strip()
+
+        # Skip rows where ALL data columns are empty
+        if not any([e_val, f_val, g_val, h_val]):
+            continue
+
+        # / or - means no satellite show
+        sat_cn = ""
+        if e_val:
+            e_str = str(e_val).strip()
+            if e_str not in ("", "/", "-"):
+                sat_cn = e_str
+
+        sat_en = ""
+        if f_val:
+            f_str = str(f_val).strip()
+            if f_str not in ("", "/", "-"):
+                sat_en = f_str
+
+        records.append({
+            "category": current_cat,
+            "parent_cn": current_parent,
+            "parent_en": _extract_english_trailing(current_parent),
+            "sat_cn": sat_cn,
+            "sat_en": sat_en,
+            "location": str(g_val).strip() if g_val else "",
+            "next_date": str(h_val).strip() if h_val else "",
+        })
+
+    return records
+
+
+def match_brand_multistrategy(
+    conn: sqlite3.Connection,
+    name_cn: str = "",
+    name_en: str = "",
+    threshold: float = 0.80,
+) -> str | None:
+    """多策略品牌匹配。
+
+    按优先级尝试以下匹配策略：
+      Strategy 1: name_en 精确匹配
+      Strategy 2: name_cn 精确匹配
+      Strategy 3: name_cn LIKE 子串（前 10/8/6 字）
+      Strategy 4: 主办方含杜塞尔（前置条件：搜索词含杜塞尔关键词）
+      Strategy 5: difflib.SequenceMatcher 模糊匹配（阈值 threshold，最小长度 >= 6）
+
+    Returns:
+        brand_id 或 None
+    """
+    search_cn = name_cn.strip() if name_cn else ""
+    search_en = name_en.strip() if name_en else ""
+
+    # Strategy 1: Exact name_en match
+    if search_en:
+        row = conn.execute(
+            "SELECT brand_id FROM exhibition_brand WHERE name_en = ?",
+            (search_en,),
+        ).fetchone()
+        if row:
+            return row[0]
+
+    # Strategy 2: Exact name_cn match
+    if search_cn:
+        row = conn.execute(
+            "SELECT brand_id FROM exhibition_brand WHERE name_cn = ?",
+            (search_cn,),
+        ).fetchone()
+        if row:
+            return row[0]
+
+    # Strategy 3: name_cn LIKE substring
+    if search_cn and len(search_cn) >= 4:
+        for prefix_len in (10, 8, 6):
+            part = search_cn[:prefix_len]
+            if len(part) >= 4:
+                row = conn.execute(
+                    "SELECT brand_id FROM exhibition_brand "
+                    "WHERE name_cn LIKE ? LIMIT 1",
+                    (f"%{part}%",),
+                ).fetchone()
+                if row:
+                    return row[0]
+
+    # Strategy 4: Organizer contains 杜塞尔
+    combined = (search_cn + " " + search_en).lower()
+    if "杜塞尔" in combined or "dusseldorf" in combined:
+        row = conn.execute(
+            "SELECT brand_id FROM exhibition_brand "
+            "WHERE organizer LIKE '%杜塞尔%' LIMIT 1"
+        ).fetchone()
+        if row:
+            return row[0]
+
+    # Strategy 5: difflib fuzzy match
+    all_rows = conn.execute(
+        "SELECT brand_id, name_cn FROM exhibition_brand"
+    ).fetchall()
+    search_text = search_cn or search_en
+    if search_text and len(search_text) >= 6:
+        best_ratio, best_id = 0.0, None
+        for bid, name in all_rows:
+            if not name:
+                continue
+            ratio = difflib.SequenceMatcher(None, search_text, name).ratio()
+            if ratio > best_ratio:
+                best_ratio, best_id = ratio, bid
+        if best_ratio >= threshold:
+            return best_id
+
+    return None
+
+
+# ─── mds 子命令 ──────────────────────────────────────────────────────────────
 
 def cmd_mds(args: argparse.Namespace) -> None:
-    """CLEAN-MDS: 从 Excel 标记 MD 自有品牌（stub）。"""
-    print("Not yet implemented: mds sub-command")
+    """CLEAN-MDS: 从 Excel 标记 MD 自有品牌。
+
+    Step 1: 解析 Excel → 品牌记录 list
+    Step 2: 对每一条记录，多策略匹配 exhibition_brand
+    Step 3: 匹配成功 → UPDATE mds_related = category
+    Step 4: 未匹配的母展 → INSERT 新品牌到 exhibition_brand
+    """
+    conn = sqlite3.connect(str(args.db))
+    conn.row_factory = sqlite3.Row
+
+    if not args.dry_run:
+        backup_table(conn)
+
+    # Parse Excel
+    excel_path = BASE_DIR / "杜塞境外展时间表_for update_2026.xlsx"
+    if not excel_path.exists():
+        log.error("Excel 文件不存在: %s", excel_path)
+        conn.close()
+        return
+
+    records = parse_md_excel(str(excel_path))
+    log.info("Excel 共 %d 条记录", len(records))
+
+    matched = 0
+    new_brands = 0
+    unmatched_parents: list[dict] = []
+    inserted_parents: set[str] = set()
+
+    for rec in records:
+        brand_id = None
+
+        # Try matching satellite show first
+        if rec["sat_cn"] or rec["sat_en"]:
+            brand_id = match_brand_multistrategy(
+                conn, name_cn=rec["sat_cn"], name_en=rec["sat_en"]
+            )
+
+        # Then try parent exhibition
+        if brand_id is None:
+            brand_id = match_brand_multistrategy(
+                conn, name_cn=rec["parent_cn"], name_en=rec["parent_en"]
+            )
+
+        if brand_id:
+            matched += 1
+            if args.dry_run:
+                log.info("  [DRY-RUN] %s: mds_related='%s'",
+                         brand_id, rec["category"])
+            else:
+                conn.execute(
+                    "UPDATE exhibition_brand SET mds_related = ? WHERE brand_id = ?",
+                    (rec["category"], brand_id),
+                )
+        else:
+            # Not matched — track parent for INSERT
+            parent_key = rec["parent_cn"].strip()
+            if parent_key and parent_key not in inserted_parents:
+                inserted_parents.add(parent_key)
+                unmatched_parents.append(rec)
+
+    # Insert new brands for unmatched parent exhibitions
+    for rec in unmatched_parents:
+        new_id = f"EXPO-{uuid4().hex[:8].upper()}"
+        parent_en = rec["parent_en"] or ""
+        if not parent_en:
+            from scripts.data.name_en_patterns import generate_name_en  # noqa: PLC0415
+
+            parent_en = generate_name_en(rec["parent_cn"])
+
+        if args.dry_run:
+            log.info("  [DRY-RUN] NEW BRAND: %s (%s) -> %s",
+                     new_id, rec["parent_cn"], parent_en)
+        else:
+            conn.execute(
+                "INSERT INTO exhibition_brand "
+                "(brand_id, name_cn, name_en, industry_l1, mds_related) "
+                "VALUES (?, ?, ?, ?, ?)",
+                (new_id, rec["parent_cn"].strip(), parent_en,
+                 rec["category"], rec["category"]),
+            )
+            log.warning("NEW BRAND (needs review): %s -> %s (%s)",
+                        new_id, rec["parent_cn"], rec["category"])
+        new_brands += 1
+
+    unmatched_count = len(records) - matched - min(len(unmatched_parents), new_brands)
+    log.info(
+        "统计: 总行数=%d 已匹配=%d 新品牌=%d 未匹配=%d",
+        len(records), matched, new_brands, unmatched_count,
+    )
+
+    if args.dry_run:
+        log.info("DRY-RUN 模式: 未写库，全部回滚")
+    else:
+        conn.commit()
+        log.info("已提交变更到数据库")
+    conn.close()
 
 
 # ─── jufair-l2 子命令 (stub) ──────────────────────────────────────────────────
