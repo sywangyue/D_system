@@ -149,11 +149,77 @@ def cmd_name_en(args: argparse.Namespace) -> None:
     conn.close()
 
 
-# ─── industry 子命令 (stub) ──────────────────────────────────────────────────
+# ─── industry 子命令 ─────────────────────────────────────────────────────────
 
 def cmd_industry(args: argparse.Namespace) -> None:
-    """CLEAN-INDUSTRY: 将 industry_l1 归并为 6 个 MD 类别（stub）。"""
-    print("Not yet implemented: industry sub-command")
+    """CLEAN-INDUSTRY: 将 industry_l1 归并为 6 个 MD 类别。
+
+    Step 1: 查询所有 industry_l1 != '' 的行
+    Step 2: 对每一行调用 classify_industry_l1 映射到目标类别
+    Step 3: UPDATE 表（target 非空且与原始值不同时）
+    Step 4: 打印映射统计和未匹配列表
+    """
+    from scripts.data.md_category_rules import classify_industry_l1, list_nonempty_categories
+
+    conn = sqlite3.connect(str(args.db))
+    conn.row_factory = sqlite3.Row
+
+    if not args.dry_run:
+        backup_table(conn)
+
+    categories = list_nonempty_categories()
+    log.info("MD 类别: %s", categories)
+
+    rows = conn.execute(
+        "SELECT brand_id, name_cn, industry_l1 FROM exhibition_brand "
+        "WHERE industry_l1 != ''"
+    ).fetchall()
+    total_processed = len(rows)
+    log.info("待处理行数: %d", total_processed)
+
+    mapped_count = 0
+    unchanged_count = 0
+    unmapped: set[str] = set()
+
+    for row in rows:
+        original = (row["industry_l1"] or "").strip()
+        target = classify_industry_l1(original)
+
+        if not target:
+            unmapped.add(original)
+            continue
+
+        if target == original:
+            unchanged_count += 1
+            continue
+
+        mapped_count += 1
+        if args.dry_run:
+            log.info("  [DRY-RUN] %s (%s): %r -> %r",
+                     row["brand_id"], row["name_cn"], original, target)
+        else:
+            conn.execute(
+                "UPDATE exhibition_brand SET industry_l1 = ? WHERE brand_id = ?",
+                (target, row["brand_id"]),
+            )
+
+    # 统计
+    log.info(
+        "映射统计: 总处理=%d 已映射=%d 未变更=%d 未匹配=%d",
+        total_processed, mapped_count, unchanged_count, len(unmapped),
+    )
+
+    if unmapped:
+        log.warning("未匹配的 industry_l1 值（共 %d 个）:", len(unmapped))
+        for val in sorted(unmapped):
+            log.warning("  - %s", val)
+
+    if args.dry_run:
+        log.info("DRY-RUN 模式: 未写库，全部回滚")
+    else:
+        conn.commit()
+        log.info("已提交变更到数据库")
+    conn.close()
 
 
 # ─── mds 子命令 (stub) ────────────────────────────────────────────────────────
