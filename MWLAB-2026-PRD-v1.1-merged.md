@@ -473,6 +473,45 @@ WHERE brand_id = 'EXPO-0001';
 
 ---
 
+## 附录 C：实现追踪
+
+| Phase | 需求 ID | 状态 | 完成日期 | 验证方式 |
+|-------|---------|------|----------|----------|
+| 1 | DATA-01 | ✅ 完成 | 2026-04 | `crawlers/jufair_crawler.py` 可运行，3.4K 条数据入库 |
+| 1 | DATA-02 | ✅ 完成 | 2026-04 | `crawlers/cnexpo_crawler.py` 可运行 |
+| 1 | DATA-03 | ✅ 完成 | 2026-04 | `scheduler.py` + `crawl_log` 表 |
+| 2 | DMG-01 | ✅ 完成 | 2026-04 | `merge_engine.py` 通过 93 条金标准 |
+| 2 | DMG-02 | ✅ 完成 | 2026-04 | `schema/init_db.sql` 6 表 + 索引 |
+| 2 | TAG-01 | ✅ 完成 | 2026-04 | `tag_api.py` + `tests/test_tag_api.py` |
+| 3 | DSH-01 | ✅ 完成 | 2026-04 | Dashboard 查询 API |
+| 3 | AUT-01 | ✅ 完成 | 2026-04 | JWT 认证 |
+| 3 | OPS-01 | ✅ 完成 | 2026-04 | Docker 镜像 |
+| 3 | OPS-02 | ✅ 完成 | 2026-04 | OpenAPI 文档 |
+| 3 | OPS-03 | ✅ 完成 | 2026-04 | 部署对比表 |
+| 3b | EXPORT-TOOL | ✅ 完成 | 2026-05-06 | `tools/export_for_tagging.py` + `tests/test_tagging_tools.py` |
+| 3b | IMPORT-TOOL | ✅ 完成 | 2026-05-06 | `tools/import_tags.py` + `tests/test_tagging_tools.py` |
+| 1b | FULL-CRAWL | ⏳ 部分 | 2026-05-06 | Jufair 4,046/8,400（IP 封禁中），cnexpo ✅ |
+| 1b | CNEXPO-FULL | ✅ 完成 | 2026-05-06 | 4,570 条，229 页全部覆盖 |
+| 1b | MERGE-FULL | ✅ 完成 | 2026-05-06 | `merge_engine --batch ALL` +6,326 provenance |
+| 4 | UI-POOL | 📋 已规划 | 2026-05-06 | 7 plans in 4 waves，待执行 |
+
+---
+
+## 附录 D：完成要素检查清单
+
+- [x] 双源爬虫可用（Jufair + cnexpo）
+- [x] 6 表 Schema 完整（SQLite + PostgreSQL 双版本）
+- [x] 合并引擎通过 93 条金标准验证
+- [x] 打标 API + Excel 批量工具完整
+- [x] Dashboard 查询 API + JWT 认证
+- [x] Docker 化 + OpenAPI 文档
+- [x] cnexpo 全量采集完成（4,570 条）
+- [ ] Jufair 全量采集（4,046/8,400，等待 IP 解封）
+- [ ] Phase 4 前端架构执行（7 plans 待执行）
+- [ ] 生产部署（Cloudflare Workers + Supabase）
+
+---
+
 *PRD v1.1（整合版）· ECD-2026 · 2026.04.27 · CONFIDENTIAL*  
 *整合自: PRD v1.0（主架构）+ Adjustment v1.1（Phase 3 调整说明）*  
-*下一步动作: 客户抽检 Phase 3b 工具 → 推进 Phase 1b（全集采集）*
+*最后更新: 2026-05-07 — 项目整合清理，增加实现追踪与完成要素*
