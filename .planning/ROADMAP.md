@@ -86,7 +86,32 @@
 | 1b | FULL-CRAWL, CNEXPO-FULL, MERGE-FULL | ⏳ Pending |
 | 3b | EXPORT-TOOL, IMPORT-TOOL | ✅ Done |
 | 4 | UI-POOL | ✅ 7 plans created |
+| 5 | CLEAN-BRAND | ✅ 2 plans created |
 
 ---
 
-*Roadmap updated: 2026-05-06 · Phase 4 规划完成（7 plans in 4 waves）*
+## 📋 待执行的 Phases
+
+### Phase 5 · 数据清洗 — 品牌表深化
+
+**Goal:** exhibition_brand 表数据规范化：英文名称标准化（缺失按中文翻译补充）、一级行业标签对齐 MD 六大类别、MD 自有品牌标记与缺失展会补充、聚展二级行业分类爬取与模糊匹配标注。
+
+| Maps to | Success criteria |
+|---------|------------------|
+| CLEAN-NAME-EN | 英文名称：1,946 条缺失 + 中文名全部翻译为 "英文缩写 EXPO" 格式 |
+| CLEAN-INDUSTRY | 一级行业标签对齐 6 个 MD 类别（机械和设备/休闲/生活方式/科技+/医疗和健康/零售贸易和服务） |
+| CLEAN-MDS | MD 自有品牌标记：Excel 中展会匹配并标 mds_related=1，缺失展会补充入库 |
+| CLEAN-JUFAIR-L2 | 爬取 jufair.com 二级分类 → 模糊匹配 exhibition_brand → 标注 industry_l1 + industry_l2 |
+
+**Agent assignment:** Claude Code
+
+**Plans:** 2 plans in 2 waves
+
+| Wave | Plan | Autonomous | Objective |
+|------|------|------------|-----------|
+| 1 | 05-01 | yes | 脚本框架 + name-en + industry 子命令 + 测试 |
+| 2 | 05-02 | no (checkpoint) | mds + jufair-l2 子命令 + 爬虫模块 + 测试 |
+
+---
+
+*Roadmap updated: 2026-05-07 · Phase 5 规划完成（2 plans in 2 waves）*
