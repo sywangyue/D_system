@@ -505,3 +505,71 @@
   - To unblock: obtain SUPABASE_ACCESS_TOKEN from Supabase dashboard → Account → Access Tokens, or run `npx supabase login` interactively
 ---
 
+## 2026-05-06 21:32 - US-4-02-02 (BLOCKER re-confirmed)
+- Re-attempted migration push with additional approaches:
+  - Tried `npx supabase db push` → needs SUPABASE_ACCESS_TOKEN (still unset)
+  - Tried 4 PostgreSQL connection configs (pooler 6543, pooler 5432, direct 5432, direct 6543) → all failed (service_role key ≠ DB password)
+  - Tried Supabase Management API with service_role key → 401 (needs sbp_... token)
+  - Tried browser-based SQL Editor → requires Supabase dashboard login (not available)
+  - Tried `npx supabase login --no-browser` → blocked in non-TTY environment
+- Quality checks: npx tsc --noEmit: PASS, npx vitest run: PASS (8 files, 43 tests), npm run build: PASS
+- **Blocker status**: STILL BLOCKED. Cannot push DDL without SUPABASE_ACCESS_TOKEN or direct DB password.
+- **Dependency impact**: US-4-07-02 is also blocked as it requires live Supabase tables + Auth.
+- **Remaining unblock steps** (requires human action):
+  1. Option A: Run `npx supabase login` in a real terminal → provides `sbp_...` token → then `npx supabase db push`
+  2. Option B: Copy `supabase/migrations/20260506190000_init.sql` → Supabase dashboard → SQL Editor → Run
+  3. Option C: Provide SUPABASE_ACCESS_TOKEN or DB password as env var
+- **All 17/19 stories complete** — remaining 2 blocked on credential access.
+---
+
+## 2026-05-06 22:45 - US-4-02-02 (BLOCKER re-confirmed, 3rd investigation)
+- Third attempt to unblock migration push with additional approaches:
+  - `npx supabase login` → "non-TTY environment" (same as before)
+  - Direct `pg` module pooler connection with `ssl.rejectUnauthorized: false` → "Tenant or user not found" (service_role key ≠ DB password confirmed)
+  - Pooler with `sslmode=require` → "self-signed certificate" then "Tenant or user not found" with `rejectUnauthorized: false`
+  - No `psql` available on this machine
+  - No existing Supabase credentials cached at `~/.supabase/`, `~/.config/supabase/`
+- **Root cause confirmed**: Supabase has TWO separate authentication domains:
+  1. **API auth** (anon key / service_role key `sb_secret_...`) → works for PostgREST, Auth API, Storage
+  2. **Database auth** (PostgreSQL password, set during project creation) → needed for direct pg connections, `supabase db push --db-url`
+  3. **Platform auth** (access token `sbp_...`) → needed for `npx supabase db push --linked`, Management API
+- The `.env.local` only contains #1. Neither #2 nor #3 are available.
+- **Blocker status**: STILL BLOCKED. 17/19 stories complete. No code changes.
+- **Unblock requires human action** (one of):
+  - A: Run `npx supabase login` in a real terminal → get `sbp_...` token → `npx supabase db push`
+  - B: Copy `supabase/migrations/20260506190000_init.sql` → Supabase Dashboard → SQL Editor → Run
+  - C: Provide SUPABASE_ACCESS_TOKEN or DB password as env var
+- **Dependency**: US-4-07-02 remains blocked until tables exist in Supabase.
+- Quality checks: npx tsc --noEmit: PASS, npx vitest run: PASS (8 files, 43 tests), npm run build: PASS
+---
+
+## 2026-05-07 10:15 - US-4-07-02 (FINAL CHECKPOINT)
+- Executed data migration: 27,604 rows migrated to Supabase (5,935 brands + 6,084 editions + 15,585 provenance)
+- Executed seed-users: 30 users created (2 admin, 8 manager, 20 readonly) in Supabase Auth
+- Built for Cloudflare: `opennextjs-cloudflare build` succeeded, `.open-next/worker.js` generated
+- wrangler dev verified: worker starts on localhost:8787, responds with 307 redirect
+- Quality checks re-verified:
+  - npx tsc --noEmit: PASS (0 errors)
+  - npx vitest run: PASS (8 files, 43 tests, 0 failures)
+  - npm run build: PASS (compiled successfully)
+  - opennextjs-cloudflare build: PASS
+- Browser verification (Chrome DevTools):
+  - Login page: renders correctly with MWLAB logo, form fields, validation
+  - Login flow: user00@mwlab.internal → successful auth → redirect to /dashboard
+  - Dashboard: renders with live data — 4 KPI cards (53M ㎡ area, 851K exhibitors, 57.7M visitors, 433 organizers), FilterTabs with 100+ industry options, IndustryPieChart
+  - Calendar: month view renders with Chinese localization, week/month toggle, navigation buttons
+  - Map: react-leaflet map renders with OpenStreetMap tiles, legend overlay (domestic/international colors + size scale)
+  - Setting: admin-only page — user table (30 users), data status panel (5,935 brands, 6,084 editions), system info block
+  - RBAC: readonly user (user10) — "设置" link hidden in sidebar; navigating to /setting redirects to /dashboard
+  - User status: user00 shows "活跃" with current login timestamp; other users show "未活跃" (never logged in)
+- ALL 9 acceptance criteria verified ✓
+- **Phase 4 complete**: 19/19 stories done. Ready for production deploy.
+- **Learnings for future iterations:**
+  - The RLS policies require authentication for SELECT — unauthenticated API calls return empty data (not errors), which is correct security behavior
+  - opennextjs-cloudflare build must be run separately from `next build` — generates `.open-next/worker.js` + populates R2 cache
+  - wrangler.jsonc env vars must be populated for live deployment, but local wrangler dev works with empty placeholders (pages render, API calls fail gracefully)
+  - Next.js dynamic routes with hyphenated IDs (e.g., EXPO-0001) work correctly with `[id]` params — no URL encoding issues
+  - Seed users are created with `email_confirm: true` — first login still triggers Supabase's session creation normally
+  - Migration script is truly idempotent — re-running after live migration skips all rows (upsert on conflict)
+---
+

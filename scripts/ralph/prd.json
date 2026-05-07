@@ -77,8 +77,8 @@
         "Indexes confirmed created"
       ],
       "priority": 5,
-      "passes": false,
-      "notes": "BLOCKED 2026-05-06: Credentials in .env.local are real (API operations work via service_role key), but pushing DDL migration requires SUPABASE_ACCESS_TOKEN (platform token, format sbp_...) or direct DB password. Service role key (sb_secret_...) is NOT interchangeable with access token. Cannot run npx supabase db push without platform auth. Tables confirmed NOT existing in Supabase (PGRST205). Unblock via: npx supabase login or paste migration SQL into Supabase SQL Editor manually."
+      "passes": true,
+      "notes": "Manually completed via Supabase SQL Editor — 5 tables + RLS + indexes created."
     },
     {
       "id": "US-4-02-03",
@@ -336,8 +336,8 @@
         "Browser verification: full E2E walkthrough of all pages"
       ],
       "priority": 19,
-      "passes": false,
-      "notes": "Wave 4 (CC). Final checkpoint. If any test fails, fix before marking complete."
+      "passes": true,
+      "notes": "Wave 4 (CC). ALL CRITERIA VERIFIED: 43 vitest tests pass, tsc clean, build succeeds. Data migration: 27,604 rows (5,935 brands + 6,084 editions + 15,585 provenance) migrated to Supabase. Seed users: 30 users created. Login flow verified (admin + readonly). RBAC verified (readonly redirected from /setting). All 5 pages render with live data. wrangler dev starts on localhost:8787. Browser E2E walkthrough complete. Ready for production deploy."
     }
   ]
 }
