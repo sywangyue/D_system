@@ -12,6 +12,8 @@ import os
 import re
 from pathlib import Path
 
+import pytest
+
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from schema.db import init_db
@@ -195,6 +197,82 @@ def _insert_synthetic_jufair(conn: sqlite3.Connection, n: int) -> None:
             f'https://www.jufair.com/exhibition/{i+1000}.html',
             'TEST-BATCH-001',
         ))
+
+
+# ── exhibition_brand fixture（用于 clean_brands 测试）────────────────────────
+_EXHIBITION_BRAND_DDL = """
+CREATE TABLE IF NOT EXISTS exhibition_brand (
+    brand_id              TEXT    PRIMARY KEY,
+    name_cn               TEXT    NOT NULL,
+    name_en               TEXT    NOT NULL DEFAULT '',
+    first_year            INTEGER,
+    organizer             TEXT    NOT NULL DEFAULT '',
+    co_organizer          TEXT    NOT NULL DEFAULT '',
+    city                  TEXT    NOT NULL DEFAULT '',
+    frequency             TEXT    NOT NULL DEFAULT '',
+    industry_l1           TEXT    NOT NULL DEFAULT '',
+    industry_l2           TEXT    NOT NULL DEFAULT '',
+    competition_relation  TEXT    NOT NULL DEFAULT ''
+        CHECK (competition_relation IN ('是', '否', '')),
+    mds_related           TEXT    NOT NULL DEFAULT '',
+    scale_score           INTEGER
+        CHECK (scale_score IS NULL OR (scale_score BETWEEN 1 AND 10)),
+    is_international      INTEGER NOT NULL DEFAULT 0,
+    is_ufi_certified      INTEGER NOT NULL DEFAULT 0,
+    ma_potential          INTEGER
+        CHECK (ma_potential IS NULL OR (ma_potential BETWEEN 1 AND 5)),
+    strategic_relevance   INTEGER
+        CHECK (strategic_relevance IS NULL OR (strategic_relevance BETWEEN 1 AND 5)),
+    competitor_group      TEXT    NOT NULL DEFAULT '',
+    website               TEXT    NOT NULL DEFAULT '',
+    notes                 TEXT    NOT NULL DEFAULT '',
+    created_at            TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
+    updated_at            TEXT    NOT NULL DEFAULT (datetime('now', 'localtime'))
+);
+"""
+
+_EXHIBITION_BRAND_SEED = [
+    # 5 条带有效 name_en + non-empty industry_l1
+    ("EXPO-0001", "上海国际机床展", "Machine Tool EXPO", "机械/机床展"),
+    ("EXPO-0002", "中国国际塑料橡胶展", "CHINAPLAS", "橡塑展"),
+    ("EXPO-0003", "广州国际汽车展", "Auto Guangzhou", "汽车展"),
+    ("EXPO-0004", "北京国际印刷展", "CHINA PRINT", "印刷展"),
+    ("EXPO-0005", "深圳国际电子展", "CITE EXPO", "电子展"),
+    # 5 条空 name_en + empty industry_l1
+    ("EXPO-0011", "中国国际消费品博览会", "", ""),
+    ("EXPO-0012", "上海国际烘焙展览会", "", ""),
+    ("EXPO-0013", "北京国际物流展", "", ""),
+    ("EXPO-0014", "西部国际五金展", "", ""),
+    ("EXPO-0015", "中国国际纺织工业展", "", ""),
+    # 5 条 name_en 含中文
+    ("EXPO-0021", "全国糖酒会", "全国糖酒会CMB", "糖酒展"),
+    ("EXPO-0022", "中国国际医疗器械展", "中国医疗器械展CMEF", "医疗展"),
+    ("EXPO-0023", "上海国际酒店用品展", "酒店用品展HOTELEX", "酒店展"),
+    ("EXPO-0024", "北京国际安防展", "安防展Security China", "安防展"),
+    ("EXPO-0025", "深圳国际物联网展", "物联网展IoT EXPO", "物联网展"),
+    # 5 条带可提取的嵌入英文
+    ("EXPO-0031", "2026中国国际化工展 ICIF China", "", "化工展"),
+    ("EXPO-0032", "中国照明展（GILE）", "", "照明展"),
+    ("EXPO-0033", "ITES深圳国际工业制造展", "", "工业展"),
+    ("EXPO-0034", "中国国际医疗器械博览会 CMEF", "", "医疗展"),
+    ("EXPO-0035", "SNEC上海光伏展", "", "光伏展"),
+]
+
+
+@pytest.fixture
+def exhibition_brand_conn() -> sqlite3.Connection:
+    """创建含 exhibition_brand 表的 in-memory SQLite 连接，插入 20 条样本数据。"""
+    conn = sqlite3.connect(":memory:")
+    conn.row_factory = sqlite3.Row
+    conn.executescript(_EXHIBITION_BRAND_DDL)
+    conn.executemany(
+        "INSERT INTO exhibition_brand "
+        "(brand_id, name_cn, name_en, industry_l1) "
+        "VALUES (?,?,?,?)",
+        _EXHIBITION_BRAND_SEED,
+    )
+    conn.commit()
+    return conn
 
 
 def make_test_db() -> tuple[sqlite3.Connection, sqlite3.Connection]:
