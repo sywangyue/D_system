@@ -259,3 +259,108 @@ def test_match_brand_multistrategy():
     assert match_brand_multistrategy(conn) is None
 
     conn.close()
+
+
+# ─── jufair-l2 ────────────────────────────────────────────────────────────────
+
+from scripts.data.jufair_l2_crawler import (  # noqa: E402, PLC0415
+    JUFAIR_BASE,
+    export_categories,
+    load_categories,
+)
+
+
+def test_jufair_url_pattern():
+    """验证 jufair.com URL 生成逻辑正确。"""
+    # URL 模式: /exhibition-{parentId}-{subId}-0-0-0-0-1/
+    import re
+
+    # parent 页面: /exhibition-{parentId}
+    parent_url = f"{JUFAIR_BASE}/exhibition-123-0-0-0-0-0-1/"
+    m = re.search(r'/exhibition-(\d+)', parent_url)
+    assert m is not None, "parent ID 未匹配"
+    assert m.group(1) == "123", f"Expected parent_id=123, got {m.group(1)}"
+
+    # subcategory 页面: /exhibition-{parentId}-{subId}
+    sub_url = f"{JUFAIR_BASE}/exhibition-123-456-0-0-0-0-1/"
+    m = re.search(r'/exhibition-123-(\d+)', sub_url)
+    assert m is not None, "sub ID 未匹配"
+    assert m.group(1) == "456", f"Expected sub_id=456, got {m.group(1)}"
+
+    # Verify re.escape for dynamic parent_id extraction
+    pattern = re.compile(r'/exhibition-' + re.escape("123") + r'-(\d+)')
+    m = pattern.search(sub_url)
+    assert m is not None, "动态 parent_id 模式未匹配"
+    assert m.group(1) == "456"
+
+    # 无效 URL 不应匹配
+    bad_url = f"{JUFAIR_BASE}/some-other-page/"
+    m = re.search(r'/exhibition-(\d+)', bad_url)
+    assert m is None, "无效 URL 不应匹配 exhibition 模式"
+
+
+def test_export_import_categories():
+    """验证 export → JSON → import 的 round-trip 正确。"""
+    import json
+    import tempfile
+
+    sample_data = {
+        "parent_categories": [
+            {"name": "机械", "url": f"{JUFAIR_BASE}/exhibition-1-0-0-0-0-0-1/", "parent_id": "1"},
+            {"name": "电子", "url": f"{JUFAIR_BASE}/exhibition-2-0-0-0-0-0-1/", "parent_id": "2"},
+        ],
+        "subcategories": [
+            {"name": "机床", "sub_id": "10", "parent_id": "1"},
+            {"name": "机器人", "sub_id": "11", "parent_id": "1"},
+            {"name": "半导体", "sub_id": "20", "parent_id": "2"},
+        ],
+        "crawled_at": "2026-05-07T00:00:00Z",
+    }
+
+    with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
+        tmp_path = f.name
+
+    try:
+        # Export
+        export_categories(sample_data, tmp_path)
+
+        # Import
+        loaded = load_categories(tmp_path)
+
+        # Verify structure
+        assert "parent_categories" in loaded
+        assert "subcategories" in loaded
+        assert loaded["crawled_at"] == "2026-05-07T00:00:00Z"
+
+        # Verify parents
+        assert len(loaded["parent_categories"]) == 2
+        assert loaded["parent_categories"][0]["name"] == "机械"
+        assert loaded["parent_categories"][1]["parent_id"] == "2"
+
+        # Verify subs
+        assert len(loaded["subcategories"]) == 3
+        sub_names = {s["name"] for s in loaded["subcategories"]}
+        assert sub_names == {"机床", "机器人", "半导体"}
+
+        # Verify empty data edge case
+        empty_data = {"parent_categories": [], "subcategories": [], "crawled_at": ""}
+        export_categories(empty_data, tmp_path)
+        loaded_empty = load_categories(tmp_path)
+        assert len(loaded_empty["parent_categories"]) == 0
+        assert len(loaded_empty["subcategories"]) == 0
+
+    finally:
+        import os
+        os.unlink(tmp_path)
+
+
+def test_load_categories_file_not_found():
+    """文件不存在的错误处理。"""
+    import json
+    try:
+        load_categories("/tmp/nonexistent_jufair_cats_XXXX.json")
+        assert False, "Expected FileNotFoundError"
+    except FileNotFoundError:
+        pass
+    except json.JSONDecodeError:
+        pass
