@@ -102,7 +102,25 @@ python3 tools/import_tags.py --file exports/tagging_batch_YYYYMMDD.xlsx --change
 
 `docs/readme-hero-mds.png` 由 `scripts/generate_readme_hero.py` 生成：**透明背景**（PNG alpha，无填充底色）；主标 **MDS** 为 **2×2 物理像素/逻辑格**；副标 **BD Database** 为 **1×1 物理像素/逻辑格**（更细）；字色 **#fe5c00**（RGBA 不透明）。
 
-企业 VI 见 `3_Messe Düsseldorf_Corporate Design Manual.pdf`。
+---
+
+## 贡献方式
+
+本项目由 **Claude Code**（Anthropic 的 AI 编程代理）驱动开发，配合 GSD（Get Shit Done）工作流框架进行 Phase 规划与自治执行。
+
+```bash
+# 启动 Claude Code 并加载项目上下文
+claude
+
+# 在 Claude Code 会话中使用 GSD 命令
+/gsd-plan-phase <N>     # 规划 Phase N
+/gsd-execute-phase <N>  # 执行 Phase N
+/gsd-discuss-phase <N>  # 讨论 Phase N 设计决策
+```
+
+**核心代理角色**：Ralph（架构/基础设施）、Cursor（前端组件）、Hermes（爬虫/数据采集）。
+
+PR 提交前请确保通过 `npm test` 和 `pytest`。
 
 ---
 
