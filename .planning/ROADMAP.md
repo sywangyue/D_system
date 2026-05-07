@@ -56,23 +56,23 @@
 
 **Agent assignment:** Hermes（3 个串行子任务）
 
-### Phase 4 · 前端架构全面迁移（Next.js + Supabase + Cloudflare）
+### Phase 4 · 前端架构全面迁移（FastAPI JWT + MD Brand + 4-Layer Dashboard + SQLite BFF）
 
-**Goal:** Next.js 15 + Supabase PostgreSQL 全栈项目；实现 Login/Dashboard/Calendar/Map/Setting 五个模块；部署至 Cloudflare Workers。
+**Goal:** 实现 MD Corporate Design 品牌规范的 4 层 Dashboard + 简化 Leaflet 地图 + 日历 + 设置；FastAPI JWT 认证（替代 Supabase）；SQLite BFF 直连（替代 PostgreSQL）；科技感 UI + 真实 mwlab.db 数据验证。
 
-**Agent assignments:** CC（架构层)+ Cursor（UI 组件）+ Claude Design（UI 规范已完成）
+**Agent assignments:** CC（全栈架构 + API 重写 + 验证）
 
 **Plans:** 7 plans in 4 waves
 
-| Wave | Plan | Agent | Objective |
-|------|------|-------|-----------|
-| 1 | 04-01 | CC | Next.js 项目初始化 + 全部依赖 + 测试框架 |
-| 2 | 04-02 | CC | DB Schema 迁移 + Supabase Auth + 路由守卫 middleware |
-| 2 | 04-03 | Cursor | 根布局 layout + Sidebar + KPI 卡片 + FilterTabs + PieChart 共享组件 |
-| 3 | 04-04 | CC | API Routes（Dashboard/Brands/Tags/Users）+ seed-users + 部署配置 |
-| 3 | 04-05 | Cursor | 登录页 + Dashboard 主页（FilterTabs + KPI 卡片 + PieChart） |
-| 3 | 04-06 | Cursor | Calendar 日历 + Map 地图 + Setting 系统设置 |
-| 4 | 04-07 | CC | SQLite→Supabase 数据迁移 + 全量测试 + Cloudflare 部署验证 |
+| Wave | Plan | Objective |
+|------|------|-----------|
+| 0 | 04-01 | 基础设施：auth_api.py (FastAPI JWT) + lib/db.ts (better-sqlite3) + lib/auth.ts + Python 依赖 |
+| 0 | 04-04 | MD 品牌重塑：globals.css (橙色系) + KpiCard/FilterTabs/TrendBadge/PieChart 颜色替换 |
+| 1 | 04-02 | 认证 + 布局重写：middleware (JWT) + page.tsx + Sidebar + AppShell + types 清理 |
+| 1 | 04-03 | API 路由重写：dashboard/map/calendar/brands/users/status 全部 Supabase → better-sqlite3 |
+| 2 | 04-05 | 4 层 Dashboard：LayerTabs + SubTabs + KpiCardRow + TrendChart + BrandTable + 页面重构 |
+| 2 | 04-06 | 页面整合：登录页 (JWT 流程) + 日历/地图/设置 (MD 品牌色) |
+| 3 | 04-07 | 数据验证：KPI 准确性 + 过滤联动 + 地图聚合 + 绿色/Supabase 残留清理 |
 
 ---
 
@@ -85,7 +85,7 @@
 | 3 | DSH-01, AUT-01, OPS-01 — OPS-03 | ✅ Done |
 | 1b | FULL-CRAWL, CNEXPO-FULL, MERGE-FULL | ⏳ Pending |
 | 3b | EXPORT-TOOL, IMPORT-TOOL | ✅ Done |
-| 4 | UI-POOL | ✅ 7 plans created |
+| 4 | UI-POOL | ✅ 7 plans replaced (2026-05-07 replan) |
 | 5 | CLEAN-BRAND | ✅ 2 plans created |
 
 ---
@@ -114,4 +114,4 @@
 
 ---
 
-*Roadmap updated: 2026-05-07 · Phase 5 规划完成（2 plans in 2 waves）*
+*Roadmap updated: 2026-05-07 · Phase 4 replan complete (7 plans replaced)*
