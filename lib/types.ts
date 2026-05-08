@@ -99,10 +99,16 @@ export interface IndustryDistribution {
   value: number;
 }
 
+export interface YearTrendItem {
+  year: number;
+  area_sqm: number;
+}
+
 export interface DashboardResponse {
   kpis: KpiData;
   brands: Brand[];
   industryDistribution: IndustryDistribution[];
+  yearTrend: YearTrendItem[];
 }
 
 export interface ApiError {
