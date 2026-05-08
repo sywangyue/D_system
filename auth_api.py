@@ -21,22 +21,21 @@ from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from typing import Optional
 
+import bcrypt
 import jwt
 from fastapi import FastAPI, HTTPException, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from passlib.context import CryptContext
 from pydantic import BaseModel
 
 # ─── 配置 ──────────────────────────────────────────────────────────────────────
 BASE_DIR = Path(__file__).parent
 DB_PATH = BASE_DIR / "mwlab.db"
 
-JWT_SECRET = os.environ.get("JWT_SECRET", "mwlab-dev-secret-2026")
+JWT_SECRET = os.environ.get("JWT_SECRET", "mwlab-dev-secret-2026-with-extra-length")
 JWT_ALGORITHM = "HS256"
 JWT_EXPIRY_HOURS = 24
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 
 
@@ -92,7 +91,10 @@ def login(req: LoginRequest):
         conn.close()
 
     # 统一 401 —— 不泄露用户名是否存在（T-04-01 防信息泄露）
-    if not user or not pwd_context.verify(req.password, user["password_hash"]):
+    if not user or not bcrypt.checkpw(
+            req.password.encode("utf-8"),
+            user["password_hash"].encode("utf-8"),
+        ):
         raise HTTPException(status_code=401, detail="邮箱或密码错误")
 
     # 更新 last_login
