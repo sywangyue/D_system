@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { getUserInfo } from "@/lib/auth";
 
 interface UserEntry {
   id: string;
@@ -24,7 +24,6 @@ interface DataStatus {
 interface SystemInfo {
   node_version: string;
   next_version: string;
-  supabase_project_ref: string;
   build_time: string;
 }
 
@@ -86,7 +85,6 @@ function crawlStatusLabel(status: string | null): string {
 
 export default function SettingContent() {
   const router = useRouter();
-  const supabase = createClient();
 
   // Auth + RBAC state
   const [roleChecked, setRoleChecked] = useState(false);
@@ -100,15 +98,12 @@ export default function SettingContent() {
   const [statusError, setStatusError] = useState<string | null>(null);
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      const role =
-        (data.user?.app_metadata as Record<string, unknown>)?.role as string || "readonly";
-      if (role !== "admin") {
-        router.replace("/dashboard");
-        return;
-      }
-      setRoleChecked(true);
-    });
+    const info = getUserInfo();
+    if (!info || info.role !== "admin") {
+      router.replace("/dashboard");
+      return;
+    }
+    setRoleChecked(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -417,9 +412,9 @@ function SystemInfoBlock({
           <span className="text-text-primary font-mono">{sys?.next_version ?? "--"}</span>
         </div>
         <div>
-          <span className="text-text-secondary">Supabase 项目：</span>
+          <span className="text-text-secondary">FastAPI：</span>
           <span className="text-text-primary font-mono">
-            {sys?.supabase_project_ref ?? "--"}
+            {process.env.NEXT_PUBLIC_FASTAPI_URL || "http://localhost:8000"}
           </span>
         </div>
         <div>

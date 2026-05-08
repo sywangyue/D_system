@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
+import { saveAuth } from "@/lib/auth";
 import { AlertCircle, Loader2 } from "lucide-react";
 
 export default function LoginPage() {
@@ -31,27 +31,36 @@ export default function LoginPage() {
 
     setLoading(true);
 
-    const supabase = createClient();
-    const { error: authError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_FASTAPI_URL || "http://localhost:8000"}/api/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    if (authError) {
-      if (
-        authError.message === "Invalid login credentials" ||
-        authError.message.includes("Invalid login credentials")
-      ) {
-        setError("邮箱或密码错误，请重试");
-      } else {
-        setError("网络异常，请稍后重试");
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          setError("邮箱或密码错误，请重试");
+        } else {
+          setError(body.detail || "网络异常，请稍后重试");
+        }
+        setLoading(false);
+        return;
       }
-      setLoading(false);
-      return;
-    }
 
-    router.push("/dashboard");
-    router.refresh();
+      const data = await res.json();
+      saveAuth(
+        { email: data.email, role: data.role, display_name: data.display_name },
+        data.token,
+      );
+
+      router.push("/dashboard");
+      router.refresh();
+    } catch {
+      setError("网络异常，请稍后重试");
+      setLoading(false);
+    }
   }
 
   return (
