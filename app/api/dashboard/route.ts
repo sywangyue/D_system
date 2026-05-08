@@ -1,77 +1,79 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import type { Brand } from "@/lib/types";
+import { NextRequest, NextResponse } from 'next/server'
+import { getDb } from '@/lib/db'
 
-export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const industry_l2 = searchParams.get("industry_l2");
-  const competition_relation = searchParams.get("competition_relation");
-  const mds_related = searchParams.get("mds_related");
+export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url)
+  const industryL2 = searchParams.get('industry_l2')
+  const relation = searchParams.get('competition_relation')
+  const mds = searchParams.get('mds_related')
 
-  const supabase = await createClient();
+  let where = 'WHERE 1=1'
+  const params: (string | number)[] = []
 
-  let brandQuery = supabase.from("exhibition_brand").select("*");
-
-  if (industry_l2) {
-    brandQuery = brandQuery.eq("industry_l2", industry_l2);
+  if (industryL2) {
+    where += ' AND b.industry_l2 = ?'
+    params.push(industryL2)
   }
-  if (competition_relation) {
-    const relations = competition_relation.split(",").filter(Boolean);
+  if (relation && relation !== '全部' && relation !== '') {
+    const relations = relation.split(',').filter(Boolean)
     if (relations.length > 0) {
-      brandQuery = brandQuery.in("competition_relation", relations);
+      const placeholders = relations.map(() => '?').join(',')
+      where += ` AND b.competition_relation IN (${placeholders})`
+      params.push(...relations)
     }
   }
-  if (mds_related) {
-    brandQuery = brandQuery.in("mds_related", [mds_related]);
+  if (mds && mds !== '全部' && mds !== '') {
+    where += ' AND b.mds_related = ?'
+    params.push(mds)
   }
 
-  const { data, error } = (await brandQuery) as {
-    data: Brand[] | null;
-    error: { message: string } | null;
-  };
-  const brands = data;
+  const db = getDb()
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  // KPI aggregation
+  const kpiRow = db.prepare(`
+    SELECT
+      COALESCE(SUM(e.area_sqm), 0) as total_area,
+      COALESCE(SUM(e.exhibitors_count), 0) as total_exhibitors,
+      COALESCE(SUM(e.visitors_count), 0) as total_visitors,
+      COUNT(DISTINCT b.organizer) as total_organizers
+    FROM exhibition_brand b
+    JOIN exhibition_edition e ON e.brand_id = b.brand_id
+    ${where}
+  `).get(...params) as {
+    total_area: number
+    total_exhibitors: number
+    total_visitors: number
+    total_organizers: number
   }
 
-  if (!brands || brands.length === 0) {
-    return NextResponse.json({
-      kpis: { total_area: 0, total_exhibitors: 0, total_visitors: 0, total_organizers: 0 },
-      brands: [],
-      industryDistribution: [],
-    });
-  }
+  // Brand list
+  const brands = db.prepare(`
+    SELECT b.* FROM exhibition_brand b ${where} ORDER BY b.name_cn
+  `).all(...params)
 
-  const brandIds = brands.map((b) => b.brand_id);
+  // Industry distribution
+  const industryDistribution = db.prepare(`
+    SELECT industry_l2 as name, COUNT(*) as value
+    FROM exhibition_brand
+    ${where}
+    GROUP BY industry_l2
+    ORDER BY value DESC
+  `).all(...params)
 
-  const { data: editions, error: editionsError } = (await supabase
-    .from("exhibition_edition")
-    .select("area_sqm, exhibitors_count, visitors_count")
-    .in("brand_id", brandIds)) as {
-    data: ({ area_sqm: number | null; exhibitors_count: number | null; visitors_count: number | null })[] | null;
-    error: { message: string } | null;
-  };
+  // Year-over-year trend (B1 fix — for TrendChart component)
+  const yearTrend = db.prepare(`
+    SELECT e.year, COALESCE(SUM(e.area_sqm), 0) as area_sqm
+    FROM exhibition_brand b
+    JOIN exhibition_edition e ON e.brand_id = b.brand_id
+    ${where}
+    GROUP BY e.year
+    ORDER BY e.year
+  `).all(...params)
 
-  if (editionsError) {
-    return NextResponse.json({ error: editionsError.message }, { status: 500 });
-  }
-
-  const kpis = {
-    total_area: (editions || []).reduce((sum, e) => sum + (e.area_sqm || 0), 0),
-    total_exhibitors: (editions || []).reduce((sum, e) => sum + (e.exhibitors_count || 0), 0),
-    total_visitors: (editions || []).reduce((sum, e) => sum + (e.visitors_count || 0), 0),
-    total_organizers: new Set(brands.map((b) => b.organizer).filter(Boolean)).size,
-  };
-
-  const distMap = new Map<string, number>();
-  brands.forEach((b) => {
-    const key = b.industry_l2 || "未分类";
-    distMap.set(key, (distMap.get(key) || 0) + 1);
-  });
-  const industryDistribution = Array.from(distMap.entries()).map(
-    ([name, value]) => ({ name, value }),
-  );
-
-  return NextResponse.json({ kpis, brands, industryDistribution });
+  return NextResponse.json({
+    kpis: kpiRow,
+    brands,
+    industryDistribution,
+    yearTrend,
+  })
 }
