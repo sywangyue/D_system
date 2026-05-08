@@ -80,7 +80,7 @@ export async function GET(_request: Request) {
   const rows = db.prepare(`
     SELECT e.city,
            COUNT(DISTINCT b.brand_id) as count,
-           GROUP_CONCAT(DISTINCT b.name_cn, ', ') as exhibition_names,
+           GROUP_CONCAT(DISTINCT b.name_cn) as exhibition_names,
            MAX(CASE WHEN b.is_international = 1 THEN 1 ELSE 0 END) as has_international
     FROM exhibition_edition e
     JOIN exhibition_brand b ON b.brand_id = e.brand_id
@@ -96,7 +96,7 @@ export async function GET(_request: Request) {
 
   const markers = rows.map((row) => {
     const [lat, lng] = getCityCoord(row.city)
-    const names = row.exhibition_names ? row.exhibition_names.split(', ') : []
+    const names = row.exhibition_names ? row.exhibition_names.split(',').map(n => n.trim()) : []
     return {
       city: row.city,
       count: row.count,
