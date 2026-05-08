@@ -1,5 +1,4 @@
 // ─── Database Row Types ──────────────────────────────────────────────
-// Matches PostgreSQL schema in supabase/migrations/20260506190000_init.sql
 
 export interface Brand {
   brand_id: string;
@@ -134,64 +133,4 @@ export const TAG_FIELDS = [
   "notes",
 ] as const;
 
-// ─── Supabase Type Helpers ────────────────────────────────────────────
-// Required by @supabase/supabase-js GenericTable constraint.
-// Not exported by the package, so defined locally.
-
-interface TableRelationship {
-  foreignKeyName: string;
-  columns: string[];
-  isOneToOne?: boolean;
-  referencedRelation: string;
-  referencedColumns: string[];
-}
-
-// ─── Database Type (for use with supabase.from<"table">()) ───────────
-
-export type Database = {
-  public: {
-    Tables: {
-      exhibition_brand: {
-        Row: Brand;
-        Insert: Omit<Brand, "created_at" | "updated_at"> & {
-          created_at?: string;
-          updated_at?: string;
-        };
-        Update: Partial<Omit<Brand, "brand_id">>;
-        Relationships: TableRelationship[];
-      };
-      exhibition_edition: {
-        Row: Edition;
-        Insert: Omit<Edition, "recorded_at"> & { recorded_at?: string };
-        Update: Partial<Omit<Edition, "edition_id">>;
-        Relationships: TableRelationship[];
-      };
-      data_provenance: {
-        Row: DataProvenance;
-        Insert: Omit<DataProvenance, "crawled_at"> & { crawled_at?: string };
-        Update: Partial<Omit<DataProvenance, "record_id">>;
-        Relationships: TableRelationship[];
-      };
-      crawl_log: {
-        Row: CrawlLog;
-        Insert: Omit<CrawlLog, "id" | "created_at"> & {
-          id?: number;
-          created_at?: string;
-        };
-        Update: Partial<Omit<CrawlLog, "id">>;
-        Relationships: TableRelationship[];
-      };
-      manual_tag_history: {
-        Row: ManualTagHistory;
-        Insert: Omit<ManualTagHistory, "id" | "changed_at"> & {
-          id?: number;
-          changed_at?: string;
-        };
-        Update: Partial<Omit<ManualTagHistory, "id">>;
-        Relationships: TableRelationship[];
-      };
-    };
-    Views: {};
-    Functions: {};
-  };
-};
+// ─── (Removed in 04-02) ────────────────────────────────────────
