@@ -1,40 +1,57 @@
-// ─── 客户端认证工具 ──────────────────────────────────────────────
-// 从 localStorage 读取用户信息，替代 Supabase Auth 客户端
+// 客户端认证工具 — localStorage-based JWT helpers
+// 替代 Supabase Auth 客户端
+
+const AUTH_KEY = 'mwlab_auth'
 
 export interface UserInfo {
+  email: string
+  role: string
+  display_name: string
+}
+
+export interface AuthState {
   userEmail: string | null
   isAdmin: boolean
 }
 
-/**
- * 从 localStorage 读取用户信息
- * 登录成功后由 /api/auth/login 或登录页面将 JWT payload 存入 'user_info'
- */
-export function getUserInfo(): UserInfo {
-  if (typeof window === 'undefined') {
-    return { userEmail: null, isAdmin: false }
-  }
-
-  try {
-    const raw = localStorage.getItem('user_info')
-    if (!raw) return { userEmail: null, isAdmin: false }
-
-    const parsed = JSON.parse(raw)
-    return {
-      userEmail: parsed.email ?? null,
-      isAdmin: parsed.role === 'admin',
-    }
-  } catch {
-    return { userEmail: null, isAdmin: false }
-  }
+export function saveAuth(info: UserInfo, token: string): void {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(AUTH_KEY, JSON.stringify({ ...info, token }))
+  localStorage.setItem('user_info', JSON.stringify({ email: info.email, role: info.role }))
 }
 
-/**
- * 清除登录态并跳转到 /login
- */
+export function getUserInfo(): UserInfo | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(AUTH_KEY)
+    if (!raw) return null
+    const parsed = JSON.parse(raw)
+    return { email: parsed.email, role: parsed.role, display_name: parsed.display_name }
+  } catch { return null }
+}
+
+export function getAuthState(): AuthState {
+  const info = getUserInfo()
+  if (!info) return { userEmail: null, isAdmin: false }
+  return { userEmail: info.email, isAdmin: info.role === 'admin' }
+}
+
+export function getToken(): string | null {
+  if (typeof window === 'undefined') return null
+  try {
+    const raw = localStorage.getItem(AUTH_KEY)
+    if (!raw) return null
+    return JSON.parse(raw).token || null
+  } catch { return null }
+}
+
 export function clearAuth(): void {
+  if (typeof window === 'undefined') return
+  localStorage.removeItem(AUTH_KEY)
   localStorage.removeItem('user_info')
-  // 清除 session cookie（通过设置一个过期 cookie）
-  document.cookie = 'session=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT'
-  window.location.href = '/login'
+  document.cookie = 'session=; path=/; max-age=0'
+}
+
+export function isAuthenticated(): boolean {
+  return getUserInfo() !== null
 }

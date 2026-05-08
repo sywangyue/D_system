@@ -10,7 +10,7 @@ import {
   Settings,
   LogOut,
 } from "lucide-react"
-import { getUserInfo, clearAuth } from "@/lib/auth"
+import { getAuthState, clearAuth } from "@/lib/auth"
 
 interface NavItem {
   href: string
@@ -28,7 +28,7 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function Sidebar() {
   const pathname = usePathname()
-  const [userInfo] = useState(() => getUserInfo())
+  const [userInfo] = useState(() => getAuthState())
   const { userEmail, isAdmin } = userInfo
 
   const handleLogout = () => {
