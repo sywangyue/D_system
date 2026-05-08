@@ -1,15 +1,22 @@
-import { createClient } from "@/lib/supabase/server";
-import { redirect } from "next/navigation";
+import { cookies } from 'next/headers'
+import { redirect } from 'next/navigation'
+import { jwtVerify } from 'jose'
 
 export default async function Home() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const cookieStore = await cookies()
+  const token = cookieStore.get('session')?.value
 
-  if (user) {
-    redirect("/dashboard");
+  if (token) {
+    try {
+      const secret = new TextEncoder().encode(
+        process.env.JWT_SECRET || 'mwlab-dev-secret-2026'
+      )
+      await jwtVerify(token, secret)
+      redirect('/dashboard')
+    } catch {
+      redirect('/login')
+    }
   } else {
-    redirect("/login");
+    redirect('/login')
   }
 }

@@ -1,100 +1,96 @@
-"use client";
+"use client"
 
-import { usePathname } from "next/navigation";
-import Link from "next/link";
-import { useEffect, useState } from "react";
-import { createClient } from "@/lib/supabase/client";
+import { usePathname } from "next/navigation"
+import Link from "next/link"
+import { useState } from "react"
+import {
+  LayoutDashboard,
+  Calendar,
+  Map,
+  Settings,
+  LogOut,
+} from "lucide-react"
+import { getUserInfo, clearAuth } from "@/lib/auth"
 
 interface NavItem {
-  href: string;
-  label: string;
-  icon: string;
-  adminOnly?: boolean;
+  href: string
+  label: string
+  icon: React.ReactNode
+  adminOnly?: boolean
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: "dashboard" },
-  { href: "/calendar", label: "日历", icon: "calendar" },
-  { href: "/map", label: "地图", icon: "map" },
-  { href: "/setting", label: "设置", icon: "settings", adminOnly: true },
-];
+  { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
+  { href: "/calendar", label: "日历", icon: <Calendar size={20} /> },
+  { href: "/map", label: "地图", icon: <Map size={20} /> },
+  { href: "/setting", label: "设置", icon: <Settings size={20} />, adminOnly: true },
+]
 
 export default function Sidebar() {
-  const pathname = usePathname();
-  const [userEmail, setUserEmail] = useState<string | null>(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const supabase = createClient();
+  const pathname = usePathname()
+  const [userInfo] = useState(() => getUserInfo())
+  const { userEmail, isAdmin } = userInfo
 
-  useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
-      if (data.user) {
-        setUserEmail(data.user.email ?? null);
-        setIsAdmin(data.user.app_metadata?.role === "admin");
-      }
-    });
-  }, []);
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/login";
-  };
+  const handleLogout = () => {
+    clearAuth()
+  }
 
   const visibleItems = NAV_ITEMS.filter(
     (item) => !item.adminOnly || isAdmin
-  );
+  )
 
   return (
     <aside className="w-sidebar flex-shrink-0 h-full bg-surface border-r border-border flex flex-col">
       {/* Logo area */}
-      <div className="h-16 flex items-center px-4">
-        <span className="text-base font-semibold text-text-primary">MWLAB</span>
+      <div className="h-16 flex items-center px-4 border-b border-border">
+        <span className="text-base font-semibold text-text-primary tracking-wide">
+          MWLAB
+        </span>
       </div>
 
       {/* Navigation items */}
-      <nav className="flex-1">
+      <nav className="flex-1 py-2">
         {visibleItems.map((item) => {
-          const isActive = pathname.startsWith(item.href);
+          const isActive = pathname.startsWith(item.href)
 
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-4 min-h-nav-item transition-[background] duration-150 ease
+              className={`flex items-center gap-3 px-4 min-h-nav-item transition-all duration-150 ease
                 ${isActive
-                  ? "border-l-4 border-accent bg-accent-surface"
-                  : "border-l-4 border-transparent hover:bg-border"
+                  ? "border-l-4 border-accent bg-accent-surface text-accent-dark"
+                  : "border-l-4 border-transparent hover:bg-border text-gray-600 hover:text-text-primary"
                 }`}
             >
-              <svg
-                className={`w-5 h-5 ${isActive ? "text-accent" : "text-gray-500"}`}
-                aria-hidden="true"
-              >
-                <use href={`/icons.svg#${item.icon}`} />
-              </svg>
+              <span className={isActive ? "text-accent" : "text-gray-400"}>
+                {item.icon}
+              </span>
               <span
-                className={`text-sm ${isActive ? "font-semibold text-accent-dark" : "font-normal text-gray-700"}`}
+                className={`text-sm ${isActive ? "font-semibold" : "font-normal"}`}
               >
                 {item.label}
               </span>
             </Link>
-          );
+          )
         })}
       </nav>
 
       {/* Bottom user area */}
       {userEmail && (
         <div className="mt-auto p-4 border-t border-border">
-          <div className="text-sm text-text-secondary truncate">
+          <div className="text-sm text-text-secondary truncate mb-1">
             {userEmail}
           </div>
           <button
             onClick={handleLogout}
-            className="text-sm text-gray-500 hover:text-text-primary mt-1 cursor-pointer"
+            className="flex items-center gap-2 text-sm text-gray-500 hover:text-text-primary transition-colors cursor-pointer"
           >
-            退出
+            <LogOut size={16} />
+            <span>退出</span>
           </button>
         </div>
       )}
     </aside>
-  );
+  )
 }
