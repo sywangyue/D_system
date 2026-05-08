@@ -115,7 +115,7 @@ Phase 4 的核心任务是将项目从旧版 Hirezy 风格的初始前端全面�
 | 行业分布图表（recharts） | Browser / Client | — | 纯客户端 SVG 渲染，无需 SSR |
 | 日历视图（react-big-calendar） | Browser / Client | — | 纯客户端，dynamic import + ssr:false |
 | 地图（Leaflet） | Browser / Client | — | 依赖 window/document，必须 dynamic import |
-| Setting 页用户管理 | API / Backend (FastAPI → SQLite) | Browser / Client | 用户列表查询在 FastAPI 执行 |
+| Setting 页用户管理 | API / Backend (Next.js BFF → better-sqlite3) | — | 见 W2：只读查询，无业务逻辑，直接走 BFF 层 |
 | 打标操作（PATCH tags） | API / Backend (FastAPI tag_api.py) | — | 标签验证逻辑在 tag_api.py 现有实现 |
 | 静态资产 / CSS | CDN / Static (Next.js build output) | — | Next.js 构建产出的静态文件由 CDN 缓存 |
 
@@ -235,6 +235,9 @@ Phase 4 的核心任务是将项目从旧版 Hirezy 风格的初始前端全面�
 # Python 后端新增依赖
 pip install pyjwt passlib[bcrypt]
 
+# 前端 — 04-02 需要安装 jose（Edge Runtime 兼容 JWT 库）
+npm install jose
+
 # 前端 — 所有核心库已安装
 npm list better-sqlite3 leaflet react-leaflet recharts lucide-react react-big-calendar
 ```
@@ -307,8 +310,8 @@ npm list better-sqlite3 leaflet react-leaflet recharts lucide-react react-big-ca
 用户操作 → 前端状态更新 → fetch(`/api/dashboard?industry_l2=X&relation=Y`)
   → Next.js API Route
     → better-sqlite3.prepare(SQL).all(params)
-    → JSON Response
-  → 前端渲染（KPI 卡片/图表/列表）
+    → JSON Response { kpis, brands, industryDistribution, yearTrend }
+  → 前端渲染（KPI 卡片/图表/列表/TrendChart）
 
 用户登录 → POST /api/auth/login { email, password }
   → FastAPI auth_api.py
@@ -340,7 +343,7 @@ DashboardPage
 │
 ├── [Layer 1 — 概览层]
 │   ├── SubTab: 总览 → KpiCardRow（展览面积/展商/观众/集团 + 年比趋势）
-│   ├── SubTab: 趋势 → YearTrendChart（折线图 + KPI 年比变化）
+│   ├── SubTab: 趋势 → TrendChart（数据源: API yearTrend 字段）
 │   ├── SubTab: 集团 → OrganizerBreakdown（主办方 Top 10）
 │   └── SubTab: 快照 → QuickStats（数据概览文本摘要）
 │
@@ -439,7 +442,17 @@ export async function GET(request: NextRequest) {
     ORDER BY value DESC
   `).all(...params)
 
-  return NextResponse.json({ kpis: kpiRow, brands, industryDistribution })
+  // 年比趋势（B1 修复 —— 供 TrendChart 组件使用）
+  const yearTrend = db.prepare(`
+    SELECT e.year, COALESCE(SUM(e.area_sqm), 0) as area_sqm
+    FROM exhibition_brand b
+    JOIN exhibition_edition e ON e.brand_id = b.brand_id
+    ${where}
+    GROUP BY e.year
+    ORDER BY e.year
+  `).all(...params)
+
+  return NextResponse.json({ kpis: kpiRow, brands, industryDistribution, yearTrend })
 }
 ```
 
@@ -449,6 +462,11 @@ export async function GET(request: NextRequest) {
 -- Layer 1 — 概览 KPI（已有）
 SELECT SUM(area_sqm), SUM(exhibitors_count), SUM(visitors_count), COUNT(DISTINCT organizer)
 FROM exhibition_brand b JOIN exhibition_edition e ON e.brand_id = b.brand_id
+
+-- Layer 1 — 年比趋势（B1 修复）
+SELECT e.year, SUM(e.area_sqm) as area_sqm
+FROM exhibition_brand b JOIN exhibition_edition e ON e.brand_id = b.brand_id
+GROUP BY e.year ORDER BY e.year
 
 -- Layer 2 — 行业分布
 SELECT industry_l2, COUNT(*) as cnt
@@ -504,13 +522,13 @@ mwlab-dashboard/
 │   ├── setting/
 │   │   └── page.tsx            # 设置页（admin only）
 │   └── api/
-│       ├── dashboard/route.ts  # BFF: 聚合查询 + 过滤
+│       ├── dashboard/route.ts  # BFF: 聚合查询 + 过滤 + 年比趋势
 │       ├── brands/[id]/
 │       │   ├── route.ts        # BFF: 品牌详情 (better-sqlite3)
 │       │   └── tags/route.ts   # Proxy: → FastAPI PATCH tags
 │       ├── calendar/route.ts   # BFF: 日历事件
 │       ├── map/route.ts        # BFF: 地图标注
-│       └── users/route.ts      # Proxy: → FastAPI GET users
+│       └── users/route.ts      # BFF: 用户列表 (better-sqlite3)
 ├── components/
 │   ├── layout/
 │   │   ├── AppShell.tsx        # 根布局壳（修改：MD Logo）
@@ -522,7 +540,7 @@ mwlab-dashboard/
 │   │   ├── KpiCard.tsx         # 单张 KPI 卡片（玻璃态）
 │   │   ├── TrendBadge.tsx      # 趋势徽章（MD 橙色调）
 │   │   ├── FilterTabs.tsx      # 三排过滤（MD 胶囊色）
-│   │   ├── YearTrendChart.tsx  # 年比趋势图（recharts）
+│   │   ├── YearTrendChart.tsx  # 年比趋势图（recharts，数据源 API yearTrend）
 │   │   ├── RelationPieChart.tsx # 竞争关系饼图
 │   │   ├── OrganizerTable.tsx  # 主办方排名表
 │   │   └── BrandTable.tsx      # 品牌明细表
@@ -989,25 +1007,21 @@ export default function KpiCard({ label, value, unit, trend, variant = 'standard
 
 ## Open Questions
 
-1. **FastAPI auth_api.py 合并还是独立？**
+1. **FastAPI auth_api.py 合并还是独立？** → **(RESOLVED: 独立 auth_api.py)**
    - What we know: tag_api.py 是单一 FastAPI 实例，在 port 8000 运行。
-   - What's unclear: 应该将 auth 端点并入 tag_api.py，还是新建 auth_api.py 独立运行（不同端口）。
    - Recommendation: **并入 tag_api.py**（添加 `/api/auth/login` 路由），避免多端口运维复杂性。在 tag_api.py 顶部添加 CORS middleware。
+   - **Decision (04-01 / D-18 discretion):** 创建独立 auth_api.py。理由：关注点分离——auth 与 tag 职责不同；避免 CORS middleware 配置冲突（tag_api.py 已有 CORS 配置）；auth 端点可能需要独立扩缩容或更换 JWT 实现。D-17 "保留 FastAPI" 的实现同时兼容两种方式。Next.js API Routes 代理层屏蔽了后端子服务细节。
 
-2. **现有 user 表密码格式？**
+2. **现有 user 表密码格式？** → **(RESOLVED: 04-01 Task 3 执行检查)**
    - What we know: SQLite `user` 表有 `password_hash` TEXT 字段。
-   - What's unclear: 现有数据的密码是 bcrypt 格式还是明文？需要先查看样本数据。
    - Recommendation: Wave 0 先检查 `SELECT password_hash FROM user LIMIT 1`，如果是明文就运行一次性迁移脚本 `python scripts/hash-passwords.py`。
+   - **Result:** 由 04-01 Task 3 在 Wave 0 执行检查；如为明文则通过 scripts/hash-passwords.py 迁移为 bcrypt。
 
-3. **Leaflet MarkerCluster 插件选择？**
-   - What we know: 需要城市级聚合标注，不使用 D3/Deck.gl。
-   - What's unclear: react-leaflet-cluster vs 手写 Leaflet.markercluster 封装。
-   - Recommendation: 使用 `react-leaflet-cluster`（轻量，1.4K stars）或纯 Leaflet.markercluster + useEffect 集成。因城市标注数量不超过 200 个，甚至可不使用聚合插件，直接用 CircleMarker 聚合（一个城市一个圆点）。
+3. **Leaflet MarkerCluster 插件选择？** → **(RESOLVED: 不使用集群插件)**
+   - Recommendation: 使用 CircleMarker 直接聚合（一个城市一个圆点），不引入 MarkerCluster 插件。城市标注数量预计不超过 200 个，CircleMarker 性能足够。详见 04-06 Task 3 map-view.tsx 实现。
 
-4. **部署目标？**
-   - What we know: 旧计划用 Cloudflare Workers，新决策未指定。
-   - What's unclear: 最终部署到哪里（本地服务器、VPS、Cloudflare）。
-   - Recommendation: 开发阶段 `npm run dev` 本地运行。部署可后续决定（Next.js 标准部署到任何 Node.js 主机）。保留 Dockerfile 选项。
+4. **部署目标？** → **(DEFERRED — 超出 Phase 4 范围)**
+   - Recommendation: 开发阶段 `npm run dev` 本地运行。部署方式在后续 Phase 决定。保留 Dockerfile 选项。
 
 ---
 
@@ -1049,20 +1063,22 @@ export default function KpiCard({ label, value, unit, trend, variant = 'standard
 | UI-POOL-AUTH | 未登录访问 /dashboard 重定向到 /login | integration | `vitest run tests/middleware.test.ts` | ❌ Wave 0 |
 | UI-POOL-AUTH | POST /api/auth/login 返回 JWT（正确密码） | unit | `pytest tests/test_auth_api.py -x -k test_login_success` | ❌ Wave 0 |
 | UI-POOL-AUTH | POST /api/auth/login 返回 401（错误密码） | unit | `pytest tests/test_auth_api.py -x -k test_login_fail` | ❌ Wave 0 |
-| UI-POOL-DASH | GET /api/dashboard 返回 KPI + brands + distribution | integration | `vitest run tests/api/dashboard.test.ts` | ❌ Wave 0 |
+| UI-POOL-DASH | GET /api/dashboard 返回 KPI + brands + distribution + yearTrend | integration | `vitest run tests/api/dashboard.test.ts` | ❌ Wave 0 |
 | UI-POOL-MAP | GET /api/map/markers 返回城市聚合数据 | integration | `vitest run tests/api/map.test.ts` | ❌ Wave 0 |
 | UI-POOL-TAGS | PATCH /api/brands/{id}/tags 写入 + 记录历史 | integration | `pytest tests/test_tag_api.py -x` | ✅ Wave 0（已有 tag_api 测试） |
 | UI-POOL-MD-COLORS | CSS 中无绿色 (#22C55E) 残留 | lint/check | `grep -r "#22C55E\|green-" app/ components/ --include='*.{tsx,css}'` | ❌ Wave 0 |
 | UI-POOL-4LAYER | Layer 1-4 切换不报错 | manual | 浏览器手动验证 | -- |
+| UI-POOL-TREND | TrendChart 显示 API yearTrend 数据非空状态 | integration | `curl -s /api/dashboard | jq '.yearTrend | length > 0'` | ❌ Wave 0 (B1) |
 
 ### Wave 0 Gaps
 
 - [ ] `tests/middleware.test.ts` — JWT 路由守卫测试
-- [ ] `tests/api/dashboard.test.ts` — better-sqlite3 聚合查询测试
+- [ ] `tests/api/dashboard.test.ts` — better-sqlite3 聚合查询测试（含 yearTrend）
 - [ ] `tests/api/map.test.ts` — 地图标注查询测试
 - [ ] `tests/test_auth_api.py` — FastAPI auth 端点测试（pytest）
 - [ ] 清理 `lib/supabase/` 目录
 - [ ] `pip install passlib[bcrypt] pyjwt`
+- [ ] `npm install jose`
 
 ---
 
@@ -1132,7 +1148,7 @@ export default function KpiCard({ label, value, unit, trend, variant = 'standard
 ### Wave 0（基础设施 — 30 分钟）
 1. `pip install passlib[bcrypt] pyjwt` — Python 依赖
 2. 检查 `SELECT password_hash FROM user LIMIT 1` — 确认密码格式
-3. 创建 `auth_api.py`（扩展 tag_api.py 或独立）— 含 login + verify 端点
+3. 创建 `auth_api.py`（独立文件）— 含 login + verify 端点
 4. 更新 `.env.local` — 移除 Supabase keys，添加 `JWT_SECRET`、`FASTAPI_URL`
 5. 清理 `lib/supabase/` 目录
 6. 清理 `supabase/migrations/`、`wrangler.jsonc`、`open-next.config.ts`
@@ -1140,11 +1156,12 @@ export default function KpiCard({ label, value, unit, trend, variant = 'standard
 
 ### Wave 1（核心架构 — 2 小时）
 1. 创建 `lib/db.ts` — better-sqlite3 单例
-2. 重写 `app/api/dashboard/route.ts` — better-sqlite3 聚合查询
+2. 重写 `app/api/dashboard/route.ts` — better-sqlite3 聚合查询（含 yearTrend）
 3. 重写 `app/api/map/markers/route.ts` — better-sqlite3 城市聚合
 4. 重写 `app/api/calendar/events/route.ts` — better-sqlite3 届次查询
 5. 重写 `app/api/brands/[id]/route.ts` — better-sqlite3 品牌详情
 6. 重写 `middleware.ts` — JWT cookie 验证（替换 Supabase）
+7. `npm install jose` — Edge Runtime 兼容 JWT 库
 
 ### Wave 2（MD 品牌重塑 — 1.5 小时）
 1. 更新 `globals.css` — 全部 Token 替换为 MD 色板
@@ -1158,7 +1175,7 @@ export default function KpiCard({ label, value, unit, trend, variant = 'standard
 ### Wave 3（4 层 Dashboard — 2 小时）
 1. 创建 `components/dashboard/LayerTabs.tsx` — 4 层切换器
 2. 创建 `components/dashboard/SubTabs.tsx` — 层内 Tab
-3. 创建 `app/dashboard/layer-1-overview/` — KPI 大卡 + 趋势 + 集团
+3. 创建 `app/dashboard/layer-1-overview/` — KPI 大卡 + 趋势（含 yearTrend）+ 集团
 4. 创建 `app/dashboard/layer-2-analysis/` — 行业/竞争/MDS 分析
 5. 创建 `app/dashboard/layer-3-geo/` — 地图/城市/场馆
 6. 创建 `app/dashboard/layer-4-detail/` — 品牌列表/搜索/导出
@@ -1173,11 +1190,12 @@ export default function KpiCard({ label, value, unit, trend, variant = 'standard
 ### Wave 5（登录 + 设置 + 验证 — 1 小时）
 1. 更新 `app/login/page.tsx` — MD Logo + JWT login flow
 2. 更新 `app/setting/page.tsx` — admin-only 用户管理 + 爬虫状态
-3. 数据验证：KPI 数字准确性、过滤联动、地图聚合数量
+3. 数据验证：KPI 数字准确性、过滤联动、地图聚合数量、yearTrend 非空
 
 ### REVIEW 清单
 - [ ] `grep -r "#22C55E\|green-" app/ components/ --include='*.{tsx,css}'` — 0 残留
 - [ ] `grep -r "supabase" app/ lib/ components/ --include='*.{tsx,ts}'` — 0 引用
 - [ ] `npx vitest run` — 绿
 - [ ] `npm run dev` + 浏览器验证 4 层切换
+- [ ] `curl -s /api/dashboard | python3 -c "import sys,json; d=json.load(sys.stdin); print('yearTrend:', len(d.get('yearTrend',[])))"` — yearTrend 非空
 - [ ] VS Code `Ctrl+Shift+P` → `Simple Browser` → `http://localhost:3000` → UI audit with gstack /browse

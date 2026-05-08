@@ -1,82 +1,64 @@
-# Phase 4: 前端架构全面迁移 + Dashboard UI - Context
+# Phase 4: UI/UX 全面重新架构 - Context
 
-**Gathered:** 2026-05-06
-**Status:** Ready for planning
+**Gathered:** 2026-05-07
+**Status:** Ready for planning (replan — 替代 2026-05-06 版 CONTEXT.md)
 
 <domain>
 ## Phase Boundary
 
-本 Phase 交付完整的可访问前端系统：技术栈从 FastAPI+SQLite 全面迁移至 Next.js+Supabase，实现用户登录、Dashboard数据可视化、Calendar展会日历、Map地理分布四个模块，并部署至 Cloudflare Pages（域名已购）。
+本 Phase 交付完整的 UI/UX 重新架构：基于 Messe Düsseldorf Corporate Design Manual 品牌规范，实现 4 层 Dashboard + 简化地图 + 科技感 UI，所有界面与现有 mwlab.db 数据关联验证。
 
-Phase 1b（全集采集）和 Phase 3b（打标工具，**✅ 工程已交付**）与本 Phase 并行推进，不构成前端启动的前置阻塞。
+Phase 1b（全集采集）和 Phase 3b（打标工具）与本 Phase 并行推进，不构成前端启动的前置阻塞。
 
 </domain>
 
 <decisions>
 ## Implementation Decisions
 
-### 技术栈 & 部署
+### MD 品牌规范集成（NEW — 2026-05-07 replan）
 
-- **D-01:** 前端框架 → **Next.js**（React生态，SSR/SSG均可，Cloudflare Pages原生支持）
-- **D-02:** 前端托管 → **Cloudflare Pages**（域名已购，免费，静态+Edge Functions）
-- **D-03:** 数据库 → **Supabase PostgreSQL**（免费层，500MB存储，当前数据约10MB，足够）
-- **D-04:** 认证系统 → **Supabase Auth**（email+password，替代现有 FastAPI JWT）
-- **D-05:** 后端逻辑 → **Next.js API Routes**（替代FastAPI，TypeScript实现，部署在CF Pages的Edge Functions）
-- **D-06:** 现有 FastAPI（`tag_api.py`、`merge_engine.py`等Python代码）→ **废弃，功能在API Routes中重写**
+- **D-01:** 品牌色彩体系 → 严格遵循 Messe Düsseldorf Corporate Design Manual（`3_Messe Düsseldorf_Corporate Design Manual.pdf`）中的官方色板，包括主色（MD Blue）、辅色、强调色，建立 CSS 变量体系（`--md-blue`, `--md-*`）
+- **D-02:** 品牌字体 → 遵循 CD Manual 字体规范（DIN / Arial 体系），建立 Tailwind fontFamily token
+- **D-03:** Logo 与品牌标识 → 登录页 + Dashboard 全局导航栏使用 MD 官方 Logo，遵循 CD Manual 中 Logo 安全距离和最小尺寸规范
+- **D-04:** 布局网格 → 遵循 CD Manual 定义的网格系统和间距规范
 
-> 注：Cloudflare Pages不支持Python运行时，FastAPI无法直接迁移，需要用TypeScript重写业务逻辑。
+### Dashboard 分层架构（NEW）
 
-### UI 界面结构
+- **D-05:** Dashboard 至少 4 层，每层 4-6 个标签栏 →
+  - **Layer 1（概览层）**：KPI 总览卡片（展览面积 / 展商数量 / 观众数量 / 展览集团 / 年比趋势）
+  - **Layer 2（分析层）**：行业分布（industry_l1/l2 饼图/柱状图）、竞争关系分布（竞争对手/潜在伙伴/新进入者）
+  - **Layer 3（地理层）**：城市/场馆分布热力、国内外展会对比
+  - **Layer 4（明细层）**：品牌/展会列表 + 排序/搜索/过滤
+  - 每层内部有 4-6 个可切换的 Tab/标签栏，用于切换不同的数据视角
+- **D-06:** 导航结构 → 左侧边栏或顶部导航栏（以 MD 品牌规范为准），支持 4 层 Dashboard 快速跳转
 
-- **D-07:** 左侧边栏4项 →
-  - Dashboard（所有角色可见）
-  - Calendar（所有角色可见）
-  - Map（所有角色可见）
-  - Setting（**仅 admin 可见**）
-- **D-08:** 界面参考风格 → Hirezy Dashboard（Image #1）：白色背景，圆角卡片，绿色主色调，浅紫色辅色卡片，现代简洁扁平风格
-- **D-09:** Dashboard 三排过滤 Tab（与PRD §5三个点选控件完全对齐）：
-  - **排1（行业筛选）**：单选 industry_l1，联动显示 industry_l2 子选项
-  - **排2（关系筛选）**：多选：全部 / 竞争对手 / 潜在伙伴 / 新进入者
-  - **排3（MDS相关性）**：单选：全部 / MFC / Reha China / 无
-- **D-10:** Dashboard KPI卡片区（与Image #2卡片样式完全一致，大数字+趋势徽章）：
-  - 卡片1：**展览面积**（area_sqm，显示过滤后总量，单位㎡）
-  - 卡片2：**展商数量**（exhibitors_count，过滤后合计）
-  - 卡片3：**观众数量**（visitors_count，过滤后合计）
-  - 卡片4：**展览集团**（organizer字段去重计数，即有多少个不同主办方）
-  - 趋势徽章：**年比年趋势**（yoy_trend字段，上升/平稳/下降 → 绿/灰/红 + ↑/→/↓）
-  - 图表区：**行业标签细分**（industry_l2分布，参考Image #2"Application by Department"圆饼图样式）
+### 地图模块（CHANGED）
 
-### 登录 & 账号系统
+- **D-07:** 地图方案 → **不再使用**过度精确的全球地图 + 标记线方案。改用 **Leaflet + OpenStreetMap 瓦片**（类似 openstreetmap.org 结构），仅做城市级聚合标注，不做热力密度 / 路径线
+- **D-08:** 地图功能范围 → 按 `city` 聚合展会数量，显示城市标记点，点击显示展会列表。不做路径动画 / 飞线 / 复杂热力图层
 
-- **D-11:** 登录方式 → 账号密码登录（Supabase Auth，email+password，无SSO/OAuth）
-- **D-12:** 账号总数 → 30个账号（Supabase免费层支持）
-- **D-13:** 权限角色 → 延用现有三角色定义（Phase 3已实现）：
-  - `admin`：全功能 + Setting页 + 打标权限
-  - `manager`：Dashboard + Calendar + Map + 打标权限，无Setting
-  - `readonly`：Dashboard + Calendar + Map，仅查看，不可打标
-- **D-14:** 账号初始化 → **seed脚本**（`scripts/seed-users.ts`），包含30个账号+密码+角色，一次性执行，账号修改通过Supabase控制台
-- **D-15:** Admin密码 → 通过seed脚本单独设置（明文写在seed脚本的环境变量中，`.env.local`隔离）
+### UI/UX 样式方向（NEW）
 
-### Calendar 模块
+- **D-09:** 整体风格 → **科技感 + 非技术人员友好**：深色主题可选、高对比度数据卡片、大号数字、清晰的层级导航。参考：现代数据大屏（但不做 3D / WebGL 过度效果）
+- **D-10:** 点选交互 → 过滤/筛选控件使用 Pill/Tag 风格（圆角胶囊），选中态使用 MD 品牌主色，hover 有微动效。三步点选内到达目标数据（符合 PRD 核心目标）
+- **D-11:** 响应式 → 桌面端大屏优先（1920×1080 基准），移动端做基本可读适配（不作为本 Phase 重点）
 
-- **D-16:** 功能范围 → **展会日历视图**：按月/周视图显示展会 `date_start`/`date_end`，点击展会显示详情弹窗（name_cn, venue, city, exhibitors_count）
+### 数据接入验证（NEW）
 
-### Map 模块
+- **D-12:** 所有 UI 组件必须连接真实 mwlab.db 数据进行验证，不能使用 mock 数据
+- **D-13:** 验证清单：KPI 卡片数字准确、过滤联动正确、地图聚合数量与实际一致
 
-- **D-17:** 功能范围 → **全球展会地理分布图**（国内+国际），按 `city` 字段聚合展会数量，热力点显示。推荐使用 Leaflet（免费，无API Key限制）
+### 技术栈（保留）
 
-### Phase 执行顺序
+- **D-14:** 前端框架 → Next.js（React 生态，SSR/SSG 均可）
+- **D-15:** 数据库 → SQLite（mwlab.db 直连，开发阶段）/ 可选 Supabase PostgreSQL
+- **D-16:** 认证 → 保留现有 JWT 3 角色体系（admin / manager / readonly）
+- **D-17:** 后端 API → 保留现有 FastAPI Dashboard API（Phase 3 已交付），前端通过 REST API 调用
 
-- **D-18:** Phase 1b（Hermes全集采集）与 Phase 4（前端开发）**并行推进**，互不阻塞
-- **D-19:** Phase 3b（Cursor 打标工具）**✅ 已交付**；与 Phase 4（前端开发）**并行推进**
-- **D-20:** 前端开发初期可连接现有 SQLite 数据（3.4K条）进行界面开发和验证，Supabase 迁移完成后无缝切换
+### 自治执行方案
 
-### Agent 分工
-
-- **D-21:** **CC（Claude Code）**→ Phase 4 架构层：Next.js项目初始化、Supabase接入配置、DB Schema迁移（SQLite→PostgreSQL）、Next.js API Routes设计与实现、Supabase Auth接入
-- **D-22:** **Cursor**→ 界面开发主力：所有页面组件实现（Dashboard/Calendar/Map/Login/Setting），在CC定义的API Routes和数据结构上开发
-- **D-23:** **Claude Design**（一次性）→ 在CC完成项目初始化后、Cursor开始界面开发前，生成完整UI规范（Tailwind配置、颜色Token、组件样式规范），Cursor照规范实现
-- **D-24:** **Hermes**→ 继续执行 Phase 1b（Jufair全集补采5K条 + cnexpo全量 + 合并引擎），与前端并行
+- **D-18:** 执行方式 → Ralph 自治循环（用户离开 6 小时），GSD 规划 + Superpowers 执行 + gstack UI/UX 审核
+- **D-19:** 时间预算 → 2-8 小时，覆盖规划→执行→审核→修复全流程
 
 </decisions>
 
@@ -85,71 +67,56 @@ Phase 1b（全集采集）和 Phase 3b（打标工具，**✅ 工程已交付**�
 
 **Downstream agents MUST read these before planning or implementing.**
 
+### 品牌规范
+
+- `3_Messe Düsseldorf_Corporate Design Manual.pdf` — MD 官方品牌手册（颜色、字体、Logo、网格）
+
 ### PRD & 需求
 
-- `MWLAB-2026-PRD-v1.1-merged.md` §5 — 前端约束（3个点选控件定义，严格遵守）
-- `MWLAB-2026-PRD-v1.1-merged.md` §3 — 数据架构（6张表字段定义，展览面积/展商/观众字段来源）
-- `MWLAB-2026-PRD-v1.1-merged.md` §6 — 部署目标（域名、用户管理30人上限）
-- `MWLAB-2026-PRD-v1.1-merged.md` §7 Phase 4 — UI/UX范围定义
+- `MWLAB-2026-PRD-v1.1-merged.md` §5 — 前端约束（3 个点选控件定义，严格遵守）
+- `MWLAB-2026-PRD-v1.1-merged.md` §3 — 数据架构（6 张表字段定义）
+- `MWLAB-2026-PRD-v1.1-merged.md` §7 Phase 4 — UI/UX 范围定义
 
 ### 数据架构
 
-- `schema/init_db.sql` — 当前SQLite Schema（6张表），迁移至PostgreSQL时的参照
+- `schema/init_db.sql` — 当前 SQLite Schema（6 张表）
 - `AGENTS.md` — 数据字段定义权威来源、文件索引
 
-### 现有实现（待废弃/参考）
+### 现有实现
 
-- `tag_api.py` — 现有打标API逻辑（TypeScript重写时的参照）
-- `merge_engine.py` — 合并引擎逻辑（仅参考，不迁移）
+- `tag_api.py` — 打标 API
+- `merge_engine.py` — 合并引擎
+- Phase 3 Dashboard API — 现有查询端点
 
 ### 状态
 
-- `.planning/STATE.md` — 当前Phase状态
-- `.planning/ROADMAP.md` — Phase定义和顺序
+- `.planning/STATE.md` — 当前 Phase 状态
+- `.planning/ROADMAP.md` — Phase 定义和顺序
 
 </canonical_refs>
-
-<code_context>
-## Existing Code Insights
-
-### Reusable Assets
-- `schema/init_db.sql`：6张表的完整DDL，直接转为PostgreSQL语法（SQLite→PostgreSQL差异极小，主要是AUTO INCREMENT→SERIAL/BIGSERIAL，BLOB→BYTEA）
-- `tag_api.py`：打标API的业务逻辑（PATCH /api/brands/{id}，manual_tag_history写入），作为 Next.js API Routes 实现的参照
-- 现有 JWT 3角色系统（admin/manager/readonly）：角色定义迁移到 Supabase Auth metadata
-
-### Established Patterns
-- 字段命名全部 `snake_case`（保持，Supabase PostgreSQL一致）
-- API端点风格：`/api/资源-名/动作`，小写连字符（保持）
-- 数据源双优先级规则（展商/观众数/面积取较大值）：在API Routes查询层实现
-
-### Integration Points
-- Phase 1b 的爬虫（Hermes）直接写入 Supabase PostgreSQL，无需中间层
-- Phase 3b 的 Excel 导入工具（`tools/import_tags.py`）：**当前连接本地 SQLite**；迁移 Supabase 后改为 PostgreSQL 连接串（或经 API Routes）
-- Supabase Row Level Security（RLS）实现角色权限控制
-
-</code_context>
 
 <specifics>
 ## Specific Ideas
 
-- **界面参考**：`dashboard_references.png`（项目根目录）— Hirezy风格截图，左侧边栏+顶部KPI卡片+图表区布局
-- **KPI卡片样式**：完全参照Image #2结构：高亮主卡（绿色背景大数字）+ 3个次级卡（白色背景），每卡有趋势徽章（↑↓→ + 百分比）
-- **三排Tab风格**：pill样式（圆角胶囊形），选中态绿色，与侧边栏选中态一致
-- **Setting页**：仅admin可见（侧边栏中条件渲染）；初期功能：用户列表展示 + 数据更新状态面板
-- **地图库**：Leaflet（开源免费，无需API Key，Cloudflare Pages可直接使用）
+- **MD 品牌色板**：从 CD Manual PDF 提取官方色值（MD Blue 主色 + 辅色系统），建立 design token
+- **4 层 Dashboard 导航**：考虑 Tab Bar 或 Sidebar 内部嵌套方案，确保每层切换 < 1 秒
+- **地图简化**：Leaflet + OSM 瓦片，仅做城市级 Marker 聚合（MarkerCluster 插件），不引入 D3/Deck.gl 等重型库
+- **深色/浅色主题**：优先交付浅色主题（符合 MD 品牌规范），深色作为可选增强
+- **科技感元素**：微妙的玻璃态卡片、微动效过渡、数据加载骨架屏
 
 </specifics>
 
 <deferred>
 ## Deferred Ideas
 
-- **打标前端界面**（Setting页内嵌打标功能）→ Phase 5 或 Phase 3b 扩展，当前 Setting 仅做用户管理
-- **AI推荐功能**（PRD已明确不做）→ 永久排除
-- **移动端适配** → 当前为桌面端大屏优先，移动端未定义
+- **打标前端界面** → Phase 5 或 Phase 3b 扩展
+- **AI 推荐功能** → 永久排除
+- **移动端深度适配** → 当前仅做基本可读
+- **3D 地球 / WebGL 大屏效果** → 过度，不做
 
 </deferred>
 
 ---
 
 *Phase: 04-frontend-architecture*
-*Context gathered: 2026-05-06*
+*Context gathered: 2026-05-07 · replan (替代 2026-05-06 版)*
