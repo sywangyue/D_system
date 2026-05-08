@@ -15,14 +15,14 @@ interface IndustryPieChartProps {
 }
 
 const CHART_COLORS = [
-  "#22C55E", // green-500
-  "#3B82F6", // blue-500
-  "#F59E0B", // amber-500
-  "#8B5CF6", // violet-500
-  "#EF4444", // red-500
-  "#06B6D4", // cyan-500
-  "#F97316", // orange-500
-  "#6B7280", // gray-500 catch-all
+  "#fe5c00",  // MD Orange (主色)
+  "#e60070",  // MD Magenta
+  "#ff8c00",  // MD Light Orange
+  "#FF3400",  // MD Red
+  "#9c9c9c",  // MD Grey
+  "#ffc500",  // MD Yellow
+  "#e55300",  // MD Orange Dark
+  "#6B7280",  // grey-500 fallback
 ];
 
 interface CustomTooltipPayload {

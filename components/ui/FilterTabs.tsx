@@ -45,7 +45,7 @@ function Pill({
       className={`h-8 px-3 rounded-full text-sm cursor-pointer transition-[background,border-color] duration-100 ease
         ${
           isSelected
-            ? "bg-accent-surface border border-accent text-green-700 font-semibold"
+            ? "bg-accent-surface border border-accent text-accent-dark font-semibold"
             : "bg-white border border-border text-gray-700 hover:bg-surface"
         }
         focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2
