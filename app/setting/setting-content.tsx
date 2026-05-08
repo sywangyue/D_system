@@ -5,12 +5,11 @@ import { useRouter } from "next/navigation";
 import { getUserInfo } from "@/lib/auth";
 
 interface UserEntry {
-  id: string;
+  user_id: string;
   email: string;
   role: string;
-  last_sign_in_at: string | null;
-  created_at: string;
-  confirmed_at: string | null;
+  is_active: number;
+  last_login: string | null;
 }
 
 interface DataStatus {
@@ -33,9 +32,9 @@ interface StatusResponse {
 }
 
 function getUserStatus(user: UserEntry): { label: string; color: string } {
-  if (!user.confirmed_at) return { label: "未验证", color: "bg-amber-100 text-amber-800" };
-  if (user.last_sign_in_at) {
-    const lastLogin = new Date(user.last_sign_in_at).getTime();
+  if (!user.is_active) return { label: "已禁用", color: "bg-amber-100 text-amber-800" };
+  if (user.last_login) {
+    const lastLogin = new Date(user.last_login).getTime();
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
     if (lastLogin > thirtyDaysAgo) return { label: "活跃", color: "bg-green-100 text-green-800" };
   }
@@ -325,7 +324,7 @@ function UsersTable({ users }: { users: UserEntry[] }) {
               const status = getUserStatus(user);
               return (
                 <tr
-                  key={user.id}
+                  key={user.user_id}
                   className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors"
                 >
                   <td className="px-6 py-3 font-mono text-xs text-text-primary">
@@ -346,7 +345,7 @@ function UsersTable({ users }: { users: UserEntry[] }) {
                     </span>
                   </td>
                   <td className="px-6 py-3 text-text-secondary">
-                    {formatDateTime(user.last_sign_in_at)}
+                    {formatDateTime(user.last_login)}
                   </td>
                 </tr>
               );

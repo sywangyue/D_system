@@ -24,9 +24,9 @@ function getRadius(count: number): number {
 function chinaStyle(count: number) {
   return {
     radius: getRadius(count),
-    fillColor: "#3B82F6",
-    fillOpacity: 0.65,
-    color: "#2563EB",
+    fillColor: "#fe5c00",
+    fillOpacity: 0.7,
+    color: "#e55300",
     weight: 2,
   };
 }
@@ -34,9 +34,9 @@ function chinaStyle(count: number) {
 function intlStyle(count: number) {
   return {
     radius: getRadius(count),
-    fillColor: "#F97316",
+    fillColor: "#ff8c00",
     fillOpacity: 0.65,
-    color: "#EA580C",
+    color: "#e55300",
     weight: 2,
   };
 }
@@ -67,7 +67,7 @@ export default function MapView({ markers }: MapViewProps) {
               <div className="text-xs text-gray-600 mb-2">
                 {m.count} 个展会
                 <span className="ml-2 inline-block w-2 h-2 rounded-full" style={{
-                  backgroundColor: m.is_china ? "#3B82F6" : "#F97316",
+                  backgroundColor: m.is_china ? "#fe5c00" : "#ff8c00",
                 }} />
                 <span className="ml-1 text-gray-500">
                   {m.is_china ? "国内" : "国际"}

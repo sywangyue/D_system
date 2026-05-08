@@ -35,7 +35,7 @@ export default function LoginPage() {
       const res = await fetch(`${process.env.NEXT_PUBLIC_FASTAPI_URL || "http://localhost:8000"}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email: email.trim().toLowerCase(), password }),
       });
 
       if (!res.ok) {
@@ -54,6 +54,8 @@ export default function LoginPage() {
         { email: data.email, role: data.role, display_name: data.display_name },
         data.token,
       );
+
+      document.cookie = `session=${data.token}; path=/; max-age=86400; SameSite=Lax`;
 
       router.push("/dashboard");
       router.refresh();

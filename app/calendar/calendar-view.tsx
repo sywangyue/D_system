@@ -33,9 +33,9 @@ const eventStyle: Record<string, React.CSSProperties> = {
     borderRadius: "4px",
   },
   "潜在伙伴": {
-    backgroundColor: "#DCFCE7",
-    borderLeft: "3px solid #22C55E",
-    color: "#16A34A",
+    backgroundColor: "#fff3ec",
+    borderLeft: "3px solid #fe5c00",
+    color: "#e55300",
     borderRadius: "4px",
   },
   default: {
