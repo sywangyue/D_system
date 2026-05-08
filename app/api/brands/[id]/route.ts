@@ -1,38 +1,36 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
-import type { Brand, Edition } from "@/lib/types";
+import { NextResponse } from 'next/server'
+import { getDb } from '@/lib/db'
+import type { Brand, Edition } from '@/lib/types'
 
 export async function GET(
-  request: Request,
+  _request: Request,
   { params }: { params: Promise<{ id: string }> },
 ) {
-  const { id } = await params;
-  const supabase = await createClient();
+  const { id } = await params
+  const db = getDb()
 
-  const result = (await supabase
-    .from("exhibition_brand")
-    .select("*")
-    .eq("brand_id", id)
-    .single()) as { data: Brand | null; error: { message: string } | null };
+  const brand = db.prepare(`
+    SELECT brand_id, name_cn, name_en, first_year, organizer, co_organizer, city,
+           frequency, industry_l1, industry_l2, competition_relation, mds_related,
+           scale_score, is_international, is_ufi_certified, ma_potential,
+           strategic_relevance, competitor_group, website, notes, created_at, updated_at
+    FROM exhibition_brand
+    WHERE brand_id = ?
+  `).get(id) as Brand | undefined
 
-  const { data: brand, error } = result;
-
-  if (error || !brand) {
-    return NextResponse.json({ error: "Brand not found" }, { status: 404 });
+  if (!brand) {
+    return NextResponse.json({ error: 'Brand not found' }, { status: 404 })
   }
 
-  const { data: editions, error: editionsError } = (await supabase
-    .from("exhibition_edition")
-    .select("*")
-    .eq("brand_id", id)
-    .order("year", { ascending: false })) as {
-    data: Edition[] | null;
-    error: { message: string } | null;
-  };
+  const editions = db.prepare(`
+    SELECT edition_id, brand_id, year, date_start, date_end, city, venue, status,
+           area_sqm, exhibitors_count, visitors_count, overseas_exhibitor_pct,
+           booth_price_per_sqm, heat_score, yoy_trend, anomaly_flag, data_source,
+           recorded_at, notes
+    FROM exhibition_edition
+    WHERE brand_id = ?
+    ORDER BY year DESC
+  `).all(id) as Edition[]
 
-  if (editionsError) {
-    return NextResponse.json({ error: editionsError.message }, { status: 500 });
-  }
-
-  return NextResponse.json({ brand, editions });
+  return NextResponse.json({ brand, editions })
 }

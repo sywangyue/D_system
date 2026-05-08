@@ -1,43 +1,45 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from 'next/server'
+import { getDb } from '@/lib/db'
 
 export async function GET(_request: Request) {
-  const supabase = await createClient();
+  const db = getDb()
 
-  const result = (await supabase
-    .from("exhibition_edition")
-    .select("edition_id, date_start, date_end, venue, city, exhibitors_count, brand_id, exhibition_brand(name_cn, competition_relation)")
-    .not("date_start", "is", null)
-    .order("date_start", { ascending: true })) as {
-    data: {
-      edition_id: string;
-      date_start: string;
-      date_end: string | null;
-      venue: string;
-      city: string;
-      exhibitors_count: number | null;
-      brand_id: string;
-      exhibition_brand: { name_cn: string; competition_relation: string } | null;
-    }[] | null;
-    error: { message: string } | null;
-  };
+  const rows = db.prepare(`
+    SELECT e.edition_id,
+           e.date_start,
+           e.date_end,
+           e.venue,
+           e.city,
+           e.exhibitors_count,
+           e.brand_id,
+           b.name_cn,
+           b.competition_relation
+    FROM exhibition_edition e
+    JOIN exhibition_brand b ON b.brand_id = e.brand_id
+    WHERE e.date_start IS NOT NULL AND e.date_start != ''
+    ORDER BY e.date_start ASC
+  `).all() as {
+    edition_id: string
+    date_start: string
+    date_end: string | null
+    venue: string
+    city: string
+    exhibitors_count: number | null
+    brand_id: string
+    name_cn: string
+    competition_relation: string
+  }[]
 
-  const { data: editions, error } = result;
+  const events = rows.map((row) => ({
+    edition_id: row.edition_id,
+    name_cn: row.name_cn || '未知展会',
+    date_start: row.date_start,
+    date_end: row.date_end,
+    venue: row.venue,
+    city: row.city,
+    exhibitors_count: row.exhibitors_count,
+    competition_relation: row.competition_relation || '',
+  }))
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  const events = (editions || []).map((ed) => ({
-    edition_id: ed.edition_id,
-    name_cn: ed.exhibition_brand?.name_cn || "未知展会",
-    date_start: ed.date_start,
-    date_end: ed.date_end,
-    venue: ed.venue,
-    city: ed.city,
-    exhibitors_count: ed.exhibitors_count,
-    competition_relation: ed.exhibition_brand?.competition_relation || "",
-  }));
-
-  return NextResponse.json({ events });
+  return NextResponse.json({ events })
 }

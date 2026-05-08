@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { NextResponse } from 'next/server'
+import { getDb } from '@/lib/db'
 
 const cityCoords: Record<string, [number, number]> = {
   "北京": [39.9042, 116.4074],
@@ -63,69 +63,49 @@ const cityCoords: Record<string, [number, number]> = {
   "新德里": [28.6139, 77.209],
   "伊斯坦布尔": [41.0082, 28.9784],
   "迪拜": [25.2048, 55.2708],
-};
+}
 
 function getCityCoord(city: string): [number, number] {
-  const cleaned = city.trim();
-  if (cityCoords[cleaned]) return cityCoords[cleaned];
+  const cleaned = city.trim()
+  if (cityCoords[cleaned]) return cityCoords[cleaned]
   for (const [key, coord] of Object.entries(cityCoords)) {
-    if (cleaned.includes(key) || key.includes(cleaned)) return coord;
+    if (cleaned.includes(key) || key.includes(cleaned)) return coord
   }
-  return [35, 105];
+  return [35, 105]
 }
 
 export async function GET(_request: Request) {
-  const supabase = await createClient();
+  const db = getDb()
 
-  const result = (await supabase
-    .from("exhibition_edition")
-    .select("city, exhibitors_count, brand_id, exhibition_brand(name_cn, is_international)")
-    .not("city", "is", null)) as {
-    data: {
-      city: string;
-      exhibitors_count: number | null;
-      brand_id: string;
-      exhibition_brand: { name_cn: string; is_international: number } | null;
-    }[] | null;
-    error: { message: string } | null;
-  };
+  const rows = db.prepare(`
+    SELECT e.city,
+           COUNT(DISTINCT b.brand_id) as count,
+           GROUP_CONCAT(DISTINCT b.name_cn, ', ') as exhibition_names,
+           MAX(CASE WHEN b.is_international = 1 THEN 1 ELSE 0 END) as has_international
+    FROM exhibition_edition e
+    JOIN exhibition_brand b ON b.brand_id = e.brand_id
+    WHERE e.city != ''
+    GROUP BY e.city
+    ORDER BY count DESC
+  `).all() as {
+    city: string
+    count: number
+    exhibition_names: string
+    has_international: number
+  }[]
 
-  const { data: editions, error } = result;
-
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-
-  const cityMap = new Map<string, { count: number; names: string[]; isChina: boolean }>();
-
-  for (const ed of editions || []) {
-    const city = ed.city.trim();
-    if (!city) continue;
-    const entry = cityMap.get(city) || { count: 0, names: [], isChina: true };
-    entry.count++;
-    const name = ed.exhibition_brand?.name_cn;
-    if (name && !entry.names.includes(name)) {
-      entry.names.push(name);
+  const markers = rows.map((row) => {
+    const [lat, lng] = getCityCoord(row.city)
+    const names = row.exhibition_names ? row.exhibition_names.split(', ') : []
+    return {
+      city: row.city,
+      count: row.count,
+      lat,
+      lng,
+      top_exhibitions: names.slice(0, 3),
+      is_china: row.has_international === 0,
     }
-    if (ed.exhibition_brand && ed.exhibition_brand.is_international === 1) {
-      entry.isChina = false;
-    }
-    cityMap.set(city, entry);
-  }
+  })
 
-  const markers = Array.from(cityMap.entries())
-    .map(([city, data]) => {
-      const [lat, lng] = getCityCoord(city);
-      return {
-        city,
-        count: data.count,
-        lat,
-        lng,
-        top_exhibitions: data.names.slice(0, 3),
-        is_china: data.isChina,
-      };
-    })
-    .sort((a, b) => b.count - a.count);
-
-  return NextResponse.json({ markers });
+  return NextResponse.json({ markers })
 }
