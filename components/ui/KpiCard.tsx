@@ -85,7 +85,7 @@ export default function KpiCard({
       className={`flex-1 min-w-[160px] rounded-xl p-5 transition-[box-shadow,transform] duration-150 ease
         ${
           isHighlight
-            ? "bg-accent-surface hover:shadow-[0_4px_12px_rgba(34,197,94,0.15)]"
+            ? "bg-accent-surface hover:shadow-[0_4px_12px_rgba(254,92,0,0.12)]"
             : "bg-white border border-border shadow-[0_1px_3px_rgba(0,0,0,0.06)] hover:shadow-[0_4px_12px_rgba(0,0,0,0.10)]"
         }
         hover:-translate-y-px
@@ -93,13 +93,13 @@ export default function KpiCard({
     >
       <div
         className={`text-xs font-normal uppercase tracking-wide ${
-          isHighlight ? "text-green-700" : "text-text-secondary"
+          isHighlight ? "text-accent-dark" : "text-text-secondary"
         }`}
       >
         {label}
       </div>
       <div className="flex items-baseline mt-0.5">
-        <span className="text-4xl font-semibold text-text-primary leading-10">
+        <span className="kpi-value text-text-primary">
           {formatNumber(value)}
         </span>
         {unit && (

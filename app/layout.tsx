@@ -9,7 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "MWLAB Dashboard",
+  title: "MWLAB 2026 | 竞争盘面看板",
   description: "Exhibition Competitive Dashboard",
 };
 

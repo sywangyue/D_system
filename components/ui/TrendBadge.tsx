@@ -8,7 +8,7 @@ const TREND_CONFIG = {
   "上升": {
     icon: ArrowUp,
     text: "↑ 上升",
-    className: "text-green-600 bg-accent-surface",
+    className: "text-[var(--color-md-orange-dark)] bg-accent-surface",
   },
   "平稳": {
     icon: Minus,
@@ -18,7 +18,7 @@ const TREND_CONFIG = {
   "下降": {
     icon: ArrowDown,
     text: "↓ 下降",
-    className: "text-red-600 bg-red-100",
+    className: "text-[var(--color-md-red)] bg-red-50",
   },
 } as const;
 
