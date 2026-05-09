@@ -13,8 +13,8 @@
   },
   "dependencies": {
     "@opennextjs/cloudflare": "^1.19.6",
-    "@supabase/ssr": "^0.10.2",
-    "@supabase/supabase-js": "^2.105.3",
+    "@types/bcryptjs": "^2.4.6",
+    "bcryptjs": "^3.0.3",
     "jose": "^6.2.3",
     "leaflet": "^1.9.4",
     "lucide-react": "^0.532.0",

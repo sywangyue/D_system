@@ -25,7 +25,7 @@ from pathlib import Path
 # ============ 配置 ============
 _PROJECT_ROOT = Path(__file__).resolve().parent
 PROJECT_DIR = str(_PROJECT_ROOT)
-DB_PATH = str(_PROJECT_ROOT / "crawl_scheduler.db")
+DB_PATH = str(_PROJECT_ROOT / "mwlab.db")
 JUFAIR_DB = str(_PROJECT_ROOT / "jufair_2026.db")
 CNEXPO_DB = str(_PROJECT_ROOT / "cnexpo_2026.db")
 MAX_RETRIES = 3
@@ -45,38 +45,21 @@ CRAWLERS = {
 
 
 # ====================================================================
-# 数据库 — crawl_log 表
+# 数据库 — mwlab.db 的 crawl_log 表
 # ====================================================================
 
-CRAWL_LOG_SCHEMA = """
-    CREATE TABLE IF NOT EXISTS crawl_log (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        crawl_batch_id TEXT NOT NULL,
-        source TEXT NOT NULL,              -- jufair / cnexpo
-        crawl_type TEXT NOT NULL,           -- incremental / full
-        status TEXT NOT NULL DEFAULT 'running',  -- running / completed / failed
-        started_at TEXT NOT NULL,
-        finished_at TEXT,
-        records_added INTEGER DEFAULT 0,
-        error_message TEXT DEFAULT '',
-        retry_count INTEGER DEFAULT 0
-    )
-"""
-
-
 def init_log_db():
+    """连接 mwlab.db（crawl_log 表由 schema/init_db.sql 创建，无需建表）。"""
     conn = sqlite3.connect(DB_PATH)
-    conn.execute(CRAWL_LOG_SCHEMA)
-    conn.execute("CREATE INDEX IF NOT EXISTS idx_cl_batch ON crawl_log(crawl_batch_id)")
-    conn.execute("CREATE INDEX IF NOT EXISTS idx_cl_status ON crawl_log(status)")
-    conn.commit()
     return conn
 
 
-def log_start(conn, batch_id, source, crawl_type):
+def log_start(conn, batch_id, source_site):
+    """插入一条 running 记录，返回 rowid。"""
     cursor = conn.execute(
-        "INSERT INTO crawl_log (crawl_batch_id, source, crawl_type, started_at) VALUES (?, ?, ?, ?)",
-        (batch_id, source, crawl_type, datetime.now().isoformat()),
+        """INSERT INTO crawl_log (batch_id, source_site, started_at, status)
+           VALUES (?, ?, ?, 'running')""",
+        (batch_id, source_site, datetime.now().isoformat()),
     )
     conn.commit()
     return cursor.lastrowid
@@ -84,24 +67,20 @@ def log_start(conn, batch_id, source, crawl_type):
 
 def log_complete(conn, log_id, records_added):
     conn.execute(
-        "UPDATE crawl_log SET status='completed', finished_at=?, records_added=? WHERE id=?",
+        """UPDATE crawl_log
+           SET status='success', finished_at=?, total_inserted=?
+           WHERE id=?""",
         (datetime.now().isoformat(), records_added, log_id),
     )
     conn.commit()
 
 
-def log_fail(conn, log_id, error_message, retry_count=0):
+def log_fail(conn, log_id, error_message):
     conn.execute(
-        "UPDATE crawl_log SET status='failed', finished_at=?, error_message=?, retry_count=? WHERE id=?",
-        (datetime.now().isoformat(), error_message[:500], retry_count, log_id),
-    )
-    conn.commit()
-
-
-def log_retry(conn, log_id, retry_count):
-    conn.execute(
-        "UPDATE crawl_log SET retry_count=? WHERE id=?",
-        (retry_count, log_id),
+        """UPDATE crawl_log
+           SET status='failed', finished_at=?, error_message=?
+           WHERE id=?""",
+        (datetime.now().isoformat(), error_message[:500], log_id),
     )
     conn.commit()
 
@@ -270,7 +249,7 @@ def execute_with_retry(source, crawl_type, batch_id):
 
         if attempt < MAX_RETRIES:
             delay = RETRY_DELAY * attempt
-            print(f"      等待{delay}s后重试...")
+            print(f"      等待 {delay}s 后重试...")
             time.sleep(delay)
 
     return 0, last_error
@@ -303,12 +282,14 @@ def run_scheduled(crawl_type, batch_id):
 
     for source in ["jufair", "cnexpo"]:
         print(f"\n--- {source} ---")
-        log_id = log_start(conn, batch_id, source, crawl_type)
+        # batch_id per-source 保证 mwlab.db crawl_log.batch_id UNIQUE 约束
+        source_batch_id = f"{batch_id}_{source}"
+        log_id = log_start(conn, source_batch_id, source)
 
         added, error = execute_with_retry(source, crawl_type, batch_id)
 
         if error:
-            log_fail(conn, log_id, error, retry_count=MAX_RETRIES)
+            log_fail(conn, log_id, error)
             alert_error(f"[{source}] {crawl_type} 失败: {error}")
             has_error = True
             print(f"  ❌ {source} 失败: {error[:120]}")
@@ -345,17 +326,17 @@ def cmd_run_now():
 
 
 def cmd_status():
-    """查看最近爬取记录。"""
+    """查看最近爬取记录（从 mwlab.db crawl_log 表读取）。"""
     conn = init_log_db()
     rows = conn.execute(
-        """SELECT id, crawl_batch_id, source, crawl_type, status,
-                  started_at, finished_at, records_added, error_message, retry_count
+        """SELECT id, batch_id, source_site, status,
+                  started_at, finished_at, total_inserted, error_message
            FROM crawl_log
            ORDER BY id DESC LIMIT 20"""
     ).fetchall()
 
     print(f"\n{'='*70}")
-    print(f"  最近爬取记录 (crawl_log)")
+    print(f"  最近爬取记录 (mwlab.db · crawl_log)")
     print(f"{'='*70}")
 
     if not rows:
@@ -364,13 +345,13 @@ def cmd_status():
         return
 
     for r in rows:
-        status_icon = "✅" if r[4] == "completed" else "❌" if r[4] == "failed" else "⏳"
-        print(f"  #{r[0]} {status_icon} {r[2]:8s} | {r[3]:12s} | {r[4]:10s} | "
-              f"新增{r[7]:>4d}条 | 重试{r[9]}次")
+        status_icon = "✅" if r[3] == "success" else "❌" if r[3] == "failed" else "⏳"
+        inserted = r[6] or 0
+        print(f"  #{r[0]} {status_icon} {r[2]:8s} | {r[3]:10s} | 新增{inserted:>4d}条")
         print(f"      批次: {r[1]}")
-        print(f"      开始: {r[5][:19]} | 结束: {r[6][:19] if r[6] else '进行中'}")
-        if r[8]:
-            print(f"      错误: {r[8][:100]}")
+        print(f"      开始: {r[4][:19]} | 结束: {r[5][:19] if r[5] else '进行中'}")
+        if r[7]:
+            print(f"      错误: {r[7][:100]}")
         print()
 
     conn.close()

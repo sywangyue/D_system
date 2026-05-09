@@ -62,7 +62,7 @@ class TestTaggingTools(unittest.TestCase):
         self.assertEqual(ids, ["EXPO-TST1"])
 
     def test_import_writes_history(self):
-        from tag_api import TAGGABLE_FIELDS
+        from tools.import_tags import TAGGABLE_FIELDS
         from tools import import_tags
 
         headers = ["brand_id", "name_cn", "name_en"] + list(TAGGABLE_FIELDS.keys())

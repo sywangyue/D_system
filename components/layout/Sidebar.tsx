@@ -1,6 +1,6 @@
 "use client"
 
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import { useState } from "react"
 import {
@@ -28,11 +28,14 @@ const NAV_ITEMS: NavItem[] = [
 
 export default function Sidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const [userInfo] = useState(() => getAuthState())
   const { userEmail, isAdmin } = userInfo
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" })
     clearAuth()
+    router.push("/login")
   }
 
   const visibleItems = NAV_ITEMS.filter(

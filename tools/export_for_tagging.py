@@ -24,7 +24,27 @@ from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.worksheet.datavalidation import DataValidation
 
-from tag_api import DB_PATH, TAGGABLE_FIELDS
+DB_PATH = _REPO_ROOT / "mwlab.db"
+
+TAGGABLE_FIELDS: dict[str, type] = {
+    "competition_relation":  str,
+    "mds_related":           str,
+    "scale_score":           int,
+    "is_international":      int,
+    "is_ufi_certified":      int,
+    "ma_potential":          int,
+    "strategic_relevance":   int,
+    "competitor_group":      str,
+    "industry_l1":           str,
+    "industry_l2":           str,
+    "notes":                 str,
+    "first_year":            int,
+    "organizer":             str,
+    "co_organizer":          str,
+    "city":                  str,
+    "frequency":             str,
+    "website":               str,
+}
 
 # 固定列：主键 + 中文名/英文名（便于人工核对，不可打标）
 _PREFIX_COLS = ["brand_id", "name_cn", "name_en"]

@@ -1,10 +1,7 @@
-import TrendBadge from "./TrendBadge";
-
 interface KpiCardProps {
   label: string;
   value: number | null;
   unit?: string;
-  trend?: "上升" | "平稳" | "下降" | null;
   variant?: "highlight" | "standard";
   isLoading?: boolean;
   error?: string | null;
@@ -19,7 +16,6 @@ export default function KpiCard({
   label,
   value,
   unit,
-  trend,
   variant = "standard",
   isLoading = false,
   error = null,
@@ -27,14 +23,11 @@ export default function KpiCard({
 }: KpiCardProps) {
   const isHighlight = variant === "highlight";
 
-  // Loading skeleton
   if (isLoading) {
     return (
       <div
         className={`flex-1 min-w-[160px] rounded-xl p-5 ${
-          isHighlight
-            ? "bg-accent-surface"
-            : "bg-white border border-border shadow-sm"
+          isHighlight ? "bg-accent-surface" : "bg-white border border-border shadow-sm"
         }`}
         aria-busy="true"
       >
@@ -48,14 +41,11 @@ export default function KpiCard({
     );
   }
 
-  // Error state
   if (error) {
     return (
       <div
         className={`flex-1 min-w-[160px] rounded-xl p-5 ${
-          isHighlight
-            ? "bg-accent-surface"
-            : "bg-white border border-border shadow-sm"
+          isHighlight ? "bg-accent-surface" : "bg-white border border-border shadow-sm"
         }`}
         role="alert"
       >
@@ -67,14 +57,11 @@ export default function KpiCard({
     );
   }
 
-  // Empty / no data
   if (value === null || value === undefined) {
     return (
       <div
         className={`flex-1 min-w-[160px] rounded-xl p-5 ${
-          isHighlight
-            ? "bg-accent-surface"
-            : "bg-white border border-border shadow-sm"
+          isHighlight ? "bg-accent-surface" : "bg-white border border-border shadow-sm"
         }`}
       >
         <div className="text-xs font-normal text-text-secondary uppercase tracking-wide">
@@ -117,9 +104,6 @@ export default function KpiCard({
             {unit}
           </span>
         )}
-      </div>
-      <div className="mt-1">
-        <TrendBadge trend={trend} />
       </div>
     </div>
   );

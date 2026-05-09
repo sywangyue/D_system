@@ -1,5 +1,4 @@
 // 客户端认证工具 — localStorage-based JWT helpers
-// 替代 Supabase Auth 客户端
 
 const AUTH_KEY = 'mwlab_auth'
 
@@ -17,7 +16,6 @@ export interface AuthState {
 export function saveAuth(info: UserInfo, token: string): void {
   if (typeof window === 'undefined') return
   localStorage.setItem(AUTH_KEY, JSON.stringify({ ...info, token }))
-  localStorage.setItem('user_info', JSON.stringify({ email: info.email, role: info.role }))
 }
 
 export function getUserInfo(): UserInfo | null {
@@ -48,7 +46,6 @@ export function getToken(): string | null {
 export function clearAuth(): void {
   if (typeof window === 'undefined') return
   localStorage.removeItem(AUTH_KEY)
-  localStorage.removeItem('user_info')
   document.cookie = 'session=; path=/; max-age=0'
 }
 

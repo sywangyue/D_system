@@ -93,13 +93,11 @@ function WeakPill({
   isSelected,
   onClick,
   disabled,
-  isMulti,
 }: {
   label: string;
   isSelected: boolean;
   onClick: () => void;
   disabled?: boolean;
-  isMulti?: boolean;
 }) {
   return (
     <button
@@ -281,7 +279,6 @@ export default function SlicerBar({
               isSelected={selectedRelations.includes(opt)}
               onClick={() => handleRelationClick(opt)}
               disabled={isLoading}
-              isMulti
             />
           ))}
         </div>
