@@ -1,3 +1,5 @@
+import EmptyState from "@/components/ui/EmptyState"
+import { Inbox } from "lucide-react"
 import type { Brand } from "@/lib/types"
 
 interface BrandTableProps {
@@ -40,8 +42,8 @@ export default function BrandTable({ brands, isLoading = false }: BrandTableProp
 
   if (brands.length === 0) {
     return (
-      <div className="bg-white border border-border rounded-xl p-6 text-center text-sm text-text-secondary">
-        当前筛选条件下无展会数据
+      <div className="bg-white border border-border rounded-xl">
+        <EmptyState icon={<Inbox size={48} className="text-gray-300" />} message="当前筛选条件下无展会数据" />
       </div>
     )
   }

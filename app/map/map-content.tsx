@@ -2,7 +2,9 @@
 
 import { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
+import { MapPin } from "lucide-react";
 import Legend from "@/components/map/Legend";
+import EmptyState from "@/components/ui/EmptyState";
 import type { CityMarker } from "./map-view";
 
 const MapView = dynamic(() => import("./map-view"), { ssr: false });
@@ -63,9 +65,7 @@ export default function MapContent() {
   if (markers.length === 0) {
     return (
       <div className="bg-white border border-border rounded-xl p-4">
-        <div className="flex flex-col items-center justify-center py-20 text-center">
-          <div className="text-sm text-text-secondary">暂无展会地理数据</div>
-        </div>
+        <EmptyState icon={<MapPin size={48} className="text-gray-300" />} message="暂无展会地理数据" />
       </div>
     );
   }
