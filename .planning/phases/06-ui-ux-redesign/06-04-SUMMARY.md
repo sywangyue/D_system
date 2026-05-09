@@ -152,6 +152,18 @@ None. This plan is a pure UI layout rewrite with no new network endpoints, auth 
 - [x] Map page unaffected, remains independent sidebar navigation item
 - [x] All 3 commits created and verifiable
 
+## Self-Check: PASSED
+
+- [x] `app/dashboard/dashboard-content.tsx` exists with SlicerBar + EmptyState imports
+- [x] `components/dashboard/BrandTable.tsx` exists with EmptyState import
+- [x] `app/map/map-content.tsx` exists with EmptyState import
+- [x] `components/dashboard/LayerTabs.tsx` deleted (not found)
+- [x] `components/dashboard/SubTabs.tsx` deleted (not found)
+- [x] `.planning/phases/06-ui-ux-redesign/06-04-SUMMARY.md` exists
+- [x] All 4 commits verified: `b261147`, `9d51b35`, `5281abb`, `097f2a6`
+- [x] Zero LayerTabs/SubTabs references remain in app/ or components/
+- [x] `npm run build` passed with no errors
+
 ---
 *Phase: 06-ui-ux-redesign*
 *Plan: 04*
