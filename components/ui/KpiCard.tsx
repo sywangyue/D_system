@@ -8,6 +8,7 @@ interface KpiCardProps {
   variant?: "highlight" | "standard";
   isLoading?: boolean;
   error?: string | null;
+  icon?: React.ReactNode;
 }
 
 function formatNumber(n: number): string {
@@ -22,6 +23,7 @@ export default function KpiCard({
   variant = "standard",
   isLoading = false,
   error = null,
+  icon,
 }: KpiCardProps) {
   const isHighlight = variant === "highlight";
 
@@ -37,6 +39,9 @@ export default function KpiCard({
         aria-busy="true"
       >
         <div className="h-4 w-16 bg-gray-200 rounded animate-pulse mb-2" />
+        <div className="flex justify-center mb-2">
+          <div className="w-8 h-8 bg-gray-200 rounded animate-pulse" />
+        </div>
         <div className="h-10 w-24 bg-gray-200 rounded animate-pulse mb-1" />
         <div className="h-5 w-14 bg-gray-200 rounded animate-pulse" />
       </div>
@@ -91,6 +96,11 @@ export default function KpiCard({
         hover:-translate-y-px
       `}
     >
+      {icon && (
+        <div className={`w-8 h-8 mb-2 ${isHighlight ? "text-accent-dark" : "text-accent"}`}>
+          {icon}
+        </div>
+      )}
       <div
         className={`text-xs font-normal uppercase tracking-wide ${
           isHighlight ? "text-accent-dark" : "text-text-secondary"
