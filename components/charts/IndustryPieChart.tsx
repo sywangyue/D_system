@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { PieChart, Pie, Cell, Tooltip, Label } from "recharts";
 
 interface PieData {
@@ -38,14 +38,15 @@ interface CustomTooltipPayload {
 function CustomTooltip({
   active,
   payload,
+  total,
 }: {
   active?: boolean;
   payload?: CustomTooltipPayload[];
+  total: number;
 }) {
   if (!active || !payload?.length) return null;
 
   const { name, value } = payload[0];
-  const total = payload[0].payload.value;
   const pct = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0";
 
   return (
@@ -115,6 +116,8 @@ export default function IndustryPieChart({
       return next;
     });
   };
+
+  const dataTotal = useMemo(() => data.reduce((sum, d) => sum + d.value, 0), [data]);
 
   if (isLoading) {
     return (
@@ -229,7 +232,7 @@ export default function IndustryPieChart({
                 />
               ))}
             </Pie>
-            <Tooltip content={<CustomTooltip />} />
+            <Tooltip content={<CustomTooltip total={dataTotal} />} />
           </PieChart>
         </div>
 
