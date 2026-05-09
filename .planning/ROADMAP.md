@@ -87,6 +87,7 @@
 | 3b | EXPORT-TOOL, IMPORT-TOOL | ✅ Done |
 | 4 | UI-POOL | ✅ 7 plans replaced (2026-05-07 replan) |
 | 5 | CLEAN-BRAND | ✅ 2 plans created |
+| 6 | UI-SLICER, UI-DASHBOARD, UI-MAP, UI-SAAS | ✅ 4 plans created |
 
 ---
 
@@ -114,4 +115,28 @@
 
 ---
 
-*Roadmap updated: 2026-05-07 · Phase 4 replan complete (7 plans replaced)*
+### Phase 6 · Dashboard UX 重塑（Excel Slicer + PowerBI 盘面 + SaaS 质感）
+
+**Goal:** 简化当前过度复杂的 Dashboard 交互，重塑为 Excel 切片器风格 + PowerBI 基础盘面 + MD 品牌 SaaS 设计质感。核心原则：数据点选同步、二级行业列表不遮挡、地图为独立图层、设计质感对标生态型 SaaS。
+
+| Maps to | Success criteria |
+|---------|------------------|
+| UI-SLICER | 行业筛选改为 Excel 切片器风格（L1 行 + L2 展开面板），点选即时同步全盘面 |
+| UI-DASHBOARD | PowerBI 风格四卡片 + 趋势图 + 饼图，布局响应式不堆叠 |
+| UI-MAP | Leaflet 地图保留且独立为地理图层，标记 MD 橙色 |
+| UI-SAAS | 全局 SaaS 质感：微妙阴影、圆角层级、hover 过渡、空状态插画感 |
+
+**Agent assignment:** Claude Code
+
+**Plans:** 4 plans in 2 waves
+
+| Wave | Plan | Autonomous | Objective |
+|------|------|------------|-----------|
+| 1 | 06-01 | yes | Design Tokens (shadow/radius CSS) + SlicerBar 组件 |
+| 1 | 06-02 | yes | KpiCard 图标 + IndustryPieChart Donut 中心总数 |
+| 1 | 06-03 | yes | EmptyState 组件 + TrendChart 质感更新 |
+| 2 | 06-04 | yes | Dashboard 布局重写 + LayerTabs/SubTabs 移除 + 全局 EmptyState 应用 |
+
+---
+
+*Roadmap updated: 2026-05-09 · Phase 6 plans created (4 plans in 2 waves)*
