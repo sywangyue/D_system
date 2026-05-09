@@ -70,12 +70,13 @@ export default function DashboardContent() {
 
   const buildQueryString = useCallback(() => {
     const params = new URLSearchParams();
+    if (selectedL1) params.set("industry_l1", selectedL1);
     if (selectedL2) params.set("industry_l2", selectedL2);
     if (selectedRelations.length > 0)
       params.set("competition_relation", selectedRelations.join(","));
     if (selectedMds) params.set("mds_related", selectedMds);
     return params.toString();
-  }, [selectedL2, selectedRelations, selectedMds]);
+  }, [selectedL1, selectedL2, selectedRelations, selectedMds]);
 
   const fetchData = useCallback(async (qs: string) => {
     setIsLoading(true);
@@ -132,7 +133,7 @@ export default function DashboardContent() {
     router.replace(nextUrl, { scroll: false });
     fetchData(raw);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedL2, selectedRelations, selectedMds]);
+  }, [selectedL1, selectedL2, selectedRelations, selectedMds]);
 
   const l2Options = selectedL1
     ? l2ByL1.get(selectedL1) || []
