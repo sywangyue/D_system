@@ -15,7 +15,7 @@ function formatArea(value: number): string {
 export default function TrendChart({ data, isLoading }: TrendChartProps) {
   if (isLoading) {
     return (
-      <div className="bg-white border border-border rounded-xl p-5">
+      <div className="bg-white border border-border rounded-xl p-5 shadow-[var(--shadow-sm)]">
         <h3 className="text-base font-semibold text-text-primary mb-4">年比趋势</h3>
         <div className="h-[300px] bg-gray-100 rounded-xl animate-pulse" />
       </div>
@@ -24,7 +24,7 @@ export default function TrendChart({ data, isLoading }: TrendChartProps) {
 
   if (!data || data.length === 0) {
     return (
-      <div className="bg-white border border-border rounded-xl p-5">
+      <div className="bg-white border border-border rounded-xl p-5 shadow-[var(--shadow-sm)]">
         <h3 className="text-base font-semibold text-text-primary mb-4">年比趋势</h3>
         <div className="flex items-center justify-center h-[300px] text-sm text-text-secondary">
           暂无趋势数据
@@ -34,7 +34,7 @@ export default function TrendChart({ data, isLoading }: TrendChartProps) {
   }
 
   return (
-    <div className="bg-white border border-border rounded-xl p-5">
+    <div className="bg-white border border-border rounded-xl p-5 shadow-[var(--shadow-sm)]">
       <h3 className="text-base font-semibold text-text-primary mb-4">年比趋势</h3>
       <ResponsiveContainer width="100%" height={300}>
         <BarChart data={data} margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
