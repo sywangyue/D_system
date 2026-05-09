@@ -1,6 +1,6 @@
 "use client";
 
-import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import { PieChart, Pie, Cell, Tooltip, Legend, Label } from "recharts";
 
 interface PieData {
   name: string;
@@ -166,6 +166,35 @@ export default function IndustryPieChart({
           labelLine={false}
           isAnimationActive={false}
         >
+          <Label
+            content={({ viewBox }) => {
+              if (!viewBox || !data.length) return null;
+              const total = data.reduce((sum, d) => sum + d.value, 0);
+              const { cx = 0, cy = 0 } = viewBox as { cx?: number; cy?: number };
+              return (
+                <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central">
+                  <tspan
+                    x={cx}
+                    dy="-0.3em"
+                    fontSize="26"
+                    fontWeight="700"
+                    fill="#111827"
+                  >
+                    {total.toLocaleString("en-US")}
+                  </tspan>
+                  <tspan
+                    x={cx}
+                    dy="1.5em"
+                    fontSize="12"
+                    fontWeight="400"
+                    fill="#6B7280"
+                  >
+                    品牌
+                  </tspan>
+                </text>
+              );
+            }}
+          />
           {data.map((entry, index) => (
             <Cell
               key={`cell-${entry.name}`}
