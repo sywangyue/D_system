@@ -361,22 +361,22 @@ className={`... hover:shadow-[0_4px_12px_rgba(254,92,0,0.12)] hover:-translate-y
 
 **No critical assumptions.** All major claims are verified from the codebase.
 
-## Open Questions
+## Open Questions (RESOLVED)
 
-1. **Map integration: tab or separate page?**
+1. **Map integration: tab or separate page?** RESOLVED
    - What we know: Map currently exists as both a standalone route (`/map`) and a geo subtab. User wants "地图为独立图层".
    - What's unclear: Should the map be a toggle on the dashboard page (swapping content view) or keep it as a sidebar navigation target?
-   - Recommendation: Keep it as a sidebar nav item (current approach). It already works. No need to duplicate into dashboard. The sidebar already has a "地图" link with active state.
+   - RESOLVED: Keep it as a sidebar nav item (current approach). It already works. No need to duplicate into dashboard. The sidebar already has a "地图" link with active state.
 
-2. **Competition relation and MDS filter placement**
+2. **Competition relation and MDS filter placement** RESOLVED
    - What we know: These are secondary filters that currently appear as separate pill rows in FilterTabs.
    - What's unclear: Should they remain in the sticky bar below the industry slicer, or move to a collapsible "advanced filters" section?
-   - Recommendation: Keep them as secondary rows in the sticky SlicerBar area, visually less prominent (smaller text, gray background) below the industry L1/L2 section. This maintains the "三步点选" principle.
+   - RESOLVED: Keep them as secondary rows in the sticky SlicerBar area, visually less prominent (smaller text, gray background) below the industry L1/L2 section. This maintains the "三步点选" principle.
 
-3. **BrandTable placement**
+3. **BrandTable placement** RESOLVED
    - What we know: BrandTable was under "明细-品牌列表" subtab.
    - What's unclear: Should it appear at the bottom of the single-page scroll, or be collapsible/expandable?
-   - Recommendation: Place at the bottom of the dashboard page as a collapsed-by-default section with a "显示品牌列表 (N)" toggle. Keeps the scroll view clean while maintaining access.
+   - RESOLVED: Place at the bottom of the dashboard page as a collapsed-by-default section with a "显示品牌列表 (N)" toggle. Keeps the scroll view clean while maintaining access.
 
 ## Environment Availability
 

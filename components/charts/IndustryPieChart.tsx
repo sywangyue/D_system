@@ -1,6 +1,7 @@
 "use client";
 
-import { PieChart, Pie, Cell, Tooltip, Legend, Label } from "recharts";
+import { useState } from "react";
+import { PieChart, Pie, Cell, Tooltip, Label } from "recharts";
 
 interface PieData {
   name: string;
@@ -12,6 +13,9 @@ interface IndustryPieChartProps {
   isLoading?: boolean;
   error?: string | null;
   onRetry?: () => void;
+  l2ByL1?: Map<string, string[]>;
+  selectedL2?: string | null;
+  onIndustrySelect?: (l2: string | null) => void;
 }
 
 const CHART_COLORS = [
@@ -97,7 +101,21 @@ export default function IndustryPieChart({
   isLoading = false,
   error = null,
   onRetry,
+  l2ByL1,
+  selectedL2,
+  onIndustrySelect,
 }: IndustryPieChartProps) {
+  const [collapsedGroups, setCollapsedGroups] = useState<Set<string>>(new Set());
+
+  const toggleGroup = (l1: string) => {
+    setCollapsedGroups((prev) => {
+      const next = new Set(prev);
+      if (next.has(l1)) next.delete(l1);
+      else next.add(l1);
+      return next;
+    });
+  };
+
   if (isLoading) {
     return (
       <div className="bg-white border border-border rounded-xl p-5">
@@ -148,75 +166,137 @@ export default function IndustryPieChart({
     );
   }
 
+  // Color lookup: map each L2 name → its pie slice color
+  const nameToColor = new Map<string, string>();
+  data.forEach((entry, i) => {
+    nameToColor.set(entry.name, CHART_COLORS[i % CHART_COLORS.length]);
+  });
+
   return (
     <div className="bg-white border border-border rounded-xl p-5 w-full">
       <h3 className="text-base font-semibold text-text-primary mb-4">
         行业细分分布
       </h3>
-      <PieChart width={400} height={280} className="mx-auto">
-        <Pie
-          data={data}
-          cx="50%"
-          cy="50%"
-          outerRadius={100}
-          innerRadius={50}
-          dataKey="value"
-          nameKey="name"
-          label={renderLabel}
-          labelLine={false}
-          isAnimationActive={false}
-        >
-          <Label
-            content={({ viewBox }) => {
-              if (!viewBox || !data.length) return null;
-              const total = data.reduce((sum, d) => sum + d.value, 0);
-              const { cx = 0, cy = 0 } = viewBox as { cx?: number; cy?: number };
+      <div className="flex flex-col lg:flex-row lg:gap-6">
+        {/* Pie chart */}
+        <div className="shrink-0 flex justify-center">
+          <PieChart width={400} height={280}>
+            <Pie
+              data={data}
+              cx="50%"
+              cy="50%"
+              outerRadius={100}
+              innerRadius={50}
+              dataKey="value"
+              nameKey="name"
+              label={renderLabel}
+              labelLine={false}
+              isAnimationActive={false}
+            >
+              <Label
+                content={({ viewBox }) => {
+                  if (!viewBox || !data.length) return null;
+                  const total = data.reduce((sum, d) => sum + d.value, 0);
+                  const { cx = 0, cy = 0 } = viewBox as { cx?: number; cy?: number };
+                  return (
+                    <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central">
+                      <tspan
+                        x={cx}
+                        dy="-0.3em"
+                        fontSize="26"
+                        fontWeight="700"
+                        fill="#111827"
+                      >
+                        {total.toLocaleString("en-US")}
+                      </tspan>
+                      <tspan
+                        x={cx}
+                        dy="1.5em"
+                        fontSize="12"
+                        fontWeight="400"
+                        fill="#6B7280"
+                      >
+                        品牌
+                      </tspan>
+                    </text>
+                  );
+                }}
+              />
+              {data.map((entry, index) => (
+                <Cell
+                  key={`cell-${entry.name}`}
+                  fill={CHART_COLORS[index % CHART_COLORS.length]}
+                />
+              ))}
+            </Pie>
+            <Tooltip content={<CustomTooltip />} />
+          </PieChart>
+        </div>
+
+        {/* Grouped two-level legend */}
+        {l2ByL1 && l2ByL1.size > 0 && (
+          <div className="flex-1 max-h-[300px] overflow-y-auto border border-border rounded-lg">
+            {Array.from(l2ByL1.entries()).map(([l1, l2Items]) => {
+              const isCollapsed = collapsedGroups.has(l1);
               return (
-                <text x={cx} y={cy} textAnchor="middle" dominantBaseline="central">
-                  <tspan
-                    x={cx}
-                    dy="-0.3em"
-                    fontSize="26"
-                    fontWeight="700"
-                    fill="#111827"
+                <div key={l1} className="border-b border-border last:border-b-0">
+                  <button
+                    onClick={() => toggleGroup(l1)}
+                    className="w-full flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium bg-gray-50 hover:bg-gray-100 transition-colors sticky top-0"
                   >
-                    {total.toLocaleString("en-US")}
-                  </tspan>
-                  <tspan
-                    x={cx}
-                    dy="1.5em"
-                    fontSize="12"
-                    fontWeight="400"
-                    fill="#6B7280"
-                  >
-                    品牌
-                  </tspan>
-                </text>
+                    <svg
+                      className={`w-3 h-3 text-text-secondary transition-transform shrink-0 ${isCollapsed ? "" : "rotate-90"}`}
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth={2.5}
+                    >
+                      <path d="M9 18l6-6-6-6" />
+                    </svg>
+                    <span className="text-text-primary">{l1}</span>
+                    <span className="text-text-secondary ml-auto">
+                      {l2Items.length}
+                    </span>
+                  </button>
+                  {!isCollapsed && (
+                    <div className="py-0.5">
+                      {l2Items.map((l2) => {
+                        const color = nameToColor.get(l2) || "#D1D5DB";
+                        const isSelected = selectedL2 === l2;
+                        const count = data.find((d) => d.name === l2)?.value;
+                        return (
+                          <button
+                            key={l2}
+                            onClick={() =>
+                              onIndustrySelect?.(l2 === selectedL2 ? null : l2)
+                            }
+                            className={`w-full flex items-center gap-2 px-3 py-1 text-xs transition-colors ${
+                              isSelected
+                                ? "bg-[#fff3ec] text-[#e55300] font-medium"
+                                : "text-text-secondary hover:bg-gray-50"
+                            }`}
+                          >
+                            <span
+                              className="w-2 h-2 rounded-full shrink-0"
+                              style={{ backgroundColor: color }}
+                            />
+                            <span className="flex-1 text-left truncate">{l2}</span>
+                            {count != null && (
+                              <span className="tabular-nums text-text-secondary">
+                                {count.toLocaleString("en-US")}
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
               );
-            }}
-          />
-          {data.map((entry, index) => (
-            <Cell
-              key={`cell-${entry.name}`}
-              fill={CHART_COLORS[index % CHART_COLORS.length]}
-            />
-          ))}
-        </Pie>
-        <Tooltip content={<CustomTooltip />} />
-        <Legend
-          layout="horizontal"
-          align="center"
-          verticalAlign="bottom"
-          formatter={(_value: string, entry: { payload?: { value?: number } }) =>
-            entry.payload?.value != null
-              ? `${_value} (${entry.payload.value.toLocaleString("en-US")})`
-              : _value
-          }
-          wrapperStyle={{ fontSize: "12px" }}
-          iconType="circle"
-          iconSize={8}
-        />
-      </PieChart>
+            })}
+          </div>
+        )}
+      </div>
     </div>
   );
 }

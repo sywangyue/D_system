@@ -294,6 +294,9 @@ export default function DashboardContent() {
                   isLoading={isLoading}
                   error={error}
                   onRetry={() => fetchData(buildQueryString())}
+                  l2ByL1={l2ByL1}
+                  selectedL2={selectedL2}
+                  onIndustrySelect={setSelectedL2}
                 />
               </>
             )
@@ -322,6 +325,9 @@ export default function DashboardContent() {
                 isLoading={isLoading}
                 error={error}
                 onRetry={() => fetchData(buildQueryString())}
+                l2ByL1={l2ByL1}
+                selectedL2={selectedL2}
+                onIndustrySelect={setSelectedL2}
               />
             )
           case "relation":
