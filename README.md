@@ -1,127 +1,190 @@
-<!-- 内容聚合自：MWLAB-2026-PRD-v1.1-merged.md、.planning/PROJECT.md、.planning/ROADMAP.md、AGENTS.md -->
-
 ![MWLAB-2026 · BD Database · Exhibition Competitive Dashboard · 80s terminal pixel style](docs/readme-hero-mds.png)
 
 # MWLAB-2026 · Exhibition Competitive Dashboard
 
 **代号**：MWLAB-2026  
 **客户语境**：杜塞尔多夫展览上海（BD 总监）  
-**英文一句话**：Structured exhibition database and competitive landscape dashboard: pick a category, see competitors, partners, and new entrants with scale signals (brands / exhibitors / visitors / area).
+**一句话**：结构化展会数据库 + 竞争盘面看板——选品类，看竞争对手 / 潜在伙伴 / 新进入者，附规模信号（品牌数 / 展商 / 观众 / 面积）。
 
 ---
 
-## 项目定位（PRD）
+## 项目定位
 
-- **定义**：基于结构化展会数据库的竞争盘面看板；输入目标品类，输出 **竞争对手 / 潜在伙伴 / 新进入者** 三维视图。  
-- **服务对象**：中国总经理（决策者优先，非技术用户）。  
-- **核心场景**：评估是否进入某个新展会市场。  
-- **原则内不做**：上游产业链指数、下游 AI 建议、Gecko 集成、以自由文字录入为主交互。
-
-**价值主张（PROJECT）**：在「是否进入某个展会市场」问题上，尽量在 **三步点选** 内给出可信的竞争结构与规模信号，且无文字录入负担。
+- **核心场景**：评估是否进入某个新展会市场，三步点选内给出竞争结构与规模信号。
+- **服务对象**：中国总经理（决策者优先，非技术用户）。
+- **原则内不做**：上游产业链指数、下游 AI 建议、自由文字录入为主交互。
 
 ---
 
-## 路线图与状态（ROADMAP + AGENTS）
-
-| Phase | 内容 | 状态 |
-|-------|------|------|
-| 1 | 数据采集（Jufair + cnexpo 爬虫 + 调度器） | ✅ |
-| 2 | Schema、合并引擎、`tag_api`、金标准对拍 | ✅ |
-| 3 | Dashboard 查询 API、JWT、Docker、OpenAPI、部署对比 | ✅ |
-| 3b | Excel 批量打标（`tools/export_for_tagging.py`、`import_tags.py`） | ✅ |
-| **1b** | **全集采集（Jufair ~8.4K + cnexpo 全量 + 全量合并）** | **⏳ 当前主线** |
-| 4 | 前端 UI（HOLD，可与 1b 并行规划） | ⏸ |
-
-**当前工程重点（PROJECT）**
-
-1. **Phase 1b**：Jufair 从约 3.4K 扩至约 8.4K；cnexpo 全量探测与采集；`merge_engine` 全量跑通。  
-2. **Phase 4**：前端 UI（暂缓；打标工具链已就绪）。
-
----
-
-## 数据架构摘要（PRD + AGENTS）
-
-**流向（概念）**：Jufair / cnexpo / 手工 Excel → 原始与规范化数据 → **主库 `mwlab.db`**（合并规则见 PRD 与 `merge_engine.py`）。
-
-**六表关系（仓库内表名为单数）**
+## 技术架构
 
 ```
-exhibition_brand（品牌）
-  ├── exhibition_edition（届次，面积/展商/观众等核心数字）
-  ├── data_provenance（溯源）
-  └── manual_tag_history（人工打标历史）
-
-crawl_log          爬取批次日志
-user               用户（JWT 体系，与 Schema 中表名一致）
+Browser
+  └── Next.js 16（前端 + API Routes）
+        └── better-sqlite3 → mwlab.db（SQLite）
 ```
 
-**双源冲突（摘）**：名称/时间/地点以 jufair 为准；展商数/观众数/面积取较大值；主办方双源保留、差异人工兜底；缺失字段谁有取谁。
+**单进程，无外部服务依赖。** 认证、查询、写入全部在 Next.js API Routes 内完成。
 
-**必须人工打标的字段（摘）**：`competition_relation`、`mds_related`、`strategic_relevance`、`ma_potential`、`competitor_group`、`industry_l1` / `industry_l2`、届次侧 `yoy_trend`、`anomaly_flag` 等（完整定义见 PRD 与 `schema/init_db.sql`）。
+| 层 | 技术 |
+|----|------|
+| 前端框架 | Next.js 16 App Router + React 18 |
+| 样式 | Tailwind CSS |
+| 数据库 | SQLite（`mwlab.db`），`better-sqlite3` 读写 |
+| 认证 | JWT（`jose` 签发/验签）+ bcryptjs 密码哈希，Cookie 存储 |
+| 鉴权 | `proxy.ts`（Next.js 16 中间件）全局路由守卫 |
+| 数据采集 | Python 爬虫（`crawlers/`）+ 调度器（`scheduler.py`） |
+| 打标工具 | `tools/export_for_tagging.py` + `tools/import_tags.py`（openpyxl） |
 
 ---
 
-## 运行与约束（AGENTS + CLAUDE）
+## 本地启动
 
-- **Python**：3.12+（与项目约定一致）。  
-- **依赖栈**：FastAPI、SQLAlchemy、pandas、requests、BeautifulSoup 等；Phase 3b 工具额外需要 **openpyxl**（`python3 -m pip install openpyxl`）。  
-- **Jufair 爬虫**：须在 **大陆 IP** 环境执行（例如已验证的北京 Mac Mini 节点）。  
-- **进程**：爬虫与对外 API 建议 **分进程/分容器** 部署。
-
-**打标 API（示例）**
+**前提**：Node.js 18+、Python 3.12+
 
 ```bash
-uvicorn tag_api:app --reload --port 8000
+# 安装依赖
+npm install
+
+# 启动开发服务器（默认 http://localhost:3000）
+npm run dev
 ```
 
-**Excel 打标（Phase 3b，示例）**
+访问 `http://localhost:3000`，使用内部账号登录。
+
+> **注意**：若从局域网其他设备访问，需在 `next.config.ts` 的 `allowedDevOrigins` 中添加该设备 IP。
+
+---
+
+## 用户体系
+
+用户存储于 `mwlab.db` 的 `user` 表，角色三级：
+
+| 角色 | 权限 |
+|------|------|
+| `admin` | 全部功能 + 设置页（用户管理、数据状态） |
+| `manager` | 看板 + 打标写入 |
+| `readonly` | 仅看板查看 |
+
+重置密码（Python 直接操作 SQLite）：
 
 ```bash
+python3 -c "
+import bcrypt, sqlite3
+pw = bcrypt.hashpw('新密码'.encode(), bcrypt.gensalt()).decode()
+conn = sqlite3.connect('mwlab.db')
+conn.execute('UPDATE user SET password_hash = ? WHERE email = ?', (pw, '账号邮箱'))
+conn.commit(); conn.close()
+"
+```
+
+---
+
+## 数据库结构
+
+**主库**：`mwlab.db`（SQLite，WAL 模式）
+
+```
+exhibition_brand        展会品牌（主表）
+  ├── exhibition_edition    届次数据（面积/展商/观众等）
+  ├── data_provenance       数据溯源
+  └── manual_tag_history    人工打标历史
+
+crawl_log               爬取批次日志
+user                    系统用户
+```
+
+Schema 完整定义：`schema/init_db.sql`
+
+**双源合并规则（摘要）**：名称/时间/地点以 jufair 为准；展商数/观众数/面积取较大值；主办方双源保留；缺失字段谁有取谁。
+
+---
+
+## 数据采集
+
+Jufair 爬虫须在**大陆 IP** 环境执行。
+
+```bash
+# 手动触发单次采集
+python3 scheduler.py run
+
+# 查看采集日志状态
+python3 scheduler.py status
+```
+
+---
+
+## Excel 批量打标
+
+用于人工标注 `competition_relation`、`industry_l1/l2`、`mds_related` 等字段。
+
+```bash
+# 导出待打标 Excel
 python3 tools/export_for_tagging.py --industry_l2 "机床" --status untagged
-python3 tools/import_tags.py --file exports/tagging_batch_YYYYMMDD.xlsx --changed-by you@company.com
+
+# 导入打标结果
+python3 tools/import_tags.py \
+  --file exports/tagging_batch_YYYYMMDD.xlsx \
+  --changed-by you@company.com
+```
+
+依赖：`pip install openpyxl`
+
+---
+
+## API Routes 一览
+
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| POST | `/api/auth/login` | 登录，返回 JWT |
+| POST | `/api/auth/logout` | 退出，清除 Cookie |
+| GET | `/api/dashboard` | 看板数据（KPI + 品牌列表 + 图表数据） |
+| GET | `/api/filter-options` | 筛选项（行业 L1/L2、MDS 关联） |
+| GET | `/api/brands/[id]` | 单个品牌详情 |
+| PATCH | `/api/brands/[id]/tags` | 更新打标字段 |
+| GET | `/api/users` | 用户列表（admin） |
+| GET | `/api/setting/status` | 数据状态 + 系统信息（admin） |
+| GET | `/api/calendar/events` | 展会日历数据 |
+| GET | `/api/map/markers` | 展会地理分布数据 |
+
+---
+
+## 测试
+
+```bash
+# 前端 API 测试
+npm test
+
+# Python 工具测试
+python3 -m pytest tests/ -v
 ```
 
 ---
 
-## 权威文档与规划入口
+## 权威文档
 
 | 资源 | 路径 |
 |------|------|
 | 整合 PRD（唯一产品权威） | `MWLAB-2026-PRD-v1.1-merged.md` |
-| 代理/架构一页纸 | `AGENTS.md` |
-| AI/协作约束 | `CLAUDE.md` |
-| 项目叙述与决策表 | `.planning/PROJECT.md` |
-| Phase 路线与需求 ID | `.planning/ROADMAP.md` |
-| 架构补充说明 | `docs/ARCHITECTURE.md` |
-
-**金标准数据**：93 条手工品牌样本为字段定义的工程基准（PRD / Phase 2 验收）。
+| 架构说明 | `docs/ARCHITECTURE.md` |
+| Claude Code 行为约束 | `CLAUDE.md` |
+| 项目上下文与文件索引 | `AGENTS.md` |
+| 历史规划文档 | `_archive/planning/` |
 
 ---
 
-## 首图说明
+## Phase 状态
 
-`docs/readme-hero-mds.png` 由 `scripts/generate_readme_hero.py` 生成：**透明背景**（PNG alpha，无填充底色）；主标 **MDS** 为 **2×2 物理像素/逻辑格**；副标 **BD Database** 为 **1×1 物理像素/逻辑格**（更细）；字色 **#fe5c00**（RGBA 不透明）。
-
----
-
-## 贡献方式
-
-本项目由 **Claude Code**（Anthropic 的 AI 编程代理）驱动开发，配合 GSD（Get Shit Done）工作流框架进行 Phase 规划与自治执行。
-
-```bash
-# 启动 Claude Code 并加载项目上下文
-claude
-
-# 在 Claude Code 会话中使用 GSD 命令
-/gsd-plan-phase <N>     # 规划 Phase N
-/gsd-execute-phase <N>  # 执行 Phase N
-/gsd-discuss-phase <N>  # 讨论 Phase N 设计决策
-```
-
-**核心代理角色**：Ralph（架构/基础设施）、Cursor（前端组件）、Hermes（爬虫/数据采集）。
-
-PR 提交前请确保通过 `npm test` 和 `pytest`。
+| Phase | 内容 | 状态 |
+|-------|------|------|
+| 1 | 数据采集（Jufair + cnexpo 爬虫 + 调度器） | ✅ |
+| 2 | Schema、合并引擎、人工打标工具链 | ✅ |
+| 3 | 看板 API、JWT 认证、前端基础架构 | ✅ |
+| 3b | Excel 批量打标工具 | ✅ |
+| 4 | 前端 UI（筛选看板、日历、地图、设置） | ✅ |
+| 架构整改 | 移除 Supabase 和 FastAPI，统一到 Next.js 单进程 | ✅ |
+| **1b** | **全集采集（Jufair ~8.4K + cnexpo 全量）** | **⏳** |
 
 ---
 
-*README 随 PRD 与 `.planning/*` 变更时请同步更新。*
+*本项目由 Claude Code（Anthropic）驱动开发。*
