@@ -59,7 +59,7 @@ export async function GET(request: NextRequest) {
   // Industry distribution
   const industryDistribution = db.prepare(`
     SELECT industry_l2 as name, COUNT(*) as value
-    FROM exhibition_brand
+    FROM exhibition_brand b
     ${where}
     GROUP BY industry_l2
     ORDER BY value DESC
