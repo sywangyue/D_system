@@ -2,24 +2,14 @@
 
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import dynamic from "next/dynamic";
-import FilterTabs from "@/components/ui/FilterTabs";
-import LayerTabs, { type LayerId } from "@/components/dashboard/LayerTabs";
-import SubTabs, {
-  OVERVIEW_SUBTABS,
-  ANALYSIS_SUBTABS,
-  GEO_SUBTABS,
-  DETAIL_SUBTABS,
-  type SubTab,
-} from "@/components/dashboard/SubTabs";
+import { ChevronDown, ChevronRight, SearchX } from "lucide-react";
+import SlicerBar from "@/components/dashboard/SlicerBar";
 import KpiCardRow from "@/components/dashboard/KpiCardRow";
 import TrendChart from "@/components/dashboard/TrendChart";
-import BrandTable from "@/components/dashboard/BrandTable";
 import IndustryPieChart from "@/components/charts/IndustryPieChart";
+import BrandTable from "@/components/dashboard/BrandTable";
+import EmptyState from "@/components/ui/EmptyState";
 import type { DashboardResponse, Brand } from "@/lib/types";
-import type { CityMarker } from "@/app/map/map-view";
-
-const MapView = dynamic(() => import("@/app/map/map-view"), { ssr: false });
 
 const COMPETITION_RELATION_OPTIONS = ["竞争对手", "潜在伙伴", "新进入者"];
 const MDS_RELATED_OPTIONS = ["MFC", "Reha China", "无"];
@@ -47,40 +37,10 @@ function deriveIndustryOptions(brands: Brand[]) {
   };
 }
 
-function getDefaultSub(layer: LayerId): string {
-  switch (layer) {
-    case "overview": return OVERVIEW_SUBTABS[0].id;
-    case "analysis": return ANALYSIS_SUBTABS[0].id;
-    case "geo": return GEO_SUBTABS[0].id;
-    case "detail": return DETAIL_SUBTABS[0].id;
-  }
-}
-
-function getSubtabs(layer: LayerId): SubTab[] {
-  switch (layer) {
-    case "overview": return OVERVIEW_SUBTABS;
-    case "analysis": return ANALYSIS_SUBTABS;
-    case "geo": return GEO_SUBTABS;
-    case "detail": return DETAIL_SUBTABS;
-  }
-}
-
-function EmptyState({ message }: { message: string }) {
-  return (
-    <div className="flex items-center justify-center py-16 text-sm text-text-secondary">
-      {message}
-    </div>
-  )
-}
-
 export default function DashboardContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const mountedRef = useRef(false);
-
-  // Layer + SubTab state
-  const [activeLayer, setActiveLayer] = useState<LayerId>("overview");
-  const [activeSub, setActiveSub] = useState<string>(() => getDefaultSub("overview"));
 
   // Filter state
   const [selectedL2, setSelectedL2] = useState<string | null>(
@@ -100,9 +60,8 @@ export default function DashboardContent() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Map markers (lazy-fetched when geo layer is active)
-  const [mapMarkers, setMapMarkers] = useState<CityMarker[]>([]);
-  const [mapLoading, setMapLoading] = useState(false);
+  // Brand table collapse state
+  const [brandsExpanded, setBrandsExpanded] = useState(true);
 
   // Filter options
   const [l1Options, setL1Options] = useState<string[]>([]);
@@ -135,17 +94,6 @@ export default function DashboardContent() {
       setIsLoading(false);
     }
   }, []);
-
-  // Fetch map markers when geo layer becomes active
-  useEffect(() => {
-    if (activeLayer !== "geo" || mapMarkers.length > 0) return;
-    setMapLoading(true);
-    fetch("/api/map/markers")
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error())))
-      .then((json) => setMapMarkers(json.markers || []))
-      .catch(() => {})
-      .finally(() => setMapLoading(false));
-  }, [activeLayer, mapMarkers.length]);
 
   // Initial mount
   useEffect(() => {
@@ -186,21 +134,24 @@ export default function DashboardContent() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedL2, selectedRelations, selectedMds]);
 
-  // Layer change → reset sub tab
-  const handleLayerChange = (layer: LayerId) => {
-    setActiveLayer(layer);
-    setActiveSub(getDefaultSub(layer));
-  };
-
   const l2Options = selectedL1
     ? l2ByL1.get(selectedL1) || []
     : allL2Options;
+
+  const handleClearFilters = () => {
+    setSelectedL1(null);
+    setSelectedL2(null);
+    setSelectedRelations([]);
+    setSelectedMds(null);
+  };
+
+  const brandsCount = data?.brands?.length ?? 0;
 
   // ─── Render: Initial loading ──────────────────────────────────────
   if (isLoading && !data) {
     return (
       <div className="space-y-6">
-        <FilterTabs
+        <SlicerBar
           industryL1Options={[]}
           selectedL1={null}
           onL1Change={() => {}}
@@ -218,7 +169,10 @@ export default function DashboardContent() {
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <KpiCardRow data={null} isLoading />
         </div>
-        <IndustryPieChart data={[]} isLoading />
+        <div className="lg:grid lg:grid-cols-2 gap-6">
+          <TrendChart data={[]} isLoading />
+          <IndustryPieChart data={[]} isLoading />
+        </div>
       </div>
     );
   }
@@ -239,10 +193,10 @@ export default function DashboardContent() {
   }
 
   // ─── Render: Empty ────────────────────────────────────────────────
-  if (data && data.brands.length === 0) {
+  if (data && brandsCount === 0) {
     return (
       <div className="space-y-6">
-        <FilterTabs
+        <SlicerBar
           industryL1Options={l1Options}
           selectedL1={selectedL1}
           onL1Change={setSelectedL1}
@@ -257,144 +211,16 @@ export default function DashboardContent() {
           onMdsChange={setSelectedMds}
           isLoading={isLoading}
         />
-        <div className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="text-sm text-text-secondary mb-2">
-            没有匹配的展会数据
-          </div>
-          <button
-            onClick={() => {
-              setSelectedL1(null);
-              setSelectedL2(null);
-              setSelectedRelations([]);
-              setSelectedMds(null);
-            }}
-            className="text-xs text-accent hover:text-accent-dark underline"
-          >
-            清除筛选条件
-          </button>
-        </div>
+        <EmptyState
+          icon={<SearchX size={48} className="text-gray-300" />}
+          message="当前筛选条件下没有匹配的展会数据"
+          action={{ label: "清除筛选条件", onClick: handleClearFilters }}
+        />
       </div>
     );
   }
 
   // ─── Render: Populated ────────────────────────────────────────────
-  const subtabs = getSubtabs(activeLayer);
-
-  const renderContent = () => {
-    switch (activeLayer) {
-      // ── 概览层 ────────────────────────────────────────────────
-      case "overview":
-        switch (activeSub) {
-          case "summary":
-            return (
-              <>
-                <KpiCardRow data={data?.kpis ?? null} isLoading={isLoading} />
-                <IndustryPieChart
-                  data={data?.industryDistribution ?? []}
-                  isLoading={isLoading}
-                  error={error}
-                  onRetry={() => fetchData(buildQueryString())}
-                  l2ByL1={l2ByL1}
-                  selectedL2={selectedL2}
-                  onIndustrySelect={setSelectedL2}
-                />
-              </>
-            )
-          case "trend":
-            return (
-              <TrendChart
-                data={data?.yearTrend ?? []}
-                isLoading={isLoading}
-              />
-            )
-          case "organizer":
-            return <EmptyState message="集团分析功能开发中" />
-          case "snapshot":
-            return <EmptyState message="快照功能开发中" />
-          default:
-            return null
-        }
-
-      // ── 分析层 ────────────────────────────────────────────────
-      case "analysis":
-        switch (activeSub) {
-          case "industry":
-            return (
-              <IndustryPieChart
-                data={data?.industryDistribution ?? []}
-                isLoading={isLoading}
-                error={error}
-                onRetry={() => fetchData(buildQueryString())}
-                l2ByL1={l2ByL1}
-                selectedL2={selectedL2}
-                onIndustrySelect={setSelectedL2}
-              />
-            )
-          case "relation":
-            return <EmptyState message="竞争关系分析开发中" />
-          case "mds":
-            return <EmptyState message="MDS 相关分析开发中" />
-          case "heat":
-            return <EmptyState message="热力矩阵开发中" />
-          case "tags":
-            return <EmptyState message="标签摘要开发中" />
-          default:
-            return null
-        }
-
-      // ── 地理层 ────────────────────────────────────────────────
-      case "geo":
-        switch (activeSub) {
-          case "cities":
-            if (mapLoading) {
-              return (
-                <div className="bg-white border border-border rounded-xl p-4">
-                  <div className="h-[500px] bg-gray-100 animate-pulse rounded-lg" />
-                </div>
-              )
-            }
-            if (mapMarkers.length === 0) {
-              return <EmptyState message="暂无地理数据" />
-            }
-            return (
-              <div className="bg-white border border-border rounded-xl p-4">
-                <div style={{ height: 500 }}>
-                  <MapView markers={mapMarkers} />
-                </div>
-              </div>
-            )
-          case "venues":
-            return <EmptyState message="场馆列表开发中" />
-          case "compare":
-            return <EmptyState message="国内外对比开发中" />
-          case "city-rank":
-            return <EmptyState message="城市排名开发中" />
-          case "venue-rank":
-            return <EmptyState message="场馆排名开发中" />
-          default:
-            return null
-        }
-
-      // ── 明细层 ────────────────────────────────────────────────
-      case "detail":
-        switch (activeSub) {
-          case "brands":
-            return <BrandTable brands={data?.brands ?? []} isLoading={isLoading} />
-          case "editions":
-            return <EmptyState message="届次列表开发中" />
-          case "search":
-            return <EmptyState message="搜索功能开发中" />
-          case "export":
-            return <EmptyState message="导出功能开发中" />
-          default:
-            return null
-        }
-
-      default:
-        return null
-    }
-  }
-
   return (
     <div className="space-y-6">
       {error && (
@@ -412,7 +238,7 @@ export default function DashboardContent() {
         </div>
       )}
 
-      <FilterTabs
+      <SlicerBar
         industryL1Options={l1Options}
         selectedL1={selectedL1}
         onL1Change={(v) => {
@@ -431,11 +257,40 @@ export default function DashboardContent() {
         isLoading={isLoading}
       />
 
-      <LayerTabs activeLayer={activeLayer} onChange={handleLayerChange} />
+      <KpiCardRow data={data?.kpis ?? null} isLoading={isLoading} />
 
-      <SubTabs tabs={subtabs} activeTab={activeSub} onChange={setActiveSub} />
+      <div className="lg:grid lg:grid-cols-2 gap-6">
+        <TrendChart data={data?.yearTrend ?? []} isLoading={isLoading} />
+        <IndustryPieChart
+          data={data?.industryDistribution ?? []}
+          isLoading={isLoading}
+          error={error}
+          onRetry={() => fetchData(buildQueryString())}
+          l2ByL1={l2ByL1}
+          selectedL2={selectedL2}
+          onIndustrySelect={setSelectedL2}
+        />
+      </div>
 
-      {renderContent()}
+      {/* Brand Table — collapsible section */}
+      {brandsCount > 0 && (
+        <div>
+          <button
+            onClick={() => setBrandsExpanded(!brandsExpanded)}
+            className="flex items-center gap-2 mb-3 text-sm font-medium text-text-primary hover:text-accent transition-colors"
+          >
+            {brandsExpanded ? (
+              <ChevronDown size={16} className="text-text-secondary" />
+            ) : (
+              <ChevronRight size={16} className="text-text-secondary" />
+            )}
+            品牌列表 ({brandsCount})
+          </button>
+          {brandsExpanded && (
+            <BrandTable brands={data?.brands ?? []} isLoading={isLoading} />
+          )}
+        </div>
+      )}
     </div>
   );
 }
