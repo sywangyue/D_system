@@ -508,10 +508,28 @@ WHERE brand_id = 'EXPO-0001';
 - [x] cnexpo 全量采集完成（4,570 条）
 - [ ] Jufair 全量采集（4,046/8,400，等待 IP 解封）
 - [ ] Phase 4 前端架构执行（7 plans 待执行）
-- [ ] 生产部署（Cloudflare Workers + Supabase）
+- [ ] 生产部署（Cloudflare Workers）
 
 ---
 
 *PRD v1.1（整合版）· ECD-2026 · 2026.04.27 · CONFIDENTIAL*  
 *整合自: PRD v1.0（主架构）+ Adjustment v1.1（Phase 3 调整说明）*  
 *最后更新: 2026-05-07 — 项目整合清理，增加实现追踪与完成要素*
+
+## 变更记录 · 20260427
+
+### 架构变更
+- 移除 Supabase 集成（含残留组件）
+- 移除 FastAPI 独立服务，合并至 Next.js API Routes
+- 数据链路简化为：SQLite → API Routes → 前端
+
+### 清理内容
+- 归档文档：56 份
+- 删除脚手架文件：1 份（共 6 行）
+- 合并文档：0 份
+
+### 当前技术栈
+- 前端：Next.js + Tailwind
+- 数据库：SQLite
+- 部署目标：阿里云海外节点 + Cloudflare 域名（mwlaboratory.com）
+- 定时任务：crontab

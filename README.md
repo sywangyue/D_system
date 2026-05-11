@@ -165,7 +165,7 @@ python3 -m pytest tests/ -v
 
 | 资源 | 路径 |
 |------|------|
-| 整合 PRD（唯一产品权威） | `MWLAB-2026-PRD-v1.1-merged.md` |
+| 整合 PRD（唯一产品权威） | `docs/MWLAB-2026-PRD-v1.1-merged.md` |
 | 架构说明 | `docs/ARCHITECTURE.md` |
 | Claude Code 行为约束 | `CLAUDE.md` |
 | 项目上下文与文件索引 | `AGENTS.md` |
