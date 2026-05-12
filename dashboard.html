@@ -325,8 +325,8 @@ a{text-decoration:none;color:inherit}
 .kpi-sub{font-size:12px;color:var(--text-3);margin-top:4px}
 
 /* ── Brand cards ───────────────────────────────────────────────── */
-.main{display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start;margin-bottom:24px}
-.card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(272px,1fr));gap:16px}
+.main{margin-bottom:24px}
+.card-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
 .brand-card{
   background:var(--bg-card);border-radius:var(--r-card);
   padding:16px;box-shadow:var(--shadow);
@@ -378,6 +378,21 @@ a{text-decoration:none;color:inherit}
 }
 .badge-mds{background:#FFF3EC;color:#E55300}
 .badge-ufi{background:#EFF6FF;color:#1A4F8A}
+
+/* ── Pagination ──────────────────────────────────────────────────── */
+.pager{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px}
+.pager-btn{
+  height:28px;padding:0 12px;border-radius:6px;
+  border:1px solid var(--divider);background:var(--bg-card);
+  font-size:12px;color:var(--text-2);cursor:pointer;
+  transition:all .12s;
+}
+.pager-btn:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.pager-btn:disabled{opacity:.35;cursor:default}
+.pager-num{font-size:12px;color:var(--text-2);padding:0 8px}
+
+/* ── Section title ───────────────────────────────────────────────── */
+.section-title{font-family:var(--font-display);font-size:15px;font-weight:600;color:var(--text-1);margin-bottom:12px}
 
 /* ── Charts sidebar — card reused in trend row ──────────────────── */
 .charts-col{display:none}
@@ -636,8 +651,9 @@ th.sorted .si{opacity:1}
       </div>
     </div>
 
-    <!-- Main: cards + charts -->
+    <!-- Main: cards -->
     <div class="main">
+      <div class="section-title">展会概览</div>
       <div class="card-grid" id="cardGrid"><!-- JS --></div>
     </div>
 
@@ -664,6 +680,7 @@ th.sorted .si{opacity:1}
           <tbody id="tblBody"><!-- JS --></tbody>
         </table>
       </div>
+      <div class="pager" id="tablePager"></div>
     </div>
 
   </div><!-- /pageContent -->
@@ -813,17 +830,22 @@ function renderRel(){
 }
 
 /* ── Render brand cards ─────────────────────────────────────────── */
+let cardPage = 0;
+const CARDS_PER_PAGE = 12;
+
 function renderCards(){
   const brands = S.brands;
   const g = document.getElementById('cardGrid');
   if (!brands.length){
-    g.innerHTML = '<div class="empty"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><p>没有匹配的展会品牌</p></div>';
+    g.innerHTML = '<div class="empty" style="grid-column:1/-1"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg><p>没有匹配的展会品牌</p></div>';
     return;
   }
   const {compact, ufi, mds} = S.tw;
-  const MAX_CARDS = 50;
   const sorted = [...brands].sort((a, b) => (b.strategic_relevance || 0) - (a.strategic_relevance || 0));
-  const displayBrands = sorted.slice(0, MAX_CARDS);
+  const totalPages = Math.ceil(sorted.length / CARDS_PER_PAGE);
+  if (cardPage >= totalPages) cardPage = totalPages - 1;
+  if (cardPage < 0) cardPage = 0;
+  const displayBrands = sorted.slice(cardPage * CARDS_PER_PAGE, (cardPage + 1) * CARDS_PER_PAGE);
   let html = displayBrands.map(b => {
     const dateStr = b.date_start ? fmtDateStr(b.date_start) + (b.date_end ? '–' + fmtDateStr(b.date_end).split('.').slice(1).join('.') : '') : '';
     return '<div class="brand-card" onclick="openPanel(\'brand\', ' + brands.indexOf(b) + ')">' +
@@ -851,10 +873,22 @@ function renderCards(){
       '</div>' +
     '</div>';
   }).join('');
-  if (brands.length > MAX_CARDS) {
-    html += '<div style="text-align:center;padding:12px;color:var(--text-3);font-size:12px;grid-column:1/-1">显示 ' + MAX_CARDS + '/' + brands.length + ' 个品牌（按战略评分排序），完整列表见下方表格</div>';
-  }
+  html += '<div class="pager">' +
+    '<button class="pager-btn" onclick="goCardPage(0)" ' + (cardPage === 0 ? 'disabled' : '') + '>首页</button>' +
+    '<button class="pager-btn" onclick="goCardPage(' + (cardPage - 1) + ')" ' + (cardPage === 0 ? 'disabled' : '') + '>上一页</button>' +
+    '<span class="pager-num">' + (cardPage + 1) + ' / ' + totalPages + '</span>' +
+    '<button class="pager-btn" onclick="goCardPage(' + (cardPage + 1) + ')" ' + (cardPage >= totalPages - 1 ? 'disabled' : '') + '>下一页</button>' +
+    '<button class="pager-btn" onclick="goCardPage(' + (totalPages - 1) + ')" ' + (cardPage >= totalPages - 1 ? 'disabled' : '') + '>末页</button>' +
+  '</div>';
   g.innerHTML = html;
+}
+
+function goCardPage(n) {
+  cardPage = n;
+  renderCards();
+  if (S.brands.length) {
+    document.getElementById('cardGrid').scrollIntoView({ behavior: 'instant', block: 'start' });
+  }
 }
 
 /* ── Render SVG bar chart ────────────────────────────────────────── */
@@ -954,6 +988,9 @@ function renderTrends() {
 }
 
 /* ── Render table ───────────────────────────────────────────────── */
+let tablePage = 0;
+const ROWS_PER_PAGE = 20;
+
 function renderTable(){
   const brands = S.brands;
   const sorted = [...brands].sort((a, b) => {
@@ -962,16 +999,22 @@ function renderTable(){
     return S.sortD === 'asc' ? va - vb : vb - va;
   });
 
-  document.getElementById('tblCnt').textContent = '共 ' + brands.length + ' 条';
+  const totalPages = Math.max(1, Math.ceil(sorted.length / ROWS_PER_PAGE));
+  if (tablePage >= totalPages) tablePage = totalPages - 1;
+  if (tablePage < 0) tablePage = 0;
+  const start = tablePage * ROWS_PER_PAGE;
+  const displayRows = sorted.slice(start, start + ROWS_PER_PAGE);
+
+  document.getElementById('tblCnt').textContent = '第 ' + (start + 1) + '–' + Math.min(start + ROWS_PER_PAGE, sorted.length) + ' 条，共 ' + sorted.length + ' 条';
   document.querySelectorAll('th[data-k]').forEach(th => {
-    const sorted = th.dataset.k === S.sortK;
-    th.classList.toggle('sorted', sorted);
+    const s = th.dataset.k === S.sortK;
+    th.classList.toggle('sorted', s);
     const si = th.querySelector('.si');
-    if (si) si.textContent = sorted ? (S.sortD === 'asc' ? '↑' : '↓') : '↕';
+    if (si) si.textContent = s ? (S.sortD === 'asc' ? '↑' : '↓') : '↕';
   });
 
-  document.getElementById('tblBody').innerHTML = sorted.map((b, i) =>
-    '<tr style="cursor:pointer" onclick="openPanel(\'brand\',' + i + ')">' +
+  document.getElementById('tblBody').innerHTML = displayRows.map((b, i) =>
+    '<tr style="cursor:pointer" onclick="openPanel(\'brand\',' + (start + i) + ')">' +
       '<td class="td-pri">' + (b.name_cn || '') + '<div class="td-sec">' + (b.name_en || '') + '</div></td>' +
       '<td style="color:var(--text-2)">' + (b.industry_l2 || '') + '</td>' +
       '<td style="color:var(--text-2);max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">' + (b.organizer || '') + '</td>' +
@@ -982,6 +1025,18 @@ function renderTable(){
       '<td><span class="rel-pill ' + relCls(b.competition_relation) + '">' + (b.competition_relation || '') + '</span></td>' +
     '</tr>'
   ).join('');
+
+  document.getElementById('tablePager').innerHTML =
+    '<button class="pager-btn" onclick="goTablePage(0)" ' + (tablePage === 0 ? 'disabled' : '') + '>首页</button>' +
+    '<button class="pager-btn" onclick="goTablePage(' + (tablePage - 1) + ')" ' + (tablePage === 0 ? 'disabled' : '') + '>上一页</button>' +
+    '<span class="pager-num">' + (tablePage + 1) + ' / ' + totalPages + '</span>' +
+    '<button class="pager-btn" onclick="goTablePage(' + (tablePage + 1) + ')" ' + (tablePage >= totalPages - 1 ? 'disabled' : '') + '>下一页</button>' +
+    '<button class="pager-btn" onclick="goTablePage(' + (totalPages - 1) + ')" ' + (tablePage >= totalPages - 1 ? 'disabled' : '') + '>末页</button>';
+}
+
+function goTablePage(n) {
+  tablePage = n;
+  renderTable();
 }
 
 /* ── Calendar ──────────────────────────────────────────────────── */
@@ -1487,6 +1542,8 @@ async function clearAll(){
 
 /* ── Master render ──────────────────────────────────────────────── */
 function renderAll(){
+  cardPage = 0;
+  tablePage = 0;
   renderKPI();
   renderL1();
   renderL2();
@@ -1505,6 +1562,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const k = th.dataset.k;
       S.sortD = S.sortK === k ? (S.sortD === 'asc' ? 'desc' : 'asc') : 'desc';
       S.sortK = k;
+      tablePage = 0;
       renderTable();
     });
   });
