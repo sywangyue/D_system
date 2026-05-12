@@ -125,7 +125,7 @@ a{text-decoration:none;color:inherit}
 .s-pill.rel-n.active{background:var(--n-tx);border-color:var(--n-tx)}
 .divline{height:1px;background:var(--divider);margin:2px 0}
 .l2-panel{
-  display:flex;gap:6px;flex-wrap:wrap;
+  display:grid;grid-template-columns:repeat(10,1fr);gap:6px;
   padding:10px 16px;background:var(--bg-page);border-radius:8px;
 }
 
@@ -453,7 +453,6 @@ th.sorted .si{opacity:1}
     MWLAB
     <span class="nav-badge">2026</span>
   </a>
-  <div class="nav-mid" id="navMid"><!-- JS --></div>
   <div class="nav-right">
     <button class="btn-clear" id="btnClear" onclick="clearAll()">✕ 清除筛选</button>
     <div class="avatar" title="BD总监">BD</div>
@@ -622,7 +621,8 @@ const S = {
   l1: null, l2: null, rels: [],
   sortK: 'exhibitors_count', sortD: 'desc',
   brands: [], kpis: {}, industryDistribution: [], yearTrend: [],
-  tw: { compact: false, ufi: true, mds: true }
+  tw: { compact: false, ufi: true, mds: true },
+  allL1s: [], allL2s: {}
 };
 
 const PIE_COLORS = ['#FE5C00','#1A4F8A','#1A6B3A','#C0392B','#F59E0B','#7B2D8B','#6B7280'];
@@ -642,6 +642,16 @@ async function fetchData() {
   S.kpis = data.kpis || {};
   S.industryDistribution = data.industryDistribution || [];
   S.yearTrend = data.yearTrend || [];
+  // 首次无筛选加载时缓存全量 l1/l2，后续 renderL1 不受过滤影响
+  if (!S.l1 && !S.l2 && !S.rels.length) {
+    S.allL1s = uniq(S.brands.map(b => b.industry_l1).filter(Boolean)).sort();
+    S.brands.forEach(b => {
+      if (b.industry_l1 && b.industry_l2) {
+        if (!S.allL2s[b.industry_l1]) S.allL2s[b.industry_l1] = new Set();
+        S.allL2s[b.industry_l1].add(b.industry_l2);
+      }
+    });
+  }
 }
 
 /* ── Utils ─────────────────────────────────────────────────────── */
@@ -688,25 +698,17 @@ function renderKPI(){
   document.getElementById('k-new').textContent   = brands.filter(b => b.competition_relation === '新进入者').length;
 }
 
-/* ── Render Nav pills ───────────────────────────────────────────── */
-function renderNav(){
-  const l1s = uniq(S.brands.map(b => b.industry_l1).filter(Boolean)).sort();
-  document.getElementById('navMid').innerHTML = l1s.map(l1 =>
-    '<button class="nav-pill' + (S.l1 === l1 ? ' active' : '') + '" onclick="selL1(\'' + l1.replace(/'/g, "\\'") + '\')">' + l1 + '</button>'
-  ).join('');
-  document.getElementById('btnClear').style.display =
-    (S.l1 || S.l2 || S.rels.length) ? 'block' : 'none';
-}
-
 /* ── Render L1 slicer ───────────────────────────────────────────── */
 function renderL1(){
-  const l1s = uniq(S.brands.map(b => b.industry_l1).filter(Boolean)).sort();
+  const l1s = S.allL1s.length ? S.allL1s : uniq(S.brands.map(b => b.industry_l1).filter(Boolean)).sort();
   document.getElementById('rowL1').innerHTML =
     '<span class="slicer-lbl">行业</span>' +
     '<button class="s-pill' + (!S.l1 ? ' active' : '') + '" onclick="selL1(null)">全部</button>' +
     l1s.map(l =>
       '<button class="s-pill' + (S.l1 === l ? ' active' : '') + '" onclick="selL1(\'' + l.replace(/'/g, "\\'") + '\')">' + l + '</button>'
     ).join('');
+  document.getElementById('btnClear').style.display =
+    (S.l1 || S.l2 || S.rels.length) ? 'block' : 'none';
 }
 
 /* ── Render L2 panel ────────────────────────────────────────────── */
@@ -714,7 +716,9 @@ function renderL2(){
   const w = document.getElementById('l2Wrap');
   if (!S.l1){ w.style.display = 'none'; return; }
   w.style.display = '';
-  const l2s = uniq(S.brands.filter(b => b.industry_l1 === S.l1).map(b => b.industry_l2).filter(Boolean)).sort();
+  const l2s = S.allL2s[S.l1]
+    ? [...S.allL2s[S.l1]].sort()
+    : uniq(S.brands.filter(b => b.industry_l1 === S.l1).map(b => b.industry_l2).filter(Boolean)).sort();
   document.getElementById('panelL2').innerHTML =
     '<button class="s-pill' + (!S.l2 ? ' active' : '') + '" onclick="selL2(null)">全部</button>' +
     l2s.map(l =>
@@ -1302,7 +1306,6 @@ async function clearAll(){
 /* ── Master render ──────────────────────────────────────────────── */
 function renderAll(){
   renderKPI();
-  renderNav();
   renderL1();
   renderL2();
   renderRel();
