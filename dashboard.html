@@ -130,10 +130,10 @@ a{text-decoration:none;color:inherit}
 }
 
 /* ── Top Row: Calendar + Map ───────────────────────────────────── */
-.top-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;align-items:start}
+.top-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;align-items:stretch}
 
 /* ── Calendar ──────────────────────────────────────────────────── */
-.cal-card{background:var(--bg-card);border-radius:var(--r-card);box-shadow:var(--shadow);overflow:hidden}
+.cal-card{background:var(--bg-card);border-radius:var(--r-card);box-shadow:var(--shadow);overflow:hidden;display:flex;flex-direction:column}
 .cal-hd{
   display:flex;justify-content:space-between;align-items:center;
   padding:16px 20px;border-bottom:1px solid var(--divider);
@@ -165,7 +165,7 @@ a{text-decoration:none;color:inherit}
 }
 .wday.weekend{color:var(--c-tx);opacity:.7}
 
-.cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);flex:1;grid-auto-rows:1fr}
 .day-cell{
   min-height:64px;padding:5px;
   border-right:1px solid var(--divider);border-bottom:1px solid var(--divider);
@@ -206,8 +206,9 @@ a{text-decoration:none;color:inherit}
 .map-wrap{
   background:var(--bg-card);border-radius:var(--r-card);
   box-shadow:var(--shadow);overflow:hidden;position:relative;
+  display:flex;flex-direction:column;
 }
-.map-svg{display:block;width:100%;height:auto}
+.map-svg{display:block;width:100%;height:100%}
 
 .map-loading{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
@@ -251,6 +252,23 @@ a{text-decoration:none;color:inherit}
 }
 .z-btn:hover{background:var(--bg-page)}
 .z-btn.active{background:var(--text-1);border-color:transparent;color:#fff}
+
+/* Map fullscreen */
+.map-fs-btn{
+  position:absolute;top:12px;right:60px;z-index:10;
+  height:26px;padding:0 10px;border-radius:var(--r-tag);
+  border:1px solid rgba(0,0,0,0.09);background:var(--bg-card);
+  font-size:11px;font-weight:500;color:var(--text-2);
+  cursor:pointer;transition:all .12s;
+}
+.map-fs-btn:hover{background:var(--bg-page)}
+.map-wrap.fullscreen{
+  position:fixed;inset:0;z-index:200;border-radius:0;background:var(--bg-card);
+}
+.map-wrap.fullscreen .map-svg{height:100vh}
+.map-wrap.fullscreen .map-fs-btn{top:16px;right:20px}
+.map-wrap.fullscreen .zoom-btns{top:16px;right:72px}
+.map-wrap.fullscreen .map-legend{bottom:24px;left:24px}
 
 /* ── KPI Row ───────────────────────────────────────────────────── */
 .kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
@@ -503,6 +521,7 @@ th.sorted .si{opacity:1}
 
       <!-- Map -->
       <div class="map-wrap" id="mapWrap">
+        <button class="map-fs-btn" onclick="toggleFullscreen()" title="全屏">⛶</button>
         <svg id="mapSvg" class="map-svg" viewBox="0 0 800 400"
              xmlns="http://www.w3.org/2000/svg" style="font-family:var(--font-text)">
           <rect width="800" height="400" fill="#F0F4F8"/>
@@ -1021,7 +1040,7 @@ function goToday() {
 const W = 800, H = 400;
 
 function proj(lon, lat) {
-  return [(lon + 180) / 360 * W, (90 - lat) / 360 * H];
+  return [(lon + 180) / 360 * W, (90 - lat) / 180 * H];
 }
 
 const CITY_GEO = {
@@ -1185,6 +1204,22 @@ function setView(v, btn) {
   requestAnimationFrame(frame);
 }
 
+function toggleFullscreen() {
+  const wrap = document.getElementById('mapWrap');
+  const btn = wrap.querySelector('.map-fs-btn');
+  wrap.classList.toggle('fullscreen');
+  if (wrap.classList.contains('fullscreen')) {
+    document.body.style.overflow = 'hidden';
+    btn.textContent = '✕';
+    btn.title = '退出全屏';
+  } else {
+    document.body.style.overflow = '';
+    btn.textContent = '⛶';
+    btn.title = '全屏';
+  }
+  setTimeout(() => drawCities(), 150);
+}
+
 async function initMap() {
   try {
     const world = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json());
@@ -1346,6 +1381,21 @@ async function init(){
 
 init();
 initMap();
+
+// ESC 退出全屏
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') {
+    const wrap = document.getElementById('mapWrap');
+    if (wrap.classList.contains('fullscreen')) {
+      wrap.classList.remove('fullscreen');
+      document.body.style.overflow = '';
+      const btn = wrap.querySelector('.map-fs-btn');
+      btn.textContent = '⛶'; btn.title = '全屏';
+      setTimeout(() => drawCities(), 150);
+    }
+  }
+});
+
 </script>
 </body>
 </html>
