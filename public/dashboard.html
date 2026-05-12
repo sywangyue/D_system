@@ -1340,19 +1340,26 @@ function drawCities() {
   if (!mapReady) return;
   const cm = cityMap();
   const el = document.getElementById('cities');
+
+  // Collect and sort cities by brand count, keep top 22
+  let entries = Object.entries(CITY_GEO)
+    .map(([city, geo]) => ({ city, geo, count: (cm[city] || []).length }))
+    .filter(e => e.count > 0)
+    .sort((a, b) => b.count - a.count);
+  const topCities = entries.slice(0, 15);
+
   let h = '';
-  Object.entries(CITY_GEO).forEach(([city, [lon, lat]]) => {
+  topCities.forEach(({ city, geo: [lon, lat], count }) => {
     const brands = cm[city];
-    if (!brands || !brands.length) return;
     const [cx, cy] = proj(lon, lat);
-    const r = Math.max(4, Math.min(9, 3 + brands.length * 1.5));
+    const r = Math.max(2, Math.min(4, 1.5 + count * 0.4));
     const color = domColor(brands);
     const isActive = activeCity === city;
     h += '<g class="city-mk" data-city="' + city + '" style="cursor:pointer">' +
-      '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (r + 3).toFixed(1) + '" fill="' + color + '" opacity="' + (isActive ? '0.25' : '0.12') + '"/>' +
-      '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="' + color + '" stroke="white" stroke-width="1"/>' +
-      '<text x="' + cx.toFixed(1) + '" y="' + (cy - r - 3).toFixed(1) + '" text-anchor="middle" font-size="8" font-weight="500" fill="#1D1D1F" class="city-label">' + city + '</text>' +
-      '<text x="' + cx.toFixed(1) + '" y="' + (cy + 1.5).toFixed(1) + '" text-anchor="middle" font-size="7" font-weight="700" fill="white">' + brands.length + '</text>' +
+      '<title>' + city + ' · ' + count + ' 场展会</title>' +
+      '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (r + 2.5).toFixed(1) + '" fill="' + color + '" opacity="' + (isActive ? '0.25' : '0.12') + '"/>' +
+      '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="' + color + '" stroke="white" stroke-width="0.7"/>' +
+      '<text x="' + cx.toFixed(1) + '" y="' + (cy + 1).toFixed(1) + '" text-anchor="middle" font-size="6" font-weight="700" fill="white">' + count + '</text>' +
     '</g>';
   });
   el.innerHTML = h;
