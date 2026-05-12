@@ -155,6 +155,17 @@ a{text-decoration:none;color:inherit}
 }
 .cal-nav-btn:hover{background:var(--bg-page);color:var(--text-1)}
 
+/* Calendar view toggle */
+.cal-view-btns{display:flex;gap:4px}
+.v-btn{
+  height:26px;padding:0 10px;border-radius:var(--r-tag);
+  border:1px solid rgba(0,0,0,0.09);background:transparent;
+  font-size:11px;font-weight:500;color:var(--text-2);
+  cursor:pointer;transition:all .12s;
+}
+.v-btn:hover{background:var(--bg-page)}
+.v-btn.active{background:var(--text-1);border-color:transparent;color:#fff}
+
 .week-hd{
   display:grid;grid-template-columns:repeat(7,1fr);
   border-bottom:1px solid var(--divider);
@@ -201,6 +212,27 @@ a{text-decoration:none;color:inherit}
 .ev-p{background:var(--p-bg);color:var(--p-tx)}
 .ev-n{background:var(--n-bg);color:var(--n-tx)}
 .more-badge{font-size:9px;color:var(--text-3);padding-left:4px;font-weight:500}
+
+/* Calendar: past dates + year/week views */
+.day-cell.past{background:rgba(0,0,0,0.03)}
+.day-cell.past .day-num{color:var(--text-3)}
+.year-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.mini-month{background:var(--bg-page);border-radius:8px;padding:8px}
+.mini-mh{font-size:12px;font-weight:600;color:var(--text-1);margin-bottom:4px;text-align:center;cursor:pointer}
+.mini-mh:hover{color:var(--accent)}
+.mini-mg{display:grid;grid-template-columns:repeat(7,1fr)}
+.mini-wd{font-size:7px;text-align:center;padding:1px 0;color:var(--text-3)}
+.mini-d{font-size:8px;text-align:center;padding:2px 0;color:var(--text-2);cursor:pointer;border-radius:3px}
+.mini-d:hover{background:var(--bg-hover)}
+.mini-d.ev{color:var(--accent);font-weight:700}
+.mini-d.today{background:var(--accent);color:#fff;font-weight:700}
+.week-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+.week-col{min-height:200px;border-right:1px solid var(--divider);padding:6px}
+.week-col:last-child{border-right:none}
+.week-dh{font-size:12px;font-weight:600;text-align:center;padding:4px 0;color:var(--text-2)}
+.week-dh.today{color:var(--accent)}
+.week-ev{font-size:10px;padding:2px 4px;margin:1px 0;border-radius:3px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.4}
+.week-ev:hover{opacity:.8}
 
 /* ── Map ───────────────────────────────────────────────────────── */
 .map-wrap{
@@ -364,6 +396,19 @@ a{text-decoration:none;color:inherit}
 .lg-name{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .lg-val{font-weight:600;color:var(--text-1);flex-shrink:0}
 
+/* ── Trend Row ─────────────────────────────────────────────────── */
+.trend-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px}
+.trend-card{
+  background:var(--bg-card);border-radius:var(--r-card);
+  padding:16px;box-shadow:var(--shadow);
+}
+.trend-title{font-family:var(--font-display);font-size:12px;font-weight:600;color:var(--text-1);margin-bottom:12px}
+.trend-bars{display:flex;align-items:flex-end;gap:3px;height:80px}
+.trend-bar{
+  flex:1;border-radius:3px 3px 0 0;min-width:6px;
+  transition:height .3s ease;
+}
+
 /* ── Data table ────────────────────────────────────────────────── */
 .tbl-section{
   background:var(--bg-card);border-radius:var(--r-card);
@@ -511,12 +556,15 @@ th.sorted .si{opacity:1}
             <button class="cal-nav-btn" onclick="nextMonth()">›</button>
           </div>
         </div>
-        <div class="week-hd">
-          <div class="wday">一</div><div class="wday">二</div><div class="wday">三</div>
-          <div class="wday">四</div><div class="wday">五</div>
-          <div class="wday weekend">六</div><div class="wday weekend">日</div>
+        <div style="padding:8px 20px;display:flex;align-items:center;gap:12px">
+          <div class="cal-view-btns">
+            <button class="v-btn" id="vYear" onclick="setView('year')">年</button>
+            <button class="v-btn active" id="vMonth" onclick="setView('month')">月</button>
+            <button class="v-btn" id="vWeek" onclick="setView('week')">周</button>
+          </div>
+          <span style="font-size:11px;color:var(--text-3)" id="calRange"></span>
         </div>
-        <div class="cal-grid" id="calGrid"></div>
+        <div id="calBody"></div>
       </div>
 
       <!-- Map -->
@@ -540,8 +588,8 @@ th.sorted .si{opacity:1}
           <div class="leg-row"><div class="leg-dot" style="background:#1A4F8A"></div>新进入者</div>
         </div>
         <div class="zoom-btns">
-          <button class="z-btn active" id="zWorld" onclick="setView('world',this)">全球视图</button>
-          <button class="z-btn" id="zChina" onclick="setView('china',this)">聚焦中国</button>
+          <button class="z-btn active" id="zWorld" onclick="setMapView('world',this)">全球视图</button>
+          <button class="z-btn" id="zChina" onclick="setMapView('china',this)">聚焦中国</button>
         </div>
       </div>
     </div>
@@ -567,6 +615,28 @@ th.sorted .si{opacity:1}
         <div class="kpi-label">新进入者</div>
         <div class="kpi-num blue" id="k-new">—</div>
         <div class="kpi-sub">近3年首次举办</div>
+      </div>
+    </div>
+
+    <!-- Trend Row -->
+    <div class="trend-row">
+      <div class="trend-card">
+        <div class="trend-title">观众数量趋势</div>
+        <div class="trend-bars" id="trendVisitors"><!-- JS --></div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-title">展览面积趋势</div>
+        <div class="trend-bars" id="trendArea"><!-- JS --></div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-title">展商数量趋势</div>
+        <div class="trend-bars" id="trendExhibitors"><!-- JS --></div>
+      </div>
+      <div class="trend-card">
+        <div class="trend-title">行业分布</div>
+        <div class="trend-donut">
+          <svg id="trendDonut" width="104" height="104" viewBox="0 0 104 104"></svg>
+        </div>
       </div>
     </div>
 
@@ -891,6 +961,44 @@ function renderDonut(){
   ).join('');
 }
 
+/* ── Render trend row ────────────────────────────────────────────── */
+function renderTrendBars(id, data, key, color) {
+  const el = document.getElementById(id);
+  if (!data.length) { el.innerHTML = '<div style="color:var(--text-3);font-size:11px;line-height:80px">暂无数据</div>'; return; }
+  const max = Math.max(...data.map(d => d[key] || 0), 1);
+  el.innerHTML = data.map(d => {
+    const h = Math.max(4, ((d[key] || 0) / max) * 100);
+    return '<div class="trend-bar" style="height:' + h + '%;background:' + (color || 'var(--accent)') + '" title="' + d.year + ': ' + fmtN(d[key] || 0) + '"></div>';
+  }).join('');
+}
+
+function renderTrendDonut(data) {
+  const svg = document.getElementById('trendDonut');
+  if (!data.length) { svg.innerHTML = ''; return; }
+  const cx = 52, cy = 52, r = 42;
+  const total = data.reduce((s, d) => s + d.value, 0) || 1;
+  const top = data.slice(0, 6);
+  let angle = -90, paths = '';
+  top.forEach((d, i) => {
+    const sweep = (d.value / total) * 360;
+    const a1 = angle * Math.PI / 180, a2 = (angle + sweep) * Math.PI / 180;
+    const x1 = cx + r * Math.cos(a1), y1 = cy + r * Math.sin(a1);
+    const x2 = cx + r * Math.cos(a2), y2 = cy + r * Math.sin(a2);
+    const large = sweep > 180 ? 1 : 0;
+    paths += '<path d="M' + cx + ',' + cy + ' L' + x1.toFixed(1) + ',' + y1.toFixed(1) + ' A' + r + ',' + r + ' 0 ' + large + ' 1 ' + x2.toFixed(1) + ',' + y2.toFixed(1) + ' Z" fill="' + PIE_COLORS[i % PIE_COLORS.length] + '" opacity="0.85"/>';
+    angle += sweep;
+  });
+  svg.innerHTML = paths;
+}
+
+function renderTrends() {
+  const yt = S.yearTrend || [];
+  renderTrendBars('trendVisitors', yt, 'visitors_count', '#1A4F8A');
+  renderTrendBars('trendArea', yt, 'area_sqm', '#FE5C00');
+  renderTrendBars('trendExhibitors', yt, 'exhibitors_count', '#1A6B3A');
+  renderTrendDonut(S.industryDistribution || []);
+}
+
 /* ── Render table ───────────────────────────────────────────────── */
 function renderTable(){
   const brands = S.brands;
@@ -924,10 +1032,18 @@ function renderTable(){
 
 /* ── Calendar ──────────────────────────────────────────────────── */
 const MONTH_NAMES = ['一月','二月','三月','四月','五月','六月','七月','八月','九月','十月','十一月','十二月'];
+const WEEK_NAMES = ['一','二','三','四','五','六','日'];
 const TODAY = new Date();
 let curYear = TODAY.getFullYear();
 let curMonth = TODAY.getMonth();
 let selDate = null;
+let calView = 'month';
+let curWeekStart = null;
+
+function isPast(y, m, d) {
+  const t = new Date(y, m, d); t.setHours(23,59,59,999);
+  return t.getTime() < TODAY.setHours(0,0,0,0);
+}
 
 function exposByDate(y, m, d) {
   const t = new Date(y, m, d).getTime();
@@ -950,9 +1066,27 @@ function exposByMonth(y, m) {
   });
 }
 
-function renderCal() {
-  document.getElementById('calTitle').textContent = curYear + ' · ' + MONTH_NAMES[curMonth];
+function setView(v) {
+  calView = v;
+  document.querySelectorAll('.v-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('v' + v.charAt(0).toUpperCase() + v.slice(1)).classList.add('active');
+  if (v === 'week') { curWeekStart = getMonday(TODAY); }
+  selDate = null;
+  renderCal();
+}
 
+function getMonday(d) { const r = new Date(d); r.setDate(r.getDate() - (r.getDay() || 7) + 1); return r; }
+
+function renderCal() {
+  const calTitle = document.getElementById('calTitle');
+  const calBody = document.getElementById('calBody');
+  if (calView === 'year') { calTitle.textContent = curYear + ' 年'; renderYear(calBody); }
+  else if (calView === 'week') { renderWeek(calBody); }
+  else { calTitle.textContent = curYear + ' · ' + MONTH_NAMES[curMonth]; renderMonth(calBody); }
+}
+
+/* ── Month view ─────────────────────────────────────────────────── */
+function renderMonth(ct) {
   const firstDay = new Date(curYear, curMonth, 1).getDay();
   const daysInMonth = new Date(curYear, curMonth + 1, 0).getDate();
   const prevDays = new Date(curYear, curMonth, 0).getDate();
@@ -970,7 +1104,11 @@ function renderCal() {
   const sk = selDate ? dateKey(selDate.y, selDate.m, selDate.d) : null;
   const tk = dateKey(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
 
-  let html = '';
+  let wd = '<div class="week-hd">';
+  WEEK_NAMES.forEach((n, i) => wd += '<div class="wday' + (i >= 5 ? ' weekend' : '') + '">' + n + '</div>');
+  wd += '</div>';
+
+  let g = '';
   cells.forEach(cell => {
     const ck = dateKey(cell.y, cell.m, cell.d);
     const isToday = ck === tk;
@@ -983,6 +1121,7 @@ function renderCal() {
     if (isOther) cls += ' other-month';
     if (isToday) cls += ' today';
     if (isSel) cls += ' selected';
+    if (!isOther && isPast(cell.y, cell.m, cell.d) && !isToday) cls += ' past';
 
     const evs = !isOther ? exposByDate(cell.y, cell.m, cell.d) : [];
     const showEvs = evs.slice(0, 2);
@@ -994,15 +1133,71 @@ function renderCal() {
     });
     if (more > 0) evHtml += '<div class="more-badge">+' + more + ' 更多</div>';
 
-    html += '<div class="' + cls + '" data-y="' + cell.y + '" data-m="' + cell.m + '" data-d="' + cell.d + '"' +
-      ' style="' + (isWeekend && !isOther ? 'background:rgba(0,0,0,0.01)' : '') + '"' +
+    g += '<div class="' + cls + '" data-y="' + cell.y + '" data-m="' + cell.m + '" data-d="' + cell.d + '"' +
+      (isWeekend && !isOther ? ' style="background:rgba(0,0,0,0.01)"' : '') +
       ' onclick="selectDay(' + cell.y + ',' + cell.m + ',' + cell.d + ')">' +
       '<div class="day-num">' + cell.d + '</div>' +
-      '<div class="ev-list">' + evHtml + '</div>' +
-    '</div>';
+      '<div class="ev-list">' + evHtml + '</div></div>';
   });
 
-  document.getElementById('calGrid').innerHTML = html;
+  ct.innerHTML = wd + '<div class="cal-grid">' + g + '</div>';
+  document.getElementById('calRange').textContent = '';
+}
+
+/* ── Year view ──────────────────────────────────────────────────── */
+function renderYear(ct) {
+  let h = '<div class="year-grid">';
+  for (let m = 0; m < 12; m++) {
+    h += '<div class="mini-month">';
+    h += '<div class="mini-mh" onclick="curMonth=' + m + ';setView(\'month\')">' + MONTH_NAMES[m] + '</div>';
+    h += '<div class="mini-mg">';
+    WEEK_NAMES.forEach(n => h += '<div class="mini-wd">' + n + '</div>');
+    const fd = new Date(curYear, m, 1).getDay();
+    const dim = new Date(curYear, m + 1, 0).getDate();
+    const off = fd === 0 ? 6 : fd - 1;
+    for (let i = 0; i < off; i++) h += '<div class="mini-d"></div>';
+    const tm = dateKey(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
+    for (let d = 1; d <= dim; d++) {
+      const ck = dateKey(curYear, m, d);
+      const hasEv = exposByDate(curYear, m, d).length > 0;
+      let mc = 'mini-d';
+      if (ck === tm) mc += ' today';
+      if (hasEv) mc += ' ev';
+      h += '<div class="' + mc + '" onclick="curMonth=' + m + ';selectDay(' + curYear + ',' + m + ',' + d + ');setView(\'month\')">' + d + '</div>';
+    }
+    h += '</div></div>';
+  }
+  h += '</div>';
+  ct.innerHTML = h;
+  document.getElementById('calRange').textContent = '';
+}
+
+/* ── Week view ──────────────────────────────────────────────────── */
+function renderWeek(ct) {
+  if (!curWeekStart) curWeekStart = getMonday(TODAY);
+  const end = new Date(curWeekStart); end.setDate(end.getDate() + 6);
+  document.getElementById('calTitle').textContent =
+    curWeekStart.getFullYear() + '年' + (curWeekStart.getMonth() + 1) + '月' + curWeekStart.getDate() + '日 — ' +
+    end.getFullYear() + '年' + (end.getMonth() + 1) + '月' + end.getDate() + '日';
+  document.getElementById('calRange').textContent = '第 ' + Math.ceil((curWeekStart.getDate() + 6) / 7) + ' 周';
+
+  const tm = dateKey(TODAY.getFullYear(), TODAY.getMonth(), TODAY.getDate());
+  let h = '<div class="week-grid">';
+  for (let i = 0; i < 7; i++) {
+    const d = new Date(curWeekStart); d.setDate(d.getDate() + i);
+    const ck = dateKey(d.getFullYear(), d.getMonth(), d.getDate());
+    const isToday = ck === tm;
+    h += '<div class="week-col">';
+    h += '<div class="week-dh' + (isToday ? ' today' : '') + '">' + WEEK_NAMES[i] + '<br>' + (d.getMonth() + 1) + '/' + d.getDate() + '</div>';
+    const evs = exposByDate(d.getFullYear(), d.getMonth(), d.getDate());
+    evs.slice(0, 8).forEach(e => {
+      h += '<div class="week-ev ' + relCls(e.competition_relation).replace('rel-', 'ev-') + '" title="' + (e.name_cn || '') + '" onclick="openPanel(\'brand\',' + S.brands.indexOf(e) + ')">' + (e.name_cn || '') + '</div>';
+    });
+    if (evs.length > 8) h += '<div style="font-size:10px;color:var(--text-3)">+' + (evs.length - 8) + ' 更多</div>';
+    h += '</div>';
+  }
+  h += '</div>';
+  ct.innerHTML = h;
 }
 
 function selectDay(y, m, d) {
@@ -1016,22 +1211,20 @@ function selectDay(y, m, d) {
 }
 
 function prevMonth() {
-  curMonth--;
-  if (curMonth < 0) { curMonth = 11; curYear--; }
-  selDate = null;
-  renderCal();
+  if (calView === 'week') { curWeekStart.setDate(curWeekStart.getDate() - 7); }
+  else { curMonth--; if (curMonth < 0) { curMonth = 11; curYear--; } }
+  selDate = null; renderCal();
 }
 
 function nextMonth() {
-  curMonth++;
-  if (curMonth > 11) { curMonth = 0; curYear++; }
-  selDate = null;
-  renderCal();
+  if (calView === 'week') { curWeekStart.setDate(curWeekStart.getDate() + 7); }
+  else { curMonth++; if (curMonth > 11) { curMonth = 0; curYear++; } }
+  selDate = null; renderCal();
 }
 
 function goToday() {
-  curYear = TODAY.getFullYear();
-  curMonth = TODAY.getMonth();
+  curYear = TODAY.getFullYear(); curMonth = TODAY.getMonth();
+  curWeekStart = getMonday(TODAY);
   renderCal();
   selectDay(curYear, curMonth, TODAY.getDate());
 }
@@ -1182,7 +1375,7 @@ const VIEWS = {
   china: '570 75 220 175'
 };
 
-function setView(v, btn) {
+function setMapView(v, btn) {
   document.querySelectorAll('.z-btn').forEach(b => b.classList.remove('active'));
   btn.classList.add('active');
   const svg = document.getElementById('mapSvg');
@@ -1345,6 +1538,7 @@ function renderAll(){
   renderL2();
   renderRel();
   renderCards();
+  renderTrends();
   renderDonut();
   renderBar();
   renderTable();

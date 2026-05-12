@@ -80,9 +80,12 @@ export async function GET(request: NextRequest) {
     ORDER BY value DESC
   `).all(...params)
 
-  // Year-over-year trend (B1 fix — for TrendChart component)
+  // Year-over-year trend
   const yearTrend = db.prepare(`
-    SELECT e.year, COALESCE(SUM(e.area_sqm), 0) as area_sqm
+    SELECT e.year,
+      COALESCE(SUM(e.area_sqm), 0) as area_sqm,
+      COALESCE(SUM(e.exhibitors_count), 0) as exhibitors_count,
+      COALESCE(SUM(e.visitors_count), 0) as visitors_count
     FROM exhibition_brand b
     JOIN exhibition_edition e ON e.brand_id = b.brand_id
     ${where}
