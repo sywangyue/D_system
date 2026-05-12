@@ -5,8 +5,6 @@ import Link from "next/link"
 import { useState } from "react"
 import {
   LayoutDashboard,
-  Calendar,
-  Map,
   Settings,
   LogOut,
 } from "lucide-react"
@@ -20,9 +18,7 @@ interface NavItem {
 }
 
 const NAV_ITEMS: NavItem[] = [
-  { href: "/dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
-  { href: "/calendar", label: "日历", icon: <Calendar size={20} /> },
-  { href: "/map", label: "地图", icon: <Map size={20} /> },
+  { href: "/dashboard.html", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
   { href: "/setting", label: "设置", icon: <Settings size={20} />, adminOnly: true },
 ]
 

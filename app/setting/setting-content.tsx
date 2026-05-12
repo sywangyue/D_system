@@ -52,7 +52,7 @@ export default function SettingContent() {
   useEffect(() => {
     const info = getUserInfo();
     if (!info || info.role !== "admin") {
-      router.replace("/dashboard");
+      router.replace("/dashboard.html");
       return;
     }
     setRoleChecked(true);

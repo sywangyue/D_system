@@ -57,7 +57,7 @@ export default function LoginPage() {
 
       document.cookie = `session=${data.token}; path=/; max-age=86400; SameSite=Lax`;
 
-      router.push("/dashboard");
+      router.push("/dashboard.html");
       router.refresh();
     } catch {
       setError("网络异常，请稍后重试");
