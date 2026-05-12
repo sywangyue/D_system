@@ -240,7 +240,7 @@ a{text-decoration:none;color:inherit}
   box-shadow:var(--shadow);overflow:hidden;position:relative;
   display:flex;flex-direction:column;
 }
-.map-svg{display:block;width:100%;height:100%}
+.map-svg{display:block;width:100%;height:auto}
 
 .map-loading{
   position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
@@ -297,7 +297,7 @@ a{text-decoration:none;color:inherit}
 .map-wrap.fullscreen{
   position:fixed;inset:0;z-index:200;border-radius:0;background:var(--bg-card);
 }
-.map-wrap.fullscreen .map-svg{height:100vh}
+.map-wrap.fullscreen .map-svg{width:100vw;height:100vh}
 .map-wrap.fullscreen .map-fs-btn{top:16px;right:20px}
 .map-wrap.fullscreen .zoom-btns{top:16px;right:72px}
 .map-wrap.fullscreen .map-legend{bottom:24px;left:24px}
@@ -1345,14 +1345,14 @@ function drawCities() {
     const brands = cm[city];
     if (!brands || !brands.length) return;
     const [cx, cy] = proj(lon, lat);
-    const r = Math.max(7, Math.min(16, 5 + brands.length * 2.8));
+    const r = Math.max(4, Math.min(9, 3 + brands.length * 1.5));
     const color = domColor(brands);
     const isActive = activeCity === city;
     h += '<g class="city-mk" data-city="' + city + '" style="cursor:pointer">' +
-      '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (r + 5).toFixed(1) + '" fill="' + color + '" opacity="' + (isActive ? '0.25' : '0.12') + '"/>' +
-      '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="' + color + '" stroke="white" stroke-width="2"/>' +
-      '<text x="' + cx.toFixed(1) + '" y="' + (cy - r - 5).toFixed(1) + '" text-anchor="middle" font-size="10" font-weight="500" fill="#1D1D1F" class="city-label">' + city + '</text>' +
-      '<text x="' + cx.toFixed(1) + '" y="' + (cy + 2).toFixed(1) + '" text-anchor="middle" font-size="9" font-weight="700" fill="white">' + brands.length + '</text>' +
+      '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + (r + 3).toFixed(1) + '" fill="' + color + '" opacity="' + (isActive ? '0.25' : '0.12') + '"/>' +
+      '<circle cx="' + cx.toFixed(1) + '" cy="' + cy.toFixed(1) + '" r="' + r.toFixed(1) + '" fill="' + color + '" stroke="white" stroke-width="1"/>' +
+      '<text x="' + cx.toFixed(1) + '" y="' + (cy - r - 3).toFixed(1) + '" text-anchor="middle" font-size="8" font-weight="500" fill="#1D1D1F" class="city-label">' + city + '</text>' +
+      '<text x="' + cx.toFixed(1) + '" y="' + (cy + 1.5).toFixed(1) + '" text-anchor="middle" font-size="7" font-weight="700" fill="white">' + brands.length + '</text>' +
     '</g>';
   });
   el.innerHTML = h;
