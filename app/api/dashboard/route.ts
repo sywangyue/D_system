@@ -8,7 +8,15 @@ export async function GET(request: NextRequest) {
   const relation = searchParams.get('competition_relation')
   const mds = searchParams.get('mds_related')
 
-  let where = 'WHERE 1=1'
+  // 展示池最低条件：缺任意一项则不展示
+  const baseConditions = `
+    b.name_cn IS NOT NULL AND b.name_cn != ''
+    AND b.organizer IS NOT NULL AND b.organizer != ''
+    AND b.name_cn NOT GLOB '*[A-Za-z]*[! -~]*'
+    AND b.industry_l1 IS NOT NULL AND b.industry_l1 != ''
+  `
+
+  let where = `WHERE ${baseConditions}`
   const params: (string | number)[] = []
 
   if (industryL1) {
@@ -51,9 +59,16 @@ export async function GET(request: NextRequest) {
     total_organizers: number
   }
 
-  // Brand list
+  // Brand list — join latest edition for date/scale data
   const brands = db.prepare(`
-    SELECT b.* FROM exhibition_brand b ${where} ORDER BY b.name_cn
+    SELECT b.*,
+      e.date_start, e.date_end, e.area_sqm, e.exhibitors_count, e.visitors_count,
+      e.venue, e.status
+    FROM exhibition_brand b
+    LEFT JOIN exhibition_edition e ON e.brand_id = b.brand_id
+      AND e.year = (SELECT MAX(year) FROM exhibition_edition WHERE brand_id = b.brand_id)
+    ${where}
+    ORDER BY b.name_cn
   `).all(...params)
 
   // Industry distribution
