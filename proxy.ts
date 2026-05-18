@@ -14,7 +14,7 @@ export async function proxy(request: NextRequest) {
     pathname === '/login' ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/') ||
-    pathname.match(/\.(html|svg|png|jpg|jpeg|gif|webp|ico|css|js)$/)
+    pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|ico|css|js)$/)
   ) {
     return NextResponse.next()
   }
