@@ -7,6 +7,7 @@ import {
   LayoutDashboard,
   Settings,
   LogOut,
+  User,
 } from "lucide-react"
 import { getAuthState, clearAuth } from "@/lib/auth"
 
@@ -19,6 +20,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard.html", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
+  { href: "/profile", label: "个人资料", icon: <User size={20} /> },
   { href: "/setting", label: "设置", icon: <Settings size={20} />, adminOnly: true },
 ]
 

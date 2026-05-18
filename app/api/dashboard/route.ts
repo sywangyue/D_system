@@ -3,7 +3,7 @@ import { getDb } from '@/lib/db'
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
-  const industryL1 = searchParams.get('industry_l1')
+  const industryL1s = searchParams.getAll('industry_l1')
   const industryL2 = searchParams.get('industry_l2')
   const relation = searchParams.get('competition_relation')
   const mds = searchParams.get('mds_related')
@@ -19,9 +19,10 @@ export async function GET(request: NextRequest) {
   let where = `WHERE ${baseConditions}`
   const params: (string | number)[] = []
 
-  if (industryL1) {
-    where += ' AND b.industry_l1 = ?'
-    params.push(industryL1)
+  if (industryL1s.length > 0) {
+    const placeholders = industryL1s.map(() => '?').join(',')
+    where += ` AND b.industry_l1 IN (${placeholders})`
+    params.push(...industryL1s)
   }
   if (industryL2) {
     where += ' AND b.industry_l2 = ?'

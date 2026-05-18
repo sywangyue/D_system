@@ -50,7 +50,7 @@
 
 @layer base {
   html {
-    font-family: "Inter", "Arial", ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-family: var(--font-montserrat), "Arial", ui-sans-serif, system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
