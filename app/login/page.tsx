@@ -146,7 +146,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen">
       {/* ── Left panel: pure black + matrix rain ── */}
-      <div className="relative hidden lg:flex lg:w-[58%] flex-col overflow-hidden select-none" style={{ background: "#000" }}>
+      <div className="relative hidden lg:flex lg:w-[61.8%] flex-col overflow-hidden select-none" style={{ background: "#000" }}>
         <MatrixCanvas />
         {/* Branding */}
         <div className="relative z-10 flex flex-col h-full justify-end p-14 pb-16">
@@ -168,7 +168,7 @@ export default function LoginPage() {
       </div>
 
       {/* ── Right panel: Login form ── */}
-      <div className="relative flex flex-1 flex-col items-center justify-center bg-white px-8 lg:px-14">
+      <div className="relative flex flex-1 flex-col items-center justify-center bg-white px-8 pt-8 lg:px-14">
         <div className="w-full max-w-[340px]">
           {/* Mobile-only logo */}
           <div className="lg:hidden mb-10 text-center">
@@ -192,7 +192,7 @@ export default function LoginPage() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-[10px] font-bold text-gray-400 tracking-[0.12em] uppercase mb-2"
+                className="block text-[10px] font-bold text-gray-400 tracking-[0.12em] uppercase mb-2.5"
               >
                 邮箱
               </label>
@@ -225,7 +225,7 @@ export default function LoginPage() {
             </div>
 
             {error && (
-              <div className="flex items-center gap-2 text-sm text-red-600 bg-red-50 rounded-lg px-3.5 py-2.5">
+              <div className="flex items-center gap-2 text-sm rounded-lg px-3.5 py-2.5" style={{ color: "#FE5C00", background: "rgba(254,92,0,0.06)" }}>
                 <AlertCircle size={14} className="shrink-0" />
                 <span>{error}</span>
               </div>

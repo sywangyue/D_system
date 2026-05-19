@@ -8,12 +8,17 @@ export async function GET(request: NextRequest) {
   const relation = searchParams.get('competition_relation')
   const mds = searchParams.get('mds_related')
 
-  // 展示池最低条件：缺任意一项则不展示
+  const currentYear = new Date().getFullYear()
+  const nextYear = currentYear + 1
+  const yearSet = `(${currentYear}, ${nextYear})`
+
   const baseConditions = `
     b.name_cn IS NOT NULL AND b.name_cn != ''
-    AND b.organizer IS NOT NULL AND b.organizer != ''
-    AND b.name_cn NOT GLOB '*[A-Za-z]*[! -~]*'
     AND b.industry_l1 IS NOT NULL AND b.industry_l1 != ''
+    AND EXISTS (
+      SELECT 1 FROM exhibition_edition
+      WHERE brand_id = b.brand_id AND year IN ${yearSet}
+    )
   `
 
   let where = `WHERE ${baseConditions}`
@@ -51,7 +56,7 @@ export async function GET(request: NextRequest) {
       COALESCE(SUM(e.visitors_count), 0) as total_visitors,
       COUNT(DISTINCT b.organizer) as total_organizers
     FROM exhibition_brand b
-    JOIN exhibition_edition e ON e.brand_id = b.brand_id
+    JOIN exhibition_edition e ON e.brand_id = b.brand_id AND e.year IN ${yearSet}
     ${where}
   `).get(...params) as {
     total_area: number
@@ -60,14 +65,14 @@ export async function GET(request: NextRequest) {
     total_organizers: number
   }
 
-  // Brand list — join latest edition for date/scale data
+  // Brand list — join latest edition in target years for date/scale data
   const brands = db.prepare(`
     SELECT b.*,
       e.date_start, e.date_end, e.area_sqm, e.exhibitors_count, e.visitors_count,
       e.venue, e.status
     FROM exhibition_brand b
     LEFT JOIN exhibition_edition e ON e.brand_id = b.brand_id
-      AND e.year = (SELECT MAX(year) FROM exhibition_edition WHERE brand_id = b.brand_id)
+      AND e.year = (SELECT MAX(year) FROM exhibition_edition WHERE brand_id = b.brand_id AND year IN ${yearSet})
     ${where}
     ORDER BY b.name_cn
   `).all(...params)
@@ -88,7 +93,7 @@ export async function GET(request: NextRequest) {
       COALESCE(SUM(e.exhibitors_count), 0) as exhibitors_count,
       COALESCE(SUM(e.visitors_count), 0) as visitors_count
     FROM exhibition_brand b
-    JOIN exhibition_edition e ON e.brand_id = b.brand_id
+    JOIN exhibition_edition e ON e.brand_id = b.brand_id AND e.year IN ${yearSet}
     ${where}
     GROUP BY e.year
     ORDER BY e.year

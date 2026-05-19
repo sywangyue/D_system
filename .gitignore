@@ -9,7 +9,7 @@ venv/
 !.env.local.template
 
 # Local databases & runtime
-# *.db — temporarily allowed for deploy
+*.db
 *.db-journal
 *.db-wal
 *.db-shm
@@ -51,3 +51,21 @@ scripts/ralph/.last-branch
 # Supabase local
 supabase/.temp/
 .gstack/
+
+# Agent internals
+.agents/
+.hermes/
+
+# Data / output / logs (regenerable)
+data/
+exports/
+logs/
+output/
+
+# Backup / temp files
+*.bak
+mwlab.db.backup-*
+screenshot_verify.png
+skills-lock.json
+organizer_checkpoint.txt
+dedup_audit.log
