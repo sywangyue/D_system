@@ -1,1 +1,0 @@
-ALTER TABLE user ADD COLUMN dashboard_prefs TEXT DEFAULT NULL;
