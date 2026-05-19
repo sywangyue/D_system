@@ -5,7 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>MWLAB 2026 · 竞争盘面看板</title>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800&display=swap');
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('/fonts/montserrat-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
 /* ── Design Tokens ─────────────────────────────────────────────── */
 :root {
   --font-display: "Montserrat", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
@@ -776,8 +783,8 @@ th.sorted .si{opacity:1}
 </div>
 
 <!-- D3 + TopoJSON -->
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script src="/d3.min.js"></script>
+<script src="/topojson-client.min.js"></script>
 
 <script>
 /* ── State ─────────────────────────────────────────────────────── */
@@ -1529,7 +1536,7 @@ function toggleFullscreen() {
 
 async function initMap() {
   try {
-    const world = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json());
+    const world = await fetch('/countries-110m.json').then(r => r.json());
     drawGraticule();
     drawLands(world);
     mapReady = true;

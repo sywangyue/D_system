@@ -699,8 +699,8 @@ th.sorted .si{opacity:1}
 </div>
 
 <!-- D3 + TopoJSON -->
-<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script src="/d3.min.js"></script>
+<script src="/topojson-client.min.js"></script>
 
 <script>
 /* ── State ─────────────────────────────────────────────────────── */
@@ -1463,7 +1463,7 @@ function toggleFullscreen() {
 
 async function initMap() {
   try {
-    const world = await fetch('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json').then(r => r.json());
+    const world = await fetch('/countries-110m.json').then(r => r.json());
     drawGraticule();
     drawLands(world);
     mapReady = true;
