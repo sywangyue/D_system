@@ -1,0 +1,86 @@
+@import "tailwindcss";
+
+@theme {
+  /* MD 品牌色板 — 从 CD Manual PDF 提取 */
+  --color-md-orange: #fe5c00;
+  --color-md-orange-dark: #e55300;
+  --color-md-red: #FF3400;
+  --color-md-magenta: #e60070;
+  --color-md-light-orange: #ff8c00;
+  --color-md-yellow: #ffc500;
+  --color-md-grey: #9c9c9c;
+  --color-md-grey-20: #e8e8e8;
+  --color-md-grey-40: #d0d0d0;
+  --color-md-grey-60: #b0b0b0;
+  --color-md-grey-80: #a0a0a0;
+
+  /* 语义 Token */
+  --color-surface: #F4F6F8;
+  --color-surface-card: #FFFFFF;
+  --color-accent: var(--color-md-orange);
+  --color-accent-dark: var(--color-md-orange-dark);
+  --color-accent-surface: #fff3ec;
+  --color-destructive: #EF4444;
+  --color-border: #E5E7EB;
+  --color-text-primary: #111827;
+  --color-text-secondary: #6B7280;
+
+  /* 科技感增强 */
+  --color-glass-bg: rgba(255, 255, 255, 0.7);
+  --color-glass-border: rgba(255, 255, 255, 0.3);
+
+  /* Shadow 层级 — SaaS 质感 */
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
+  --shadow-xl: 0 12px 36px rgba(0,0,0,0.16);
+
+  /* Border-Radius 体系 */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
+  /* Hover 过渡 — 全局一致 */
+  --transition-default: 150ms ease;
+
+  /* 布局常量 */
+  --spacing-sidebar: 220px;
+  --spacing-nav-item: 44px;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-montserrat), "Arial", ui-sans-serif, system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    color: var(--color-text-primary);
+    background-color: var(--color-surface);
+  }
+
+  /* Focus ring — accessibility per UI-SPEC */
+  :focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--color-accent);
+    border-radius: 2px;
+  }
+}
+
+@layer components {
+  .glass-card {
+    background: var(--color-glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--color-glass-border);
+    border-radius: 12px;
+  }
+
+  .kpi-value {
+    font-size: 2.25rem;
+    font-weight: 600;
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+  }
+}
