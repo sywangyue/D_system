@@ -791,7 +791,7 @@ th.sorted .si{opacity:1}
 const S = {
   l1s: new Set(), l2: null, rels: [],
   sortK: 'exhibitors_count', sortD: 'desc',
-  brands: [], kpis: {}, industryDistribution: [], yearTrend: [],
+  brands: [], allBrands: [], kpis: {}, industryDistribution: [], yearTrend: [],
   tw: { compact: false, ufi: true, mds: true },
   allL1s: [], allL2s: {}
 };
@@ -800,29 +800,55 @@ const PIE_COLORS = ['#FE5C00','#FF7A2F','#FF9A60','#FFBF99','#1D1D1F','#6E6E73',
 
 /* ── API ───────────────────────────────────────────────────────── */
 async function fetchData() {
-  const params = new URLSearchParams();
-  S.l1s.forEach(l => params.append('industry_l1', l));
-  if (S.l2) params.set('industry_l2', S.l2);
-  if (S.rels.length) params.set('competition_relation', S.rels.join(','));
-
-  const res = await fetch('/api/dashboard?' + params.toString());
+  const res = await fetch('/api/dashboard');
   if (!res.ok) throw new Error('API error: ' + res.status);
   const data = await res.json();
 
-  S.brands = data.brands || [];
+  S.allBrands = data.brands || [];
   S.kpis = data.kpis || {};
-  S.industryDistribution = data.industryDistribution || [];
-  S.yearTrend = data.yearTrend || [];
-  // 首次无筛选加载时缓存全量 l1/l2，后续 renderL1 不受过滤影响
-  if (!S.l1s.size && !S.l2 && !S.rels.length) {
-    S.allL1s = uniq(S.brands.map(b => b.industry_l1).filter(Boolean)).sort();
-    S.brands.forEach(b => {
-      if (b.industry_l1 && b.industry_l2) {
-        if (!S.allL2s[b.industry_l1]) S.allL2s[b.industry_l1] = new Set();
-        S.allL2s[b.industry_l1].add(b.industry_l2);
-      }
-    });
-  }
+  // 缓存全量 l1/l2 供过滤器渲染使用
+  S.allL1s = uniq(S.allBrands.map(b => b.industry_l1).filter(Boolean)).sort();
+  S.allBrands.forEach(b => {
+    if (b.industry_l1 && b.industry_l2) {
+      if (!S.allL2s[b.industry_l1]) S.allL2s[b.industry_l1] = new Set();
+      S.allL2s[b.industry_l1].add(b.industry_l2);
+    }
+  });
+  applyFilters();
+}
+
+// 客户端过滤，零网络请求
+function applyFilters() {
+  let filtered = S.allBrands;
+  if (S.l1s.size)    filtered = filtered.filter(b => S.l1s.has(b.industry_l1));
+  if (S.l2)          filtered = filtered.filter(b => b.industry_l2 === S.l2);
+  if (S.rels.length) filtered = filtered.filter(b => S.rels.includes(b.competition_relation));
+  S.brands = filtered;
+
+  // 重算行业分布
+  const dist = {};
+  filtered.forEach(b => { if (b.industry_l2) dist[b.industry_l2] = (dist[b.industry_l2] || 0) + 1; });
+  S.industryDistribution = Object.entries(dist)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value);
+
+  // 重算年度趋势
+  const yt = {};
+  filtered.forEach(b => {
+    const yr = b.year || (b.date_start ? +b.date_start.slice(0, 4) : null);
+    if (!yr) return;
+    if (!yt[yr]) yt[yr] = { year: yr, area_sqm: 0, exhibitors_count: 0, visitors_count: 0 };
+    yt[yr].area_sqm         += b.area_sqm || 0;
+    yt[yr].exhibitors_count += b.exhibitors_count || 0;
+    yt[yr].visitors_count   += b.visitors_count || 0;
+  });
+  S.yearTrend = Object.values(yt).sort((a, b) => a.year - b.year);
+}
+
+let _renderTimer = null;
+function scheduleRender() {
+  clearTimeout(_renderTimer);
+  _renderTimer = setTimeout(renderAll, 80);
 }
 
 /* ── Utils ─────────────────────────────────────────────────────── */
@@ -1468,26 +1494,6 @@ function drawCities() {
     '</g>';
   });
   el.innerHTML = h;
-  bindCityEvents(cm);
-}
-
-function bindCityEvents(cm) {
-  document.querySelectorAll('.city-mk').forEach(el => {
-    const city = el.dataset.city;
-    const tt = document.getElementById('tooltip');
-    const wrap = document.getElementById('mapWrap');
-    el.addEventListener('mouseenter', () => {
-      tt.textContent = city + ' · ' + (cm[city] ? cm[city].length : 0) + ' 场展会';
-      tt.style.display = 'block';
-    });
-    el.addEventListener('mousemove', e => {
-      const rect = wrap.getBoundingClientRect();
-      tt.style.left = (e.clientX - rect.left + 12) + 'px';
-      tt.style.top = (e.clientY - rect.top - 40) + 'px';
-    });
-    el.addEventListener('mouseleave', () => { tt.style.display = 'none'; });
-    el.addEventListener('click', () => { openPanel('city', city); });
-  });
 }
 
 /* ── Map zoom ───────────────────────────────────────────────────── */
@@ -1541,6 +1547,35 @@ async function initMap() {
     drawLands(world);
     mapReady = true;
     drawCities();
+
+    // 城市标记事件委托（只绑定一次，避免每次 drawCities 重复绑定累积）
+    const citiesEl = document.getElementById('cities');
+    const tt = document.getElementById('tooltip');
+    const wrap = document.getElementById('mapWrap');
+    citiesEl.addEventListener('mouseover', e => {
+      const mk = e.target.closest('.city-mk');
+      if (!mk) return;
+      const city = mk.dataset.city;
+      const cm = cityMap();
+      tt.textContent = city + ' · ' + (cm[city] ? cm[city].length : 0) + ' 场展会';
+      tt.style.display = 'block';
+    });
+    citiesEl.addEventListener('mousemove', e => {
+      if (!e.target.closest('.city-mk')) return;
+      const rect = wrap.getBoundingClientRect();
+      tt.style.left = (e.clientX - rect.left + 12) + 'px';
+      tt.style.top  = (e.clientY - rect.top  - 40) + 'px';
+    });
+    citiesEl.addEventListener('mouseout', e => {
+      if (!e.target.closest('.city-mk')) return;
+      tt.style.display = 'none';
+    });
+    citiesEl.addEventListener('click', e => {
+      const mk = e.target.closest('.city-mk');
+      if (!mk) return;
+      openPanel('city', mk.dataset.city);
+    });
+
     document.getElementById('mapLoading').classList.add('hidden');
     setTimeout(() => { document.getElementById('mapLoading').style.display = 'none'; }, 350);
   } catch (err) {
@@ -1625,7 +1660,7 @@ function closePanel() {
 }
 
 /* ── Handlers ───────────────────────────────────────────────────── */
-async function selL1(v){
+function selL1(v){
   if (v === null) {
     S.l1s = new Set();
   } else if (S.l1s.has(v)) {
@@ -1634,28 +1669,28 @@ async function selL1(v){
     S.l1s.add(v);
   }
   S.l2 = null;
-  await fetchData();
-  renderAll();
+  applyFilters();
+  scheduleRender();
 }
 
-async function selL2(v){
+function selL2(v){
   S.l2 = v;
-  await fetchData();
-  renderAll();
+  applyFilters();
+  scheduleRender();
 }
 
-async function togRel(v){
+function togRel(v){
   if (!v) { S.rels = []; }
   else if (S.rels.includes(v)) S.rels = S.rels.filter(r => r !== v);
   else S.rels = [...S.rels, v];
-  await fetchData();
-  renderAll();
+  applyFilters();
+  scheduleRender();
 }
 
-async function clearAll(){
+function clearAll(){
   S.l1s = new Set(); S.l2 = null; S.rels = [];
-  await fetchData();
-  renderAll();
+  applyFilters();
+  scheduleRender();
 }
 
 /* ── Master render ──────────────────────────────────────────────── */
@@ -1715,18 +1750,20 @@ async function init(){
     if (_emailEl) _emailEl.textContent = _auth.email || '';
   } catch {}
 
-  // 加载用户偏好（有 token 才请求）
-  if (localStorage.getItem('mwlab_auth')) {
-    try {
-      const prefs = await fetch('/api/user/preferences').then(r => r.json());
-      if (prefs.l1s && prefs.l1s.length) {
-        S.l1s = new Set(prefs.l1s);
-      }
-    } catch {}
-  }
-
+  // 用户偏好与 dashboard 数据并行加载
   try {
-    await fetchData();
+    const hasAuth = !!localStorage.getItem('mwlab_auth');
+    const prefsFetch = hasAuth
+      ? fetch('/api/user/preferences').then(r => r.json()).catch(() => ({}))
+      : Promise.resolve({});
+
+    const [prefs] = await Promise.all([prefsFetch, fetchData()]);
+
+    if (prefs.l1s && prefs.l1s.length) {
+      S.l1s = new Set(prefs.l1s);
+      applyFilters();
+    }
+
     document.getElementById('pageLoading').style.display = 'none';
     document.getElementById('pageContent').style.display = '';
     renderAll();

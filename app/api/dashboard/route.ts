@@ -65,11 +65,14 @@ export async function GET(request: NextRequest) {
     total_organizers: number
   }
 
-  // Brand list — join latest edition in target years for date/scale data
+  // Brand list — explicit columns only, join latest edition in target years
   const brands = db.prepare(`
-    SELECT b.*,
-      e.date_start, e.date_end, e.area_sqm, e.exhibitors_count, e.visitors_count,
-      e.venue, e.status
+    SELECT b.brand_id, b.name_cn, b.name_en, b.organizer, b.city, b.city_en,
+      b.country_cn, b.country_en, b.industry_l1, b.industry_l2,
+      b.competition_relation, b.mds_related, b.is_ufi_certified, b.is_international,
+      b.strategic_relevance, b.scale_score, b.website, b.competitor_group,
+      e.date_start, e.date_end, e.area_sqm, e.exhibitors_count,
+      e.visitors_count, e.venue, e.status, e.year
     FROM exhibition_brand b
     LEFT JOIN exhibition_edition e ON e.brand_id = b.brand_id
       AND e.year = (SELECT MAX(year) FROM exhibition_edition WHERE brand_id = b.brand_id AND year IN ${yearSet})
@@ -104,5 +107,7 @@ export async function GET(request: NextRequest) {
     brands,
     industryDistribution,
     yearTrend,
+  }, {
+    headers: { 'Cache-Control': 'private, max-age=300' }
   })
 }
