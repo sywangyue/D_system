@@ -1,5 +1,9 @@
-import { NextRequest, NextResponse } from 'next/server'
+import { NextRequest } from 'next/server'
 import { getDb } from '@/lib/db'
+import { gzip } from 'zlib'
+import { promisify } from 'util'
+
+const gzipAsync = promisify(gzip)
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url)
@@ -102,12 +106,25 @@ export async function GET(request: NextRequest) {
     ORDER BY e.year
   `).all(...params)
 
-  return NextResponse.json({
-    kpis: kpiRow,
-    brands,
-    industryDistribution,
-    yearTrend,
-  }, {
-    headers: { 'Cache-Control': 'private, max-age=300' }
+  const json = JSON.stringify({ kpis: kpiRow, brands, industryDistribution, yearTrend })
+  const acceptEncoding = request.headers.get('Accept-Encoding') ?? ''
+
+  if (acceptEncoding.includes('gzip')) {
+    const compressed = await gzipAsync(Buffer.from(json, 'utf-8'))
+    return new Response(compressed, {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+        'Content-Encoding': 'gzip',
+        'Cache-Control': 'private, max-age=300',
+        'Vary': 'Accept-Encoding',
+      },
+    })
+  }
+
+  return new Response(json, {
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'private, max-age=300',
+    },
   })
 }
