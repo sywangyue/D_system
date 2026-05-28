@@ -8,6 +8,7 @@ import {
   Settings,
   LogOut,
   User,
+  Users,
 } from "lucide-react"
 import { getAuthState, clearAuth } from "@/lib/auth"
 
@@ -20,6 +21,7 @@ interface NavItem {
 
 const NAV_ITEMS: NavItem[] = [
   { href: "/dashboard.html", label: "看板",    icon: <LayoutDashboard size={18} /> },
+  { href: "/people",         label: "人员网络", icon: <Users size={18} /> },
   { href: "/profile",        label: "个人资料", icon: <User size={18} /> },
   { href: "/setting",        label: "设置",    icon: <Settings size={18} />, adminOnly: true },
 ]

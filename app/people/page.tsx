@@ -1,0 +1,18 @@
+import { Suspense } from 'react'
+import PeopleContent from './people-content'
+
+export default function PeoplePage() {
+  return (
+    <div style={{ minHeight: '100vh', background: '#F7F7F8', padding: '32px' }}>
+      <Suspense
+        fallback={
+          <div style={{ color: '#AEAEB2', fontSize: '14px', padding: '40px 0' }}>
+            加载中...
+          </div>
+        }
+      >
+        <PeopleContent />
+      </Suspense>
+    </div>
+  )
+}

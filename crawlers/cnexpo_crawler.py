@@ -122,7 +122,7 @@ RAW_CNEXPO_SCHEMA = """
 
 
 def init_db(db_path):
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=30)
     conn.execute(RAW_CNEXPO_SCHEMA)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_rc_source_url ON raw_cnexpo(source_url)")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_rc_batch ON raw_cnexpo(crawl_batch_id)")
@@ -385,7 +385,7 @@ def crawl_all(db_path, max_pages=100, keyword=None, batch_id=None):
 
 def show_stats(db_path):
     """输出 raw_cnexpo 表统计信息。"""
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=30)
     total = conn.execute("SELECT COUNT(*) FROM raw_cnexpo").fetchone()[0]
 
     fields = ["en_name", "date_str", "venue", "city", "area_str", "visitors_str", "exhibitors_str", "organizer", "cycle"]
@@ -423,7 +423,7 @@ def export_json(db_path, output_path=None):
     import json
     if output_path is None:
         output_path = db_path.replace(".db", "_all.json")
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=30)
     conn.row_factory = sqlite3.Row
     rows = conn.execute(
         "SELECT cn_name, en_name, date_str, year, venue, city, "
@@ -442,7 +442,7 @@ def export_csv(db_path, output_path=None):
     import csv
     if output_path is None:
         output_path = db_path.replace(".db", "_all.csv")
-    conn = sqlite3.connect(db_path)
+    conn = sqlite3.connect(db_path, timeout=30)
     rows = conn.execute(
         "SELECT cn_name, en_name, date_str, year, venue, city, "
         "area_str, visitors_str, exhibitors_str, organizer, cycle, industry "
