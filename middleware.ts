@@ -1,9 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { jwtVerify } from 'jose'
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || 'mwlab-dev-secret-2026'
-)
+if (!process.env.JWT_SECRET) throw new Error('JWT_SECRET environment variable is not set')
+const JWT_SECRET = new TextEncoder().encode(process.env.JWT_SECRET)
 
 export default async function middleware(request: NextRequest) {
   const token = request.cookies.get('session')?.value
