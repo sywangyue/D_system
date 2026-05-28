@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import Sidebar from "./Sidebar";
+import CookieBanner from "../CookieBanner";
 
 export default function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -19,6 +20,7 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
           {children}
         </div>
       </main>
+      <CookieBanner />
     </div>
   );
 }

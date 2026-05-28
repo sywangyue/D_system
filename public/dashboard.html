@@ -1793,5 +1793,21 @@ document.addEventListener('keydown', e => {
 });
 
 </script>
+
+<div id="cookieBanner" style="display:none;position:fixed;bottom:0;left:0;right:0;z-index:9999;align-items:center;justify-content:space-between;gap:16px;padding:12px 24px;background:#fff;border-top:1px solid #e5e7eb;box-shadow:0 -2px 8px rgba(0,0,0,0.06);">
+  <p style="margin:0;font-size:14px;color:#4b5563;">本网站使用 Cookie 以维持登录状态及基本功能。</p>
+  <button onclick="acceptCookie()" style="flex-shrink:0;padding:6px 16px;background:#FE5C00;color:#fff;border:none;border-radius:6px;font-size:14px;font-weight:500;cursor:pointer;">我知道了</button>
+</div>
+<script>
+  (function() {
+    if (!localStorage.getItem('cookie_consent')) {
+      document.getElementById('cookieBanner').style.display = 'flex';
+    }
+  })();
+  function acceptCookie() {
+    localStorage.setItem('cookie_consent', '1');
+    document.getElementById('cookieBanner').style.display = 'none';
+  }
+</script>
 </body>
 </html>
