@@ -241,8 +241,11 @@ export default function LoginPage() {
           </form>
         </div>
 
-        {/* Contact link */}
-        <div className="absolute bottom-8">
+        {/* Footer */}
+        <div className="absolute bottom-8 flex flex-col gap-2">
+          <p className="text-xs text-gray-400">
+            © 2026 MWLAB · 杜塞尔多夫展览（上海）有限公司&nbsp;&nbsp;保留所有权利
+          </p>
           <a
             href={`mailto:${CONTACT_EMAIL}`}
             className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
