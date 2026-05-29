@@ -3,9 +3,8 @@
 import { useState, useEffect, useRef, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { saveAuth } from "@/lib/auth";
-import { AlertCircle, Loader2, Mail } from "lucide-react";
+import { AlertCircle, Loader2 } from "lucide-react";
 
-const CONTACT_EMAIL = "wangyue8811@gmail.com";
 const CHARS = "ｦｧｨｩｪｫｬｭｮｯｱｲｳｴｵｶｷｸｹｺｻｼｽｾｿﾀﾁﾂﾃﾄﾅﾆﾇﾈﾉﾊﾋﾌﾍﾎﾏﾐﾑﾒﾓﾔﾕﾖﾗﾘﾙﾚﾛﾜﾝ0123456789";
 const TW_TEXT = "The Matrix has you";
 
@@ -242,18 +241,9 @@ export default function LoginPage() {
         </div>
 
         {/* Footer */}
-        <div className="absolute bottom-8 flex flex-col gap-2">
-          <p className="text-xs text-gray-400">
-            © 2026 MWLAB · 杜塞尔多夫展览（上海）有限公司&nbsp;&nbsp;保留所有权利
-          </p>
-          <a
-            href={`mailto:${CONTACT_EMAIL}`}
-            className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-600 transition-colors"
-          >
-            <Mail size={13} />
-            <span>联系我</span>
-          </a>
-        </div>
+        <p className="absolute bottom-4 text-xs text-gray-400">
+          © 2026 MWLAB · 杜塞尔多夫展览（上海）有限公司&nbsp;&nbsp;保留所有权利
+        </p>
       </div>
     </div>
   );
