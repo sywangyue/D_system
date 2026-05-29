@@ -24,6 +24,28 @@ ssh -i "/Volumes/databoard/AI Project/D_dashboard/MWlab.pem" admin@47.79.17.71
 
 ---
 
+## 完整代码更改流程
+
+> GitHub 与服务器**完全脱钩**，push 到 GitHub 不会触发任何服务器操作，需手动部署。
+
+```
+编写代码
+  ↓
+git add / git commit          # 版本控制：记录变更
+  ↓
+git push origin main          # 备份到 GitHub（不影响服务器）
+  ↓
+npm run build                 # 本地 Mac 编译（服务器内存不足）
+  ↓
+rsync .next/ → 服务器         # 上传构建产物
+  ↓
+pm2 reload mwlab-dashboard    # 零停机重载
+```
+
+**关键约束**：GitHub 仓库是代码备份，服务器运行的是本地编译后上传的产物，两者版本必须手动保持同步。
+
+---
+
 ## 日常部署流程
 
 > 服务器内存不足以跑 `npm run build`（OOM），永久策略：**本地 Mac 构建 → rsync 上传**。
@@ -51,8 +73,10 @@ rsync -avz --delete \
 
 ```bash
 ssh -i "/Volumes/databoard/AI Project/D_dashboard/MWlab.pem" admin@47.79.17.71 \
-  "pm2 restart mwlab-dashboard"
+  "source ~/.nvm/nvm.sh && pm2 reload mwlab-dashboard"
 ```
+
+> 必须先 `source ~/.nvm/nvm.sh` 才能找到 pm2，否则报 `command not found`。
 
 ### 4. 验证
 
@@ -103,12 +127,17 @@ nohup .venv/bin/python3 scheduler.py --run-now >> logs/scheduler.log 2>&1 &
 
 ## PM2 常用命令
 
+> 所有 PM2 命令需在服务器上先执行 `source ~/.nvm/nvm.sh`，或直接用完整路径 `/home/admin/.nvm/versions/node/v20.20.2/bin/pm2`。
+
 ```bash
+# 远程执行示例（从本地 Mac）
+ssh -i "MWlab.pem" admin@47.79.17.71 "source ~/.nvm/nvm.sh && pm2 status"
+
 pm2 status                     # 查看进程状态
 pm2 logs mwlab-dashboard       # 实时日志
 pm2 logs mwlab-dashboard --lines 100  # 最近 100 行
-pm2 restart mwlab-dashboard    # 重启
-pm2 reload mwlab-dashboard     # 零停机重载（graceful）
+pm2 restart mwlab-dashboard    # 重启（有短暂停机）
+pm2 reload mwlab-dashboard     # 零停机重载（推荐）
 ```
 
 ---
