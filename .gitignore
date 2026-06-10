@@ -23,8 +23,9 @@ cnexpo_crawl_progress.log
 .idea/
 .vscode/
 
-# Local tooling (may contain secrets)
-.claude/
+# Local tooling (may contain secrets) — skills/ subdir is tracked
+.claude/*
+!.claude/skills
 
 # Next.js
 node_modules/

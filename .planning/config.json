@@ -1,0 +1,22 @@
+{
+  "project": "MWLAB-2026",
+  "version": "1.0.0",
+  "workflow": {
+    "discuss_mode": "discuss",
+    "research_enabled": true,
+    "plan_checker_enabled": true,
+    "nyquist_validation_enabled": false,
+    "commit_docs": false,
+    "ui_phase": false,
+    "ui_safety_gate": false,
+    "security_enforcement": false,
+    "auto_advance": false,
+    "pattern_mapper": false,
+    "post_planning_gaps": true
+  },
+  "models": {
+    "researcher": "claude-sonnet-4-6",
+    "planner": "claude-sonnet-4-6",
+    "checker": "claude-sonnet-4-6"
+  }
+}
