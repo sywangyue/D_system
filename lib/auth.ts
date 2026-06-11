@@ -1,4 +1,4 @@
-// 客户端认证工具 — localStorage-based JWT helpers
+// 客户端认证工具 — session cookie + localStorage user-info helpers
 
 const AUTH_KEY = 'mwlab_auth'
 
@@ -13,9 +13,9 @@ export interface AuthState {
   isAdmin: boolean
 }
 
-export function saveAuth(info: UserInfo, token: string): void {
+export function saveAuth(info: UserInfo): void {
   if (typeof window === 'undefined') return
-  localStorage.setItem(AUTH_KEY, JSON.stringify({ ...info, token }))
+  localStorage.setItem(AUTH_KEY, JSON.stringify(info))
 }
 
 export function getUserInfo(): UserInfo | null {
@@ -34,19 +34,9 @@ export function getAuthState(): AuthState {
   return { userEmail: info.email, isAdmin: info.role === 'admin' }
 }
 
-export function getToken(): string | null {
-  if (typeof window === 'undefined') return null
-  try {
-    const raw = localStorage.getItem(AUTH_KEY)
-    if (!raw) return null
-    return JSON.parse(raw).token || null
-  } catch { return null }
-}
-
 export function clearAuth(): void {
   if (typeof window === 'undefined') return
   localStorage.removeItem(AUTH_KEY)
-  document.cookie = 'session=; path=/; max-age=0'
 }
 
 export function isAuthenticated(): boolean {

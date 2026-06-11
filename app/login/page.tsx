@@ -129,11 +129,7 @@ export default function LoginPage() {
         return;
       }
       const data = await res.json();
-      saveAuth(
-        { email: data.email, role: data.role, display_name: data.display_name },
-        data.token,
-      );
-      document.cookie = `session=${data.token}; path=/; max-age=86400; SameSite=Lax`;
+      saveAuth({ email: data.email, role: data.role, display_name: data.display_name });
       router.push("/dashboard.html");
       router.refresh();
     } catch {

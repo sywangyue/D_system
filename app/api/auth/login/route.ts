@@ -51,12 +51,18 @@ export async function POST(request: Request) {
       .setExpirationTime('24h')
       .sign(JWT_SECRET)
 
-    return NextResponse.json({
-      token,
+    const response = NextResponse.json({
       email: user.email,
       role: user.role,
       display_name: user.display_name,
     })
+    response.cookies.set('session', token, {
+      httpOnly: true,
+      sameSite: 'lax',
+      path: '/',
+      maxAge: 86400,
+    })
+    return response
   } finally {
     db.close()
   }
