@@ -18,17 +18,21 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // API 路由：有 token 则注入用户信息，无 token 则放行（返回 401 由 handler 处理）
+  // API 路由：无条件先剥离外部传入的 x-user-* 头，再按验签结果注入可信值
   if (pathname.startsWith('/api/')) {
-    if (!token) return NextResponse.next()
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.delete('x-user-email')
+    requestHeaders.delete('x-user-role')
+    if (!token) {
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+    }
     try {
       const { payload } = await jwtVerify(token, JWT_SECRET)
-      const requestHeaders = new Headers(request.headers)
       requestHeaders.set('x-user-email', payload.email as string)
       requestHeaders.set('x-user-role', payload.role as string)
       return NextResponse.next({ request: { headers: requestHeaders } })
     } catch {
-      return NextResponse.next()
+      return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
     }
   }
 
@@ -41,6 +45,8 @@ export default async function middleware(request: NextRequest) {
     const { payload } = await jwtVerify(token, JWT_SECRET)
 
     const requestHeaders = new Headers(request.headers)
+    requestHeaders.delete('x-user-email')
+    requestHeaders.delete('x-user-role')
     requestHeaders.set('x-user-email', payload.email as string)
     requestHeaders.set('x-user-role', payload.role as string)
 
