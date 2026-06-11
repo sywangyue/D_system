@@ -63,6 +63,13 @@ exports/
 logs/
 output/
 
+# SSH keys / certificates
+*.pem
+*.key
+
+# Archived root clutter
+_archive/
+
 # Backup / temp files
 *.bak
 mwlab.db.backup-*
