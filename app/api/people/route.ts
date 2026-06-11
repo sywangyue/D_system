@@ -1,7 +1,9 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getDb, getWritableDb } from '@/lib/db'
+import { requireUser } from '@/lib/api-guard'
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  if (!requireUser(request)) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   const db = getDb()
   const people = db.prepare(`
     SELECT p.*,

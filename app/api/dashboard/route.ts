@@ -1,11 +1,13 @@
-import { NextRequest } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
+import { requireUser } from '@/lib/api-guard'
 import { gzip } from 'zlib'
 import { promisify } from 'util'
 
 const gzipAsync = promisify(gzip)
 
 export async function GET(request: NextRequest) {
+  if (!requireUser(request)) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   const { searchParams } = new URL(request.url)
   const industryL1s = searchParams.getAll('industry_l1')
   const industryL2 = searchParams.get('industry_l2')

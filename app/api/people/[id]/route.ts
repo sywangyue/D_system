@@ -1,10 +1,12 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getDb } from '@/lib/db'
+import { requireUser } from '@/lib/api-guard'
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  if (!requireUser(req)) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   const { id } = await params
   const db = getDb()
 
