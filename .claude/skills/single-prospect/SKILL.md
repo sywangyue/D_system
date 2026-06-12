@@ -3,7 +3,7 @@ name: single-prospect
 description: 单一目标客户深度调研。输入公司名称（协会/企业/代理机构），整合 mwlab.db 参展轨迹、企查查工商信息和 WebSearch，输出全息客户画像 Markdown 报告，含风险标注（违规代理排查）。
 argument-hint: "[公司名称 + 可选: 调查目的，例: 上海精密机床 代理商资质排查]"
 disable-model-invocation: true
-allowed-tools: Bash WebSearch Read Write
+allowed-tools: Bash, WebSearch, Read, Write
 ---
 
 ## 单一客户深度调研任务
@@ -17,7 +17,17 @@ allowed-tools: Bash WebSearch Read Write
 > 以下数据自动注入，来自 mwlab.db。查询 organizer 字段和品牌名称进行模糊匹配。
 > 若公司名称较通用（如"上海机床"），DB 可能返回多条相关展会，请全部纳入分析。
 
-!`python3 tools/intel/db_query.py company-history "$ARGUMENTS"`
+先用 Write 工具将目标公司名写入 /tmp/single_target.txt：
+
+```
+$ARGUMENTS
+```
+
+然后执行：
+
+```bash
+python3 tools/intel/db_query.py company-history "$(cat /tmp/single_target.txt)"
+```
 
 ---
 
@@ -26,7 +36,7 @@ allowed-tools: Bash WebSearch Read Write
 执行企查查模糊搜索获取工商信息：
 
 ```bash
-python3 tools/intel/qcc_client.py "$ARGUMENTS" --size 3
+python3 tools/intel/qcc_client.py "$(cat /tmp/single_target.txt)" --size 3
 ```
 
 **降级说明**：若 QCC_APP_KEY 未配置，输出"[企查查未配置]"，请继续执行，在报告的企业工商信息章节注明"企查查未配置，以下信息来自 WebSearch"。
@@ -139,8 +149,8 @@ python3 tools/intel/qcc_client.py "$ARGUMENTS" --size 3
 ```bash
 python3 tools/intel/report_writer.py \
   --type single_prospect \
-  --target-company "$ARGUMENTS" \
-  --content "$(cat /tmp/single_report.md)"
+  --target-company "$(cat /tmp/single_target.txt)" \
+  --content-file /tmp/single_report.md
 ```
 
 > 注意：联系人信息（如找到具体联系人）可手工录入 person + exhibition_contact 表（D-22 约定），本 Skill 不自动写入（无法从 WebSearch 可靠提取结构化联系人数据）。

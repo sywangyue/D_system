@@ -54,7 +54,7 @@ def _report_filename(report_type: str, params: dict) -> Path:
     elif report_type == "brand_research":
         slug_parts.append(_slugify(params.get("brand_id", "unknown")))
     elif report_type in ("batch_prospect", "single_prospect"):
-        slug_parts.append(_slugify(params.get("target_company", params.get("brand_id", "unknown"))))
+        slug_parts.append(_slugify(params.get("target_company") or params.get("brand_id") or "unknown"))
 
     slug = "_".join(slug_parts) or "report"
     filename = f"{report_type}_{slug}_{ts}.md"
@@ -71,6 +71,7 @@ def write_report(
     params: dict | None = None,
     status: str = "published",
     created_by: str = "claude-code",
+    db_path: str | Path | None = None,
 ) -> int:
     """
     写入调研报告到 DB + 文件系统，返回 intel_report.id。
@@ -107,7 +108,9 @@ def write_report(
     rel_path = str(report_path.relative_to(_REPO_ROOT))
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    conn = sqlite3.connect(str(DB_PATH))
+    target_db = db_path or DB_PATH
+    conn = sqlite3.connect(str(target_db))
+    conn.execute("PRAGMA foreign_keys = ON")
     try:
         cur = conn.execute(
             """
@@ -153,6 +156,7 @@ def main() -> None:
     parser.add_argument("--content-file", help="报告内容文件路径（--content 和 --content-file 二选一）")
     parser.add_argument("--status", default="published",
                         choices=["draft", "published", "archived"])
+    parser.add_argument("--db", default=str(DB_PATH), help="数据库路径（默认 mwlab.db）")
     args = parser.parse_args()
 
     if args.content:
@@ -170,6 +174,7 @@ def main() -> None:
         industry_l2=args.industry_l2,
         target_company=args.target_company,
         status=args.status,
+        db_path=args.db,
     )
     print(f"报告已写入 → intel_report.id = {report_id}")
 

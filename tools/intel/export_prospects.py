@@ -172,18 +172,29 @@ def main() -> None:
     group.add_argument("--brand-id", help="按展会品牌 ID 过滤")
     group.add_argument("--report-id", type=int, help="按 intel_report_id 过滤")
     group.add_argument("--all", action="store_true", dest="all_records", help="导出全部记录")
-    parser.add_argument("--format", default="xlsx", choices=["xlsx", "csv"], help="输出格式")
+    parser.add_argument("--format", default=None, choices=["xlsx", "csv"], help="输出格式（默认从 --out 扩展名推断）")
     parser.add_argument("--out", help="输出文件路径（可选，默认 reports/customer/）")
     args = parser.parse_args()
 
+    fmt = args.format
     out_path = Path(args.out) if args.out else None
+
+    # 从 --out 扩展名推断格式，与 --format 冲突时报错
+    if out_path and out_path.suffix in ('.xlsx', '.csv'):
+        ext_fmt = 'xlsx' if out_path.suffix == '.xlsx' else 'csv'
+        if fmt and fmt != ext_fmt:
+            print(f"错误: --out 扩展名 ({out_path.suffix}) 与 --format ({fmt}) 冲突", file=sys.stderr)
+            sys.exit(1)
+        fmt = ext_fmt
+
+    fmt = fmt or 'xlsx'  # 默认 xlsx
 
     try:
         result_path = export_prospects(
             brand_id=args.brand_id,
             report_id=args.report_id,
             all_records=args.all_records,
-            fmt=args.format,
+            fmt=fmt,
             out_path=out_path,
         )
         print(f"导出成功 → {result_path}")

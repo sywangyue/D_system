@@ -36,16 +36,30 @@ def _connect() -> sqlite3.Connection:
 def brand_research(identifier: str) -> str:
     """查询单一品牌完整信息（历史届次 + 竞争关系）"""
     conn = _connect()
-    row = conn.execute(
+    rows = conn.execute(
         "SELECT * FROM exhibition_brand WHERE brand_id = ? OR name_cn LIKE ?",
         (identifier, f"%{identifier}%")
-    ).fetchone()
+    ).fetchall()
 
-    if not row:
+    if not rows:
         conn.close()
         return f"错误: 未找到品牌 '{identifier}'"
 
+    # 多命中消歧：精确匹配优先，再按 scale_score DESC
+    exact = [r for r in rows if r["brand_id"] == identifier or r["name_cn"] == identifier]
+    if exact:
+        rows = sorted(exact, key=lambda r: r["scale_score"] or 0, reverse=True)
+    else:
+        rows = sorted(rows, key=lambda r: r["scale_score"] or 0, reverse=True)
+
+    row = rows[0]
     brand_id = row["brand_id"]
+
+    # 输出多命中提示
+    extra_hits = []
+    if len(rows) > 1:
+        for r in rows[1:6]:
+            extra_hits.append(f"  - {r['name_cn']} ({r['brand_id']}) 规模={r['scale_score'] or 'N/A'}")
 
     editions = conn.execute(
         "SELECT year, area_sqm, exhibitors_count, visitors_count, "
@@ -119,6 +133,11 @@ def brand_research(identifier: str) -> str:
     else:
         output.append("（暂无历史届次数据）")
 
+    if extra_hits:
+        output.append("")
+        output.append(f"### 另有 {len(rows) - 1} 条匹配（仅显示前 5）")
+        output.extend(extra_hits)
+
     output.append("")
     output.extend(relation_section)
 
@@ -150,10 +169,12 @@ def industry_research(industry_l1: str, industry_l2: str | None = None) -> str:
         label = f"{industry_l1}" + (f" / {industry_l2}" if industry_l2 else "")
         return f"该行业暂无数据: {label}"
 
-    total = conn.execute(
-        "SELECT COUNT(*) as cnt FROM exhibition_brand WHERE industry_l1 = ?",
-        (industry_l1,)
-    ).fetchone()["cnt"]
+    total_params: list[str | int] = [industry_l1]
+    total_sql = "SELECT COUNT(*) as cnt FROM exhibition_brand WHERE industry_l1 = ?"
+    if industry_l2:
+        total_sql += " AND industry_l2 = ?"
+        total_params.append(industry_l2)
+    total = conn.execute(total_sql, total_params).fetchone()["cnt"]
 
     ufi_count = sum(1 for r in rows if r["is_ufi_certified"])
     intl_count = sum(1 for r in rows if r["is_international"])
@@ -204,7 +225,7 @@ def company_history(company_name: str) -> str:
         return f"未找到与 '{company_name}' 相关的参展记录"
 
     output = [
-        f"### '{company_name}' 相关参展记录（共 {len(rows)} 条，最多显示30条）",
+        f"### '{company_name}' 展会关联记录（主办/冠名维度，共 {len(rows)} 条，最多显示30条）",
     ]
     for r in rows:
         output.append(
@@ -261,7 +282,14 @@ def main() -> None:
     if args.query_type == "brand-research":
         print(brand_research(args.identifier))
     elif args.query_type == "industry-research":
-        print(industry_research(args.identifier, args.l2))
+        # 支持 "机械和设备/机床" 斜杠语法自动分割 l1/l2
+        l1 = args.identifier
+        l2 = args.l2
+        if "/" in args.identifier and not args.l2:
+            parts = args.identifier.split("/", 1)
+            l1 = parts[0].strip()
+            l2 = parts[1].strip()
+        print(industry_research(l1, l2))
     elif args.query_type == "company-history":
         print(company_history(args.identifier))
     elif args.query_type == "edition-detail":

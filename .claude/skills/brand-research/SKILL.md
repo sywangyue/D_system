@@ -3,7 +3,7 @@ name: brand-research
 description: 对目标展会品牌进行完整调研分析。输入 brand_id（如 EXPO-0001）或品牌中文名，从 mwlab.db 获取完整历史届次和竞争关系数据，结合 WebSearch 调研主办方背景，输出历史趋势分析、竞争格局、MA 价值评估和 BD 战略建议。
 argument-hint: "[brand_id 或品牌中文名，例: EXPO-0001 或 中国国际机床展览会]"
 disable-model-invocation: true
-allowed-tools: Bash WebSearch Read Write
+allowed-tools: Bash, WebSearch, Read, Write
 ---
 
 ## 品牌调研任务
@@ -17,7 +17,17 @@ allowed-tools: Bash WebSearch Read Write
 > 以下由脚本自动执行，输出内容直接来自 mwlab.db。
 > **规则：报告中所有展会历史数据（面积、展商数、观众数、届次）必须来自以下 DB 输出，禁止 LLM 凭记忆填写数字。**
 
-!`python3 tools/intel/db_query.py brand-research "$ARGUMENTS"`
+先用 Write 工具将目标品牌标识写入 /tmp/brand_id.txt：
+
+```
+$ARGUMENTS
+```
+
+然后执行：
+
+```bash
+python3 tools/intel/db_query.py brand-research "$(cat /tmp/brand_id.txt)"
+```
 
 ---
 
@@ -148,11 +158,11 @@ allowed-tools: Bash WebSearch Read Write
 ```bash
 python3 tools/intel/report_writer.py \
   --type brand_research \
-  --brand-id "$ARGUMENTS" \
-  --content "$(cat /tmp/brand_report.md)"
+  --brand-id "$(cat /tmp/brand_id.txt)" \
+  --content-file /tmp/brand_report.md
 ```
 
-> 注意：若 $ARGUMENTS 是品牌名称而非 brand_id，在第一步 DB 输出中确认实际 brand_id 后，将 --brand-id 替换为实际 brand_id 值。
+> 注意：若 $ARGUMENTS 是品牌名称而非 brand_id，在第一步 DB 输出中确认实际 brand_id 后，更新 /tmp/brand_id.txt 中的内容再执行保存。
 
 执行成功后输出 `报告已写入 → intel_report.id = <N>`。
 

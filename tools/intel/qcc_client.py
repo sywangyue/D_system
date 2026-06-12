@@ -118,9 +118,26 @@ def fuzzy_search(
         data = resp.json()
 
         if data.get("Status") != "200":
+            status = data.get("Status", "UNKNOWN")
+            message = data.get("Message", "企查查 API 返回非200状态")
+
+            if status == "201":
+                return {
+                    "Status": "201",
+                    "Message": "查询无结果（正常）",
+                    "Result": [],
+                }
+            if status in ("101", "102"):
+                reason = "Key 无效或未授权" if status == "101" else "余额不足（按次计费，请检查账户）"
+                return {
+                    "Status": status,
+                    "Message": f"STOP_BATCH: {reason}",
+                    "Result": [],
+                }
+
             return {
-                "Status": data.get("Status", "UNKNOWN"),
-                "Message": data.get("Message", "企查查 API 返回非200状态"),
+                "Status": status,
+                "Message": message,
                 "Result": [],
             }
         return data
@@ -136,6 +153,10 @@ def format_search_results(result: dict[str, Any]) -> str:
     status = result.get("Status")
     if status == "PLACEHOLDER":
         return f"[企查查未配置] {result.get('Message', '')}"
+    if status == "201":
+        return f"[企查查] 查询无结果（正常）: {result.get('Message', '')}"
+    if status in ("101", "102"):
+        return f"[企查查] {result.get('Message', '')}"
     if status != "200":
         return f"[企查查错误] Status={status}: {result.get('Message', '')}"
 

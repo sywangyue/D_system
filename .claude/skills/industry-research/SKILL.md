@@ -3,7 +3,7 @@ name: industry-research
 description: 对目标行业进行展会竞争格局调研。输入行业标签（如「机械和设备」），从 mwlab.db 获取该行业完整展会地图，结合 WebSearch 分析市场趋势，输出 TAM/SAM/SOM 估算、Porter 五力分析和切入点建议。
 argument-hint: "[industry_l1 或 industry_l1/industry_l2，例: 机械和设备 或 机械和设备/机床]"
 disable-model-invocation: true
-allowed-tools: Bash WebSearch Read Write
+allowed-tools: Bash, WebSearch, Read, Write
 ---
 
 ## 行业调研任务
@@ -17,7 +17,17 @@ allowed-tools: Bash WebSearch Read Write
 > 以下数据由脚本自动注入，直接来自 mwlab.db，是本次调研的唯一可信基础数据来源。
 > **规则：报告中所有展会名称、数量、规模数字必须来自以下 DB 数据，禁止 LLM 虚构。**
 
-!`python3 tools/intel/db_query.py industry-research "$ARGUMENTS"`
+先用 Write 工具将行业标签写入 /tmp/industry_target.txt：
+
+```
+$ARGUMENTS
+```
+
+然后执行：
+
+```bash
+python3 tools/intel/db_query.py industry-research "$(cat /tmp/industry_target.txt)"
+```
 
 ---
 
@@ -124,8 +134,8 @@ allowed-tools: Bash WebSearch Read Write
 ```bash
 python3 tools/intel/report_writer.py \
   --type industry_research \
-  --industry-l1 "$ARGUMENTS" \
-  --content "$(cat /tmp/industry_report.md)"
+  --industry-l1 "$(cat /tmp/industry_target.txt)" \
+  --content-file /tmp/industry_report.md
 ```
 
 执行成功后输出 `报告已写入 → intel_report.id = <N>`。
