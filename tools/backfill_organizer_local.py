@@ -86,6 +86,7 @@ def opencli_eval(url, js):
             return None
         return json.loads(r.stdout)
     except Exception as e:
+        print(f"[WARN] {url}: {e}")
         return None
 
 

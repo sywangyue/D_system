@@ -90,24 +90,44 @@ def build_matchers():
 def extract_geo(name_cn, city_patterns, country_patterns):
     """
     Extract city and country from exhibition name.
-    Returns (city_cn, city_en, country_cn, country_en) or (None,)*4.
+    Returns (city_cn, city_en, country_cn, country_en, ambiguous) where ambiguous
+    is a list of extra matching city keywords (empty when unambiguous).
     """
     if not name_cn:
-        return None, None, None, None
-    
+        return None, None, None, None, []
+
+    # Collect ALL matching cities, then prefer the longest (most specific) match.
+    # city_patterns is sorted longest-first so iteration order already prefers longer
+    # keywords; we still collect all matches to detect ambiguity.
+    all_matches = []
+    for cp in city_patterns:
+        pos = name_cn.find(cp["keyword"])
+        if pos >= 0:
+            # Skip if a longer keyword that is a superset already matched at same pos
+            # (e.g. "哈尔滨" subsumes "尔" — avoid spurious sub-matches)
+            shadowed = any(
+                m["pos"] <= pos and m["pos"] + m["len"] >= pos + cp["len"]
+                for m in all_matches
+            )
+            if not shadowed:
+                all_matches.append({**cp, "pos": pos})
+
+    # Remove matches subsumed by a longer match found anywhere in all_matches
+    def _is_subsumed(m):
+        return any(
+            o is not m and o["pos"] <= m["pos"] and o["pos"] + o["len"] >= m["pos"] + m["len"]
+            for o in all_matches
+        )
+    all_matches = [m for m in all_matches if not _is_subsumed(m)]
+
+    # Select best: longest keyword wins; break ties by earliest position
+    all_matches.sort(key=lambda m: (-m["len"], m["pos"]))
+    ambiguous = [m["keyword"] for m in all_matches[1:]] if len(all_matches) > 1 else []
+    matched_city = all_matches[0] if all_matches else None
+
     # ---- Priority 1: Check if name contains "国家+城市" pattern ----
     # This is for names like "俄罗斯莫斯科紧固件展" where both appear
     # We check foreign cities first and validate against their expected country
-    matched_city = None
-    matched_city_pos = len(name_cn) + 1
-    
-    for cp in city_patterns:
-        pos = name_cn.find(cp["keyword"])
-        if pos >= 0 and pos < matched_city_pos:
-            matched_city = cp
-            matched_city_pos = pos
-    
-    # If we found a foreign city, check if its country also appears in the name
     if matched_city and matched_city["type"] == "foreign_city":
         country_in_name = matched_city["country_cn"]
         if country_in_name in name_cn:
@@ -117,8 +137,9 @@ def extract_geo(name_cn, city_patterns, country_patterns):
                 matched_city["city_en"],
                 matched_city["country_cn"],
                 matched_city["country_en"],
+                ambiguous,
             )
-    
+
     # If we found a CN city or province, that takes priority over country-only match
     if matched_city and matched_city["type"] in ("cn_city", "cn_province"):
         return (
@@ -126,8 +147,9 @@ def extract_geo(name_cn, city_patterns, country_patterns):
             matched_city["city_en"],
             matched_city["country_cn"],
             matched_city["country_en"],
+            ambiguous,
         )
-    
+
     # ---- Priority 2: Foreign city standalone (e.g., "巴黎航展") ----
     if matched_city and matched_city["type"] == "foreign_city":
         return (
@@ -135,32 +157,32 @@ def extract_geo(name_cn, city_patterns, country_patterns):
             matched_city["city_en"],
             matched_city["country_cn"],
             matched_city["country_en"],
+            ambiguous,
         )
     
     # ---- Priority 3: Country-only (e.g., "土库曼斯坦石油展") ----
     matched_country = None
     matched_country_pos = len(name_cn) + 1
-    
+
     for cp in country_patterns:
         pos = name_cn.find(cp["keyword"])
         if pos >= 0 and pos < matched_country_pos:
-            # Check it's not part of a non-country term
             kw = cp["keyword"]
-            # Avoid matching "欧洲" etc
             if kw not in NON_COUNTRY_TERMS:
                 matched_country = cp
                 matched_country_pos = pos
-    
+
     if matched_country:
         return (
             None,
             None,
             matched_country["country_cn"],
             matched_country["country_en"],
+            [],
         )
-    
+
     # ---- Nothing matched ----
-    return None, None, None, None
+    return None, None, None, None, []
 
 
 def infer_country(name_cn, is_international, is_international_source):
@@ -193,13 +215,13 @@ def update_db(db_path, brand_id, city_cn, city_en, country_cn, country_en, dry_r
     """Update geo fields in DB. Returns True if updated."""
     if dry_run:
         return True
-    
+
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     conn = sqlite3.connect(db_path)
     try:
         updates = []
         params = []
-        
+
         if city_cn:
             updates.append("city = ?")
             params.append(city_cn)
@@ -212,30 +234,41 @@ def update_db(db_path, brand_id, city_cn, city_en, country_cn, country_en, dry_r
         if country_en:
             updates.append("country_en = ?")
             params.append(country_en)
-        
+
         if not updates:
             conn.close()
             return False
-        
+
         updates.append("updated_at = ?")
         params.append(now)
         params.append(brand_id)
-        
+
         sql = f"UPDATE exhibition_brand SET {', '.join(updates)} WHERE brand_id = ?"
         conn.execute(sql, params)
-        
-        # Record to manual_tag_history
-        conn.execute(
-            """INSERT INTO manual_tag_history 
-               (brand_id, field_name, old_value, new_value, changed_by, changed_at)
-               VALUES (?, 'geo_fields', '', 'auto_extract', 'geo_extractor', ?)""",
-            (brand_id, now)
-        )
-        
+
+        # Record one audit row per field with actual values written [CORE-11]
+        field_values = []
+        if city_cn:
+            field_values.append(("city", city_cn))
+        if city_en:
+            field_values.append(("city_en", city_en))
+        if country_cn:
+            field_values.append(("country_cn", country_cn))
+        if country_en:
+            field_values.append(("country_en", country_en))
+        for field_name, new_value in field_values:
+            conn.execute(
+                """INSERT INTO manual_tag_history
+                   (brand_id, field_name, old_value, new_value, changed_by, changed_at)
+                   VALUES (?, ?, '', ?, 'geo_extractor', ?)""",
+                (brand_id, field_name, new_value, now)
+            )
+
         conn.commit()
         return True
     except Exception as e:
         conn.rollback()
+        print(f"[WARN] {brand_id}: {e}")  # [CORE-13] swallowed error now observable
         return False
     finally:
         conn.close()
@@ -289,9 +322,11 @@ def main():
             continue
         
         # Try extraction from name
-        ext_city, ext_city_en, ext_country, ext_country_en = extract_geo(
+        ext_city, ext_city_en, ext_country, ext_country_en, ambiguous = extract_geo(
             name_cn, city_patterns, country_patterns
         )
+        if ambiguous:
+            print(f"[AMBIGUOUS] {brand_id} {name_cn[:40]!r}: matched '{ext_city}', also: {ambiguous}", file=sys.stderr)
         
         # Determine what to write
         write_city = None
