@@ -383,17 +383,19 @@ def parse_detail_page(detail_url):
 # 爬取逻辑
 # ====================================================================
 
-def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batch_id=""):
+def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batch_id="", crawled=None):
     """
     爬取指定月份的全部展会列表页。
     - month: 1-12
     - source_type: 'domestic' | 'international'
     - keyword: 可选关键词过滤（匹配中文名或英文名）
     - crawl_detail: 是否进详情页补爬额外字段
+    - crawled: 已爬 URL 集合（由 crawl_all 统一维护，避免重复查询 DB）
     """
     type_code = "1" if source_type == "domestic" else "0"
     base_path = f"/exhibition-0-0-{type_code}-0-0-{month:02d}-"
-    crawled = get_crawled_urls(conn)
+    if crawled is None:  # [CRWL-19] fallback for direct callers
+        crawled = get_crawled_urls(conn)
     new_count = 0
     page = 1
 
@@ -506,6 +508,7 @@ def crawl_all(db_path, months=None, keyword=None, crawl_detail=False, batch_id=N
     aborted = False
 
     try:
+        crawled = get_crawled_urls(conn)  # [CRWL-19] fetch once, pass into month loops
         for m in sorted(months):
             _log(f"\n📅 {TARGET_YEAR}年{m:02d}月")
             for st in ["domestic", "international"]:
@@ -513,7 +516,7 @@ def crawl_all(db_path, months=None, keyword=None, crawl_detail=False, batch_id=N
                     break
                 label = "国内" if st == "domestic" else "国际"
                 _log(f"  [{label}]")
-                n = crawl_month(conn, m, st, keyword=keyword, crawl_detail=crawl_detail, batch_id=batch_id)
+                n = crawl_month(conn, m, st, keyword=keyword, crawl_detail=crawl_detail, batch_id=batch_id, crawled=crawled)
                 total += n
                 if n:
                     _log(f"  ✅ 新增 {n} 条")

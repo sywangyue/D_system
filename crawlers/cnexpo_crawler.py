@@ -304,11 +304,26 @@ def parse_detail_page(detail_url):
             if m_cyc:
                 data["cycle"] = m_cyc.group(1)
 
-    # --- 英文名 ---
-    paragraphs_eng = [p.get_text(strip=True) for p in soup.find_all("p") if p.get_text(strip=True)]
-    page_text = "\n".join(paragraphs_eng)
+    # --- 英文名 (CRWL-18) ---
+    # Limit search to title-adjacent area: h1 + the first 6 sibling paragraphs after it.
+    # Avoids picking up navigation/footer recommendation text from full-page <p> scan.
+    eng_paragraphs = []
+    title_node = soup.find("h1")
+    if title_node:
+        for sibling in title_node.next_siblings:
+            tag = getattr(sibling, "name", None)
+            if tag == "p":
+                txt = sibling.get_text(strip=True)
+                if txt:
+                    eng_paragraphs.append(txt)
+                if len(eng_paragraphs) >= 6:
+                    break
+            elif tag in ("h2", "h3", "h4", "table", "div"):
+                break  # stop at next block-level structural element
+    if not eng_paragraphs:
+        eng_paragraphs = [p.get_text(strip=True) for p in soup.find_all("p") if p.get_text(strip=True)]
     eng_pattern = r"([A-Z][A-Za-z\s/&\-',]+(?:Expo|Exhibition|Fair|Show|Conference|Summit)[A-Za-z\s/&\-',0-9]*)"
-    eng_m = re.search(eng_pattern, page_text)
+    eng_m = re.search(eng_pattern, "\n".join(eng_paragraphs))
     if eng_m:
         eng = eng_m.group(1).strip()
         if len(eng) > 8 and not re.search(r"[\u4e00-\u9fff]", eng) and len(eng) < 100:
