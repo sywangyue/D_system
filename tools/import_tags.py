@@ -100,16 +100,9 @@ def main() -> int:
     ap.add_argument("--changed-by", required=True, help="写入 manual_tag_history.changed_by，须为邮箱")
     ap.add_argument("--reason", default="", help="可选：统一备注，写入每条 manual_tag_history.reason")
     ap.add_argument("--db", default="", help="SQLite 路径（默认 mwlab.db）")
-    ap.add_argument("--tagger", default="", help="兼容旧参数：与 --changed-by 相同含义")
     args = ap.parse_args()
 
     changed_by = args.changed_by.strip()
-    if args.tagger.strip():
-        if changed_by and args.tagger.strip() != changed_by:
-            print("错误: --tagger 与 --changed-by 不一致", file=sys.stderr)
-            return 1
-        if not changed_by:
-            changed_by = args.tagger.strip()
     if not changed_by or "@" not in changed_by:
         print("错误: --changed-by 须为有效邮箱", file=sys.stderr)
         return 1
