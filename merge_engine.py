@@ -453,8 +453,8 @@ def run_merge(
     stats = dict(brands_created=0, brands_matched=0,
                  editions_upserted=0, provenance_written=0, skipped=0)
 
-    # 打开目标库（确保 schema 存在）
-    target_conn = init_db(target_db) if not dry_run else init_db(":memory:")
+    # 打开目标库（dry-run 也连接真实库以获取匹配统计，结束时 rollback）
+    target_conn = init_db(str(target_db))
 
     # 读两个源
     with sqlite3.connect(str(jufair_db)) as jc:
@@ -554,6 +554,8 @@ def run_merge(
 
     if not dry_run:
         target_conn.commit()
+    else:
+        target_conn.rollback()
     target_conn.close()
 
     log.info(
