@@ -320,6 +320,19 @@ def upsert_edition(
 ) -> str:
     year = norm.get('year') or 0
     edition_id = f"{brand_id}-{year}"
+
+    # CORE-02: Python-side data_source merge & de-dup
+    existing = conn.execute(
+        "SELECT data_source FROM exhibition_edition WHERE edition_id = ?",
+        (edition_id,)
+    ).fetchone()
+    if existing:
+        merged_ds = '/'.join(dict.fromkeys(
+            (existing[0] + '/' + data_source).split('/')
+        ))
+    else:
+        merged_ds = data_source
+
     conn.execute(
         """
         INSERT INTO exhibition_edition
@@ -338,7 +351,7 @@ def upsert_edition(
             date_end    = COALESCE(NULLIF(excluded.date_end,''),    date_end),
             venue       = COALESCE(NULLIF(excluded.venue,''),       venue),
             city        = COALESCE(NULLIF(excluded.city,''),        city),
-            data_source = excluded.data_source || '/' || data_source,
+            data_source = excluded.data_source,
             recorded_at = datetime('now','localtime')
         """,
         (
@@ -346,7 +359,7 @@ def upsert_edition(
             norm.get('date_start'), norm.get('date_end'),
             norm['city'], norm['venue'],
             norm['area_sqm'], norm['exhibitors_count'], norm['visitors_count'],
-            data_source,
+            merged_ds,
         )
     )
     return edition_id
@@ -432,13 +445,13 @@ def run_merge(
             cnexpo_rows = _fetch_raw(cc, "raw_cnexpo", batch_id)
     log.info("raw_cnexpo: 读取 %d 行 (batch=%s)", len(cnexpo_rows), batch_id)
 
-    # 构建 cnexpo 索引（按 cn_name，用于双源匹配）
-    cnexpo_index: dict[str, dict] = {}
+    # 构建 cnexpo 索引（按 cn_name，携带原始行用于跨源 raw_payload）
+    cnexpo_index: dict[str, tuple[dict, dict]] = {}
     for raw in cnexpo_rows:
         norm = normalize_row(raw, 'cnexpo')
         key = norm['cn_name']
         if key:
-            cnexpo_index[key] = norm
+            cnexpo_index[key] = (norm, raw)
 
     # 处理 jufair 行
     for raw in jufair_rows:
@@ -451,8 +464,9 @@ def run_merge(
             continue
 
         # 查找 cnexpo 同名记录
-        norm_c = cnexpo_index.get(cn_name)
-        if norm_c:
+        norm_c_raw = cnexpo_index.get(cn_name)
+        if norm_c_raw:
+            norm_c, raw_c = norm_c_raw
             norm = merge_two_sources(norm_j, norm_c)
             conflict_notes = norm.pop('conflict_notes', '')
             source_urls    = norm.pop('source_urls', [])
@@ -464,6 +478,7 @@ def run_merge(
             source_urls    = [norm_j.get('source_url', '')]
             batch_ids      = [norm_j.get('crawl_batch_id', '')]
             data_source = 'jufair'
+            raw_c = None  # used only when site == 'cnexpo', unreachable here
 
         # 品牌匹配或创建
         brand_id = match_brand(target_conn, cn_name)
@@ -480,8 +495,9 @@ def run_merge(
 
             for url in filter(None, source_urls):
                 site = 'jufair' if 'jufair' in url else 'cnexpo'
+                payload = raw if site == 'jufair' else raw_c
                 insert_provenance(
-                    target_conn, brand_id, site, url, raw,
+                    target_conn, brand_id, site, url, payload,
                     batch_ids[0] if batch_ids else '',
                     notes=conflict_notes
                 )
