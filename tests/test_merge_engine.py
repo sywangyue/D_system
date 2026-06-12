@@ -23,7 +23,7 @@ from merge_engine import (
     next_brand_id,
     run_merge,
 )
-from tests.conftest import make_test_db, build_raw_jufair_fixture, build_raw_cnexpo_fixture
+from tests.conftest import build_raw_jufair_fixture, build_raw_cnexpo_fixture
 
 
 # ─── parse_numeric ──────────────────────────────────────────────────────────
@@ -397,6 +397,113 @@ class Test93SampleIntegration(unittest.TestCase):
         print(f"  → exhibition_brand  : {self.brand_count} 行")
         print(f"  → exhibition_edition: {self.edition_count} 行")
         print(f"  → data_provenance   : {self.prov_count} 行")
+
+
+# ─── CORE-01/02/03/04/08 回归用例（Wave 2 审计修复）───────────────────────────
+
+class TestAuditRegression(unittest.TestCase):
+
+    def test_next_brand_id_with_hex_ids(self):
+        """含 EXPO-D92BC0D6 等 hex ID 时，next_brand_id 返回数字序列下一值。"""
+        conn = sqlite3.connect(':memory:')
+        conn.execute("""
+            CREATE TABLE exhibition_brand (
+                brand_id TEXT PRIMARY KEY, name_cn TEXT
+            )
+        """)
+        conn.execute("INSERT INTO exhibition_brand VALUES ('EXPO-D92BC0D6', 'Hex展')")
+        conn.execute("INSERT INTO exhibition_brand VALUES ('EXPO-0001', '数字展')")
+        result = next_brand_id(conn)
+        self.assertEqual(result, 'EXPO-0002',
+                         f"hex ID 被计入 max: got {result}")
+        conn.close()
+
+    def test_merge_idempotent_double_run(self):
+        """同源数据 run_merge 两次，第二次后品牌/届次/溯源行数与 data_source 不变。"""
+        import tempfile
+        jufair_db = tempfile.NamedTemporaryFile(suffix='.db', delete=False)
+        cnexpo_db = tempfile.NamedTemporaryFile(suffix='.db', delete=False)
+        target_db = tempfile.NamedTemporaryFile(suffix='.db', delete=False)
+        jufair_db.close(); cnexpo_db.close(); target_db.close()
+
+        try:
+            # 构建源数据
+            j_conn = sqlite3.connect(jufair_db.name)
+            build_raw_jufair_fixture(j_conn)
+            c_conn = sqlite3.connect(cnexpo_db.name)
+            build_raw_cnexpo_fixture(c_conn, jufair_conn=j_conn)
+            j_conn.close()
+            c_conn.close()
+
+            stats1 = run_merge(
+                jufair_db=Path(jufair_db.name),
+                cnexpo_db=Path(cnexpo_db.name),
+                target_db=Path(target_db.name),
+                batch_id='IDEMP-1',
+                dry_run=False,
+            )
+
+            conn = sqlite3.connect(target_db.name)
+            r1_brands = conn.execute("SELECT COUNT(*) FROM exhibition_brand").fetchone()[0]
+            r1_editions = conn.execute("SELECT COUNT(*) FROM exhibition_edition").fetchone()[0]
+            r1_prov = conn.execute("SELECT COUNT(*) FROM data_provenance").fetchone()[0]
+            conn.close()
+
+            stats2 = run_merge(
+                jufair_db=Path(jufair_db.name),
+                cnexpo_db=Path(cnexpo_db.name),
+                target_db=Path(target_db.name),
+                batch_id='IDEMP-2',
+                dry_run=False,
+            )
+
+            conn = sqlite3.connect(target_db.name)
+            r2_brands = conn.execute("SELECT COUNT(*) FROM exhibition_brand").fetchone()[0]
+            r2_editions = conn.execute("SELECT COUNT(*) FROM exhibition_edition").fetchone()[0]
+            r2_prov = conn.execute("SELECT COUNT(*) FROM data_provenance").fetchone()[0]
+
+            self.assertEqual(r1_brands, r2_brands, "第二次合并品牌数变化")
+            self.assertEqual(r1_editions, r2_editions, "第二次合并届次数变化")
+            self.assertEqual(r1_prov, r2_prov, "第二次合并溯源行数变化")
+            self.assertEqual(stats2['brands_created'], 0, "第二次应无新品牌")
+            self.assertEqual(stats2['editions_upserted'], 0, "第二次应无可变数据")
+
+            # data_source 不应含重复段
+            bad_sources = conn.execute(
+                "SELECT COUNT(*) FROM exhibition_edition WHERE data_source LIKE '%/%/%'"
+            ).fetchone()[0]
+            self.assertEqual(bad_sources, 0, f"data_source 仍有重复段: {bad_sources}")
+            conn.close()
+        finally:
+            for f in [jufair_db.name, cnexpo_db.name, target_db.name]:
+                try: os.unlink(f)
+                except OSError: pass
+
+    def test_normalize_city_four_char(self):
+        """四字城市名原样保留；省份-城市格式去省份前缀。"""
+        self.assertEqual(normalize_city('呼和浩特'), '呼和浩特')
+        self.assertEqual(normalize_city('乌鲁木齐'), '乌鲁木齐')
+        self.assertEqual(normalize_city('齐齐哈尔'), '齐齐哈尔')
+        self.assertEqual(normalize_city('西双版纳'), '西双版纳')
+        self.assertEqual(normalize_city('湖北武汉'), '武汉')
+        self.assertEqual(normalize_city('江苏南京'), '南京')
+
+    def test_parse_date_cross_year_and_same_month(self):
+        """跨年区间结束年+1；同月日范围可解析。"""
+        # 跨年（结束月<开始月时年份+1）
+        start, end = parse_date_pair('2024.09.01-02.01')
+        self.assertEqual(start, '2024-09-01')
+        self.assertEqual(end, '2025-02-01')
+
+        # 同月日范围
+        start2, end2 = parse_date_pair('2024.05.06-05.08')
+        self.assertEqual(start2, '2024-05-06')
+        self.assertEqual(end2, '2024-05-08')
+
+        # 单日
+        start3, end3 = parse_date_pair('2024.10.01')
+        self.assertEqual(start3, '2024-10-01')
+        self.assertIsNone(end3, "单日无结束日期应为 None")
 
 
 if __name__ == "__main__":

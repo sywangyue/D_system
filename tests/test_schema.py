@@ -213,5 +213,54 @@ class TestSchemaInsertRetrieve(unittest.TestCase):
         self.assertIsNotNone(row)
 
 
+# ─── 迁移完整性回归（CORE-04）───────────────────────────────────────────────
+
+class TestMigrationsApplied(unittest.TestCase):
+    """验证 init_db 应用了全部迁移。"""
+
+    def setUp(self):
+        self.conn = init_db(":memory:")
+
+    def tearDown(self):
+        self.conn.close()
+
+    def test_init_db_applies_all_migrations(self):
+        """所有迁移产生的列和表就位。"""
+        # 版本 2: display_ready
+        cols = get_table_columns(self.conn, "exhibition_brand")
+        self.assertIn('display_ready', cols)
+
+        # 版本 3: dashboard_prefs
+        cols_user = get_table_columns(self.conn, "user")
+        self.assertIn('dashboard_prefs', cols_user)
+
+        # 版本 4-5: timeline/relation/people 表
+        tables = get_all_tables(self.conn)
+        self.assertIn('exhibition_timeline', tables)
+        self.assertIn('exhibition_relation', tables)
+        self.assertIn('person', tables)
+
+        # 版本 6: intel_report / customer_prospect
+        self.assertIn('intel_report', tables)
+        self.assertIn('customer_prospect', tables)
+
+        # 版本 7: provenance 唯一索引
+        indexes = {r[0] for r in self.conn.execute(
+            "SELECT name FROM sqlite_master WHERE type='index'"
+        ).fetchall()}
+        self.assertIn('idx_provenance_brand_url', indexes)
+
+        # 版本 8: prospect 唯一索引
+        self.assertIn('idx_prospect_brand_qcc', indexes)
+
+    def test_schema_version_all_registered(self):
+        """schema_version 表中应包含版本 1-8。"""
+        versions = {r[0] for r in self.conn.execute(
+            "SELECT version FROM schema_version"
+        ).fetchall()}
+        for v in range(1, 9):
+            self.assertIn(v, versions, f"迁移 v{v} 未注册")
+
+
 if __name__ == "__main__":
     unittest.main(verbosity=2)
