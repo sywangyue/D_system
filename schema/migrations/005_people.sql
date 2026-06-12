@@ -36,6 +36,3 @@ CREATE TABLE IF NOT EXISTS contact_relation (
 
 CREATE INDEX IF NOT EXISTS idx_contact_person ON exhibition_contact(person_id);
 CREATE INDEX IF NOT EXISTS idx_contact_brand  ON exhibition_contact(brand_id);
-
-INSERT OR IGNORE INTO schema_version(version, description, applied_at)
-VALUES('005', 'person + exhibition_contact + contact_relation', datetime('now'));

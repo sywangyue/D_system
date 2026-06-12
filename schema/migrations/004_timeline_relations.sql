@@ -32,6 +32,3 @@ CREATE TABLE IF NOT EXISTS exhibition_relation (
 CREATE INDEX IF NOT EXISTS idx_timeline_brand ON exhibition_timeline(brand_id, event_date);
 CREATE INDEX IF NOT EXISTS idx_relation_from  ON exhibition_relation(from_brand_id);
 CREATE INDEX IF NOT EXISTS idx_relation_to    ON exhibition_relation(to_brand_id);
-
-INSERT OR IGNORE INTO schema_version(version, description, applied_at)
-VALUES('004', 'exhibition_timeline + exhibition_relation', datetime('now'));
