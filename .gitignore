@@ -71,6 +71,7 @@ output/
 _archive/
 
 # Backup / temp files
+backups/
 *.bak
 mwlab.db.backup-*
 screenshot_verify.png
