@@ -150,12 +150,12 @@ def normalize_city(raw: Optional[str]) -> str:
 def next_brand_id(conn: sqlite3.Connection) -> str:
     """生成下一个 EXPO-XXXX 格式品牌ID（线程不安全，单进程使用）。"""
     row = conn.execute(
-        "SELECT brand_id FROM exhibition_brand ORDER BY brand_id DESC LIMIT 1"
+        "SELECT MAX(CAST(SUBSTR(brand_id,6) AS INTEGER)) "
+        "FROM exhibition_brand "
+        "WHERE brand_id GLOB 'EXPO-[0-9]*' "
+        "  AND brand_id NOT GLOB 'EXPO-*[^0-9]*'"
     ).fetchone()
-    if not row:
-        return "EXPO-0001"
-    m = re.match(r'EXPO-(\d+)', row[0])
-    num = int(m.group(1)) + 1 if m else 1
+    num = (row[0] + 1) if row[0] is not None else 1
     return f"EXPO-{num:04d}"
 
 
