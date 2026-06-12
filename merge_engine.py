@@ -95,13 +95,22 @@ def parse_date_pair(raw: Optional[str]) -> tuple[Optional[str], Optional[str]]:
         return None, None
     s = str(raw).strip()
 
-    # "2026.05.01-05.05" 或 "2026.12.09 - 12.11"
+    # "2026.12.30 - 01.02"（跨年区间：结束月<开始月时年份+1）
     m = re.match(
         r'(\d{4})[.\-](\d{1,2})[.\-](\d{1,2})\s*[-–]\s*(\d{1,2})[.\-](\d{1,2})', s
     )
     if m:
         y, sm, sd, em, ed = m.groups()
-        return f"{y}-{int(sm):02d}-{int(sd):02d}", f"{y}-{int(em):02d}-{int(ed):02d}"
+        ey = int(y) + 1 if int(em) < int(sm) else int(y)
+        return f"{y}-{int(sm):02d}-{int(sd):02d}", f"{ey}-{int(em):02d}-{int(ed):02d}"
+
+    # "2026.05.01-05"（同月仅日范围）
+    m = re.match(
+        r'(\d{4})[.\-](\d{1,2})[.\-](\d{1,2})\s*[-–]\s*(\d{1,2})$', s
+    )
+    if m:
+        y, mo, sd, ed = m.groups()
+        return f"{y}-{int(mo):02d}-{int(sd):02d}", f"{y}-{int(mo):02d}-{int(ed):02d}"
 
     # "2026-4-24" 或 "2026.4.24"（仅开始日期）
     m = re.match(r'^(\d{4})[.\-](\d{1,2})[.\-](\d{1,2})$', s)
@@ -135,15 +144,21 @@ def normalize_city(raw: Optional[str]) -> str:
       "湖北武汉" → "武汉"
       "北京北京" → "北京"
       "广东广州" → "广州"
+      "呼和浩特" → "呼和浩特"（保持）
     """
     if not raw:
         return ''
     s = str(raw).strip()
     if len(s) == 4 and s[:2] == s[2:]:   # 直辖市：上海上海
         return s[:2]
-    if len(s) == 4:                        # 省市：湖北武汉 → 武汉
+    if len(s) == 4 and s[:2] in CN_PROVINCES:  # 省市：湖北武汉 → 武汉
         return s[2:]
     return s
+
+CN_PROVINCES = {'内蒙古','广西','西藏','宁夏','新疆',
+                '河北','山西','辽宁','吉林','黑龙江','江苏','浙江',
+                '安徽','福建','江西','山东','河南','湖北','湖南',
+                '广东','海南','四川','贵州','云南','陕西','甘肃','青海'}
 
 
 # ─── 品牌ID生成 ────────────────────────────────────────────────────────────────
