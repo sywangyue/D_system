@@ -10,6 +10,7 @@ jufair.com 聚展网展会数据爬虫
 """
 
 import argparse
+import random
 import sqlite3
 import sys
 import time
@@ -25,6 +26,10 @@ MAX_RETRIES = 3
 TARGET_YEAR = 2026
 RATE_LIMIT_BACKOFF = 15.0  # 触发反爬后的额外等待（秒）
 PROXY_URL = "socks5h://127.0.0.1:9050"  # Tor 默认 SOCKS5 端口
+_BATCH_PAUSE_EVERY = 50    # 每 N 个请求执行长休止
+_BATCH_PAUSE_MIN = 60      # 长休止最小秒数
+_BATCH_PAUSE_MAX = 120     # 长休止最大秒数
+_CIRCUIT_BREAKER_MAX = 5   # 全局连续失败熔断阈值
 # ============================
 
 USER_AGENTS = [
@@ -42,34 +47,47 @@ SESSION.headers.update({
 })
 
 _proxy_enabled = False
+# 运行前选定固定 UA（Session Cookie 与指纹一致）
+_fixed_ua = random.choice(USER_AGENTS) if USER_AGENTS else ""
+SESSION.headers.update({"User-Agent": _fixed_ua})
 
 
 # ====================================================================
 # HTTP 请求（带反爬缓解）
 # ====================================================================
 
-_ua_index = 0
 _consecutive_403 = 0
-
-
-def _rotate_ua():
-    global _ua_index
-    _ua_index = (_ua_index + 1) % len(USER_AGENTS)
-    return USER_AGENTS[_ua_index]
+_global_consecutive_fail = 0  # 全局熔断计数器
+_request_count = 0            # 请求计数器（长休止用）
 
 
 def _jitter_delay(base=BASE_DELAY):
     """随机抖动延迟，避免被检测到固定节奏。"""
-    import random
     return base + random.uniform(-0.5, 1.5)
+
+
+def _batch_pause_if_needed():
+    """每 BATCH_PAUSE_EVERY 个请求执行长休止。"""
+    global _request_count
+    _request_count += 1
+    if _request_count % _BATCH_PAUSE_EVERY == 0:
+        pause = random.uniform(_BATCH_PAUSE_MIN, _BATCH_PAUSE_MAX)
+        print(f"  [PAUSE] 已满 {_BATCH_PAUSE_EVERY} 请求，休止 {pause:.0f}s...")
+        time.sleep(pause)
+
+
+def _log(msg: str):
+    """带时间戳的日志输出。"""
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{ts}] {msg}")
 
 
 def fetch_page(url, label="", timeout=25):
     """HTTP GET + 自动重试 + 反爬缓解。支持 --proxy 走 Tor。"""
-    global _consecutive_403
+    global _consecutive_403, _global_consecutive_fail, _request_count
+    _batch_pause_if_needed()
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            SESSION.headers.update({"User-Agent": _rotate_ua()})
             kwargs = {"timeout": timeout}
             if _proxy_enabled:
                 kwargs["proxies"] = {"http": PROXY_URL, "https": PROXY_URL}
@@ -77,35 +95,55 @@ def fetch_page(url, label="", timeout=25):
 
             if resp.status_code == 200:
                 _consecutive_403 = 0
+                _global_consecutive_fail = 0
+                # 编码兜底
+                if not resp.encoding or resp.encoding == 'ISO-8859-1':
+                    resp.encoding = resp.apparent_encoding
+                # 软封禁检测：200 但无 .exh-info-wrap 和翻页结构
+                if ".exh-info-wrap" not in resp.text and "page-box" not in resp.text:
+                    _log(f"[WARN] {label} HTTP 200 但疑似封禁/验证码页")
+                    _global_consecutive_fail += 1
+                    if _global_consecutive_fail >= _CIRCUIT_BREAKER_MAX:
+                        _log(f"[ABORT] 全局连续失败 {_CIRCUIT_BREAKER_MAX} 次，终止运行")
+                        return None
+                    return None
                 return resp.text
 
-            if resp.status_code == 403:
+            if resp.status_code in (403, 429, 503):
                 _consecutive_403 += 1
-                backoff = RATE_LIMIT_BACKOFF * _consecutive_403
-                print(f"  [!] {label} HTTP 403 (第{attempt}次) 等待{backoff:.0f}s...", end="")
+                _global_consecutive_fail += 1
+                retry_after = resp.headers.get("Retry-After")
+                planned_backoff = RATE_LIMIT_BACKOFF * _consecutive_403
+                if retry_after:
+                    try:
+                        planned_backoff = max(planned_backoff, float(retry_after))
+                    except ValueError:
+                        pass
+                _log(f"[!] {label} HTTP {resp.status_code} (第{attempt}次) 等待{planned_backoff:.0f}s...")
+                if _global_consecutive_fail >= _CIRCUIT_BREAKER_MAX:
+                    _log(f"[ABORT] 全局连续失败 {_CIRCUIT_BREAKER_MAX} 次，终止运行")
+                    return None
                 if attempt < MAX_RETRIES:
-                    print()
-                    time.sleep(backoff)
+                    time.sleep(planned_backoff)
                 else:
-                    print(" 放弃")
-                    _consecutive_403 = 0
+                    _log(f"  放弃 {label}")
                     return None
             else:
-                print(f"  [!] {label} HTTP {resp.status_code} (第{attempt}次)")
+                _log(f"[!] {label} HTTP {resp.status_code} (第{attempt}次)")
                 if attempt < MAX_RETRIES:
                     time.sleep(BASE_DELAY * attempt)
                 else:
-                    print("  放弃")
+                    _log(f"  放弃 {label}")
                     return None
 
         except requests.RequestException as e:
-            print(f"  [!] {label} 异常: {e} (第{attempt}次)", end="")
+            _log(f"[!] {label} 异常: {e} (第{attempt}次)")
             if attempt < MAX_RETRIES:
                 delay = BASE_DELAY * attempt
-                print(f" 等待{delay:.0f}s...")
+                _log(f"  等待{delay:.0f}s...")
                 time.sleep(delay)
             else:
-                print(" 放弃")
+                _log(f"  放弃 {label}")
                 return None
     return None
 
@@ -156,9 +194,10 @@ def get_crawled_urls(conn):
 
 
 def insert_batch(conn, records, crawled_urls):
-    """批量写入 raw_jufair（INSERT OR IGNORE 防重复）。"""
+    """批量写入 raw_jufair（INSERT OR IGNORE 防重复），返回真实新增行数。"""
     if not records:
         return 0
+    before = conn.total_changes
     conn.executemany(
         """INSERT OR IGNORE INTO raw_jufair
            (cn_name, en_name, date_str, year, venue, city,
@@ -172,9 +211,11 @@ def insert_batch(conn, records, crawled_urls):
         records,
     )
     conn.commit()
+    after = conn.total_changes
+    actual = after - before
     for r in records:
         crawled_urls.add(r["source_url"])
-    return len(records)
+    return actual
 
 
 # ====================================================================
@@ -197,11 +238,28 @@ def _data_value(container, tag="data"):
 
 
 def _data_with_unit(container):
-    """取 'data + .unitText' 拼接值。"""
+    """取 'data + .unitText' 拼接值，为空返回 ''。"""
     val = _data_value(container, "data")
     unit_el = container.select_one(".unitText")
     unit = unit_el.get_text(strip=True) if unit_el else ""
     return val + unit if val else ""
+
+
+def _scale_field(container, expected_unit_keyword):
+    """
+    从 .scale-remind 容器提取统计值，单位文本含 expected_unit_keyword 时才返回值。
+    expected_unit_keyword: '平方米'/'人'/'家'
+    单位不符时置空并 [WARN]。
+    """
+    raw = _data_with_unit(container)
+    if not raw:
+        return ""
+    unit_el = container.select_one(".unitText")
+    unit = unit_el.get_text(strip=True) if unit_el else ""
+    if expected_unit_keyword not in unit:
+        _log(f"[WARN] 统计字段单位不符（期望含'{expected_unit_keyword}'，实际'{unit}'），置空")
+        return ""
+    return raw
 
 
 def parse_list_page(html, source_type, crawl_batch_id):
@@ -228,16 +286,16 @@ def parse_list_page(html, source_type, crawl_batch_id):
 
         date_str = time_tag.get_text(strip=True) if time_tag else ""
 
-        # 统计数据区域
+        # 统计数据区域（带单位校验）
         scale_divs = art.select(".scale-remind")
         area_str = visitors_str = exhibitors_str = ""
         if scale_divs:
-            area_str = _data_with_unit(scale_divs[0])
+            area_str = _scale_field(scale_divs[0], "平方米")
             children = scale_divs[0].select("div")
             if len(children) >= 2:
-                visitors_str = _data_with_unit(children[1])
+                visitors_str = _scale_field(children[1], "人")
             if len(scale_divs) >= 2:
-                exhibitors_str = _data_with_unit(scale_divs[1])
+                exhibitors_str = _scale_field(scale_divs[1], "家")
 
         item = {
             "cn_name": cn_name,
@@ -346,12 +404,12 @@ def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batc
         if html is None:
             break
         if not has_target_year(html):
-            print(f"    [p{page}] 无{TARGET_YEAR}年数据，停止")
+            _log(f"  [p{page}] 无{TARGET_YEAR}年数据，停止")
             break
 
         items = parse_list_page(html, source_type, batch_id)
         if not items:
-            print(f"    [p{page}] 无条目，停止")
+            _log(f"  [p{page}] 无条目，停止")
             break
 
         # 关键词过滤
@@ -363,7 +421,7 @@ def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batc
             ]
 
         if not items:
-            print(f"    [p{page}] 无'{keyword}'匹配，跳过")
+            _log(f"  [p{page}] 无'{keyword}'匹配，跳过")
             page += 1
             time.sleep(_jitter_delay())
             continue
@@ -376,32 +434,63 @@ def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batc
         # 详情页补爬
         detail_ok = 0
         if crawl_detail and new_records:
-            for rec in new_records:
-                extra = parse_detail_page(rec["source_url"])
+            # 补爬存量 detail_crawled=0 记录
+            backfill_records = conn.execute(
+                "SELECT source_url FROM raw_jufair WHERE detail_crawled=0"
+            ).fetchall()
+            backfill_urls = [r[0] for r in backfill_records]
+            all_detail_urls = [r["source_url"] for r in new_records] + [
+                u for u in backfill_urls if u not in {r["source_url"] for r in new_records}
+            ]
+            for surl in all_detail_urls:
+                extra = parse_detail_page(surl)
                 if extra:
-                    updates = {k: extra.get(k, "") for k in
-                               ["organizer", "city", "cycle", "industry", "area_str", "visitors_str", "exhibitors_str"]}
-                    updates["detail_crawled"] = 1
-                    updates["source_url"] = rec["source_url"]
+                    non_empty = {k: v for k, v in extra.items() if v}
+                    if not non_empty:
+                        continue
+                    set_parts = [f"{k}=:_{k}" for k in non_empty if k in
+                                 ["organizer", "city", "cycle", "industry", "area_str", "visitors_str", "exhibitors_str"]]
+                    if not set_parts:
+                        continue
+                    set_clause = ", ".join(set_parts)
+                    params = {f"_{k}": v for k, v in non_empty.items()}
+                    params["_source_url"] = surl
                     conn.execute(
-                        """UPDATE raw_jufair SET
-                           organizer=:organizer, city=:city, cycle=:cycle, industry=:industry,
-                           area_str=:area_str, visitors_str=:visitors_str, exhibitors_str=:exhibitors_str,
-                           detail_crawled=:detail_crawled
-                           WHERE source_url=:source_url""",
-                        updates,
+                        f"UPDATE raw_jufair SET {set_clause}, detail_crawled=1 WHERE source_url=:_source_url",
+                        params,
                     )
                     detail_ok += 1
                 time.sleep(_jitter_delay())
             conn.commit()
 
         detail_msg = f" 详情{detail_ok}/{len(new_records)}" if crawl_detail else ""
-        print(f"    [p{page}] {len(items)}条 → 新增{n}{detail_msg}")
+        _log(f"  [p{page}] {len(items)}条 → 新增{n}{detail_msg}")
 
         page += 1
         time.sleep(_jitter_delay())
 
     return new_count
+
+
+def _write_crawl_log(conn, batch_id, status, total_fetched=0, total_inserted=0):
+    """写入 crawl_log 记录。"""
+    from datetime import datetime as dt
+    now = dt.now().strftime("%Y-%m-%d %H:%M:%S")
+    # 尝试 INSERT，若表不存在则静默跳过
+    try:
+        if status == "running":
+            conn.execute(
+                "INSERT INTO crawl_log(batch_id, status, started_at) VALUES (?, ?, ?)",
+                (batch_id, status, now),
+            )
+        else:
+            conn.execute(
+                "UPDATE crawl_log SET status=?, finished_at=?, total_fetched=?, total_inserted=? WHERE batch_id=?",
+                (status, now, total_fetched, total_inserted, batch_id),
+            )
+        conn.commit()
+    except Exception:
+        pass  # crawl_log 表可能不存在（旧库）
 
 
 def crawl_all(db_path, months=None, keyword=None, crawl_detail=False, batch_id=None):
@@ -412,22 +501,34 @@ def crawl_all(db_path, months=None, keyword=None, crawl_detail=False, batch_id=N
         months = list(range(1, 13))
 
     conn = init_db(db_path)
+    _write_crawl_log(conn, batch_id, "running")
     total = 0
+    aborted = False
 
-    for m in sorted(months):
-        print(f"\n📅 {TARGET_YEAR}年{m:02d}月")
-        for st in ["domestic", "international"]:
-            label = "国内" if st == "domestic" else "国际"
-            print(f"  [{label}]")
-            n = crawl_month(conn, m, st, keyword=keyword, crawl_detail=crawl_detail, batch_id=batch_id)
-            total += n
-            if n:
-                print(f"  ✅ 新增 {n} 条")
-            else:
-                print(f"  - 无新增")
+    try:
+        for m in sorted(months):
+            _log(f"\n📅 {TARGET_YEAR}年{m:02d}月")
+            for st in ["domestic", "international"]:
+                if aborted:
+                    break
+                label = "国内" if st == "domestic" else "国际"
+                _log(f"  [{label}]")
+                n = crawl_month(conn, m, st, keyword=keyword, crawl_detail=crawl_detail, batch_id=batch_id)
+                total += n
+                if n:
+                    _log(f"  ✅ 新增 {n} 条")
+                else:
+                    _log(f"  - 无新增")
+            if aborted:
+                break
+    except Exception as e:
+        _log(f"  [EXCEPTION] {e}")
+        _write_crawl_log(conn, batch_id, "failed", total_fetched=0, total_inserted=total)
+        conn.close()
+        raise
 
     conn.close()
-    return total, batch_id
+    return total, batch_id, aborted
 
 
 # ====================================================================
@@ -532,6 +633,8 @@ def main():
                         help="同时爬取详情页（补爬主办方/城市/行业等）")
     parser.add_argument("--batch-id", type=str, default=None,
                         help="爬取批次标识")
+    parser.add_argument("--year", type=int, default=TARGET_YEAR,
+                        help="目标年份（默认 2026）")
     parser.add_argument("--proxy", action="store_true",
                         help="通过 Tor SOCKS5 代理请求（需提前启动 Tor）")
     parser.add_argument("--all", action="store_true",
@@ -560,34 +663,51 @@ def main():
     if args.all:
         args.months = list(range(1, 13))
 
+    import crawlers.jufair_crawler as _self
+    _self.TARGET_YEAR = args.year
+
     global _proxy_enabled
     if args.proxy:
         _proxy_enabled = True
-        # Verify proxy works
         try:
             r = requests.get("https://check.torproject.org/api/ip",
                            proxies={"http": PROXY_URL, "https": PROXY_URL},
                            timeout=10)
             result = r.json()
             if result.get("IsTor"):
-                print(f"🔒 Tor 代理已启用 (IP: {result.get('IP', 'unknown')})")
+                _log(f"🔒 Tor 代理已启用 (IP: {result.get('IP', 'unknown')})")
             else:
-                print("⚠️ 代理未通过 Tor 验证，继续但可能不可靠")
+                _log("⚠️ 代理未通过 Tor 验证，退出")
+                sys.exit(1)
         except Exception as e:
-            print(f"⚠️ 代理连接失败: {e}，回退到直连")
+            _log(f"❌ 代理连接失败: {e}，退出")
             _proxy_enabled = False
+            sys.exit(1)
 
-    total, batch_id = crawl_all(
+    total, batch_id, aborted = crawl_all(
         args.db,
         months=args.months,
         keyword=args.keyword,
         crawl_detail=args.detail,
         batch_id=args.batch_id,
     )
-    print(f"\n{'='*55}")
-    print(f"✅ 任务1 完成！批次: {batch_id}")
-    print(f"   共计新增 {total} 条")
-    print(f"{'='*55}")
+
+    conn = sqlite3.connect(args.db)
+    _write_crawl_log(conn, batch_id, "failed" if aborted else ("success" if total > 0 else "partial"),
+                     total_fetched=0, total_inserted=total)
+    conn.close()
+
+    _log(f"\n{'='*55}")
+    if total == 0:
+        _log(f"⚠ 全部失败（批次: {batch_id}）")
+        sys.exit(1)
+    elif aborted:
+        _log(f"⚠ 部分失败，共新增 {total} 条（批次: {batch_id}）")
+        sys.exit(2)
+    else:
+        _log(f"✅ 任务完成！批次: {batch_id}")
+        _log(f"   共计新增 {total} 条")
+        _log(f"{'='*55}")
 
 
 if __name__ == "__main__":

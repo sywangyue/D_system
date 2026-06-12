@@ -13,6 +13,7 @@ cnexpo.com 中国会展网展会数据爬虫
 """
 
 import argparse
+import random
 import re
 import sqlite3
 import sys
@@ -27,6 +28,10 @@ BASE_URL = "https://www.cnexpo.com"
 BASE_DELAY = 2.5   # 基础请求间隔（秒）
 MAX_RETRIES = 3
 RATE_LIMIT_BACKOFF = 15.0
+_BATCH_PAUSE_EVERY = 50
+_BATCH_PAUSE_MIN = 60
+_BATCH_PAUSE_MAX = 120
+_CIRCUIT_BREAKER_MAX = 5
 # ============================
 
 USER_AGENTS = [
@@ -43,54 +48,78 @@ SESSION.headers.update({
     "Referer": "https://www.cnexpo.com/",
 })
 
-_ua_index = 0
+# 运行前选定固定 UA
+_fixed_ua = random.choice(USER_AGENTS) if USER_AGENTS else ""
+SESSION.headers.update({"User-Agent": _fixed_ua})
+
 _consecutive_403 = 0
-
-
-def _rotate_ua():
-    global _ua_index
-    _ua_index = (_ua_index + 1) % len(USER_AGENTS)
-    return USER_AGENTS[_ua_index]
+_global_consecutive_fail = 0
+_request_count = 0
 
 
 def _jitter_delay(base=BASE_DELAY):
-    import random
     return base + random.uniform(-0.5, 1.5)
+
+
+def _batch_pause_if_needed():
+    global _request_count
+    _request_count += 1
+    if _request_count % _BATCH_PAUSE_EVERY == 0:
+        pause = random.uniform(_BATCH_PAUSE_MIN, _BATCH_PAUSE_MAX)
+        _log(f"  [PAUSE] 已满 {_BATCH_PAUSE_EVERY} 请求，休止 {pause:.0f}s...")
+        time.sleep(pause)
+
+
+def _log(msg: str):
+    ts = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    print(f"[{ts}] {msg}")
 
 
 def fetch_page(url, label="", timeout=25):
     """HTTP GET + 自动重试 + 反爬缓解。"""
-    global _consecutive_403
+    global _consecutive_403, _global_consecutive_fail, _request_count
+    _batch_pause_if_needed()
     for attempt in range(1, MAX_RETRIES + 1):
         try:
-            SESSION.headers.update({"User-Agent": _rotate_ua()})
             resp = SESSION.get(url, timeout=timeout)
             if resp.status_code == 200:
                 _consecutive_403 = 0
+                _global_consecutive_fail = 0
+                if not resp.encoding or resp.encoding == 'ISO-8859-1':
+                    resp.encoding = resp.apparent_encoding
                 return resp.text
-            if resp.status_code == 403:
+            if resp.status_code in (403, 429, 503):
                 _consecutive_403 += 1
-                backoff = RATE_LIMIT_BACKOFF * _consecutive_403
-                print(f"  [!] {label} HTTP 403 (第{attempt}次) 等待{backoff:.0f}s...")
+                _global_consecutive_fail += 1
+                retry_after = resp.headers.get("Retry-After")
+                planned_backoff = RATE_LIMIT_BACKOFF * _consecutive_403
+                if retry_after:
+                    try:
+                        planned_backoff = max(planned_backoff, float(retry_after))
+                    except ValueError:
+                        pass
+                _log(f"[!] {label} HTTP {resp.status_code} (第{attempt}次) 等待{planned_backoff:.0f}s...")
+                if _global_consecutive_fail >= _CIRCUIT_BREAKER_MAX:
+                    _log(f"[ABORT] 全局连续失败 {_CIRCUIT_BREAKER_MAX} 次，终止运行")
+                    return None
                 if attempt < MAX_RETRIES:
-                    time.sleep(backoff)
+                    time.sleep(planned_backoff)
                 else:
-                    print("  放弃")
-                    _consecutive_403 = 0
+                    _log(f"  放弃 {label}")
                     return None
             else:
-                print(f"  [!] {label} HTTP {resp.status_code} (第{attempt}次)")
+                _log(f"[!] {label} HTTP {resp.status_code} (第{attempt}次)")
                 if attempt < MAX_RETRIES:
                     time.sleep(BASE_DELAY * attempt)
                 else:
-                    print("  放弃")
+                    _log(f"  放弃 {label}")
                     return None
         except requests.RequestException as e:
-            print(f"  [!] {label} 异常: {e} (第{attempt}次)")
+            _log(f"[!] {label} 异常: {e} (第{attempt}次)")
             if attempt < MAX_RETRIES:
                 time.sleep(BASE_DELAY * attempt)
             else:
-                print("  放弃")
+                _log(f"  放弃 {label}")
                 return None
     return None
 
@@ -137,6 +166,7 @@ def get_crawled_urls(conn):
 def insert_batch(conn, records, crawled_urls):
     if not records:
         return 0
+    before = conn.total_changes
     conn.executemany(
         """INSERT OR IGNORE INTO raw_cnexpo
            (cn_name, en_name, date_str, year, venue, city,
@@ -150,9 +180,11 @@ def insert_batch(conn, records, crawled_urls):
         records,
     )
     conn.commit()
+    after = conn.total_changes
+    actual = after - before
     for r in records:
         crawled_urls.add(r["source_url"])
-    return len(records)
+    return actual
 
 
 # ====================================================================
@@ -201,7 +233,7 @@ def _extract_year(date_str):
 def parse_detail_page(detail_url):
     """
     从 cnexpo 详情页提取全部字段。
-    数据分布在 <p> 标签中，第 2~5 个 <p> 包含结构化信息。
+    按标签文本关键词锚定提取，弃用 paragraph[2..5] 位置索引。
     """
     html = fetch_page(detail_url, label=f"详情 {detail_url[-40:]}")
     if not html:
@@ -209,13 +241,6 @@ def parse_detail_page(detail_url):
 
     soup = BeautifulSoup(html, "html.parser")
     data = {}
-
-    # --- 收集所有非空 <p> 标签文本 ---
-    paragraphs = []
-    for p in soup.find_all("p"):
-        t = p.get_text(strip=True)
-        if t:
-            paragraphs.append(t)
 
     # --- 1. 中文名 ---
     h1 = soup.find("h1")
@@ -227,49 +252,61 @@ def parse_detail_page(detail_url):
             t = title_tag.get_text(strip=True)
             data["cn_name"] = re.sub(r"-中国会展网$", "", t).strip()
 
-    # --- 2. 日期 ---
-    if len(paragraphs) > 2:
-        m = re.search(r"(\d{4}\.\d{2}\.\d{2}\s*-\s*\d{2}\.\d{2})", paragraphs[2])
-        if m:
-            data["date_str"] = m.group(1)
+    # --- 2-5: 按标签文本锚定提取（遍历 <p>）---
+    _VENUE_KEYWORDS = {"馆", "中心", "会展", "广场", "展览", "展厅"}
 
-    # --- 3. 展馆名称（含城市信息）---
-    if len(paragraphs) > 3:
-        venue_line = paragraphs[3]
-        venue_line = re.sub(r"^[\s]+", "", venue_line)
-        # 提取城市（城市格式：省份-城市 或 城市-城市）
-        city_m = re.match(r"([\u4e00-\u9fff]+)-([\u4e00-\u9fff]+)\s+", venue_line)
-        if city_m:
-            data["city"] = city_m.group(2)
-        # 提取场馆名（去掉城市前缀后的剩余部分）
-        venue_m = re.search(r"(?:[\u4e00-\u9fff]+-[\u4e00-\u9fff]+\s+)?(.+)", venue_line)
-        if venue_m and venue_m.group(1):
-            data["venue"] = venue_m.group(1).strip()
+    for p in soup.find_all("p"):
+        t = p.get_text(strip=True)
+        if not t:
+            continue
 
-    # --- 4. 主办单位 ---
-    if len(paragraphs) > 4:
-        m = re.search(r"主办单位[：:](.+)", paragraphs[4])
-        if m:
-            data["organizer"] = m.group(1).strip()
+        # 日期：覆盖区间、单日、全写结束日期
+        if "date_str" not in data:
+            m = re.search(r"(\d{4}\.\d{2}\.\d{2})\s*-\s*(\d{4}\.\d{2}\.\d{2}|\d{2}\.\d{2})", t)
+            if m:
+                data["date_str"] = m.group(1) + " - " + m.group(2)
+            else:
+                m = re.search(r"(\d{4}\.\d{2}\.\d{2})", t)
+                if m:
+                    data["date_str"] = m.group(1)
 
-    # --- 5. 统计数据（面积/展商/观众/周期）---
-    if len(paragraphs) > 5:
-        stats_line = paragraphs[5]
-        m_area = re.search(r"会展面积[：:]\s*([\d,]+平方米)", stats_line)
-        if m_area:
-            data["area_str"] = "面积:" + m_area.group(1)
-        m_exh = re.search(r"展商数量[：:]\s*([\d,]+家)", stats_line)
-        if m_exh:
-            data["exhibitors_str"] = "展商:" + m_exh.group(1)
-        m_vis = re.search(r"观众数量[：:]\s*([\d,]+人)", stats_line)
-        if m_vis:
-            data["visitors_str"] = "观众:" + m_vis.group(1)
-        m_cyc = re.search(r"举办周期[：:]\s*([^\s]+)", stats_line)
-        if m_cyc:
-            data["cycle"] = m_cyc.group(1)
+        # 地点/展馆（跳过含"时间/日期"的行）
+        if "venue" not in data and "city" not in data:
+            if "时间" in t or "日期" in t:
+                continue
+            city_m = re.match(r"([\u4e00-\u9fff]+)-([\u4e00-\u9fff]+)\s+(.+)", t)
+            if city_m:
+                data["city"] = city_m.group(2)
+                venue_raw = city_m.group(3).strip()
+                if any(kw in venue_raw for kw in _VENUE_KEYWORDS):
+                    data["venue"] = venue_raw
+                elif venue_raw:
+                    print(f"[WARN] cnexpo venue 不含场馆关键词，置空: {venue_raw}")
 
-    # --- 6. 英文名（从页面文本中正则提取）---
-    page_text = "\n".join(paragraphs)
+        # 主办
+        if "organizer" not in data:
+            m = re.search(r"主办单位[：:](.+)", t)
+            if m:
+                data["organizer"] = m.group(1).strip()
+
+        # 统计数据
+        if not any(k in data for k in ("area_str", "exhibitors_str", "visitors_str", "cycle")):
+            m_area = re.search(r"会展面积[：:]\s*([\d,]+平方米)", t)
+            if m_area:
+                data["area_str"] = "面积:" + m_area.group(1)
+            m_exh = re.search(r"展商数量[：:]\s*([\d,]+家)", t)
+            if m_exh:
+                data["exhibitors_str"] = "展商:" + m_exh.group(1)
+            m_vis = re.search(r"观众数量[：:]\s*([\d,]+人)", t)
+            if m_vis:
+                data["visitors_str"] = "观众:" + m_vis.group(1)
+            m_cyc = re.search(r"举办周期[：:]\s*([^\s]+)", t)
+            if m_cyc:
+                data["cycle"] = m_cyc.group(1)
+
+    # --- 英文名 ---
+    paragraphs_eng = [p.get_text(strip=True) for p in soup.find_all("p") if p.get_text(strip=True)]
+    page_text = "\n".join(paragraphs_eng)
     eng_pattern = r"([A-Z][A-Za-z\s/&\-',]+(?:Expo|Exhibition|Fair|Show|Conference|Summit)[A-Za-z\s/&\-',0-9]*)"
     eng_m = re.search(eng_pattern, page_text)
     if eng_m:
@@ -285,7 +322,6 @@ def parse_detail_page(detail_url):
 
     return data
 
-
 # ====================================================================
 # 爬取逻辑
 # ====================================================================
@@ -293,7 +329,7 @@ def parse_detail_page(detail_url):
 def crawl_list_pages(conn, max_pages=100, keyword=None, batch_id=""):
     """
     遍历 cnexpo 列表页，提取所有展会 URL，再逐个爬详情页。
-    cnexpo 没有按月份筛选的 URL 模式，故全量爬取后按年份/关键词过滤。
+    /events/1000/0/{page}  — 1000=国内, 0=全部年份, {page}=页码
     """
     crawled = get_crawled_urls(conn)
     new_count = 0
@@ -306,39 +342,40 @@ def crawl_list_pages(conn, max_pages=100, keyword=None, batch_id=""):
         if html is None:
             blanks += 1
             if blanks >= 5:
-                print(f"  连续5页无响应，停止")
+                _log(f"  连续5页无响应，停止")
                 break
             continue
         blanks = 0
 
         items = parse_list_page(html)
         if not items:
-            print(f"  [p{page}] 无展会链接，停止")
+            _log(f"  [p{page}] 无展会链接，停止")
             break
 
-        # 过滤未爬取的新链接
         new_links = [it for it in items if it["source_url"] not in crawled]
         if not new_links:
-            print(f"  [p{page}] {len(items)}条，全部已爬")
+            _log(f"  [p{page}] {len(items)}条，全部已爬")
             time.sleep(_jitter_delay())
             continue
 
-        print(f"  [p{page}] {len(items)}条展会链接，{len(new_links)}条新")
+        _log(f"  [p{page}] {len(items)}条展会链接，{len(new_links)}条新")
 
-        # 逐个爬详情页
         page_new = 0
         for item in new_links:
             detail = parse_detail_page(item["source_url"])
             if not detail:
+                time.sleep(_jitter_delay())  # CRWL-03: 失败路径也 sleep
                 continue
 
-            # 关键词过滤
+            kw_match = True
             if keyword:
                 kw = keyword.lower()
                 cn = detail.get("cn_name", "").lower()
                 en = detail.get("en_name", "").lower()
-                if kw not in cn and kw not in en:
-                    continue
+                kw_match = (kw in cn or kw in en)
+
+            if not kw_match:
+                _log(f"  [p{page}] 不匹配关键词，已入库供下游过滤: {detail.get('cn_name', '')}")
 
             record = {
                 "cn_name": detail.get("cn_name", item["cn_name"]),
@@ -362,10 +399,29 @@ def crawl_list_pages(conn, max_pages=100, keyword=None, batch_id=""):
             time.sleep(_jitter_delay())
 
         new_count += page_new
-        print(f"    → 新增{page_new}条")
+        _log(f"    → 新增{page_new}条")
         time.sleep(_jitter_delay())
 
     return new_count
+
+
+def _write_crawl_log(conn, batch_id, status, total_fetched=0, total_inserted=0):
+    try:
+        from datetime import datetime as dt
+        now = dt.now().strftime("%Y-%m-%d %H:%M:%S")
+        if status == "running":
+            conn.execute(
+                "INSERT INTO crawl_log(batch_id, status, started_at) VALUES (?, ?, ?)",
+                (batch_id, status, now),
+            )
+        else:
+            conn.execute(
+                "UPDATE crawl_log SET status=?, finished_at=?, total_fetched=?, total_inserted=? WHERE batch_id=?",
+                (status, now, total_fetched, total_inserted, batch_id),
+            )
+        conn.commit()
+    except Exception:
+        pass
 
 
 def crawl_all(db_path, max_pages=100, keyword=None, batch_id=None):
@@ -374,7 +430,14 @@ def crawl_all(db_path, max_pages=100, keyword=None, batch_id=None):
         batch_id = datetime.now().strftime("cnexpo_%Y%m%d_%H%M%S")
 
     conn = init_db(db_path)
-    total = crawl_list_pages(conn, max_pages=max_pages, keyword=keyword, batch_id=batch_id)
+    _write_crawl_log(conn, batch_id, "running")
+    try:
+        total = crawl_list_pages(conn, max_pages=max_pages, keyword=keyword, batch_id=batch_id)
+    except Exception as e:
+        _log(f"  [EXCEPTION] {e}")
+        _write_crawl_log(conn, batch_id, "failed", total_fetched=0, total_inserted=0)
+        conn.close()
+        raise
     conn.close()
     return total, batch_id
 
@@ -496,10 +559,20 @@ def main():
         keyword=args.keyword,
         batch_id=args.batch_id,
     )
-    print(f"\n{'='*55}")
-    print(f"✅ 任务2 完成！批次: {batch_id}")
-    print(f"   共计新增 {total} 条")
-    print(f"{'='*55}")
+
+    conn = sqlite3.connect(args.db)
+    _write_crawl_log(conn, batch_id, "success" if total > 0 else "failed",
+                     total_fetched=0, total_inserted=total)
+    conn.close()
+
+    _log(f"\n{'='*55}")
+    if total == 0:
+        _log(f"⚠ 全部失败（批次: {batch_id}）")
+        sys.exit(1)
+    else:
+        _log(f"✅ 任务完成！批次: {batch_id}")
+        _log(f"   共计新增 {total} 条")
+        _log(f"{'='*55}")
 
 
 if __name__ == "__main__":
