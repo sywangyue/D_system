@@ -248,11 +248,11 @@ crawl_log (爬取日志表)               users (用户表)
 
 | 维度 | 决策 |
 |------|------|
-| 域名 | Cloudflare 购买，CNAME DNS only（灰云）指向 Railway |
-| 服务器 | Railway · Singapore 节点（`asia-southeast1`），大陆 RTT ~60ms |
+| 域名 | Cloudflare 购买，CNAME DNS only（灰云）指向阿里云 |
+| 服务器 | 阿里云 ECS（北京节点），大陆低延迟 |
 | 用户管理 | 内置账号系统，JWT 认证，admin / manager / readonly 三角色，上限30人 |
-| 数据存储 | SQLite（`mwlab.db`，随 Railway 容器部署，22MB） |
-| 构建 | Nixpacks + `nixpacks.toml`（强制 Node.js 20，防止 Python 文件导致误判） |
+| 数据存储 | SQLite（`mwlab.db`，22MB，部署于服务器本地） |
+| 构建 | Node.js 20 + 标准部署流程 |
 | 静态资源 | D3.js / TopoJSON / world-atlas / Montserrat 字体全部自托管于 `public/`，无外部 CDN 依赖 |
 
 ---
@@ -639,9 +639,9 @@ PRD 与 ROADMAP 因演进路径不同采用了两套 Phase 编号体系。执行
 
 ### 当前技术栈
 - 前端：Next.js 16 + Tailwind 4 + Vanilla JS（dashboard.html）
-- 数据库：SQLite（`mwlab.db`，22MB，随容器部署）
-- 部署：Railway（Singapore 节点建议）+ Cloudflare 自定义域名（DNS only CNAME）
-- 构建：Nixpacks + nixpacks.toml（Node.js 20）
+- 数据库：SQLite（`mwlab.db`，22MB，部署于服务器本地）
+- 部署：阿里云 ECS（北京节点）+ Cloudflare 自定义域名（DNS only CNAME）
+- 构建：Node.js 20（标准部署）
 
 ---
 
