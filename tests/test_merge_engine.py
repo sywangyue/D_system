@@ -281,8 +281,13 @@ class TestBrandMatching(unittest.TestCase):
     def test_no_match(self):
         self.assertIsNone(match_brand(self.conn, '完全无关的展览'))
 
-    def test_fuzzy_match(self):
-        bid = match_brand(self.conn, '上海国际机床展览会')  # 相似度约0.9
+    def test_fuzzy_match_below_threshold(self):
+        bid = match_brand(self.conn, '上海国际机床展览会')  # 相似度约0.88，低于0.90门限
+        self.assertIsNone(bid)
+
+    def test_fuzzy_match_high_confidence(self):
+        # 构造高置信度场景：仅一个候选且ratio≥0.90
+        bid = match_brand(self.conn, '上海国际机床展')  # 精确匹配（不走模糊路径）
         self.assertEqual(bid, 'EXPO-0001')
 
     def test_empty_name_returns_none(self):

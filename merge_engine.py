@@ -180,7 +180,7 @@ MATCH_THRESHOLD = 0.85
 def match_brand(conn: sqlite3.Connection, cn_name: str) -> Optional[str]:
     """
     在 exhibition_brand 中查找与 cn_name 匹配的品牌。
-    优先精确匹配，次之 SequenceMatcher 模糊匹配（阈值 0.85）。
+    优先精确匹配，次之 SequenceMatcher 模糊匹配（双门限：≥0.90 且与次优差距 ≥0.05）。
     返回 brand_id 或 None。
     """
     if not cn_name:
@@ -193,14 +193,21 @@ def match_brand(conn: sqlite3.Connection, cn_name: str) -> Optional[str]:
     rows = conn.execute(
         "SELECT brand_id, name_cn FROM exhibition_brand"
     ).fetchall()
-    best_ratio, best_id = 0.0, None
+    best_ratio, best_id, second_ratio = 0.0, None, 0.0
     for bid, name in rows:
         ratio = difflib.SequenceMatcher(None, cn_name, name or '').ratio()
         if ratio > best_ratio:
+            second_ratio = best_ratio
             best_ratio, best_id = ratio, bid
-    if best_ratio >= MATCH_THRESHOLD:
-        log.debug("模糊匹配: %r → %s (%.2f)", cn_name, best_id, best_ratio)
+        elif ratio > second_ratio:
+            second_ratio = ratio
+    # 双门限：必须 ≥0.90，且与次优差距 ≥0.05（或仅一个候选）
+    margin = best_ratio - second_ratio if second_ratio > 0 else 1.0
+    if best_ratio >= 0.90 and margin >= 0.05:
+        log.debug("模糊匹配: %r → %s (%.2f, margin=%.2f)", cn_name, best_id, best_ratio, margin)
         return best_id
+    if best_ratio >= MATCH_THRESHOLD:
+        log.warning("[LOW-CONF] %s | %s | %.2f | margin=%.2f", cn_name, best_id, best_ratio, margin)
     return None
 
 
@@ -333,8 +340,10 @@ def upsert_edition(
     norm: dict,
     data_source: str
 ) -> str:
-    year = norm.get('year') or 0
-    edition_id = f"{brand_id}-{year}"
+    raw_year = norm.get('year')
+    year = raw_year or 0
+    suffix = str(raw_year) if raw_year else (norm.get('date_start') or 'undated')
+    edition_id = f"{brand_id}-{suffix}"
 
     # CORE-02: Python-side data_source merge & de-dup
     existing = conn.execute(
