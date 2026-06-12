@@ -62,8 +62,10 @@ def _query_prospects(
     brand_id: str | None = None,
     report_id: int | None = None,
     all_records: bool = False,
+    db_path: str | Path | None = None,
 ) -> list[dict]:
-    conn = sqlite3.connect(str(DB_PATH))
+    target_db = db_path or DB_PATH
+    conn = sqlite3.connect(str(target_db))
     conn.row_factory = sqlite3.Row
 
     if brand_id:
@@ -149,9 +151,10 @@ def export_prospects(
     all_records: bool = False,
     fmt: str = "xlsx",
     out_path: Path | None = None,
+    db_path: str | Path | None = None,
 ) -> Path:
     """查询并导出线索，返回输出文件路径。"""
-    rows = _query_prospects(brand_id=brand_id, report_id=report_id, all_records=all_records)
+    rows = _query_prospects(brand_id=brand_id, report_id=report_id, all_records=all_records, db_path=db_path)
     if not rows:
         raise ValueError("未找到符合条件的客户线索记录")
 
@@ -174,6 +177,7 @@ def main() -> None:
     group.add_argument("--all", action="store_true", dest="all_records", help="导出全部记录")
     parser.add_argument("--format", default=None, choices=["xlsx", "csv"], help="输出格式（默认从 --out 扩展名推断）")
     parser.add_argument("--out", help="输出文件路径（可选，默认 reports/customer/）")
+    parser.add_argument("--db", default=str(DB_PATH), help="数据库路径（默认 mwlab.db）")
     args = parser.parse_args()
 
     fmt = args.format
@@ -196,6 +200,7 @@ def main() -> None:
             all_records=args.all_records,
             fmt=fmt,
             out_path=out_path,
+            db_path=args.db,
         )
         print(f"导出成功 → {result_path}")
     except ValueError as e:
