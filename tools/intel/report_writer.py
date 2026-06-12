@@ -39,7 +39,7 @@ _REPORT_DIRS: dict[str, Path] = {
 
 def _slugify(text: str) -> str:
     """简单 slug：保留字母数字中文，其余换 _，截断到 60 字符。"""
-    text = re.sub(r"[^\w一-鿿]", "_", text)
+    text = re.sub(r"[^\w]", "_", text)
     return text[:60]
 
 

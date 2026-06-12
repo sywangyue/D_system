@@ -110,7 +110,6 @@ CN_CITIES = {
     "商丘": ("Shangqiu", "中国", "China"),
     "濮阳": ("Puyang", "中国", "China"),
     "周口": ("Zhoukou", "中国", "China"),
-    "驻马店": ("Zhumadian", "中国", "China"),
     "漯河": ("Luohe", "中国", "China"),
     "鹤壁": ("Hebi", "中国", "China"),
     "三门峡": ("Sanmenxia", "中国", "China"),
@@ -122,8 +121,6 @@ CN_CITIES = {
     "邢台": ("Xingtai", "中国", "China"),
     "衡水": ("Hengshui", "中国", "China"),
     "承德": ("Chengde", "中国", "China"),
-    "秦皇岛": ("Qinhuangdao", "中国", "China"),
-    "张家口": ("Zhangjiakou", "中国", "China"),
     "包头": ("Baotou", "中国", "China"),
     "鄂尔多斯": ("Ordos", "中国", "China"),
     "赤峰": ("Chifeng", "中国", "China"),
@@ -648,8 +645,3 @@ NON_COUNTRY_TERMS = {
 # ============================================================
 # 推理规则：完全无 geo 信息时的国家推断
 # ============================================================
-# 注意：这些规则只在 name_cn 中完全找不到已知 geo 词时触发
-INFERENCE_RULES = {
-    # 产业和城市绑定的展会（如"广交会" → 广州/中国）
-    # 留空：此类规则需要更细粒度分析，暂不启用
-}
