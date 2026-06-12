@@ -31,7 +31,6 @@
 | 爬虫目录 | `crawlers/` |
 | Schema | `schema/init_db.sql` |
 | 合并引擎 | `merge_engine.py` |
-| 打标 API | `tag_api.py` |
 | Phase 3b 打标工具 | `tools/export_for_tagging.py`, `tools/import_tags.py` |
 
 ## 代码风格

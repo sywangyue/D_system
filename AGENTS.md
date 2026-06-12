@@ -13,7 +13,7 @@
 | Phase | 内容 | 状态 |
 |-------|------|------|
 | Phase 1 | 数据采集器（Jufair + cnexpo 爬虫 + 调度器） | ✅ 已完成 |
-| Phase 2 | Schema + 合并引擎 + 打标 API（6 表 + merge_engine + tag_api） | ✅ 已完成 |
+| Phase 2 | Schema + 合并引擎 + 打标工具（6 表 + merge_engine + export_for_tagging/import_tags） | ✅ 已完成 |
 | Phase 3 | Dashboard 查询 API + JWT 认证 + Docker + OpenAPI + 部署表 | ✅ 已完成 |
 | **Phase 1b** | **全集采集（Jufair 8.4K + cnexpo 全量）** | **⏳ 当前任务** |
 | **Phase 3b** | **打标批量工具（Excel 导出/导入）** | **✅ 已完成** |
@@ -70,7 +70,7 @@ crawl_log (爬取日志)           users (用户表)
 | crawlers/jufair_crawler.py | Jufair 爬虫 |
 | crawlers/cnexpo_crawler.py | cnexpo 爬虫 |
 | merge_engine.py | 双源合并引擎 |
-| tag_api.py | 打标 API（FastAPI） |
+| tools/export_for_tagging.py / import_tags.py | Phase 3b 打标批量工具（Excel 导入导出） |
 | tools/export_for_tagging.py | Phase 3b · Excel 导出待打标行 |
 | tools/import_tags.py | Phase 3b · Excel 写回 + `manual_tag_history` |
 | scheduler.py | 定时调度器 |

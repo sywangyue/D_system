@@ -1,5 +1,8 @@
 # MWLAB-2026 — Roadmap
 
+> Phase 编号对照见 `docs/MWLAB-2026-PRD-v1.1-merged.md → §Phase 编号对照（v1.1 后）`  
+> 执行与状态追踪以本 ROADMAP 编号为准。
+
 **项目**: Exhibition Competitive Intelligence Dashboard  
 **客户**: Messe Düsseldorf China (杜塞展览)  
 **当前目标**: 为 BD 团队构建展会情报后端系统
@@ -21,7 +24,7 @@
 ### Phase 2: Schema + 合并引擎
 **Status:** ✅ Complete  
 **Goal:** 六表 Schema + 双源合并引擎 + 打标 API  
-**Deliverables:** schema/init_db.sql, merge_engine.py, tag_api.py
+**Deliverables:** schema/init_db.sql, merge_engine.py, tools/export_for_tagging.py / import_tags.py（打标工具）
 
 ### Phase 3: Dashboard 查询 API
 **Status:** ✅ Complete  

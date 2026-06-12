@@ -621,6 +621,22 @@ WHERE brand_id = 'EXPO-0001';
 - `init()` 并行 fetch（user prefs + dashboard 数据 Promise.all）
 - API 精简字段（`SELECT b.*` → 18 显式列）+ `Cache-Control: private, max-age=300`
 
+## Phase 编号对照（v1.1 后）
+
+PRD 与 ROADMAP 因演进路径不同采用了两套 Phase 编号体系。执行与状态追踪以 **ROADMAP 编号**为准。
+
+| PRD 编号 | PRD 阶段名 | ROADMAP 编号 | ROADMAP 阶段名 |
+|----------|-----------|-------------|---------------|
+| Phase 1 | 数据采集器 | Phase 1 | 数据采集器 |
+| Phase 1b | 全集采集 | Phase 1b | 全集采集 |
+| Phase 2 | 数据清洗与匹配引擎 | Phase 2 | Schema + 合并引擎 |
+| Phase 3 | API 层与用户系统 | Phase 3 | Dashboard 查询 API |
+| Phase 3b | 补充开发工具 | Phase 3b | 打标批量工具 |
+| Phase 4 | UI/UX 设计与前端实现 | *（ROADMAP 无对应，视作 Phase 3 后续补充）* |
+| Phase 5 | 生产部署与性能优化 | Phase 5 | 情报后端（Intelligence Backend） |
+
+> **说明**: PRD 的 Phase 5（部署与性能优化）已在 v1.1 完成，而 ROADMAP 的 Phase 5（情报后端）是后续新阶段。两套编号在此处产生语义偏移——PRD Phase 5 的实际工作内容在 ROADMAP 中没有独立阶段（部署环节分散在各阶段），ROADMAP 的 Phase 5 是全新的情报功能模块。
+
 ### 当前技术栈
 - 前端：Next.js 16 + Tailwind 4 + Vanilla JS（dashboard.html）
 - 数据库：SQLite（`mwlab.db`，22MB，随容器部署）

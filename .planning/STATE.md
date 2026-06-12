@@ -20,7 +20,7 @@
 
 - 数据库：SQLite (mwlab.db)，5,856 brands，6,129 editions
 - 分类系统：8 大类 L1 + 多个 L2，100% 覆盖
-- API 框架：FastAPI + JWT 认证
+- API 框架：Next.js API Routes + JWT (middleware.ts 验签)
 - 部署：阿里云（北京节点，IP 限制）
 - 后端语言：Python 3.12+
 
