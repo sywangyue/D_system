@@ -277,7 +277,7 @@ def update_db(db_path, brand_id, city_cn, city_en, country_cn, country_en, dry_r
 def main():
     parser = argparse.ArgumentParser(description="从展会名称提取地理信息")
     parser.add_argument("--dry-run", action="store_true")
-    parser.add_argument("--db", default=os.path.join(PROJECT_DIR, "mwlab.db"))
+    parser.add_argument("--db", default=os.path.join(PROJECT_DIR, "data", "mwlab.db"))
     args = parser.parse_args()
     
     city_patterns, country_patterns = build_matchers()

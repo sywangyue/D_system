@@ -23,7 +23,7 @@ import re
 from datetime import datetime
 
 # === 配置 ===
-DB_PATH = "/Volumes/databoard/AI Project/D_dashboard/mwlab.db"
+DB_PATH = "/Volumes/databoard/AI Project/D_dashboard/data/mwlab.db"
 CHECKPOINT_FILE = "/Volumes/databoard/AI Project/D_dashboard/scripts/organizer_checkpoint.txt"
 SESSION_NAME = "jufair_backfill"
 PAGE_DELAY = 3  # 页面加载等待秒数

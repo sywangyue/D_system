@@ -17,7 +17,7 @@ import sqlite3
 import sys
 from pathlib import Path
 
-DEFAULT_DB = Path(__file__).resolve().parent.parent.parent / "mwlab.db"
+DEFAULT_DB = Path(__file__).resolve().parent.parent.parent / "data" / "mwlab.db"
 
 # JSON 字段映射到 DB 列
 _FIELD_MAP = {

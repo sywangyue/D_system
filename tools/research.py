@@ -21,8 +21,8 @@ import sys
 from pathlib import Path
 from typing import Optional
 
-BASE_DIR = Path(__file__).parent
-DB_PATH = BASE_DIR / "mwlab.db"
+BASE_DIR = Path(__file__).parent.parent
+DB_PATH = BASE_DIR / "data" / "mwlab.db"
 
 
 def get_conn() -> sqlite3.Connection:

@@ -19,7 +19,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from schema.db import init_db
 
 PROJECT_DIR   = Path(__file__).parent.parent
-JUFAIR_SRC_DB = PROJECT_DIR / "jufair_2026.db"
+JUFAIR_SRC_DB = PROJECT_DIR / "data" / "jufair_2026.db"
 
 # ── 脏数据注入场景 ─────────────────────────────────────────────────────────────
 DIRTY_VARIANTS = [

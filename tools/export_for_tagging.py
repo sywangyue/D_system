@@ -24,7 +24,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font
 from openpyxl.worksheet.datavalidation import DataValidation
 
-DB_PATH = _REPO_ROOT / "mwlab.db"
+DB_PATH = _REPO_ROOT / "data" / "mwlab.db"
 
 TAGGABLE_FIELDS: dict[str, type] = {
     "competition_relation":  str,

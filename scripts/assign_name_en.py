@@ -11,7 +11,7 @@ import sys
 import os
 from collections import Counter, defaultdict
 
-DB_PATH = "mwlab.db"
+DB_PATH = "data/mwlab.db"
 DRY_RUN_CSV = "exports/name_en_dry_run.csv"
 
 # ═══════════════════════════════════════════════════

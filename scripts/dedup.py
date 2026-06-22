@@ -18,7 +18,7 @@ from collections import Counter, defaultdict
 from datetime import datetime
 from pathlib import Path
 
-DEFAULT_DB = Path(__file__).parent.parent / "mwlab.db"
+DEFAULT_DB = Path(__file__).parent.parent / "data" / "mwlab.db"
 
 
 # ── 标准化函数 ──────────────────────────────────────────────────────────────

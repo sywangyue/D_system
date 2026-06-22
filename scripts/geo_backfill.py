@@ -11,7 +11,7 @@ import sqlite3
 import re
 import os
 
-DB_PATH = "mwlab.db"
+DB_PATH = "data/mwlab.db"
 
 # ═══════════════════════════════════════════════════
 # 中英对照表

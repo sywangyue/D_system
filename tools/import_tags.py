@@ -21,7 +21,7 @@ if str(_REPO_ROOT) not in sys.path:
 
 from openpyxl import load_workbook
 
-DB_PATH = _REPO_ROOT / "mwlab.db"
+DB_PATH = _REPO_ROOT / "data" / "mwlab.db"
 
 TAGGABLE_FIELDS: dict[str, type] = {
     "competition_relation":  str,

@@ -26,10 +26,10 @@ from datetime import datetime
 from pathlib import Path
 from typing import Optional
 
-BASE_DIR = Path(__file__).parent
-DEFAULT_JUFAIR_DB  = BASE_DIR / "jufair_2026.db"
-DEFAULT_CNEXPO_DB  = BASE_DIR / "cnexpo_2026.db"
-DEFAULT_TARGET_DB  = BASE_DIR / "mwlab.db"
+BASE_DIR = Path(__file__).parent.parent
+DEFAULT_JUFAIR_DB  = BASE_DIR / "data" / "jufair_2026.db"
+DEFAULT_CNEXPO_DB  = BASE_DIR / "data" / "cnexpo_2026.db"
+DEFAULT_TARGET_DB  = BASE_DIR / "data" / "mwlab.db"
 
 logging.basicConfig(
     level=logging.INFO,

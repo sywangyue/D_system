@@ -544,7 +544,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="cnexpo.com 中国会展网数据采集器 (Phase 1 · Hermes 任务2)"
     )
-    parser.add_argument("--db", default="cnexpo_2026.db",
+    parser.add_argument("--db", default="data/cnexpo_2026.db",
                         help="SQLite 数据库路径 (默认: cnexpo_2026.db)")
     parser.add_argument("--max-pages", type=int, default=100,
                         help="最大翻页数 (默认: 100)")

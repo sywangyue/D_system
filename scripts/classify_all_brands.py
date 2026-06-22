@@ -22,8 +22,8 @@ from collections import OrderedDict
 from pathlib import Path
 
 BASE_DIR = Path(__file__).parent.parent
-DB_PATH = BASE_DIR / "mwlab.db"
-JUFAIR_DB_PATH = BASE_DIR / "jufair_2026.db"
+DB_PATH = BASE_DIR / "data" / "mwlab.db"
+JUFAIR_DB_PATH = BASE_DIR / "data" / "jufair_2026.db"
 
 logging.basicConfig(
     level=logging.INFO,

@@ -35,7 +35,7 @@ from datetime import datetime
 
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_DIR = os.path.dirname(SCRIPT_DIR)
-DB_PATH = os.path.join(PROJECT_DIR, "mwlab.db")
+DB_PATH = os.path.join(PROJECT_DIR, "data", "mwlab.db")
 CSV_PATH = "/tmp/organizer_backfill.csv"
 
 # opencli session name (create once, reuse)

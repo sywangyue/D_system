@@ -626,7 +626,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="jufair.com 聚展网展会数据采集器 (Phase 1 · Hermes 任务1)"
     )
-    parser.add_argument("--db", default="jufair_2026.db",
+    parser.add_argument("--db", default="data/jufair_2026.db",
                         help="SQLite 数据库路径 (默认: jufair_2026.db)")
     parser.add_argument("--months", type=int, nargs="+", default=None,
                         help="月份列表，如 --months 5 6 7")

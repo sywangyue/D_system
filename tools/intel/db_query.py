@@ -18,7 +18,7 @@ import sqlite3
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-DB_PATH = _REPO_ROOT / "mwlab.db"
+DB_PATH = _REPO_ROOT / "data" / "mwlab.db"
 
 # ── 查询上限（防止输出过大撑满 LLM 上下文）
 MAX_EDITIONS = 10

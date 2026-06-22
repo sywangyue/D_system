@@ -16,7 +16,7 @@ import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 
-DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "mwlab.db")
+DB_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "data", "mwlab.db")
 MAX_WORKERS = 8
 REQUEST_TIMEOUT = 12
 DELAY_PER_WORKER = 0.3  # seconds between requests per thread

@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
-DB_PATH = BASE_DIR / "mwlab.db"
+DB_PATH = BASE_DIR / "data" / "mwlab.db"
 
 logging.basicConfig(
     level=logging.INFO,

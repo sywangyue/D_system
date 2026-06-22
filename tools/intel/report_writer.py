@@ -27,7 +27,7 @@ from datetime import datetime
 from pathlib import Path
 
 _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
-DB_PATH = _REPO_ROOT / "mwlab.db"
+DB_PATH = _REPO_ROOT / "data" / "mwlab.db"
 
 _REPORT_DIRS: dict[str, Path] = {
     "industry_research": _REPO_ROOT / "reports" / "industry",

@@ -12,7 +12,7 @@ from openpyxl import Workbook
 from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 from openpyxl.utils import get_column_letter
 
-DB_PATH = "/Volumes/databoard/AI Project/D_dashboard/mwlab.db"
+DB_PATH = "/Volumes/databoard/AI Project/D_dashboard/data/mwlab.db"
 OUT_DIR = "/Volumes/databoard/AI Project/D_dashboard"
 
 # 排除的非大陆城市/地区

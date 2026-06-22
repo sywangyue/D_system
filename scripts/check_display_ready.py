@@ -25,7 +25,7 @@ import os
 from datetime import datetime
 
 PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-DB_PATH = os.path.join(PROJECT_ROOT, "mwlab.db")
+DB_PATH = os.path.join(PROJECT_ROOT, "data", "mwlab.db")
 
 CONDITIONS = """
     (name_cn IS NOT NULL AND name_cn != '')
