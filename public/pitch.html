@@ -1,0 +1,1187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MWLAB 2026 — 展会竞争情报系统</title>
+<style>
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 300 800;
+  font-display: swap;
+  src: url('/fonts/montserrat-latin.woff2') format('woff2');
+}
+:root {
+  --accent:  #FE5C00;
+  --black:   #000000;
+  --text:    #1D1D1F;
+  --text2:   #6E6E73;
+  --text3:   #AEAEB2;
+  --border:  #D1D1D6;
+  --surface: #F5F5F7;
+  --card:    #FFFFFF;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-family:'Montserrat',-apple-system,system-ui,sans-serif;-webkit-font-smoothing:antialiased;scroll-behavior:smooth;scroll-padding-top:64px}
+body{background:var(--surface);color:var(--text)}
+
+/* ── Navbar ── */
+.navbar{position:fixed;top:0;left:0;right:0;z-index:999;
+  background:#2D2D2F;border-bottom:1px solid rgba(255,255,255,0.08);height:56px;
+  display:flex;align-items:center;padding:0 40px}
+.nav-inner{width:100%;display:flex;align-items:center;gap:0}
+.nav-logo{font-size:14px;font-weight:700;color:#fff;letter-spacing:-0.01em;
+  display:flex;align-items:center;gap:7px;white-space:nowrap;margin-right:40px;flex-shrink:0}
+.nav-logo-dot{width:7px;height:7px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.nav-cta{margin-left:auto;margin-right:14px;padding:7px 18px;
+  background:var(--accent);color:#fff;border-radius:6px;
+  font-size:13px;font-weight:600;text-decoration:none;
+  transition:background 150ms;white-space:nowrap;flex-shrink:0}
+.nav-cta:hover{background:#E55300}
+/* Lang in nav */
+.nav-lang{display:flex;gap:3px;margin-left:auto;flex-shrink:0}
+.lang-btn{padding:4px 10px;border:none;background:none;color:rgba(255,255,255,0.85);
+  font-family:inherit;font-size:14px;font-weight:600;letter-spacing:0.08em;
+  cursor:pointer;border-radius:5px;transition:all 150ms}
+.lang-btn.active{background:var(--accent);color:#fff}
+.lang-btn:not(.active):hover{color:#fff}
+
+/* ── Hero ── */
+.hero{position:relative;min-height:70vh;background:#000;display:flex;
+  flex-direction:column;justify-content:flex-end;padding:64px;padding-top:96px;overflow:hidden}
+#hero-canvas{position:absolute;inset:0;width:100%;height:100%}
+.hero-content{position:relative;z-index:1}
+.hero-label{font-size:clamp(14px,1.8vw,18px);font-weight:600;letter-spacing:0.15em;
+  text-transform:uppercase;color:#fff;margin-bottom:20px}
+.hero-title{font-size:clamp(42px,8vw,88px);font-weight:800;color:#fff;
+  line-height:1.0;letter-spacing:-0.03em;margin-bottom:16px}
+.hero-title .accent{color:var(--accent)}
+.hero-sub{font-size:clamp(14px,1.8vw,18px);color:#fff;
+  font-weight:400;margin-bottom:52px;max-width:480px}
+.hero-stats{display:flex;gap:48px;margin-bottom:52px;flex-wrap:wrap}
+.stat-num{font-size:clamp(30px,4.5vw,46px);font-weight:700;color:#fff;
+  letter-spacing:-0.02em;line-height:1}
+.stat-label{font-size:clamp(14px,1.8vw,18px);color:#fff;font-weight:500;
+  margin-top:4px}
+.hero-cta{display:inline-flex;align-items:center;gap:9px;padding:14px 28px;
+  background:var(--accent);color:#fff;border-radius:8px;font-family:inherit;
+  font-size:14px;font-weight:600;text-decoration:none;transition:background 150ms}
+.hero-cta:hover{background:#E55300}
+
+/* ── Section ── */
+.section{padding:80px 64px}
+.section-eyebrow{font-size:14px;font-weight:700;letter-spacing:0.35em;
+  text-transform:uppercase;color:var(--accent);margin-bottom:10px}
+.section-title{font-size:clamp(26px,3.5vw,42px);font-weight:700;
+  letter-spacing:-0.02em;margin-bottom:52px}
+
+/* ── What is MWLAB ── */
+.what-section{background:var(--card);padding:100px 64px}
+.what-inner{max-width:1160px;margin:0 auto;
+  display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.what-h2{font-size:clamp(26px,3vw,40px);font-weight:800;
+  letter-spacing:-0.025em;line-height:1.15;margin:12px 0 16px;color:var(--text)}
+.what-desc{font-size:16px;color:var(--text2);line-height:1.75;
+  margin-bottom:28px;max-width:440px}
+.what-list{list-style:none;display:flex;flex-direction:column;gap:12px}
+.what-list li{display:flex;align-items:center;gap:10px;
+  font-size:14px;font-weight:600;color:var(--text)}
+.what-dot{display:inline-block;width:6px;height:6px;border-radius:50%;
+  background:var(--accent);flex-shrink:0}
+/* Mock device frames */
+.what-visual{position:relative;height:380px}
+.mock-laptop{position:absolute;left:0;top:0;width:76%;
+  background:#1A1A1C;border-radius:10px 10px 0 0;
+  box-shadow:0 12px 40px rgba(0,0,0,0.18);overflow:hidden}
+.mock-screen{padding:8px}
+.mock-topbar{height:24px;background:#2C2C2E;border-radius:4px 4px 0 0;
+  display:flex;align-items:center;padding:0 10px;gap:5px;margin-bottom:4px}
+.mock-dot{display:inline-block;width:8px;height:8px;border-radius:50%}
+.mock-dot.r{background:#FF5F57}.mock-dot.y{background:#FEBC2E}.mock-dot.g{background:#28C840}
+.mock-body{display:flex;height:180px;gap:4px}
+.mock-side{width:18%;background:#111113;border-radius:3px;padding:10px 6px;
+  display:flex;flex-direction:column;gap:6px}
+.mock-side-item{height:8px;border-radius:3px;background:rgba(255,255,255,0.08)}
+.mock-side-item.active{background:rgba(254,92,0,0.4)}
+.mock-content{flex:1;background:#1C1C1E;border-radius:3px;padding:12px;
+  display:flex;flex-direction:column;gap:8px}
+.mock-stat-row{display:flex;gap:8px}
+.mock-stat{flex:1;background:rgba(255,255,255,0.04);border-radius:4px;
+  padding:6px 8px;display:flex;flex-direction:column;gap:4px}
+.mock-stat-n{height:14px;width:60%;background:rgba(254,92,0,0.35);border-radius:2px}
+.mock-stat-l{height:8px;width:80%;background:rgba(255,255,255,0.08);border-radius:2px}
+.mock-chart{height:60px;background:linear-gradient(180deg,
+  rgba(254,92,0,0.15) 0%,rgba(254,92,0,0.03) 100%);
+  border-radius:4px;border-bottom:1px solid rgba(254,92,0,0.3)}
+.mock-table{display:flex;flex-direction:column;gap:3px}
+.mock-tr{height:8px;border-radius:2px;background:rgba(255,255,255,0.06)}
+.mock-tr.head{background:rgba(255,255,255,0.12)}
+.mock-chin{height:10px;background:#2C2C2E;border-radius:0 0 6px 6px}
+.mock-phone{position:absolute;right:0;bottom:0;width:22%;
+  background:#1A1A1C;border-radius:18px;padding:12px 8px;
+  box-shadow:0 16px 48px rgba(0,0,0,0.22);
+  display:flex;flex-direction:column;gap:6px}
+.mock-ph-notch{height:8px;width:36%;background:#000;
+  border-radius:4px;margin:0 auto 6px}
+.mock-ph-row{border-radius:3px;height:10px}
+.mock-ph-row.a{background:rgba(255,255,255,0.08)}
+.mock-ph-row.b{width:55%;background:rgba(254,92,0,0.25)}
+
+/* ── Capabilities — alternating full-width rows ── */
+.cap-section{padding:96px 0}
+.cap-section>.section-eyebrow,
+.cap-section>.section-title{padding:0 64px}
+.cap-row{display:grid;grid-template-columns:1fr 1fr;min-height:440px}
+.cap-row.reverse .cap-visual{order:-1}
+.cap-text{padding:72px 64px;display:flex;flex-direction:column;
+  justify-content:center;gap:18px;background:var(--card)}
+.cap-visual{background:#000;position:relative;overflow:hidden}
+.cap-visual canvas{position:absolute;inset:0;width:100%!important;height:100%!important}
+.cap-num{font-size:12px;font-weight:700;letter-spacing:0.3em;
+  color:var(--accent);text-transform:uppercase}
+.cap-title{font-size:clamp(20px,2.2vw,30px);font-weight:800;
+  letter-spacing:-0.02em;line-height:1.2;color:var(--text)}
+.cap-desc{font-size:15px;color:var(--text2);line-height:1.7;max-width:420px}
+.cap-outputs{list-style:none;display:flex;flex-direction:column;gap:8px}
+.cap-outputs li{font-size:14px;color:var(--text);font-weight:500;
+  padding-left:14px;position:relative}
+.cap-outputs li::before{content:'';position:absolute;left:0;top:7px;
+  width:5px;height:5px;border-radius:50%;background:var(--accent)}
+.cap-dl{display:inline-flex;align-items:center;gap:7px;
+  font-size:13px;font-weight:600;color:var(--accent);text-decoration:none;
+  margin-top:4px;padding:8px 0;
+  border-bottom:1px solid rgba(254,92,0,0.25);
+  transition:border-color 150ms;width:fit-content}
+.cap-dl:hover{border-color:var(--accent)}
+
+/* ── Horizontal timeline section ── */
+.hx-section{background:var(--card);padding:72px 64px}
+.hx-scroll{overflow-x:auto;padding-bottom:12px;margin-top:48px}
+.hx-track{position:relative;min-width:860px;padding:48px 0 36px}
+.hx-line-wrap{position:absolute;top:48px;left:0;right:0;height:2px}
+.hx-line-bg{position:absolute;inset:0;background:var(--border)}
+.hx-line-progress{position:absolute;top:0;left:0;height:100%;
+  width:57.1%;background:var(--accent)}
+.hx-nodes{display:flex;justify-content:space-between;position:relative;z-index:1}
+.hx-node{display:flex;flex-direction:column;align-items:center;
+  gap:0;flex:1;min-width:0}
+.hx-dot-wrap{margin-bottom:12px}
+.hx-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--border);
+  background:#fff;margin:0 auto;transition:all 200ms}
+.hx-node.done .hx-dot{background:var(--accent);border-color:var(--accent)}
+.hx-node.now .hx-dot{background:var(--accent);border-color:var(--accent);
+  width:18px;height:18px;box-shadow:0 0 0 5px rgba(254,92,0,0.18)}
+.hx-node.future .hx-dot{background:#fff;border-color:var(--border)}
+.hx-date{font-size:14px;font-weight:700;color:var(--text);
+  text-align:center;margin-bottom:4px;white-space:nowrap}
+.hx-node.done .hx-date,.hx-node.now .hx-date{color:var(--accent)}
+.hx-label{font-size:14px;color:var(--text);text-align:center;
+  line-height:1.45;padding:0 4px;max-width:90px}
+.hx-node.now .hx-label{color:var(--text);font-weight:600}
+/* Connector label on "now" node */
+.hx-now-badge{display:inline-block;font-size:14px;font-weight:700;
+  letter-spacing:0.15em;text-transform:uppercase;color:#fff;
+  background:var(--accent);border-radius:3px;padding:2px 5px;
+  margin-bottom:6px}
+
+/* ── Timeline detail + subtitle ── */
+.hx-subtitle{font-size:15px;color:var(--text2);margin-bottom:48px;margin-top:-36px}
+.hx-detail{font-size:12px;color:var(--text2);line-height:1.5;
+  margin-top:6px;max-width:110px;text-align:center}
+.hx-node.now .hx-detail{color:var(--accent)}
+.hx-node.done .hx-detail{color:var(--text2)}
+.hx-node.future .hx-detail{color:var(--text3)}
+
+/* ── Footer ── */
+.site-footer{background:#1D1D1F;padding:52px 64px;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  flex-wrap:wrap;gap:32px}
+.footer-left{display:flex;flex-direction:column;gap:8px}
+.footer-copy{font-size:14px;color:rgba(255,255,255,0.65);line-height:1.7}
+.footer-cta-btn{display:inline-flex;align-items:center;gap:8px;
+  padding:10px 22px;border-radius:8px;background:var(--accent);
+  color:#fff;font-size:14px;font-weight:700;text-decoration:none;
+  letter-spacing:0.05em;margin-top:16px;transition:opacity 150ms}
+.footer-cta-btn:hover{opacity:0.88}
+.footer-logos{display:flex;gap:20px;align-items:flex-end}
+.logo-block{border:1px solid rgba(255,255,255,0.12);border-radius:10px;
+  padding:18px 24px;min-width:140px;display:flex;flex-direction:column;
+  align-items:center;gap:8px;background:rgba(255,255,255,0.03)}
+.logo-placeholder{width:64px;height:32px;border-radius:4px;
+  background:rgba(255,255,255,0.08);border:1px dashed rgba(255,255,255,0.2)}
+.logo-name{font-size:14px;font-weight:700;color:rgba(255,255,255,0.7);
+  letter-spacing:0.12em;text-transform:uppercase;text-align:center}
+
+/* ── Responsive ── */
+@media(max-width:1024px){
+  .hero{padding:48px 40px;padding-top:96px}
+  .section{padding:64px 40px}
+  .what-section{padding:72px 40px}
+  .what-inner{grid-template-columns:1fr;gap:48px}
+  .what-visual{height:320px}
+  .mock-laptop{width:68%}
+  .mock-phone{width:26%}
+  .cap-section>.section-eyebrow,
+  .cap-section>.section-title{padding:0 40px}
+  .cap-text{padding:48px 40px}
+  .hx-section{padding:64px 40px}
+}
+@media(max-width:768px){
+  .navbar{padding:0 20px}
+  .nav-cta{display:none}
+  .hero{padding:40px 24px;padding-top:80px;min-height:60vh}
+  .hero-stats{gap:28px}
+  .what-section{padding:56px 24px}
+  .what-inner{grid-template-columns:1fr;gap:40px}
+  .what-visual{height:260px}
+  .mock-laptop{width:70%}
+  .mock-phone{width:24%}
+  .cap-section{padding:56px 0}
+  .cap-section>.section-eyebrow,
+  .cap-section>.section-title{padding:0 24px}
+  .cap-row{grid-template-columns:1fr;min-height:auto}
+  .cap-row.reverse .cap-visual{order:0}
+  .cap-text{padding:40px 24px}
+  .cap-visual{min-height:240px}
+  .cap-desc{max-width:100%}
+  .hx-section{padding:56px 24px}
+  .hx-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .hx-track{min-width:600px}
+  .site-footer{flex-direction:column;gap:24px;padding:40px 24px}
+  .section{padding:56px 24px}
+}
+@media(max-width:480px){
+  .hero-stats{flex-direction:column;gap:16px}
+  .what-visual{height:220px}
+  .mock-laptop{width:72%}
+  .mock-phone{width:22%}
+  .cap-visual{min-height:200px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════ -->
+<nav class="navbar" id="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo">
+      <div class="nav-logo-dot"></div>
+      MWLAB · 2026
+    </div>
+    <a href="/login" class="nav-cta" data-k="cta">进入系统</a>
+    <div class="nav-lang">
+      <button class="lang-btn active" data-lang="zh">中文</button>
+      <button class="lang-btn" data-lang="en">EN</button>
+      <button class="lang-btn" data-lang="de">DE</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HERO
+══════════════════════════════════════ -->
+<section class="hero">
+  <canvas id="hero-canvas"></canvas>
+  <div class="hero-content">
+    <div class="hero-label"><span data-k="hero-company">MWLAB · 2026 · 杜塞尔多夫展览（上海）有限公司</span></div>
+    <h1 class="hero-title">
+      <span data-k="h1a">展会竞争</span><br>
+      <span class="accent" data-k="h1b">情报系统</span>
+    </h1>
+    <p class="hero-sub" data-k="hsub">将市场数据，转化为可执行的商业决策</p>
+    <div class="hero-stats">
+      <div><div class="stat-num">5,941</div><div class="stat-label" data-k="s1">展会品牌</div></div>
+      <div><div class="stat-num">6,129</div><div class="stat-label" data-k="s2">历史届次</div></div>
+      <div><div class="stat-num">115</div><div class="stat-label" data-k="s3">细分子类别</div></div>
+      <div><div class="stat-num">3</div><div class="stat-label" data-k="s4">数据来源</div></div>
+    </div>
+    <a href="/login" class="hero-cta">
+      <span data-k="cta">进入系统</span>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     WHAT IS MWLAB
+══════════════════════════════════════ -->
+<section class="what-section" id="what">
+  <div class="what-inner">
+    <div class="what-text">
+      <div class="section-eyebrow" data-k="what-eye">MWLAB 是什么</div>
+      <h2 class="what-h2" data-k="what-h2">为杜塞 BD 团队打造的<br>展会情报系统</h2>
+      <p class="what-desc" data-k="what-desc">将公开市场数据转化为可执行的销售决策。覆盖行业调研、品牌尽调、客户挖掘全周期。</p>
+      <ul class="what-list">
+        <li><span class="what-dot"></span><span data-k="what-b1">5,800+ 展会品牌实时数据库</span></li>
+        <li><span class="what-dot"></span><span data-k="what-b2">4 层情报能力覆盖完整销售周期</span></li>
+        <li><span class="what-dot"></span><span data-k="what-b3">数据来源可追溯，禁止 AI 虚构</span></li>
+      </ul>
+    </div>
+    <div class="what-visual">
+      <div class="mock-laptop">
+        <div class="mock-screen">
+          <div class="mock-topbar">
+            <span class="mock-dot r"></span>
+            <span class="mock-dot y"></span>
+            <span class="mock-dot g"></span>
+          </div>
+          <div class="mock-body">
+            <div class="mock-side">
+              <div class="mock-side-item"></div>
+              <div class="mock-side-item active"></div>
+              <div class="mock-side-item"></div>
+              <div class="mock-side-item"></div>
+            </div>
+            <div class="mock-content">
+              <div class="mock-stat-row">
+                <div class="mock-stat"><div class="mock-stat-n"></div><div class="mock-stat-l"></div></div>
+                <div class="mock-stat"><div class="mock-stat-n"></div><div class="mock-stat-l"></div></div>
+                <div class="mock-stat"><div class="mock-stat-n"></div><div class="mock-stat-l"></div></div>
+              </div>
+              <div class="mock-chart"></div>
+              <div class="mock-table">
+                <div class="mock-tr head"></div>
+                <div class="mock-tr"></div>
+                <div class="mock-tr"></div>
+                <div class="mock-tr"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="mock-chin"></div>
+      </div>
+      <div class="mock-phone">
+        <div class="mock-ph-notch"></div>
+        <div class="mock-ph-row a"></div>
+        <div class="mock-ph-row b"></div>
+        <div class="mock-ph-row a"></div>
+        <div class="mock-ph-row b"></div>
+        <div class="mock-ph-row a"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     CAPABILITIES
+══════════════════════════════════════ -->
+<section class="cap-section">
+  <div class="section-eyebrow" data-k="cap-eye">4项核心能力</div>
+  <h2 class="section-title" data-k="cap-h2">系统能做什么</h2>
+
+  <!-- 01 text-left / visual-right -->
+  <div class="cap-row" id="cap1">
+    <div class="cap-text">
+      <div class="cap-num">01</div>
+      <h3 class="cap-title" data-k="c1t">行业调研</h3>
+      <p class="cap-desc" data-k="c1d">开拓新市场前，30分钟完成全行业展会版图分析</p>
+      <ul class="cap-outputs">
+        <li data-k="c1o1">全行业展会版图</li>
+        <li data-k="c1o2">竞争对手盘点</li>
+        <li data-k="c1o3">市场规模估算</li>
+        <li data-k="c1o4">并购目标清单</li>
+      </ul>
+      <a href="/docs/capability-01.pdf" class="cap-dl">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span data-k="c1dl">下载示例报告</span>
+      </a>
+    </div>
+    <div class="cap-visual"><canvas id="cv1"></canvas></div>
+  </div>
+
+  <!-- 02 visual-left / text-right -->
+  <div class="cap-row reverse" id="cap2">
+    <div class="cap-visual"><canvas id="cv2"></canvas></div>
+    <div class="cap-text">
+      <div class="cap-num">02</div>
+      <h3 class="cap-title" data-k="c2t">品牌展会调研</h3>
+      <p class="cap-desc" data-k="c2d">谈判前，生成完整标的尽调报告与BD策略建议</p>
+      <ul class="cap-outputs">
+        <li data-k="c2o1">近5年规模趋势</li>
+        <li data-k="c2o2">竞争关系网络</li>
+        <li data-k="c2o3">主办方企业背景</li>
+        <li data-k="c2o4">BD谈判策略</li>
+      </ul>
+      <a href="/docs/capability-02.pdf" class="cap-dl">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span data-k="c2dl">下载示例报告</span>
+      </a>
+    </div>
+  </div>
+
+  <!-- 03 text-left / visual-right -->
+  <div class="cap-row" id="cap3">
+    <div class="cap-text">
+      <div class="cap-num">03</div>
+      <h3 class="cap-title" data-k="c3t">批量客户挖掘</h3>
+      <p class="cap-desc" data-k="c3d">输入竞品展会名称，自动生成可直接销售的企业名单</p>
+      <ul class="cap-outputs">
+        <li data-k="c3o1">公司名称 · 法定代表人</li>
+        <li data-k="c3o2">成立日期 · 经营状态</li>
+        <li data-k="c3o3">注册地址</li>
+        <li data-k="c3o4">导出Excel，直接销售开发</li>
+      </ul>
+      <a href="/docs/capability-03.pdf" class="cap-dl">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span data-k="c3dl">下载示例名单</span>
+      </a>
+    </div>
+    <div class="cap-visual"><canvas id="cv3"></canvas></div>
+  </div>
+
+  <!-- 04 visual-left / text-right -->
+  <div class="cap-row reverse" id="cap4">
+    <div class="cap-visual"><canvas id="cv4"></canvas></div>
+    <div class="cap-text">
+      <div class="cap-num">04</div>
+      <h3 class="cap-title" data-k="c4t">单一客户深度挖掘</h3>
+      <p class="cap-desc" data-k="c4d">拜访前，生成完整客户情报包，精准切入，避免无效拜访</p>
+      <ul class="cap-outputs">
+        <li data-k="c4o1">工商信息 · 参展历史</li>
+        <li data-k="c4o2">切入点分析</li>
+        <li data-k="c4o3">风险预警标注</li>
+        <li data-k="c4o4">BD行动建议</li>
+      </ul>
+      <a href="/docs/capability-04.pdf" class="cap-dl">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 1v7M3 6l3 3 3-3M1 10h10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <span data-k="c4dl">下载示例报告</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════════════
+     HORIZONTAL TIMELINE
+══════════════════════════════════════ -->
+<section class="section hx-section" id="roadmap">
+  <div class="section-eyebrow" data-k="hx-eye">系统成长路线图</div>
+  <h2 class="section-title" data-k="hx-h2">从零到全员</h2>
+  <p class="hx-subtitle" data-k="hx-sub">一条时间线，贯穿 MWLAB 的完整成长历程</p>
+  <div class="hx-scroll">
+    <div class="hx-track">
+      <div class="hx-line-wrap">
+        <div class="hx-line-bg"></div>
+        <div class="hx-line-progress"></div>
+      </div>
+      <div class="hx-nodes">
+        <div class="hx-node done">
+          <div class="hx-dot-wrap"><div class="hx-dot"></div></div>
+          <div class="hx-date">2024 · 05</div>
+          <div class="hx-label" data-k="hx-l1">Max Onboard</div>
+          <div class="hx-detail" data-k="hx-d1">BD数据化进程正式启动</div>
+        </div>
+        <div class="hx-node done">
+          <div class="hx-dot-wrap"><div class="hx-dot"></div></div>
+          <div class="hx-date">2024 · 07</div>
+          <div class="hx-label" data-k="hx-l2">BD数据化项目启动 OFA</div>
+          <div class="hx-detail" data-k="hx-d2">首个BD项目启动</div>
+        </div>
+        <div class="hx-node done">
+          <div class="hx-dot-wrap"><div class="hx-dot"></div></div>
+          <div class="hx-date">2025 · 07</div>
+          <div class="hx-label" data-k="hx-l3">数据雏形 · 首个数据闭环</div>
+          <div class="hx-detail" data-k="hx-d3">基于OFA的数据闭环初步建立</div>
+        </div>
+        <div class="hx-node now">
+          <div class="hx-dot-wrap">
+            <div class="hx-now-badge" data-k="hx-now">当前</div>
+            <div class="hx-dot"></div>
+          </div>
+          <div class="hx-date">2026 · 07</div>
+          <div class="hx-label" data-k="hx-l4">SaaS · 看板 · SQL数据库</div>
+          <div class="hx-detail" data-k="hx-d4">自开发SaaS全面上线</div>
+        </div>
+        <div class="hx-node future">
+          <div class="hx-dot-wrap"><div class="hx-dot"></div></div>
+          <div class="hx-date">2027</div>
+          <div class="hx-label" data-k="hx-l5">0门槛 · 全员可用</div>
+          <div class="hx-detail" data-k="hx-d5">一封邮件触发完整数据报告</div>
+        </div>
+        <div class="hx-node future">
+          <div class="hx-dot-wrap"><div class="hx-dot"></div></div>
+          <div class="hx-date">2028</div>
+          <div class="hx-label" data-k="hx-l6">桌面BD工具</div>
+          <div class="hx-detail" data-k="hx-d6">彻底离线化、桌面化</div>
+        </div>
+        <div class="hx-node future">
+          <div class="hx-dot-wrap"><div class="hx-dot"></div></div>
+          <div class="hx-date">2029</div>
+          <div class="hx-label" data-k="hx-l7">全员数字化</div>
+          <div class="hx-detail" data-k="hx-d7">无纸化BD工作流，数据驱动所有决策</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════
+     FOOTER
+══════════════════════════════════════ -->
+<footer class="site-footer">
+  <div class="footer-left">
+    <div class="footer-copy" data-k="footer-copy">
+      © 2026 杜塞尔多夫展览（上海）有限公司<br>
+      MWLAB · 内部工具 · 不对外发布<br>
+      Internal use only · Nur für den internen Gebrauch
+    </div>
+    <a href="/login" class="footer-cta-btn">
+      <span data-k="cta">进入系统</span>
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
+  <div class="footer-logos">
+    <div class="logo-block">
+      <div class="logo-placeholder"></div>
+      <div class="logo-name" data-k="logo-mdc">MDC<br>杜塞尔多夫展览中国</div>
+    </div>
+    <div class="logo-block">
+      <div class="logo-placeholder"></div>
+      <div class="logo-name" data-k="logo-mds">MDS<br>杜塞尔多夫展览上海</div>
+    </div>
+  </div>
+</footer>
+
+<!-- ══════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════ -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js"></script>
+<script>
+/* ─────────────────────────────────────
+   I18N
+───────────────────────────────────── */
+const LANG = {
+  zh: {
+    h1a:'展会竞争', h1b:'情报系统',
+    hsub:'将市场数据，转化为可执行的商业决策',
+    s1:'展会品牌', s2:'历史届次', s3:'细分子类别', s4:'数据来源',
+    cta:'进入系统',
+    'hero-company':'MWLAB · 2026 · 杜塞尔多夫展览（上海）有限公司',
+    'footer-copy':'© 2026 杜塞尔多夫展览（上海）有限公司<br>MWLAB · 内部工具 · 不对外发布<br>Internal use only · Nur für den internen Gebrauch',
+    'logo-mdc':'MDC<br>杜塞尔多夫展览中国',
+    'logo-mds':'MDS<br>杜塞尔多夫展览上海',
+    'cap-eye':'4项核心能力', 'cap-h2':'系统能做什么',
+    c1t:'行业调研', c1d:'开拓新市场前，30分钟完成全行业展会版图分析',
+    c1o1:'全行业展会版图', c1o2:'竞争对手盘点', c1o3:'市场规模估算', c1o4:'并购目标清单',
+    c2t:'品牌展会调研', c2d:'谈判前，生成完整标的尽调报告与BD策略建议',
+    c2o1:'近5年规模趋势', c2o2:'竞争关系网络', c2o3:'主办方企业背景', c2o4:'BD谈判策略',
+    c3t:'批量客户挖掘', c3d:'输入竞品展会名称，自动生成可直接销售的企业名单',
+    c3o1:'公司名称 · 法定代表人', c3o2:'成立日期 · 经营状态', c3o3:'注册地址', c3o4:'导出Excel，直接销售开发',
+    c4t:'单一客户深度挖掘', c4d:'拜访前，生成完整客户情报包，精准切入，避免无效拜访',
+    c4o1:'工商信息 · 参展历史', c4o2:'切入点分析', c4o3:'风险预警标注', c4o4:'BD行动建议',
+    'hx-eye':'系统成长路线图','hx-h2':'从零到全员','hx-now':'当前',
+    'hx-sub':'一条时间线，贯穿 MWLAB 的完整成长历程',
+    'hx-l1':'Max Onboard','hx-l2':'OFA项目启动','hx-l3':'数据雏形建立',
+    'hx-l4':'SaaS上线','hx-l5':'0门槛全员可用','hx-l6':'桌面BD工具','hx-l7':'全员数字化',
+    'hx-d1':'BD数据化进程正式启动','hx-d2':'首个BD项目启动','hx-d3':'基于OFA的数据闭环建立',
+    'hx-d4':'自开发SaaS全面上线','hx-d5':'一封邮件触发完整数据报告',
+    'hx-d6':'彻底离线化、桌面化','hx-d7':'无纸化BD工作流，数据驱动所有决策',
+    c1dl:'下载示例报告', c2dl:'下载示例报告', c3dl:'下载示例名单', c4dl:'下载示例报告',
+    'what-eye':'MWLAB 是什么',
+    'what-h2':'为杜塞 BD 团队打造的<br>展会情报系统',
+    'what-desc':'将公开市场数据转化为可执行的销售决策。覆盖行业调研、品牌尽调、客户挖掘全周期。',
+    'what-b1':'5,800+ 展会品牌实时数据库',
+    'what-b2':'4 层情报能力覆盖完整销售周期',
+    'what-b3':'数据来源可追溯，禁止 AI 虚构',
+  },
+  en: {
+    h1a:'Exhibition', h1b:'Intelligence',
+    hsub:'Turning market data into actionable business decisions',
+    s1:'Exhibition Brands', s2:'Historical Editions', s3:'Sub-categories', s4:'Data Sources',
+    cta:'Enter System',
+    'hero-company':'MWLAB · 2026 · Messe Duesseldorf Shanghai',
+    'footer-copy':'© 2026 Messe Duesseldorf Shanghai<br>MWLAB · Internal Tool · Not for external distribution<br>Internal use only · Nur für den internen Gebrauch',
+    'logo-mdc':'MDC<br>Messe Duesseldorf China',
+    'logo-mds':'MDS<br>Messe Duesseldorf Shanghai',
+    'cap-eye':'4 Core Capabilities', 'cap-h2':'What the System Does',
+    c1t:'Industry Research', c1d:'Full exhibition landscape for any industry in 30 minutes',
+    c1o1:'Exhibition landscape', c1o2:'Competitor mapping', c1o3:'Market size estimation', c1o4:'M&A target list',
+    c2t:'Brand Research', c2d:'Complete due diligence report and BD strategy before any negotiation',
+    c2o1:'5-year scale trends', c2o2:'Competition network', c2o3:'Organizer background', c2o4:'BD negotiation strategy',
+    c3t:'Batch Prospecting', c3d:'Input a competitor exhibition — auto-generate a ready-to-use sales lead list',
+    c3o1:'Company name · Legal representative', c3o2:'Founded date · Status', c3o3:'Registered address', c3o4:'Export to Excel for direct outreach',
+    c4t:'Deep Client Research', c4d:'Complete intelligence package before every meeting — no more wasted visits',
+    c4o1:'Business info · Exhibition history', c4o2:'Entry point analysis', c4o3:'Risk flags', c4o4:'BD action plan',
+    'hx-eye':'System Roadmap','hx-h2':'Zero to Company-Wide','hx-now':'Now',
+    'hx-sub':'One timeline, the full growth journey of MWLAB',
+    'hx-l1':'Max Onboard','hx-l2':'OFA Project Start','hx-l3':'Data Foundation',
+    'hx-l4':'SaaS Launch','hx-l5':'Zero-Barrier Access','hx-l6':'Desktop BD Tool','hx-l7':'Full Digitalization',
+    'hx-d1':'BD digitalization officially started','hx-d2':'First BD project launched','hx-d3':'First closed data loop built',
+    'hx-d4':'In-house SaaS fully live','hx-d5':'One email triggers full data report',
+    'hx-d6':'Fully offline & desktop-native','hx-d7':'Paperless BD workflow, data-driven decisions',
+    c1dl:'Download sample report', c2dl:'Download sample report', c3dl:'Download sample list', c4dl:'Download sample report',
+    'what-eye':'What is MWLAB',
+    'what-h2':'Exhibition Intelligence<br>Built for Messe BD',
+    'what-desc':'Turning public market data into actionable sales decisions. Covers industry research, brand due diligence, and prospect prospecting.',
+    'what-b1':'5,800+ exhibition brands in real-time database',
+    'what-b2':'4 intelligence capabilities covering the full sales cycle',
+    'what-b3':'All data is source-traceable — no AI hallucination',
+  },
+  de: {
+    h1a:'Messe-', h1b:'Informationsplattform',
+    hsub:'Marktdaten in umsetzbare Geschäftsentscheidungen verwandeln',
+    s1:'Messebrands', s2:'Historische Auflagen', s3:'Unterkategorien', s4:'Datenquellen',
+    cta:'System öffnen',
+    'hero-company':'MWLAB · 2026 · Messe Duesseldorf Shanghai',
+    'footer-copy':'© 2026 Messe Duesseldorf Shanghai<br>MWLAB · Internes Tool · Nicht für externe Verteilung<br>Internal use only · Nur für den internen Gebrauch',
+    'logo-mdc':'MDC<br>Messe Duesseldorf China',
+    'logo-mds':'MDS<br>Messe Duesseldorf Shanghai',
+    'cap-eye':'4 Kernfunktionen', 'cap-h2':'Was das System leistet',
+    c1t:'Branchenanalyse', c1d:'Vollständige Messelandschaft in 30 Minuten — vor dem Markteintritt',
+    c1o1:'Vollständige Messenübersicht', c1o2:'Wettbewerbsanalyse', c1o3:'Marktgrößenschätzung', c1o4:'M&A-Zielliste',
+    c2t:'Messerecherche', c2d:'Due-Diligence-Bericht und Verhandlungsstrategie vor jeder Verhandlung',
+    c2o1:'5-Jahres-Trends', c2o2:'Wettbewerbsnetzwerk', c2o3:'Veranstalteranalyse', c2o4:'Verhandlungsstrategie',
+    c3t:'Massenkundengewinnung', c3d:'Messename eingeben — Kontaktliste automatisch generiert',
+    c3o1:'Firmenname · Geschäftsführer', c3o2:'Gründungsdatum · Status', c3o3:'Geschäftsadresse', c3o4:'Excel-Export für direkten Vertrieb',
+    c4t:'Tiefenkundenprofil', c4d:'Vollständiges Informationspaket vor jedem Meeting — keine unnötigen Besuche mehr',
+    c4o1:'Firmendaten · Messehistorie', c4o2:'Kontaktchancenanalyse', c4o3:'Risikomarkierung', c4o4:'BD-Aktionsplan',
+    'hx-eye':'System-Roadmap','hx-h2':'Von Null bis Unternehmensweiter Nutzung','hx-now':'Jetzt',
+    'hx-sub':'Eine Zeitlinie, der gesamte Wachstumsprozess von MWLAB',
+    'hx-l1':'Max Onboard','hx-l2':'OFA-Projektstart','hx-l3':'Datenfundament',
+    'hx-l4':'SaaS-Launch','hx-l5':'Barrierefrei für alle','hx-l6':'Desktop-BD-Tool','hx-l7':'Volldigitalisierung',
+    'hx-d1':'BD-Digitalisierung offiziell gestartet','hx-d2':'Erstes BD-Projekt gestartet','hx-d3':'Erster Datenkreislauf aufgebaut',
+    'hx-d4':'SaaS-Eigenentwicklung live','hx-d5':'Eine E-Mail triggert vollständigen Report',
+    'hx-d6':'Vollständig offline & Desktop-nativ','hx-d7':'Papierloses BD-Workflow, datengesteuerte Entscheidungen',
+    c1dl:'Beispielbericht herunterladen', c2dl:'Beispielbericht herunterladen', c3dl:'Beispielliste herunterladen', c4dl:'Beispielbericht herunterladen',
+    'what-eye':'Was ist MWLAB',
+    'what-h2':'Messe-Intelligenz<br>für das Messe-BD-Team',
+    'what-desc':'Öffentliche Marktdaten in umsetzbare Vertriebsentscheidungen verwandeln. Branchenanalyse, Due Diligence und Kundengewinnung in einem System.',
+    'what-b1':'5.800+ Messebrands in Echtzeit-Datenbank',
+    'what-b2':'4 Intelligenz-Ebenen für den gesamten Vertriebszyklus',
+    'what-b3':'Alle Daten sind quellenrückverfolgbar — keine KI-Halluzinationen',
+  }
+};
+
+let curLang = 'zh';
+function setLang(lang) {
+  curLang = lang;
+  document.querySelectorAll('.lang-btn').forEach(b => {
+    b.classList.toggle('active', b.dataset.lang === lang);
+  });
+  const d = LANG[lang];
+  document.querySelectorAll('[data-k]').forEach(el => {
+    const v = d[el.dataset.k];
+    if (v !== undefined) el.innerHTML = v;
+  });
+}
+document.querySelectorAll('.lang-btn').forEach(b => {
+  b.addEventListener('click', () => setLang(b.dataset.lang));
+});
+
+/* ─────────────────────────────────────
+   HERO — Three.js floating network
+───────────────────────────────────── */
+(function () {
+  const cvs = document.getElementById('hero-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas: cvs, antialias: true });
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 200);
+  camera.position.z = 35;
+
+  const N = 100;
+  const pos = new Float32Array(N * 3);
+  const vel = [];
+  for (let i = 0; i < N; i++) {
+    pos[i*3]   = (Math.random() - 0.5) * 70;
+    pos[i*3+1] = (Math.random() - 0.5) * 45;
+    pos[i*3+2] = (Math.random() - 0.5) * 18;
+    vel.push([(Math.random()-.5)*.018,(Math.random()-.5)*.014,(Math.random()-.5)*.009]);
+  }
+  const ptGeo = new THREE.BufferGeometry();
+  ptGeo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+  scene.add(new THREE.Points(ptGeo, new THREE.PointsMaterial({ color: 0xFE5C00, size: 0.96 })));
+
+  const lineGeo = new THREE.BufferGeometry();
+  const lineMat = new THREE.LineBasicMaterial({ color: 0xFE5C00, transparent: true, opacity: 0.12 });
+  const lineSegs = new THREE.LineSegments(lineGeo, lineMat);
+  scene.add(lineSegs);
+
+  function resize() {
+    const w = cvs.parentElement.offsetWidth;
+    const h = cvs.parentElement.offsetHeight;
+    renderer.setSize(w, h);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+  window.addEventListener('resize', resize);
+  resize();
+
+  let frame = 0;
+  const CONNECT_DIST = 13;
+
+  function tick() {
+    requestAnimationFrame(tick);
+    frame++;
+
+    for (let i = 0; i < N; i++) {
+      pos[i*3]   += vel[i][0];
+      pos[i*3+1] += vel[i][1];
+      pos[i*3+2] += vel[i][2];
+      if (Math.abs(pos[i*3])   > 35) vel[i][0] *= -1;
+      if (Math.abs(pos[i*3+1]) > 22) vel[i][1] *= -1;
+      if (Math.abs(pos[i*3+2]) > 9)  vel[i][2] *= -1;
+    }
+    ptGeo.attributes.position.needsUpdate = true;
+
+    if (frame % 4 === 0) {
+      const segs = [];
+      for (let i = 0; i < N; i++) {
+        for (let j = i + 1; j < N; j++) {
+          const dx = pos[i*3]-pos[j*3], dy = pos[i*3+1]-pos[j*3+1], dz = pos[i*3+2]-pos[j*3+2];
+          if (dx*dx + dy*dy + dz*dz < CONNECT_DIST*CONNECT_DIST) {
+            segs.push(pos[i*3],pos[i*3+1],pos[i*3+2], pos[j*3],pos[j*3+1],pos[j*3+2]);
+          }
+        }
+      }
+      lineGeo.setAttribute('position', new THREE.BufferAttribute(new Float32Array(segs), 3));
+    }
+
+    camera.position.x = Math.sin(frame * 0.0008) * 2.5;
+    camera.position.y = Math.cos(frame * 0.0006) * 1.2;
+    camera.lookAt(0, 0, 0);
+    renderer.render(scene, camera);
+  }
+  tick();
+})();
+
+/* ─────────────────────────────────────
+   CANVAS UTILITIES
+───────────────────────────────────── */
+function syncSize(cv) {
+  const p = cv.parentElement;
+  const w = p.clientWidth, h = p.clientHeight || p.clientWidth;
+  const dpr = window.devicePixelRatio || 1;
+  const pw = Math.round(w * dpr), ph = Math.round(h * dpr);
+  if (cv.width !== pw || cv.height !== ph) {
+    cv.width = pw; cv.height = ph;
+    cv.style.width = w + 'px'; cv.style.height = h + 'px';
+  }
+}
+function rr(ctx, x, y, w, h, r) {
+  ctx.beginPath();
+  ctx.moveTo(x + r, y);
+  ctx.lineTo(x + w - r, y); ctx.arcTo(x+w,y,x+w,y+r,r);
+  ctx.lineTo(x+w,y+h-r);   ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+  ctx.lineTo(x+r,y+h);     ctx.arcTo(x,y+h,x,y+h-r,r);
+  ctx.lineTo(x,y+r);       ctx.arcTo(x,y,x+r,y,r);
+  ctx.closePath();
+}
+
+/* ─────────────────────────────────────
+   CV1 — Industry Research
+   Radial network: MDS hub + industry nodes + flowing packets
+───────────────────────────────────── */
+(function () {
+  const cv = document.getElementById('cv1');
+  const ctx = cv.getContext('2d');
+  let t = 0;
+
+  const NODES = [
+    { lbl:'Med',  angle: 0              },
+    { lbl:'Auto', angle: Math.PI*2/5    },
+    { lbl:'Food', angle: Math.PI*4/5    },
+    { lbl:'Tech', angle: Math.PI*6/5    },
+    { lbl:'Chem', angle: Math.PI*8/5    },
+  ];
+
+  function draw() {
+    syncSize(cv);
+    const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const W = cv.parentElement.clientWidth, H = cv.parentElement.clientHeight || W;
+    const S = Math.min(W, H);
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+
+    const cx = W * 0.5, cy = H * 0.5, R = S * 0.38;
+
+    // Pulse rings
+    for (let p = 0; p < 3; p++) {
+      const phase = ((t * 0.015 + p * 0.33) % 1);
+      ctx.beginPath();
+      ctx.arc(cx, cy, phase * R * 0.55, 0, Math.PI * 2);
+      ctx.strokeStyle = `rgba(254,92,0,${0.4 * (1 - phase)})`;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    NODES.forEach((nd, i) => {
+      const a = nd.angle + t * 0.005;
+      const nx = cx + Math.cos(a) * R;
+      const ny = cy + Math.sin(a) * R;
+      const near = ((cx-nx)*(cx-nx)+(cy-ny)*(cy-ny)) < R*R*0.04;
+
+      // Spoke
+      ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(nx, ny);
+      ctx.strokeStyle = 'rgba(254,92,0,0.2)'; ctx.lineWidth = 1; ctx.stroke();
+
+      // Packet along spoke
+      const pf = ((t * 0.012 + i * 0.2) % 1);
+      ctx.beginPath();
+      ctx.arc(cx + (nx-cx)*pf, cy + (ny-cy)*pf, 3, 0, Math.PI*2);
+      ctx.fillStyle = '#FE5C00'; ctx.fill();
+
+      // Node
+      ctx.beginPath(); ctx.arc(nx, ny, near ? 10 : 7, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(254,92,0,0.12)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(nx, ny, near ? 5 : 4, 0, Math.PI*2);
+      ctx.fillStyle = '#FE5C00'; ctx.fill();
+
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px Montserrat,system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(nd.lbl, nx, ny + (near ? 22 : 18));
+    });
+
+    // Hub — enlarged
+    ctx.beginPath(); ctx.arc(cx, cy, 18, 0, Math.PI*2);
+    ctx.fillStyle = '#FE5C00'; ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px Montserrat,system-ui,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('MDS', cx, cy + 5);
+
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ─────────────────────────────────────
+   CV2 — Brand Research
+   Animated line chart + glowing score
+───────────────────────────────────── */
+(function () {
+  const cv = document.getElementById('cv2');
+  const ctx = cv.getContext('2d');
+  let t = 0;
+  const YEARS = ['2019','2020','2021','2022','2023','2024'];
+  const VALS  = [0.48, 0.16, 0.38, 0.58, 0.74, 0.91];
+  const CYCLE = 180;
+
+  function draw() {
+    syncSize(cv);
+    const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const W = cv.parentElement.clientWidth, H = cv.parentElement.clientHeight || W;
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+
+    const L = W*0.10, R = W*0.04, T = H*0.10, B = H*0.18;
+    const gW = W - L - R, gH = H - T - B;
+    const n = VALS.length;
+
+    // Grid
+    for (let i = 0; i <= 4; i++) {
+      const gy = T + gH * (1 - i/4);
+      ctx.beginPath(); ctx.moveTo(L, gy); ctx.lineTo(L+gW, gy);
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)'; ctx.lineWidth = 1; ctx.stroke();
+    }
+
+    const prog = Math.min(1, t / CYCLE);
+    const drawN = Math.floor(prog * (n - 1));
+    const frac = prog * (n - 1) - drawN;
+    const pts = [];
+    for (let i = 0; i < n; i++) {
+      const xp = L + (i/(n-1)) * gW;
+      const yp = T + gH * (1 - VALS[i]);
+      pts.push([xp, yp]);
+    }
+
+    // Gradient fill
+    if (drawN > 0 || frac > 0) {
+      const endX = pts[drawN][0] + (drawN < n-1 ? (pts[drawN+1][0]-pts[drawN][0])*frac : 0);
+      const endY = pts[drawN][1] + (drawN < n-1 ? (pts[drawN+1][1]-pts[drawN][1])*frac : 0);
+      const grad = ctx.createLinearGradient(0, T, 0, T+gH);
+      grad.addColorStop(0, 'rgba(254,92,0,0.28)');
+      grad.addColorStop(1, 'rgba(254,92,0,0)');
+      ctx.beginPath();
+      ctx.moveTo(L, T+gH);
+      for (let i = 0; i <= drawN; i++) ctx.lineTo(pts[i][0], pts[i][1]);
+      if (drawN < n-1) ctx.lineTo(endX, endY);
+      ctx.lineTo(endX, T+gH);
+      ctx.closePath();
+      ctx.fillStyle = grad; ctx.fill();
+    }
+
+    // Line
+    ctx.beginPath();
+    for (let i = 0; i <= drawN; i++) {
+      i === 0 ? ctx.moveTo(pts[i][0], pts[i][1]) : ctx.lineTo(pts[i][0], pts[i][1]);
+    }
+    if (drawN < n-1) {
+      const ex = pts[drawN][0] + (pts[drawN+1][0]-pts[drawN][0])*frac;
+      const ey = pts[drawN][1] + (pts[drawN+1][1]-pts[drawN][1])*frac;
+      ctx.lineTo(ex, ey);
+    }
+    ctx.strokeStyle = '#FE5C00'; ctx.lineWidth = 2.5; ctx.lineJoin = 'round'; ctx.stroke();
+
+    // Points + year labels
+    for (let i = 0; i <= drawN; i++) {
+      ctx.beginPath(); ctx.arc(pts[i][0], pts[i][1], 4, 0, Math.PI*2);
+      ctx.fillStyle = '#000'; ctx.fill();
+      ctx.beginPath(); ctx.arc(pts[i][0], pts[i][1], 3.5, 0, Math.PI*2);
+      ctx.strokeStyle = '#FE5C00'; ctx.lineWidth = 2; ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px Montserrat,system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(YEARS[i], pts[i][0], T+gH+B*0.82);
+    }
+
+    // Y-axis label
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px Montserrat,system-ui,sans-serif';
+    ctx.textAlign = 'left';
+    ctx.fillText('Scale Index', L, T+8);
+
+    // Score badge when complete
+    if (prog >= 1) {
+      const pulse = 0.88 + 0.12 * Math.sin(t * 0.05);
+      ctx.save();
+      ctx.globalAlpha = Math.min(1, (t - CYCLE) / 20) * pulse;
+      const bx = W - 88, by = T + 4;
+      rr(ctx, bx, by, 80, 28, 6);
+      ctx.fillStyle = 'rgba(254,92,0,0.18)'; ctx.fill();
+      rr(ctx, bx, by, 80, 28, 6);
+      ctx.strokeStyle = 'rgba(254,92,0,0.6)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = '#FE5C00';
+      ctx.font = 'bold 14px Montserrat,system-ui,sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('M&A Score ★ 9.1', bx+40, by+18);
+      ctx.restore();
+    }
+
+    if (t > CYCLE + 80) t = 0;
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ─────────────────────────────────────
+   CV3 — Batch Prospecting
+   Exhibition → 企查查 API → company cards appearing
+───────────────────────────────────── */
+(function () {
+  const cv = document.getElementById('cv3');
+  const ctx = cv.getContext('2d');
+  let t = 0;
+  const CYCLE = 220;
+
+  function draw() {
+    syncSize(cv);
+    const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const W = cv.parentElement.clientWidth, H = cv.parentElement.clientHeight || W;
+    const S = Math.min(W, H);
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+
+    const SX = W * 0.13, SY = H * 0.5;
+    const MX = W * 0.52, MY = H * 0.5;
+    const prog = Math.min(1, t / CYCLE);
+
+    // Source node — exhibition
+    ctx.beginPath(); ctx.arc(SX, SY, S*0.07, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(254,92,0,0.1)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(SX, SY, S*0.07, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(254,92,0,0.45)'; ctx.lineWidth = 1.5; ctx.stroke();
+    ctx.fillStyle = '#FE5C00';
+    ctx.font = 'bold 14px Montserrat,system-ui,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Show', SX, SY - S*0.03);
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px Montserrat,system-ui,sans-serif';
+    ctx.fillText('Input', SX, SY + S*0.04);
+
+    // Middle API node
+    ctx.beginPath(); ctx.arc(MX, MY, S*0.065, 0, Math.PI*2);
+    ctx.fillStyle = 'rgba(254,92,0,0.08)'; ctx.fill();
+    ctx.beginPath(); ctx.arc(MX, MY, S*0.065, 0, Math.PI*2);
+    ctx.strokeStyle = 'rgba(254,92,0,0.3)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = '#FE5C00';
+    ctx.font = 'bold 14px Montserrat,system-ui,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Corp', MX, MY - S*0.03);
+    ctx.fillStyle = '#fff';
+    ctx.font = '14px Montserrat,system-ui,sans-serif';
+    ctx.fillText('API', MX, MY + S*0.04);
+
+    // Pipe SX→MX
+    ctx.setLineDash([4, 3]);
+    ctx.beginPath(); ctx.moveTo(SX+S*0.07, SY); ctx.lineTo(MX-S*0.065, MY);
+    ctx.strokeStyle = 'rgba(254,92,0,0.25)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.setLineDash([]);
+
+    // Flowing particles on pipe
+    for (let p = 0; p < 5; p++) {
+      const pf = ((t * 0.01 + p * 0.2) % 1);
+      const px = (SX+S*0.07) + ((MX-S*0.065)-(SX+S*0.07)) * pf;
+      const py = SY;
+      ctx.beginPath(); ctx.arc(px, py, S*0.01, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(254,92,0,${0.9 - pf*0.4})`; ctx.fill();
+    }
+
+    // Output cards
+    const COLS = 3, ROWS = 3;
+    const cardW = Math.max(30, S * 0.15);
+    const cardH = S * 0.09;
+    const gap = S * 0.012;
+    const gx0 = MX + S*0.08;
+    const gy0 = H * 0.5 - ((ROWS*(cardH+gap)-gap)/2);
+    const total = COLS * ROWS;
+
+    for (let i = 0; i < total; i++) {
+      const appear = Math.min(1, Math.max(0, (prog * total - i) * 1.5));
+      if (appear <= 0) continue;
+      const c = i % COLS, r = Math.floor(i / COLS);
+      const x = gx0 + c*(cardW+gap);
+      const y = gy0 + r*(cardH+gap);
+      rr(ctx, x, y, cardW * appear, cardH, 3);
+      ctx.fillStyle = `rgba(254,92,0,${0.12 + 0.08*appear})`; ctx.fill();
+      rr(ctx, x, y, cardW * appear, cardH, 3);
+      ctx.strokeStyle = `rgba(254,92,0,${0.35*appear})`; ctx.lineWidth = 1; ctx.stroke();
+      if (appear > 0.7) {
+        ctx.fillStyle = '#fff';
+        ctx.font = 'bold 14px Montserrat,system-ui,sans-serif'; ctx.textAlign = 'left';
+        ctx.fillText('Co. #' + (i+1).toString().padStart(2,'0'), x+6, y+14);
+        ctx.fillStyle = '#FE5C00';
+        ctx.font = '14px Montserrat,system-ui,sans-serif';
+        ctx.fillText('Active', x+6, y+28);
+      }
+    }
+
+    // .xlsx badge
+    if (prog > 0.5) {
+      const bAlpha = Math.min(1,(prog-0.5)*2);
+      ctx.save(); ctx.globalAlpha = bAlpha;
+      rr(ctx, gx0, gy0 - 22, 80, 20, 4);
+      ctx.fillStyle = '#1D6F42'; ctx.fill();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px Montserrat,system-ui,sans-serif'; ctx.textAlign = 'left';
+      ctx.fillText('Lead List .xlsx', gx0+8, gy0-8);
+      ctx.restore();
+    }
+
+    // Pipe MX→grid
+    ctx.setLineDash([3,4]);
+    ctx.beginPath(); ctx.moveTo(MX+S*0.065, MY); ctx.lineTo(gx0, H*0.5);
+    ctx.strokeStyle = 'rgba(254,92,0,0.18)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.setLineDash([]);
+
+    if (t > CYCLE + 60) t = 0;
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+/* ─────────────────────────────────────
+   CV4 — Deep Prospect
+   3 streams → merge → profile card → report
+───────────────────────────────────── */
+(function () {
+  const cv = document.getElementById('cv4');
+  const ctx = cv.getContext('2d');
+  let t = 0;
+
+  const SRCS = [
+    { y: 0.18, lbl:'Corp DB', sub:'Business' },
+    { y: 0.50, lbl:'Corp API', sub:'Real-time' },
+    { y: 0.82, lbl:'Web Data', sub:'Public'   },
+  ];
+
+  function draw() {
+    syncSize(cv);
+    const dpr = window.devicePixelRatio || 1;
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const W = cv.parentElement.clientWidth, H = cv.parentElement.clientHeight || W;
+    const S = Math.min(W, H);
+    ctx.clearRect(0, 0, W, H);
+    ctx.fillStyle = '#000'; ctx.fillRect(0, 0, W, H);
+
+    const cx = W * 0.52, cy = H * 0.5;
+    const R_node = S * 0.06;
+
+    SRCS.forEach((src, i) => {
+      const sx = S * 0.14, sy = S * src.y;
+
+      // Source node
+      ctx.beginPath(); ctx.arc(sx, sy, R_node, 0, Math.PI*2);
+      ctx.fillStyle = 'rgba(254,92,0,0.08)'; ctx.fill();
+      ctx.beginPath(); ctx.arc(sx, sy, R_node, 0, Math.PI*2);
+      ctx.strokeStyle = 'rgba(254,92,0,0.35)'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = '#fff';
+      ctx.font = 'bold 14px Montserrat,system-ui,sans-serif'; ctx.textAlign = 'center';
+      ctx.fillText(src.lbl, sx, sy - S*0.03);
+      ctx.fillStyle = '#fff';
+      ctx.font = '14px Montserrat,system-ui,sans-serif';
+      ctx.fillText(src.sub, sx, sy + S*0.035);
+
+      // Spoke to center
+      ctx.beginPath();
+      ctx.moveTo(sx + R_node, sy);
+      ctx.lineTo(cx - S*0.1, cy);
+      ctx.strokeStyle = 'rgba(254,92,0,0.1)'; ctx.lineWidth = 1; ctx.stroke();
+
+      // Animated particles
+      for (let p = 0; p < 4; p++) {
+        const pf = ((t * 0.009 + i * 0.33 + p * 0.25) % 1);
+        const px = (sx+R_node) + (cx-S*0.1-(sx+R_node)) * pf;
+        const py = sy + (cy - sy) * pf;
+        ctx.beginPath(); ctx.arc(px, py, S*0.01, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(254,92,0,${0.85 - pf*0.45})`; ctx.fill();
+      }
+    });
+
+    // Centre profile card — bigger, proportional to S
+    const cardW = S * 0.26, cardH = S * 0.22;
+    const cx2 = cx - cardW/2, cy2 = cy - cardH/2;
+    const glow = 0.12 + 0.06 * Math.sin(t * 0.045);
+    ctx.shadowColor = '#FE5C00'; ctx.shadowBlur = 28 * glow * 5;
+    rr(ctx, cx2, cy2, cardW, cardH, 7);
+    ctx.fillStyle = '#111'; ctx.fill();
+    ctx.strokeStyle = 'rgba(254,92,0,0.55)'; ctx.lineWidth = 1; ctx.stroke();
+    ctx.shadowBlur = 0;
+
+    ctx.fillStyle = '#FE5C00';
+    ctx.font = 'bold 14px Montserrat,system-ui,sans-serif'; ctx.textAlign = 'left';
+    ctx.fillText('Intelligence', cx2+8, cy2+S*0.06);
+    ctx.strokeStyle = 'rgba(254,92,0,0.2)'; ctx.lineWidth = 0.5;
+    ctx.beginPath(); ctx.moveTo(cx2+6, cy2+S*0.075); ctx.lineTo(cx2+cardW-6, cy2+S*0.075); ctx.stroke();
+    ['Business ▸','History ▸','Risk ▸','BD Plan ▸'].forEach((f, i) => {
+      ctx.fillStyle = '#fff';
+      ctx.font = '14px Montserrat,system-ui,sans-serif';
+      ctx.fillText(f, cx2+8, cy2+S*0.105+i*S*0.035);
+    });
+
+    // Pipe to output
+    const ox = cx + cardW/2 + 6;
+    ctx.beginPath(); ctx.moveTo(ox, cy); ctx.lineTo(W*0.88-S*0.05, cy);
+    ctx.strokeStyle = 'rgba(254,92,0,0.45)'; ctx.lineWidth = 1.5; ctx.stroke();
+
+    // Output node — report
+    ctx.beginPath(); ctx.arc(W*0.88, cy, S*0.06, 0, Math.PI*2);
+    ctx.fillStyle = '#FE5C00'; ctx.fill();
+    ctx.fillStyle = '#fff';
+    ctx.font = 'bold 14px Montserrat,system-ui,sans-serif'; ctx.textAlign = 'center';
+    ctx.fillText('Report', W*0.88, cy - S*0.02);
+    ctx.font = '14px Montserrat,system-ui,sans-serif';
+    ctx.fillText('Out', W*0.88, cy + S*0.035);
+
+    t++;
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
+
+</script>
+</body>
+</html>
