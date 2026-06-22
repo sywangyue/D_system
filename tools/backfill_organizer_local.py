@@ -15,6 +15,11 @@
   --dry-run    只打印不写库
   --delay N    每页间隔秒数 (默认 1.0)
   --db PATH    数据库路径
+
+注意: 本脚本为本地交互场景设计（argparse CLI 参数，CSV 中间层，opencli --tab page_id 调用，
+      403 检测即停，同时写 manual_tag_history 审计表）。
+      远端/cron 场景请使用 scripts/backfill_organizer.py（无参数，checkpoint 文件断点续跑，
+      失败自动重试，适合无人值守长跑）。
 """
 
 import csv

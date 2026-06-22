@@ -7,6 +7,10 @@ Jufair 主办方批量回填脚本（自洽版）
 - 最终输出汇总到 stdout（供 cron 发送）
 
 用法: python3 scripts/backfill_organizer.py
+
+注意: 本脚本为远端/cron 场景设计（无 CLI 参数，hardcoded 路径，checkpoint 文件断点续跑）。
+      本地交互场景请使用 tools/backfill_organizer_local.py（支持 --dry-run/--delay/--start/--limit，
+      读 CSV 中间层，opencli --tab page_id 方式调用，同时写 manual_tag_history 审计表）。
 """
 
 import sqlite3
