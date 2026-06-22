@@ -11,9 +11,10 @@ export default async function middleware(request: NextRequest) {
   // 完全公开路径——始终放行，不注入头部
   if (
     pathname === '/login' ||
+    pathname === '/pitch.html' ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/auth/') ||
-    pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|ico|css|js)$/)
+    pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2|woff|ttf)$/)
   ) {
     return NextResponse.next()
   }
@@ -36,9 +37,9 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
-  // 页面路由：无 token → 重定向到 /login
+  // 页面路由：无 token → 重定向到 /pitch.html（主入口）
   if (!token) {
-    return NextResponse.redirect(new URL('/login', request.url))
+    return NextResponse.redirect(new URL('/pitch.html', request.url))
   }
 
   try {
