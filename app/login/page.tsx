@@ -98,20 +98,52 @@ function MatrixCanvas() {
   return <canvas ref={ref} className="absolute inset-0 w-full h-full" />;
 }
 
+const I18N = {
+  zh: {
+    title: "欢迎回来",
+    sub: "请使用内部账号登录",
+    emailLabel: "邮箱",
+    pwLabel: "密码",
+    submit: "登 录",
+    back: "← 回到官网",
+    errEmail: "请输入邮箱地址",
+    errFmt: "邮箱格式不正确",
+    errPw: "请输入密码",
+    err401: "邮箱或密码错误，请重试",
+    errNet: "网络异常，请稍后重试",
+  },
+  en: {
+    title: "Welcome back",
+    sub: "Sign in with your internal account",
+    emailLabel: "Email",
+    pwLabel: "Password",
+    submit: "Sign in",
+    back: "← Back to website",
+    errEmail: "Please enter your email",
+    errFmt: "Invalid email format",
+    errPw: "Please enter your password",
+    err401: "Incorrect email or password",
+    errNet: "Network error, please try again",
+  },
+} as const;
+type Lang = keyof typeof I18N;
+
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [lang, setLang] = useState<Lang>("zh");
+  const t = I18N[lang];
   const router = useRouter();
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault();
     setError("");
 
-    if (!email.trim()) { setError("请输入邮箱地址"); return; }
-    if (!/\S+@\S+\.\S+/.test(email)) { setError("邮箱格式不正确"); return; }
-    if (!password) { setError("请输入密码"); return; }
+    if (!email.trim()) { setError(t.errEmail); return; }
+    if (!/\S+@\S+\.\S+/.test(email)) { setError(t.errFmt); return; }
+    if (!password) { setError(t.errPw); return; }
 
     setLoading(true);
     try {
@@ -123,7 +155,7 @@ export default function LoginPage() {
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         setError(
-          res.status === 401 ? "邮箱或密码错误，请重试" : body.detail || "网络异常，请稍后重试"
+          res.status === 401 ? t.err401 : body.detail || t.errNet
         );
         setLoading(false);
         return;
@@ -164,6 +196,23 @@ export default function LoginPage() {
 
       {/* ── Right panel: Login form ── */}
       <div className="relative flex flex-1 flex-col items-center justify-center bg-white px-8 pt-8 lg:px-14">
+        {/* Language toggle */}
+        <div className="absolute top-5 right-6 flex items-center gap-1 text-[11px] font-semibold">
+          <button
+            onClick={() => setLang("zh")}
+            className={`px-2 py-0.5 rounded transition-colors ${lang === "zh" ? "text-gray-900" : "text-gray-400 hover:text-gray-600"}`}
+          >
+            中文
+          </button>
+          <span className="text-gray-300">|</span>
+          <button
+            onClick={() => setLang("en")}
+            className={`px-2 py-0.5 rounded transition-colors ${lang === "en" ? "text-gray-900" : "text-gray-400 hover:text-gray-600"}`}
+          >
+            EN
+          </button>
+        </div>
+
         <div className="w-full max-w-[340px]">
           {/* Mobile-only logo */}
           <div className="lg:hidden mb-10 text-center">
@@ -178,9 +227,9 @@ export default function LoginPage() {
               className="font-bold text-gray-900 tracking-tight leading-none"
               style={{ fontSize: "26px" }}
             >
-              欢迎回来
+              {t.title}
             </h2>
-            <p className="text-sm text-gray-400 mt-2">请使用内部账号登录</p>
+            <p className="text-sm text-gray-400 mt-2">{t.sub}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-5">
@@ -189,7 +238,7 @@ export default function LoginPage() {
                 htmlFor="email"
                 className="block text-[10px] font-bold text-gray-400 tracking-[0.12em] uppercase mb-2.5"
               >
-                邮箱
+                {t.emailLabel}
               </label>
               <input
                 id="email"
@@ -207,7 +256,7 @@ export default function LoginPage() {
                 htmlFor="password"
                 className="block text-[10px] font-bold text-gray-400 tracking-[0.12em] uppercase mb-2"
               >
-                密码
+                {t.pwLabel}
               </label>
               <input
                 id="password"
@@ -231,9 +280,18 @@ export default function LoginPage() {
               disabled={loading}
               className="flex h-11 w-full items-center justify-center rounded-lg bg-accent font-bold text-white text-sm tracking-[0.12em] uppercase transition-opacity hover:opacity-90 disabled:opacity-50"
             >
-              {loading ? <Loader2 size={16} className="animate-spin" /> : "登 录"}
+              {loading ? <Loader2 size={16} className="animate-spin" /> : t.submit}
             </button>
           </form>
+
+          <div className="mt-5">
+            <a
+              href="/pitch.html"
+              className="flex h-10 w-full items-center justify-center rounded-lg border border-gray-300 text-sm font-medium text-gray-600 hover:border-gray-400 hover:text-gray-900 transition-all"
+            >
+              {t.back}
+            </a>
+          </div>
         </div>
 
         {/* Footer */}
