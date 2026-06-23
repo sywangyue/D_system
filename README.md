@@ -33,7 +33,7 @@ Browser
 | 数据库 | SQLite（`mwlab.db`），`better-sqlite3` 读写 |
 | 认证 | JWT（`jose` 签发/验签）+ bcryptjs 密码哈希，Cookie 存储 |
 | 鉴权 | `proxy.ts`（Next.js 16 中间件）全局路由守卫 |
-| 数据采集 | Python 爬虫（`crawlers/`）+ 调度器（`scheduler.py`） |
+| 数据采集 | Python 爬虫（`crawlers/`），手动触发 |
 | 打标工具 | `tools/export_for_tagging.py` + `tools/import_tags.py`（openpyxl） |
 
 ---
@@ -105,11 +105,14 @@ Schema 完整定义：`schema/init_db.sql`
 Jufair 爬虫须在**大陆 IP** 环境执行。
 
 ```bash
-# 手动触发单次采集
-python3 scheduler.py run
+# Jufair 全量采集
+python3 crawlers/jufair_crawler.py
 
-# 查看采集日志状态
-python3 scheduler.py status
+# cnexpo 全量采集
+python3 crawlers/cnexpo_crawler.py
+
+# 合并到主库
+python3 merge_engine.py
 ```
 
 ---
@@ -177,12 +180,14 @@ python3 -m pytest tests/ -v
 
 | Phase | 内容 | 状态 |
 |-------|------|------|
-| 1 | 数据采集（Jufair + cnexpo 爬虫 + 调度器） | ✅ |
+| 1 | 数据采集（Jufair + cnexpo 爬虫） | ✅ |
 | 2 | Schema、合并引擎、人工打标工具链 | ✅ |
 | 3 | 看板 API、JWT 认证、前端基础架构 | ✅ |
 | 3b | Excel 批量打标工具 | ✅ |
 | 4 | 前端 UI（筛选看板、日历、地图、设置） | ✅ |
 | 架构整改 | 移除 Supabase 和 FastAPI，统一到 Next.js 单进程 | ✅ |
+| 5 | Intel 后端（调研报告存储、DB 查询、企查查 API 接入） | ✅ |
+| 6 | 代码审计与合规清理（68 项修复，去除 XFF 绕过等） | ✅ |
 | **1b** | **全集采集（Jufair ~8.4K + cnexpo 全量）** | **⏳** |
 
 ---

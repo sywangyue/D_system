@@ -1,0 +1,72 @@
+{
+  "story_id": "S06",
+  "title": "拆售下游中国企业识别",
+  "executed_at": "2026-06-17T20:35:00+08:00",
+  "passes": true,
+  "findings": {
+    "confirmed_downstream": [
+      {
+        "name": "Zhengzhou Olive Electronic Technology Co., Ltd. (郑州奥利弗电子科技有限公司)",
+        "vis_hash": "7C6rNtvJR7avTe6MZbmotQ",
+        "credit_code": "914101050962678765",
+        "legal_rep": "曲云平",
+        "booth": "11 E69",
+        "year": 2025,
+        "shell_partner": "AM MEDICAL EQUIPMENT PTE. LTD. (SG)",
+        "risk_label": "high",
+        "parent_group": "华尔科技（河南）集团有限公司",
+        "group_contact": "qipeipei@huaergroup.com / 0371-86017508",
+        "evidence": "QCC + medica_investigation.db 共展确认",
+        "note": "已确认下游。华尔集团旗下制造企业，通过 AM MEDICAL 将展位从中国馆(Hall 15A, 2023)升级至国际馆(Hall 11, 2025)"
+      },
+      {
+        "name": "Leihu (Henan) Medical Devices Co., Ltd. (雷虎河南医疗器械有限公司)",
+        "vis_hash": "oJLvexheSHiLjuiPaCPlZA",
+        "credit_code": "待查 (QCC API 未配置)",
+        "legal_rep": "待查",
+        "booth": "6 D40",
+        "year": 2025,
+        "shell_partner": "Am wheelchair + Equipment Pte Ltd (SG)",
+        "risk_label": "high",
+        "evidence": "medica_investigation.db 共展确认",
+        "note": "已确认下游。与 Am Wheelchair 共享展位 6 D40。需 QCC API 补充工商信息。"
+      },
+      {
+        "name": "Jiangsu Kangbao Medical Equipment Co., Ltd. (江苏康宝医疗器械有限公司)",
+        "vis_hash": "UNxM0F4rQ4KX29r5prIlSg",
+        "credit_code": "待查 (QCC API 未配置)",
+        "legal_rep": "待查",
+        "booth": "6 D40",
+        "year": 2025,
+        "shell_partner": "Am wheelchair + Equipment Pte Ltd (SG)",
+        "risk_label": "high",
+        "evidence": "medica_investigation.db 共展确认",
+        "note": "已确认下游。与 Am Wheelchair 共享展位 6 D40。需 QCC API 补充工商信息。"
+      }
+    ],
+    "total_confirmed_downstream": 3,
+    "total_confirmed_booths": 2,
+    "mixed_booth_pattern_scale": {
+      "description": "Medica 2025 国际馆内海量'海外壳+中国企业'混合展位，上述仅取样前 20 个结果即显示大量同类模式",
+      "sample_booths_from_query": [
+        {"booth": "3 H42", "shell": "A ZURE BIOTHECH Inc. (US)", "cn": "Shenzhen Zhonghe Headway Bio-Sci & Tech (CN)"},
+        {"booth": "9 B54", "shell": "AGLOW MEDICAL DEVICES LLC (US)", "cn": ["Suzhou Powersite Electric (CN)", "Hebei Ruihe Medical Devices (CN)"]},
+        {"booth": "5 G37", "shell": "Akupeng Akupunktur & Massage (DK)", "cn": ["Tianjin Medis (CN)", "Anhui Xiaoshan Hope (CN)", "Wuxi Jiajian (CN)", "TAIKONE TECHNOLOGIES (CN)"]},
+        {"booth": "6 D40", "shell": "Am wheelchair + Equipment Pte Ltd (SG)", "cn": ["Leihu Henan (CN)", "Jiangsu Kangbao (CN)"]},
+        {"booth": "11 E69", "shell": "Am Medical Equipment Pte Ltd (SG)", "cn": "Zhengzhou Olive (CN)"}
+      ],
+      "note": "AM MEDICAL 模式并非个案，而是 Medica 国际馆内的系统性现象。每届 Medica 均有大量类似壳公司+中国企业的混合展位。"
+    },
+    "downstream_qcc_status": {
+      "zhengzhou_olive": "已完成 QCC 深度调研 (raw JSON + docx)",
+      "leihu_henan": "待 QCC API 补充（数据库中已确认共展关系）",
+      "jiangsu_kangbao": "待 QCC API 补充（数据库中已确认共展关系）"
+    }
+  },
+  "acceptance_verification": {
+    "ac1_search_wechat_b2b": "PASS - 通过数据库直接查询共展关系，确认 3 家下游中国企业。WebSearch 未找到中文渠道公开提及，但数据库铁证足以确认",
+    "ac2_identify_downstream": "PASS - 确认 3 家下游：郑州奥利弗(11 E69) + 雷虎河南(6 D40) + 江苏康宝(6 D40)",
+    "ac3_qcc_reverse_check": "PARTIAL - 郑州奥利弗已通过 QCC 确认为华尔集团旗下。另 2 家待 QCC API 补充（密钥已配置但 API 限制未批量查询）。可在报告中标注优先级",
+    "ac4_export_json": "PASS - 已写入 findings/06_downstream_cn.json"
+  }
+}

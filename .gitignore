@@ -63,6 +63,9 @@ exports/
 logs/
 output/
 
+# Customer reports & raw API data (operational, not code)
+reports/customer/
+
 # SSH keys / certificates
 *.pem
 *.key

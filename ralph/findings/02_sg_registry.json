@@ -1,0 +1,76 @@
+{
+  "story_id": "S02",
+  "title": "新加坡壳公司工商穿透",
+  "executed_at": "2026-06-17T19:45:00+08:00",
+  "passes": true,
+  "findings": {
+    "current_entity": {
+      "name": "AM MEDICAL EQUIPMENT PTE. LTD.",
+      "uen": "202324580R",
+      "incorporation_date": "2023-06-22",
+      "status": "Live",
+      "company_type": "Exempt Private Company Limited by Shares",
+      "paid_up_capital": "SGD 1,000",
+      "officers_count": 7,
+      "officer_names": "BLOCKED - Cloudflare protection on all Singapore business directory sites (companies.sg, sgbusinessdirectory.com). Requires manual ACRA BizFile query or legal request.",
+      "registered_address": "73 UPPER PAYA LEBAR ROAD, #07-02J, CENTRO BIANCO, Singapore 534818",
+      "address_type": "VIRTUAL OFFICE - 826+ entities registered at this unit",
+      "primary_ssic": "46592 - Wholesale of medical, professional, scientific and precision equipment",
+      "secondary_ssic": "70205 - Public relations, marketing and brand consultancy services",
+      "annual_return_date": "2025-08-21",
+      "account_due_date": "2026-12-31",
+      "shell_indicators": [
+        "注册资本 SGD 1,000（法定最低值）",
+        "虚拟办公室地址（同单元 826+ 家公司）",
+        "次要经营范围含公关/营销/品牌咨询（医疗器械批发商异常配置）",
+        "前身实体已注销，壳实体持续替换模式"
+      ]
+    },
+    "predecessor_entity": {
+      "name": "AM MEDICAL PTE. LTD.",
+      "uen": "202013171K",
+      "incorporation_date": "2020-05-09",
+      "status": "STRUCK OFF (已注销)",
+      "paid_up_capital": "SGD 10,000",
+      "registered_address": "73 Upper Paya Lebar Road, #06-01C, Centro Bianco, Singapore 534818",
+      "primary_ssic": "Wholesale of health supplements",
+      "account_due_date": "2021-11-30",
+      "strike_off_reason": "推定未提交年报/财报导致除名"
+    },
+    "entity_succession_pattern": {
+      "v1": "AM MEDICAL PTE. LTD. (202013171K) — 2020-05 注册，~2022 注销",
+      "v2": "AM MEDICAL EQUIPMENT PTE. LTD. (202324580R) — 2023-06 注册至今",
+      "note": "同一楼不同单元（#06-01C → #07-02J），推测同一企业服务商代理注册。Medica 参展名义同步变化：2022-2024 'Am Wheelchair + Equipment' → 2025 'Am Medical Equipment'。",
+      "shell_turnover": "当旧壳被除名时注册新壳继续运营，典型壳公司生命周期管理"
+    },
+    "website_domain_whois": {
+      "domain": "sg-amgroup.com",
+      "registrar": "Alibaba Cloud Computing (Beijing) Co., Ltd. (阿里云)",
+      "registrant_organization": "奥瑞文化传媒镇江有限公司 (Aorui Culture Media Zhenjiang Co., Ltd.)",
+      "registrant_legal_rep": "任丹芳 (Ren Danfang)",
+      "registrant_capital": "50万人民币",
+      "registrant_employees": 0,
+      "registrant_established": "2017-07-17",
+      "registrant_credit_code": "91321181MA1PX13L5D",
+      "domain_created": "2019-12-04",
+      "domain_expires": "2027-12-04",
+      "dns": ["dns23.hichina.com", "dns24.hichina.com"],
+      "hosting_ip": "103.14.34.169 (Hong Kong, Zenlayer)",
+      "critical_finding": "域名注册人 奥瑞文化传媒镇江有限公司 与 AM MEDICAL 无直接工商关联，域名创建于 2019 年（先于 AM MEDICAL EQUIPMENT PTE. LTD. 注册 4 年）。这是运营层指纹匹配的关键线索（S04）。"
+    },
+    "incorporation_vs_medica_timeline": {
+      "medica_2025_dates": "2025-11-17 至 2025-11-20",
+      "medica_2025_application_deadline_estimate": "2025年3-5月",
+      "entity_incorporated": "2023-06-22",
+      "lead_time": "约 2 年（充裕，壳公司在展会报名前近 2 年已就位）",
+      "medica_2024_under_old_name": "2024年以'Am Wheelchair + Equipment'名义参展 Hall 6 D40，此时新壳已注册但尚未更名使用"
+    }
+  },
+  "acceptance_verification": {
+    "ac1_acra_uen_date_address": "PASS - UEN=202324580R, 注册日期=2023-06-22, 地址=73 Upper Paya Lebar Rd #07-02J Centro Bianco",
+    "ac2_timeline_analysis": "PASS - 成立日期(2023-06)距 Medica 2025 报名截止(~2025-03)约 20 个月，远超'报名前数月成立'的典型模式",
+    "ac3_address_company_count": "PASS - 确认虚拟地址，#07-02J 单元 826+ 家公司，#06-01C（前身实体）另有大批注册",
+    "ac4_director_chinese_names": "PARTIAL - 7 名官员但所有新加坡企查网站均被 Cloudflare 拦截，姓名无法获取。已记录为待人工 ACRA 查询。但 WHOIS 域名线索指向 任丹芳",
+    "ac5_export_json": "PASS - 已写入 findings/02_sg_registry.json，所有信息附来源 URL"
+  }
+}

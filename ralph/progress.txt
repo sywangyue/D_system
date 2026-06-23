@@ -1,0 +1,12 @@
+## 已知线索（每轮先读这里）
+- [S01] ✅ 完成。AM MEDICAL vis_hash=4VzXDxAaSkK5z8xiERHAsA, booth 11 E69, risk=high. 历史用名 vis_hash=Xoq0b3yKRgmYCYWNmjOAZA (Am wheelchair + Equipment, Hall 6 D40). Zhengzhou Olive 同在 11 E69. 11 E 区另有 high risk 展位 11 E39 (Joytech+SPARKER). cn_in_intl_hall 全库 960 条.
+- [已知] 已知境内实体: 杭州仁然文化传媒有限公司, 法人赵立业
+- [已知] AM MEDICAL 新加坡壳公司 + 杭州仁然运营代理 模式已初步确认
+
+## 卡点记录
+- [S02] ACRA/新加坡企查网站全部被Cloudflare拦截，董事/股东姓名无法在线获取。替代方案：WHOIS域名反查已获取关联线索（奥瑞文化传媒镇江有限公司/任丹芳）
+
+## 复用模式
+- medica_investigation.db 表: editions, participations, company_entities, anomaly_flags, v_booth_rotation_alert, v_cn_in_intl_hall, v_booth_history, v_name_changes, seed_agents
+- 企查查API: python3 tools/intel/qcc_client.py
+- 企查查深度报告: python3 tools/intel/qcc_company_research.py

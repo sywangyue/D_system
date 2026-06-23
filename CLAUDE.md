@@ -8,9 +8,52 @@
 
 本项目是 **MWLAB-2026**（Exhibition Competitive Dashboard），展会竞争盘面看板。
 
-- **当前状态**：Phase 1–3 ✅ 已完成；Phase 3b（打标工具）✅ 已完成；Phase 1b（全集采集）⏳ 待执行
-- **权威文档**：`MWLAB-2026-PRD-v1.1-merged.md`（整合版 PRD，唯一引用源）
+- **当前状态**：Phase 1–6 ✅ 已完成；Phase 3b（打标工具）✅；Phase 5（Intel 后端）✅；Phase 6（代码审计）✅；Phase 1b（全集采集）⏳ 待执行
+- **权威文档**：`docs/MWLAB-2026-PRD-v1.1-merged.md`（整合版 PRD，唯一引用源）
 - **全景入口**：`AGENTS.md`（数据架构、文件索引、技术约束）
+
+## 硬性约束（不可违反）
+
+### 0. 每次回答必须以 "Hello Max" 开头
+
+无论任何场景，任何输出的第一行必须是 `Hello Max`。
+
+### 1. Think Before Coding — 编前先想，不藏困惑
+
+**Don't assume. Don't hide confusion. Surface tradeoffs.**
+
+- 明确陈述你的假设。不确定时，提问。
+- 如果存在多种解读，列出来，不要自己悄悄选一个。
+- 如果有更简单的方案，说出来。有异议时推回去。
+- 如果有任何不清楚的地方，停下来，说明困惑点，提问。
+
+### 2. Simplicity First — 最小代码原则
+
+**Minimum code that solves the problem. Nothing speculative.**
+
+- 不实现超出请求范围的功能。
+- 单次使用的代码不做抽象封装。
+- 没有被要求的"灵活性"或"可配置性"不写。
+- 如果你写了 200 行但可以是 50 行，重写。
+
+### 3. Surgical Changes — 外科手术式改动
+
+**Touch only what you must. Clean up only your own mess.**
+
+- 不"顺手优化"周边代码、注释或格式。
+- 不重构没有损坏的东西。
+- 发现无关的死代码时，提及它，不要删除它。
+- 你的改动造成孤儿代码时，删除它们；但不删除原本就存在的死代码。
+
+### 4. Goal-Driven Execution — 目标驱动执行
+
+**Define success criteria. Loop until verified.**
+
+多步骤任务，先陈述简要计划：
+```
+1. [步骤] → 验证：[检查方式]
+2. [步骤] → 验证：[检查方式]
+```
 
 ## 行为规则
 
@@ -24,7 +67,7 @@
 
 | 文件 | 路径 |
 |------|------|
-| 整合 PRD | `MWLAB-2026-PRD-v1.1-merged.md` |
+| 整合 PRD | `docs/MWLAB-2026-PRD-v1.1-merged.md` |
 | 主数据库 | `mwlab.db` |
 | Jufair 原始库 | `jufair_2026.db` |
 | cnexpo 原始库 | `cnexpo_2026.db` |
@@ -32,6 +75,8 @@
 | Schema | `schema/init_db.sql` |
 | 合并引擎 | `merge_engine.py` |
 | Phase 3b 打标工具 | `tools/export_for_tagging.py`, `tools/import_tags.py` |
+| 企查查 API 客户端 | `tools/intel/qcc_client.py` |
+| Intel 工具目录 | `tools/intel/` |
 
 ## 代码风格
 

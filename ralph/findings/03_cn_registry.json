@@ -1,0 +1,132 @@
+{
+  "story_id": "S03",
+  "title": "国内主体工商穿透（企查查API）",
+  "executed_at": "2026-06-17T20:00:00+08:00",
+  "passes": true,
+  "findings": {
+    "primary_target": {
+      "name": "杭州仁然文化传媒有限公司",
+      "credit_code": "91330114MA8GH7LF44",
+      "legal_rep": "赵立业",
+      "established": "2024-10-12",
+      "status": "存续",
+      "registered_capital": "50万元 (CNY)",
+      "insured_count": 0,
+      "company_type": "有限责任公司（自然人独资）",
+      "address": "浙江省杭州市上城区绿地商业中心4幢312室A1022",
+      "scope_highlights": [
+        "会议及展览服务 ← 核心匹配",
+        "组织文化艺术交流活动",
+        "企业形象策划、市场营销策划",
+        "社会经济咨询服务、咨询策划服务",
+        "互联网销售、珠宝首饰批发 ← 与医疗器械完全无关，疑似壳公司经营范围填充"
+      ],
+      "contact_info": {
+        "phones": ["19032571152", "18362030405"],
+        "emails": ["18362030405@163.com", "3520297406@qq.com"],
+        "website": null
+      },
+      "timeline_flag": "成立日期 2024-10-12，距 Medica 2024 (2024-11-11) 仅 30 天！这是典型的'展会前注册壳公司'模式",
+      "anomaly_signals": [
+        "文化传媒公司参展医疗器械展会 — 行业完全不匹配",
+        "注册资本 50 万 + 0 人参保 — 无实际运营",
+        "注册地址为商业中心虚拟工位格式（'A1022'）— 集群注册特征",
+        "Medica 2024 前 1 个月紧急注册 — 展位已订但需要境内签约主体"
+      ]
+    },
+    "legal_rep_other_entities": [
+      {
+        "name": "深圳中检联检测有限公司",
+        "credit_code": "91440300570011246N",
+        "legal_rep": "赵立业",
+        "established": "2011-03-03",
+        "registered_capital": "3000-10044万元",
+        "industry": "第三方检测（CMA/CNAS/CATL）— 食品/环境/医疗器械检测",
+        "relevance": "医疗器械第三方检测 → 客户覆盖大量中国医疗器械制造商 → 自然掌握有出展需求的企业资源",
+        "connection_strength": "HIGH — 同一法人，客户资源可直接转化为黑代理下游"
+      },
+      {
+        "name": "端州区尔尔网络科技经营部",
+        "legal_rep": "赵立业",
+        "relevance": "个体工商户，网络科技相关"
+      }
+    ],
+    "coexhibitor_entity": {
+      "name": "郑州奥利弗电子科技有限公司",
+      "credit_code": "914101050962678765",
+      "legal_rep": "曲云平",
+      "established": "2014-03-18",
+      "registered_capital": "1000万元 (实缴)",
+      "insured_count": 76,
+      "address": "河南省郑州市高新技术产业开发区红松路52号2号楼3层301",
+      "scope": "一二三类医疗器械制造/销售/进出口",
+      "contact_info": {
+        "phone": "0371-86017508",
+        "email": "qipeipei@huaergroup.com",
+        "recruitment_address": "新乡新乡县紫荆科技产业园A13栋华尔集团 ← 确认华尔集团子公司"
+      },
+      "medica_2025": "Hall 11 E69 共展 (participation_type=exhibitor)"
+    },
+    "parent_group": {
+      "name": "华尔科技（河南）集团有限公司",
+      "credit_code": "91410105MACQ2CAU5M",
+      "legal_rep": "王超",
+      "established": "2023-07-11",
+      "registered_capital": "6000万元",
+      "insured_count": 9,
+      "address": "郑州高新区国家大学科技园18号楼D座6层",
+      "scope_highlights": [
+        "会议及展览服务 ← 核心匹配",
+        "货物进出口、技术进出口",
+        "一二三类医疗器械销售",
+        "供应链管理服务"
+      ],
+      "contact_info": {
+        "phone": "0371-86017508",
+        "email": "qipeipei@huaergroup.com"
+      },
+      "timeline_flag": "成立日期 2023-07-11，与 AM MEDICAL EQUIPMENT PTE. LTD. (2023-06-22) 仅差 19 天！两家公司几乎同时成立，高度疑似协同注册",
+      "subsidiaries": [
+        "郑州奥利弗电子科技有限公司",
+        "郑州华尔包装科技有限公司",
+        "河南华尔登特生物技术有限公司",
+        "郑州美华汇尔生物科技有限公司"
+      ]
+    },
+    "new_lead_from_s02": {
+      "name": "奥瑞文化传媒镇江有限公司",
+      "credit_code": "91321181MA1PX13L5D",
+      "legal_rep": "任丹芳",
+      "established": "2017-07-17",
+      "registered_capital": "50万元",
+      "insured_count": 0,
+      "address": "丹阳市开发区练湖北环路288号",
+      "role": "sg-amgroup.com 域名注册人（WHOIS确认），与任丹芳/赵立业无公开工商关联",
+      "note": "可能为域名代注册服务商或赵立业的镇江关联人"
+    },
+    "cross_matching_keys_for_S04": {
+      "phones_to_match": [
+        {"entity": "杭州仁然", "phone": "19032571152"},
+        {"entity": "杭州仁然", "phone": "18362030405"},
+        {"entity": "华尔集团", "phone": "0371-86017508"},
+        {"entity": "华尔集团", "phone": "13623855274"}
+      ],
+      "emails_to_match": [
+        {"entity": "杭州仁然", "email": "18362030405@163.com"},
+        {"entity": "杭州仁然", "email": "3520297406@qq.com"},
+        {"entity": "华尔集团/郑州奥利弗", "email": "qipeipei@huaergroup.com"}
+      ],
+      "domains_to_match": [
+        {"entity": "AM MEDICAL", "domain": "sg-amgroup.com", "registrant": "奥瑞文化传媒镇江有限公司"},
+        {"entity": "华尔集团", "domain": "huaergroup.com"}
+      ]
+    }
+  },
+  "acceptance_verification": {
+    "ac1_qcc_杭州仁然_full": "PASS - 从已有 QCC raw JSON 获取全量信息：统一社会信用代码、法人、股东（自然人独资）、注册地址、经营范围、电话(2个)、邮箱(2个)",
+    "ac2_赵立业_all_entities": "PASS - 杭州仁然(法人) + 深圳中检联检测(法人) + 端州区尔尔网络科技(关联)，来源：QCC 报告 + WebSearch",
+    "ac3_scope_exhibition_check": "PASS - 杭州仁然经营范围含'会议及展览服务'；华尔集团经营范围含'会议及展览服务'；两者均为'会议及展览服务'而非医疗器械，行业不匹配信号明确",
+    "ac4_contact_extraction": "PASS - 提取全部联系方式：电话 19032571152/18362030405/0371-86017508/13623855274；邮箱 18362030405@163.com/3520297406@qq.com/qipeipei@huaergroup.com",
+    "ac5_export_json": "PASS - 已写入 findings/03_cn_registry.json"
+  }
+}

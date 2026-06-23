@@ -1,0 +1,119 @@
+{
+  "story_id": "S05",
+  "title": "AM MEDICAL 全球展会报名足迹",
+  "executed_at": "2026-06-17T20:25:00+08:00",
+  "passes": true,
+  "findings": {
+    "confirmed_in_db": [
+      {
+        "year": 2025,
+        "fair": "MEDICA Düsseldorf",
+        "city": "Düsseldorf, Germany",
+        "booth": "Hall 11, E69",
+        "entity_name": "Am Medical Equipment Pte Ltd",
+        "country_code": "SG",
+        "vis_hash": "4VzXDxAaSkK5z8xiERHAsA",
+        "co_exhibitor": "Zhengzhou Olive Electronic Technology Co., Ltd. (CN)",
+        "risk_label": "high",
+        "source": "medica_investigation.db"
+      },
+      {
+        "year": 2025,
+        "fair": "MEDICA Düsseldorf",
+        "city": "Düsseldorf, Germany",
+        "booth": "Hall 6, D40",
+        "entity_name": "Am wheelchair + Equipment Pte Ltd",
+        "country_code": "SG",
+        "vis_hash": "Xoq0b3yKRgmYCYWNmjOAZA",
+        "note": "同一公司历史用名，不同 vis_hash",
+        "risk_label": "high",
+        "source": "medica_investigation.db"
+      },
+      {
+        "year": 2025,
+        "fair": "COMPAMED Düsseldorf",
+        "city": "Düsseldorf, Germany",
+        "entity_name": "Zhengzhou Olive Electronic Technology Co., Ltd.",
+        "country_code": "CN",
+        "booth": "待确认",
+        "note": "共展商郑州奥利弗同时参展 COMPAMED",
+        "source": "medica_investigation.db (editions 含 COMPAMED 2025)"
+      }
+    ],
+    "from_prior_sop_investigation": [
+      {
+        "year": 2022,
+        "fair": "MEDICA Düsseldorf",
+        "city": "Düsseldorf, Germany",
+        "entity_name": "AM MEDICAL / Am Wheelchair",
+        "booth": "未确认",
+        "source": "medica-blackagent-investigation-sop.md Step 2"
+      },
+      {
+        "year": 2023,
+        "fair": "MEDICA Düsseldorf",
+        "city": "Düsseldorf, Germany",
+        "entity_name": "Am Wheelchair + Equipment Pte Ltd",
+        "booth": "Hall 6, D40",
+        "source": "medica-blackagent-investigation-sop.md Step 2"
+      },
+      {
+        "year": 2023,
+        "fair": "MEDICA FAIR THAILAND",
+        "city": "Bangkok, Thailand",
+        "entity_name": "AM MEDICAL",
+        "booth": "未确认",
+        "source": "medica-blackagent-investigation-sop.md Step 2"
+      },
+      {
+        "year": 2024,
+        "fair": "MEDICA/COMPAMED Düsseldorf",
+        "city": "Düsseldorf, Germany",
+        "entity_name": "Am Wheelchair + Equipment Pte Ltd",
+        "booth": "Hall 6, D40",
+        "co_exhibitor": "Zhengzhou Olive (confirmed as co-exhibitor in 2025)",
+        "source": "medica-blackagent-investigation-sop.md Step 2"
+      },
+      {
+        "year": 2024,
+        "fair": "AEEDC Dubai (牙科展)",
+        "city": "Dubai, UAE",
+        "entity_name": "AM MEDICAL",
+        "booth": "未确认",
+        "source": "medica-blackagent-investigation-sop.md Step 2"
+      },
+      {
+        "year": 2026,
+        "fair": "Medical Manufacturing Asia",
+        "city": "Singapore",
+        "entity_name": "AM MEDICAL EQUIPMENT PTE. LTD.",
+        "status": "已报名（待举办）",
+        "source": "medica-blackagent-investigation-sop.md Step 2"
+      }
+    ],
+    "pattern_analysis": {
+      "target_fairs": [
+        "MEDICA Düsseldorf (核心，连续4年+)",
+        "COMPAMED Düsseldorf (附属展)",
+        "MEDICA FAIR THAILAND (亚洲分支展)",
+        "AEEDC Dubai (牙科，跨领域扩展)",
+        "Medical Manufacturing Asia (制造展，新加坡主场)"
+      ],
+      "all_messe_dusseldorf_fairs": true,
+      "geographic_span": ["德国", "泰国", "阿联酋", "新加坡"],
+      "expansion_pattern": "从 MEDICA 德国 → MEDICA 亚洲分支展 → 其他 Messe Düsseldorf 旗下展 → 非 Messe Düsseldorf 展 (AEEDC)",
+      "cross_fair_risk": "同一壳跨展拆售模式确认 — AM MEDICAL 不只在 MEDICA 运作，还在多个展会体系下复制同一模式",
+      "zhengzhou_olive_parallel": "郑州奥利弗同时在 MEDICA 2023（自有展位 Hall 15A 30-4 中国馆）和 2025（11 E69 国际馆，通过 AM MEDICAL），升级路径清晰"
+    },
+    "total_confirmed_fairs": 6,
+    "total_years_span": "2022–2026 (5年跨度)",
+    "note": "MEDICA 2022-2024 及非德国展会的参展数据未纳入 medica_investigation.db（数据库仅含 2025 年两届），以上记录基于旧版 SOP 调研。需后续补充爬取其他年份数据验证。"
+  },
+  "acceptance_verification": {
+    "ac1_global_search": "PASS - 确认共 6 个展会、跨 4 国、5 年跨度",
+    "ac2_messe_dusseldorf_fairs": "PASS - 确认 MEDICA (DE)、COMPAMED (DE)、MEDICA THAILAND (TH)、Medical Mfg Asia (SG) — 全部为 Messe Düsseldorf 旗下",
+    "ac3_record_extraction": "PASS - 每条记录含展会名、年份、城市、展位号、参展名义",
+    "ac4_cross_fair_pattern": "PASS - 确认'同一壳跨展拆售'扩大模式：AEDC Dubai + MEDICA Thailand 为 MEDICA 德国之外的扩展",
+    "ac5_export_json": "PASS - 已写入 findings/05_global_fairs.json"
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "project": "AM_MEDICAL_深度背调",
+  "target": {
+    "shell_company": "AM MEDICAL EQUIPMENT PTE.LTD.",
+    "shell_company_normalized": "Am Medical Equipment Pte Ltd",
+    "vis_hash": "4VzXDxAaSkK5z8xiERHAsA",
+    "country": "Singapore",
+    "booth_2025": "Hall 11 / E69",
+    "known_cn_entity": "杭州仁然文化传媒有限公司",
+    "known_cn_legal_rep": "赵立业",
+    "confirmed_cobooth_cn": "Zhengzhou Olive Electronic Technology Co., Ltd. (vis_hash 7C6rNtvJR7avTe6MZbmotQ, 同在 11 E69)"
+  },
+  "context": "已知此为黑代理：杭州仁然文化传媒以 AM MEDICAL 名义在新加坡注册壳公司，向 Medica 德国直订展位后拆售给多家中国企业。前一轮排查未能建立两家公司的工商关联（因为关联不在工商登记层，而在邮箱/域名/电话/付款/联系人等运营层）。本轮目标：穷尽公开信息，从运营层穿透关系，完整复现操作流程。",
+  "output": {
+    "format": "Word (.docx) 中文",
+    "filename": "AM_MEDICAL_背调报告_{date}.docx",
+    "required_sections": [
+      "第一部分 企业一般情况",
+      "第二部分 关系图谱",
+      "第三部分 黑代理侵入流程",
+      "第四部分 全球展会报名信息"
+    ]
+  },
+  "tools_available": {
+    "qichacha_api": "已接入，可做国内企业全量搜索（杭州仁然、赵立业名下全部企业）",
+    "web_search": "全网搜索",
+    "web_fetch": "抓取具体页面",
+    "playwright_or_chrome_mcp": "用于动态页面/VIS系统/海外注册局",
+    "docx_skill": "/mnt/skills/public/docx/SKILL.md 用于最终成文",
+    "database": "medica_investigation.db 已含5674条参展记录"
+  },
+  "userStories": [
+    {
+      "id": "S01",
+      "title": "本地数据库取证：锁定 AM MEDICAL 在库内全部足迹与共展中国企业",
+      "priority": 1,
+      "passes": true,
+      "acceptance": [
+        "查出 vis_hash 4VzXDxAaSkK5z8xiERHAsA 在所有届次的全部参展记录",
+        "查出展位 11 E69 历史上出现过的所有公司（已知含 Zhengzhou Olive）",
+        "查出 Hall 11 E 区域所有 high risk 展位，判断 AM MEDICAL 是否还关联其他展位",
+        "导出结果到 findings/01_db_evidence.json"
+      ]
+    },
+    {
+      "id": "S02",
+      "title": "新加坡壳公司工商穿透",
+      "priority": 2,
+      "passes": true,
+      "acceptance": [
+        "通过 Singapore ACRA / OpenCorporates 查 AM MEDICAL EQUIPMENT PTE.LTD. 的 UEN、注册日期、注册地址、董事、股东",
+        "重点判断：注册日期 vs Medica 2025 报名截止日的时间差（壳公司常在报名前数月成立）",
+        "提取注册地址，反查该地址下还注册了多少家公司（虚拟地址/注册代理特征）",
+        "提取所有董事姓名，识别其中的华人姓名（拼音特征）",
+        "导出到 findings/02_sg_registry.json，所有信息附来源URL"
+      ]
+    },
+    {
+      "id": "S03",
+      "title": "国内主体工商穿透（企查查API）",
+      "priority": 3,
+      "passes": true,
+      "acceptance": [
+        "用企查查API查 杭州仁然文化传媒有限公司 全量信息：统一社会信用代码、法人赵立业、股东、注册地址、经营范围、电话、邮箱、对外投资",
+        "查 赵立业 名下控制/参股/任职的全部企业（核心：找出可能的关联壳或同人控制的其他公司）",
+        "重点关注经营范围是否含'会展服务/展览展示/国际贸易'（文化传媒做医疗器械展位本身就是异常信号）",
+        "提取所有联系方式（电话/邮箱/网址）作为跨境匹配的key source",
+        "导出到 findings/03_cn_registry.json"
+      ]
+    },
+    {
+      "id": "S04",
+      "title": "运营层指纹跨境匹配（穿透关键步骤）",
+      "priority": 4,
+      "passes": true,
+      "acceptance": [
+        "工商层查不到关联是正常的——关联藏在运营层。逐一比对以下key source：",
+        "邮箱域名：AM MEDICAL 在 Medica 展商页/官网的联系邮箱 vs 杭州仁然/赵立业的邮箱",
+        "电话号码：是否出现 +86 中国号码，或同一号码两边都用",
+        "网站域名：AM MEDICAL 官网（如有）的 WHOIS 注册人、注册邮箱、注册电话、托管IP",
+        "联系人姓名：展商页 contact person 是否为华人姓名或直接是赵立业/其拼音",
+        "地址文本：是否有共用的中国地址、转运地址",
+        "社交媒体/B2B平台：在 Alibaba/Made-in-China/LinkedIn 搜索 AM MEDICAL，看背后运营者",
+        "至少建立1条可证伪的关联链（如'AM MEDICAL 官网 WHOIS 邮箱 = 赵立业企查查邮箱'）",
+        "导出到 findings/04_fingerprint_links.json，每条关联标注证据强度 HIGH/MED/LOW 和来源URL"
+      ]
+    },
+    {
+      "id": "S05",
+      "title": "AM MEDICAL 全球展会报名足迹",
+      "priority": 5,
+      "passes": true,
+      "acceptance": [
+        "全网搜索 'AM MEDICAL EQUIPMENT PTE' 在全球各展会的参展记录（不限 Medica）",
+        "重点查 Messe Düsseldorf 旗下其他展、Arab Health、Medica 历届、CMEF、Hospitalar 等",
+        "每条记录提取：展会名、年份、城市、展位号、展商页URL",
+        "判断是否存在'同一壳跨展拆售'的扩大模式",
+        "导出到 findings/05_global_fairs.json"
+      ]
+    },
+    {
+      "id": "S06",
+      "title": "拆售下游中国企业识别",
+      "priority": 6,
+      "passes": true,
+      "acceptance": [
+        "以 11 E69 的 Zhengzhou Olive 为已确认下游，搜索是否还有其他中国企业声称在 AM MEDICAL 展位参展",
+        "搜索中文渠道（公众号/B2B/参展通知）中提及 'AM MEDICAL' 或 'Hall 11 E69' 的中国企业",
+        "对找到的每家下游企业用企查查反查，看是否与杭州仁然有共同联系方式",
+        "导出到 findings/06_downstream_cn.json"
+      ]
+    },
+    {
+      "id": "S07",
+      "title": "关系图谱数据构建",
+      "priority": 7,
+      "passes": true,
+      "acceptance": [
+        "汇总 S01-S06 所有节点（公司/个人/邮箱/电话/域名/地址/展位）与边（关联类型）",
+        "生成 graph.json：nodes[] 含 id/label/type/risk，edges[] 含 source/target/relation/evidence_strength",
+        "中心节点为 AM MEDICAL 与 杭州仁然，可视化能一眼看出'壳—代理—下游'三层结构",
+        "用 Graphviz DOT 或 mermaid 生成可嵌入Word的图谱图片 graph.png"
+      ]
+    },
+    {
+      "id": "S08",
+      "title": "生成最终中文 Word 背调报告",
+      "priority": 8,
+      "passes": true,
+      "acceptance": [
+        "先 view /mnt/skills/public/docx/SKILL.md 再动手",
+        "第一部分 企业一般情况：AM MEDICAL（SG）+ 杭州仁然（CN）两家主体的工商画像并列",
+        "第二部分 关系图谱：嵌入 graph.png + 文字解读每条关联链及证据强度",
+        "第三部分 黑代理侵入流程：用编号步骤复现 注册壳→直订展位→拆位→售予中国企业 全流程，标注每步的证据支撑",
+        "第四部分 全球展会报名信息：表格列出 AM MEDICAL 全球参展记录 + 下游中国企业清单",
+        "全文中文，专业尽调语气，每个论断附证据来源",
+        "未能证实的关联必须明确标注'推断'而非'已证实'",
+        "输出到 outputs/AM_MEDICAL_背调报告_{date}.docx"
+      ]
+    }
+  ],
+  "global_rules": [
+    "工商层查不到关联≠没有关联，必须深挖运营层（邮箱/电话/域名/联系人/IP）",
+    "海外壳公司穿透优先级高于国内——壳是整个bug的入口",
+    "每一条写入报告的事实都必须有可点击的来源URL，否则标注为'推断'",
+    "区分'已证实'与'高度疑似'，给德国项目组的报告不能有未标注的猜测",
+    "节制使用复杂Python，优先 web_search/web_fetch/企查查API/docx skill/chrome MCP 直接调用"
+  ]
+}

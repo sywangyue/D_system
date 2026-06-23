@@ -1,0 +1,92 @@
+{
+  "story_id": "S01",
+  "title": "本地数据库取证：锁定 AM MEDICAL 在库内全部足迹与共展中国企业",
+  "executed_at": "2026-06-17T19:30:00+08:00",
+  "passes": true,
+  "findings": {
+    "am_medical_footprint": {
+      "vis_hash": "4VzXDxAaSkK5z8xiERHAsA",
+      "canonical_name": "Am Medical Equipment Pte Ltd",
+      "country_code": "SG",
+      "total_editions_in_db": 1,
+      "first_seen": 2025,
+      "last_seen": 2025,
+      "records": [
+        {
+          "show_name": "Medica",
+          "edition_year": 2025,
+          "hall": "11",
+          "booth_number": "E69",
+          "booth_full": "11 E69",
+          "participation_type": "exhibitor",
+          "risk_label": "high",
+          "profile_url": "/vis/v1/en/exhprofiles/4VzXDxAaSkK5z8xiERHAsA"
+        }
+      ],
+      "note": "数据库仅含 Medica 2025 + COMPAMED 2025 两届。AM MEDICAL 更早年份（2022-2024 Hall 6 D40）以 'Am wheelchair + Equipment Pte Ltd' 名义参展的记录未入库，因其 vis_hash 不同（Xoq0b3yKRgmYCYWNmjOAZA）。"
+    },
+    "booth_11_E69_all_occupants": [
+      {
+        "vis_hash": "4VzXDxAaSkK5z8xiERHAsA",
+        "raw_name": "Am Medical Equipment Pte Ltd",
+        "country_code": "SG",
+        "participation_type": "exhibitor",
+        "risk_label": "high"
+      },
+      {
+        "vis_hash": "7C6rNtvJR7avTe6MZbmotQ",
+        "raw_name": "Zhengzhou Olive Electronic Technology Co., Ltd.",
+        "country_code": "CN",
+        "participation_type": "exhibitor",
+        "risk_label": "high"
+      }
+    ],
+    "hall_11_E_high_risk_booths": [
+      {
+        "booth_full": "11 E39",
+        "exhibitors": [
+          {"vis_hash": "eKi1b6lYQ7qhz64nZ8I86g", "raw_name": "Joytech Healthcare Co., Ltd.", "country": "CN", "risk_label": "high"},
+          {"vis_hash": "aoR0O21IQ1ubAh5ccy9Vog", "raw_name": "SPARKER INTERNATIONAL CORP.", "country": "unknown", "risk_label": "high"}
+        ],
+        "pattern": "同 11 E69，中国企业+海外壳混合展位"
+      },
+      {
+        "booth_full": "11 E69",
+        "exhibitors": [
+          {"vis_hash": "4VzXDxAaSkK5z8xiERHAsA", "raw_name": "Am Medical Equipment Pte Ltd", "country": "SG", "risk_label": "high"},
+          {"vis_hash": "7C6rNtvJR7avTe6MZbmotQ", "raw_name": "Zhengzhou Olive Electronic Technology Co., Ltd.", "country": "CN", "risk_label": "high"}
+        ],
+        "pattern": "海外壳(SG) + 中国企业(CN) 共展，典型黑代理拆售模式"
+      }
+    ],
+    "am_medical_name_variant": {
+      "vis_hash": "Xoq0b3yKRgmYCYWNmjOAZA",
+      "raw_name": "Am wheelchair + Equipment Pte Ltd",
+      "booth": "6 D40",
+      "country_code": "SG",
+      "risk_label": "high",
+      "note": "同一公司历史用名，但 VIS 系统分配了不同 vis_hash。老 SOP 记载 2022-2024 均以此名参展 Hall 6 D40，2025 年改为现名并移至 Hall 11 E69。"
+    },
+    "anomaly_flags": [
+      {
+        "flag_type": "cn_in_intl_hall",
+        "company": "Zhengzhou Olive Electronic Technology Co., Ltd.",
+        "booth": "11 E69",
+        "year": 2025,
+        "confidence": 60,
+        "note": "中国企业出现在国际馆展位，明确异常信号"
+      }
+    ],
+    "global_context": {
+      "total_high_risk_exhibitors": "待查询",
+      "cn_in_intl_hall_total": 960,
+      "note_from_old_sop": "Medica 2025 共 194 个海外壳+中国企业混合展位，涉 433 家中国企业"
+    }
+  },
+  "acceptance_verification": {
+    "ac1_am_medical_all_editions": "PASS - 查出 1 个 edition (Medica 2025)，数据库仅含此届。已同时查出历史用名 vis_hash Xoq0b3yKRgmYCYWNmjOAZA",
+    "ac2_booth_11_E69_history": "PASS - 2 家公司：AM MEDICAL (SG) + Zhengzhou Olive (CN)，均为 high risk",
+    "ac3_hall_11_E_high_risk": "PASS - 11 E 区域 2 个 high risk 展位：11 E39 + 11 E69",
+    "ac4_export_json": "PASS - 已写入 findings/01_db_evidence.json"
+  }
+}
