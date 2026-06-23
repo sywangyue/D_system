@@ -7,8 +7,8 @@ tools/intel/qcc_client.py — 企查查 API 封装
   python3 tools/intel/qcc_client.py "格力电器" --page 2
 
 配置（环境变量）:
-  QCC_APP_KEY     企查查 AppKey（客户提供）
-  QCC_SECRET_KEY  企查查 SecretKey（客户提供）
+  QCC_KEY     企查查 AppKey（存入 .env.local）
+  QCC_SECRET  企查查 SecretKey（存入 .env.local）
 
 未配置时降级模式：返回占位符结果，不抛出异常。
 """
@@ -31,8 +31,8 @@ _REQUEST_TIMEOUT = 10  # 秒
 
 def _is_configured() -> bool:
     """检查 API Key 是否已配置（区别于占位符）"""
-    app_key = os.environ.get("QCC_APP_KEY", _PLACEHOLDER_KEY)
-    secret_key = os.environ.get("QCC_SECRET_KEY", _PLACEHOLDER_SECRET)
+    app_key = os.environ.get("QCC_KEY", _PLACEHOLDER_KEY)
+    secret_key = os.environ.get("QCC_SECRET", _PLACEHOLDER_SECRET)
     return (
         app_key != _PLACEHOLDER_KEY
         and secret_key != _PLACEHOLDER_SECRET
@@ -84,15 +84,15 @@ def fuzzy_search(
         return {
             "Status": "PLACEHOLDER",
             "Message": (
-                "QCC_APP_KEY / QCC_SECRET_KEY 未配置。"
-                "请设置环境变量后重试。"
+                "QCC_KEY / QCC_SECRET 未配置。"
+                "请在 .env.local 中设置后重试。"
                 f"搜索关键词: {keyword}"
             ),
             "Result": [],
         }
 
-    app_key = os.environ["QCC_APP_KEY"]
-    secret_key = os.environ["QCC_SECRET_KEY"]
+    app_key = os.environ["QCC_KEY"]
+    secret_key = os.environ["QCC_SECRET"]
     token, timespan = _make_token(app_key, secret_key)
 
     headers = {

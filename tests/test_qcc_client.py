@@ -7,8 +7,8 @@ import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 # 设测试用 API Key（qcc_client.py 在模块级不检查，但 _is_configured 检查通过后 os.environ 取值）
-os.environ.setdefault("QCC_APP_KEY", "TEST_KEY")
-os.environ.setdefault("QCC_SECRET_KEY", "TEST_SECRET")
+os.environ.setdefault("QCC_KEY", "TEST_KEY")
+os.environ.setdefault("QCC_SECRET", "TEST_SECRET")
 
 import json
 import unittest
