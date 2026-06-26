@@ -3,11 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<script src="./support.js"></script>
-</head>
-<body>
-<x-dc>
-<helmet>
+<title>MWLAB 2026 — 展会竞争情报系统</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -23,7 +19,8 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
 .glass-card{background:rgba(255,255,255,0.06);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.1);border-radius:20px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 </style>
-</helmet>
+</head>
+<body>
 
 <!-- ════ NAVBAR ════ -->
 <nav style="position:fixed;top:0;left:0;right:0;z-index:999;background:#1A1A1C;border-bottom:1px solid rgba(255,255,255,0.07);height:56px;display:flex;align-items:center;padding:0 40px">
@@ -456,9 +453,8 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
   </div>
 
 </footer>
-</x-dc>
-<script type="text/x-dc" data-dc-script>
-class Component extends DCLogic {
+<script>
+class App {
   /* ─── i18n ─── */
   LANG = {
     zh: {
@@ -1057,7 +1053,7 @@ class Component extends DCLogic {
     draw();
   }
 
-  componentDidMount() {
+  init() {
     document.querySelectorAll('.lang-btn').forEach(b => {
       b.addEventListener('click', () => this.setLang(b.dataset.lang));
     });
@@ -1070,6 +1066,7 @@ class Component extends DCLogic {
     this.setupTechCanvas();
   }
 }
+document.addEventListener('DOMContentLoaded', () => new App().init());
 </script>
 </body>
 </html>
