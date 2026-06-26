@@ -13,17 +13,17 @@
 html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased;scroll-padding-top:56px}
 body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-serif}
 ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#FE5C00;border-radius:2px}
-.lang-btn{padding:4px 10px;border:none;background:none;color:rgba(0,0,0,0.65);font-family:inherit;font-size:13px;font-weight:600;letter-spacing:0.08em;cursor:pointer;border-radius:5px;transition:all 150ms}
+.lang-btn{padding:4px 10px;border:none;background:none;color:rgba(255,255,255,0.65);font-family:inherit;font-size:13px;font-weight:600;letter-spacing:0.08em;cursor:pointer;border-radius:5px;transition:all 150ms}
 .lang-btn.active{background:#FE5C00;color:#fff}
-.lang-btn:not(.active):hover{color:#000;background:rgba(0,0,0,0.08)}
-.glass-card{background:#fff;border:1px solid rgba(0,0,0,0.08);border-radius:20px}
+.lang-btn:not(.active):hover{color:#fff;background:rgba(255,255,255,0.08)}
+.glass-card{background:rgba(255,255,255,0.06);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,0.1);border-radius:20px}
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
 </style>
 </head>
 <body>
 
 <!-- ════ NAVBAR ════ -->
-<nav style="position:fixed;top:0;left:0;right:0;z-index:999;background:rgb(169,169,169);border-bottom:1px solid rgba(0,0,0,0.1);height:56px;display:flex;align-items:center;padding:0 40px">
+<nav style="position:fixed;top:0;left:0;right:0;z-index:999;background:#1A1A1C;border-bottom:1px solid rgba(255,255,255,0.07);height:56px;display:flex;align-items:center;padding:0 40px">
   <div style="width:100%;display:flex;align-items:center">
     <div style="display:flex;align-items:center;gap:10px;margin-right:auto;flex-shrink:0">
       <svg viewBox="0 0 44 28" width="44" height="28" xmlns="http://www.w3.org/2000/svg">
@@ -31,8 +31,8 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
         <polyline points="4,22 4,7 11,15 18,7 18,22" style="fill:none;stroke:white;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round"/>
         <polyline points="22,7 26,22 30,14 34,22 38,7" style="fill:none;stroke:white;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round"/>
       </svg>
-      <span style="font-size:15px;font-weight:700;color:#000;letter-spacing:0.1em">LAB</span>
-      <span style="font-size:11px;color:rgba(0,0,0,0.4);font-weight:500;margin-left:-4px">· 2026</span>
+      <span style="font-size:15px;font-weight:700;color:#fff;letter-spacing:0.1em">LAB</span>
+      <span style="font-size:11px;color:rgba(255,255,255,0.3);font-weight:500;margin-left:-4px">· 2026</span>
     </div>
     <a href="/login" style="margin-right:16px;padding:7px 18px;background:#FE5C00;color:#fff;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;white-space:nowrap;flex-shrink:0;font-family:inherit" data-k="cta">进入系统</a>
     <div style="display:flex;gap:2px;flex-shrink:0">
@@ -67,25 +67,25 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
 </section>
 
 <!-- ════ WHAT IS MWLAB (frosted glass on dark) ════ -->
-<section id="what" style="position:relative;background:#fff;padding:100px 64px;overflow:hidden">
+<section id="what" style="position:relative;background:#000;padding:100px 64px;overflow:hidden">
   <div style="position:absolute;inset:0;background:radial-gradient(ellipse at 15% 60%,rgba(254,92,0,0.09) 0%,transparent 55%),radial-gradient(ellipse at 85% 30%,rgba(254,92,0,0.05) 0%,transparent 50%)"></div>
   <div style="position:relative;z-index:1;max-width:1160px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:64px;align-items:center">
 
     <!-- Text card (frosted glass) -->
     <div class="glass-card" style="padding:44px 40px">
       <div style="font-size:13px;font-weight:700;letter-spacing:0.35em;text-transform:uppercase;color:#FE5C00;margin-bottom:10px" data-k="what-eye">MWLAB 是什么</div>
-      <h2 style="font-size:clamp(24px,2.8vw,38px);font-weight:800;letter-spacing:-0.025em;line-height:1.15;margin:10px 0 16px;color:#1D1D1F" data-k="what-h2">为杜塞中国全员打造的<br>展会情报系统</h2>
-      <p style="font-size:16px;color:#6E6E73;line-height:1.75;margin-bottom:28px;max-width:400px" data-k="what-desc">将公开市场数据转化为可执行的销售决策。覆盖行业调研、品牌尽调、客户挖掘全周期。</p>
+      <h2 style="font-size:clamp(24px,2.8vw,38px);font-weight:800;letter-spacing:-0.025em;line-height:1.15;margin:10px 0 16px;color:#fff" data-k="what-h2">为杜塞中国全员打造的<br>展会情报系统</h2>
+      <p style="font-size:16px;color:rgba(255,255,255,0.6);line-height:1.75;margin-bottom:28px;max-width:400px" data-k="what-desc">将公开市场数据转化为可执行的销售决策。覆盖行业调研、品牌尽调、客户挖掘全周期。</p>
       <ul style="list-style:none;display:flex;flex-direction:column;gap:12px">
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#1D1D1F">
+        <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:rgba(255,255,255,0.85)">
           <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#FE5C00;flex-shrink:0"></span>
           <span data-k="what-b1">5,800+ 展会品牌实时数据库</span>
         </li>
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#1D1D1F">
+        <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:rgba(255,255,255,0.85)">
           <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#FE5C00;flex-shrink:0"></span>
           <span data-k="what-b2">4 层情报能力覆盖完整销售周期</span>
         </li>
-        <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:#1D1D1F">
+        <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:rgba(255,255,255,0.85)">
           <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#FE5C00;flex-shrink:0"></span>
           <span data-k="what-b3">数据来源可追溯，禁止 AI 虚构</span>
         </li>
@@ -240,8 +240,8 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
   <canvas id="tech-canvas" style="position:absolute;inset:0;width:100%;height:100%;opacity:0.7"></canvas>
   <div style="position:relative;z-index:1;max-width:1160px;margin:0 auto">
     <div style="font-size:13px;font-weight:700;letter-spacing:0.35em;text-transform:uppercase;color:#FE5C00;margin-bottom:10px" data-k="tech-eye">技术架构</div>
-    <h2 style="font-size:clamp(26px,3.5vw,44px);font-weight:800;letter-spacing:-0.02em;color:#1D1D1F;margin-bottom:8px" data-k="tech-h2">四层精简架构</h2>
-    <p style="font-size:17px;color:#6E6E73;font-weight:400;margin-bottom:56px" data-k="tech-sub">单进程 · 零外部服务依赖</p>
+    <h2 style="font-size:clamp(26px,3.5vw,44px);font-weight:800;letter-spacing:-0.02em;color:#fff;margin-bottom:8px" data-k="tech-h2">四层精简架构</h2>
+    <p style="font-size:17px;color:rgba(255,255,255,0.45);font-weight:400;margin-bottom:56px" data-k="tech-sub">单进程 · 零外部服务依赖</p>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px">
 
       <div class="glass-card" style="padding:28px 24px">
@@ -249,8 +249,8 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><rect x="2" y="4" width="20" height="14" rx="2" stroke="#FE5C00" stroke-width="1.8"/><path d="M8 20h8M12 18v2" stroke="#FE5C00" stroke-width="1.8" stroke-linecap="round"/></svg>
         </div>
         <div style="font-size:11px;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;color:#FE5C00;margin-bottom:6px" data-k="tech-l1">界面层</div>
-        <div style="font-size:16px;font-weight:700;color:#1D1D1F;margin-bottom:6px" data-k="tech-t1">Next.js 16 · React 18</div>
-        <div style="font-size:13px;color:#6E6E73" data-k="tech-d1">Tailwind CSS</div>
+        <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px" data-k="tech-t1">Next.js 16 · React 18</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.4)" data-k="tech-d1">Tailwind CSS</div>
       </div>
 
       <div class="glass-card" style="padding:28px 24px">
@@ -258,8 +258,8 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M12 2l2 7h7l-5.5 4 2 7L12 16l-5.5 4 2-7L3 9h7z" stroke="#FE5C00" stroke-width="1.8" stroke-linejoin="round"/></svg>
         </div>
         <div style="font-size:11px;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;color:#FE5C00;margin-bottom:6px" data-k="tech-l2">应用层</div>
-        <div style="font-size:16px;font-weight:700;color:#1D1D1F;margin-bottom:6px" data-k="tech-t2">JWT · 路由守卫</div>
-        <div style="font-size:13px;color:#6E6E73" data-k="tech-d2">jose · bcryptjs</div>
+        <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px" data-k="tech-t2">JWT · 路由守卫</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.4)" data-k="tech-d2">jose · bcryptjs</div>
       </div>
 
       <div class="glass-card" style="padding:28px 24px">
@@ -267,8 +267,8 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><ellipse cx="12" cy="7" rx="8" ry="3" stroke="#FE5C00" stroke-width="1.8"/><path d="M4 7v5c0 1.66 3.58 3 8 3s8-1.34 8-3V7" stroke="#FE5C00" stroke-width="1.8"/><path d="M4 12v5c0 1.66 3.58 3 8 3s8-1.34 8-3v-5" stroke="#FE5C00" stroke-width="1.8"/></svg>
         </div>
         <div style="font-size:11px;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;color:#FE5C00;margin-bottom:6px" data-k="tech-l3">数据层</div>
-        <div style="font-size:16px;font-weight:700;color:#1D1D1F;margin-bottom:6px" data-k="tech-t3">SQLite 本地数据库</div>
-        <div style="font-size:13px;color:#6E6E73" data-k="tech-d3">better-sqlite3</div>
+        <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px" data-k="tech-t3">SQLite 本地数据库</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.4)" data-k="tech-d3">better-sqlite3</div>
       </div>
 
       <div class="glass-card" style="padding:28px 24px">
@@ -276,8 +276,8 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" stroke="#FE5C00" stroke-width="1.8" stroke-linejoin="round"/><polyline points="14 2 14 8 20 8" stroke="#FE5C00" stroke-width="1.8" stroke-linejoin="round"/><line x1="9" y1="13" x2="15" y2="13" stroke="#FE5C00" stroke-width="1.8" stroke-linecap="round"/><line x1="9" y1="17" x2="13" y2="17" stroke="#FE5C00" stroke-width="1.8" stroke-linecap="round"/></svg>
         </div>
         <div style="font-size:11px;font-weight:700;letter-spacing:0.25em;text-transform:uppercase;color:#FE5C00;margin-bottom:6px" data-k="tech-l4">采集层</div>
-        <div style="font-size:16px;font-weight:700;color:#1D1D1F;margin-bottom:6px" data-k="tech-t4">Python 爬虫</div>
-        <div style="font-size:13px;color:#6E6E73" data-k="tech-d4">公开数据源</div>
+        <div style="font-size:16px;font-weight:700;color:#fff;margin-bottom:6px" data-k="tech-t4">Python 爬虫</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.4)" data-k="tech-d4">公开数据源</div>
       </div>
 
     </div>
@@ -407,7 +407,7 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
 </section>
 
 <!-- ════ FOOTER ════ -->
-<footer style="background:rgb(169,169,169);padding:60px 64px 40px;display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;justify-content:space-between">
+<footer style="background:#1D1D1F;padding:60px 64px 40px;display:flex;flex-wrap:wrap;gap:48px;align-items:flex-start;justify-content:space-between">
 
   <!-- Left: copy + CTA -->
   <div style="display:flex;flex-direction:column;gap:10px;min-width:200px">
@@ -417,9 +417,9 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
         <polyline points="4,22 4,7 11,15 18,7 18,22" style="fill:none;stroke:white;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round"/>
         <polyline points="22,7 26,22 30,14 34,22 38,7" style="fill:none;stroke:white;stroke-width:2.3;stroke-linecap:round;stroke-linejoin:round"/>
       </svg>
-      <span style="font-size:13px;font-weight:700;color:#000;letter-spacing:0.1em">LAB</span>
+      <span style="font-size:13px;font-weight:700;color:#fff;letter-spacing:0.1em">LAB</span>
     </div>
-    <div style="font-size:14px;color:#000;line-height:1.7" data-k="footer-copy">© 2026 杜塞尔多夫展览（上海）有限公司<br>MWLAB · 内部工具 · 不对外发布</div>
+    <div style="font-size:14px;color:rgba(255,255,255,0.55);line-height:1.7" data-k="footer-copy">© 2026 杜塞尔多夫展览（上海）有限公司<br>MWLAB · 内部工具 · 不对外发布</div>
     <a href="/login" style="display:inline-flex;align-items:center;gap:8px;padding:10px 22px;border-radius:8px;background:#FE5C00;color:#fff;font-size:14px;font-weight:700;text-decoration:none;letter-spacing:0.05em;margin-top:12px;width:fit-content;font-family:inherit">
       <span data-k="cta">进入系统</span>
       <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -434,12 +434,12 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
         <img src="max-wang.png" alt="Max Wang" style="width:100%;height:100%;object-fit:cover;object-position:top center"/>
       </div>
       <div>
-        <div style="font-size:17px;font-weight:800;color:#000;margin-bottom:3px" data-k="dev-name">Max Wang</div>
+        <div style="font-size:17px;font-weight:800;color:#fff;margin-bottom:3px" data-k="dev-name">Max Wang</div>
         <div style="font-size:13px;font-weight:600;color:#FE5C00;margin-bottom:2px" data-k="dev-role">MDS BD总监</div>
-        <div style="font-size:13px;color:#000" data-k="dev-org">杜塞尔多夫展览上海</div>
+        <div style="font-size:13px;color:rgba(255,255,255,0.45)" data-k="dev-org">杜塞尔多夫展览上海</div>
       </div>
     </div>
-    <div style="font-size:13px;color:#000;line-height:1.6;max-width:240px" data-k="dev-bio">系统独立设计 · 开发 · 运维<br>MWLAB 2026 · 内部使用</div>
+    <div style="font-size:13px;color:rgba(255,255,255,0.35);line-height:1.6;max-width:240px" data-k="dev-bio">系统独立设计 · 开发 · 运维<br>MWLAB 2026 · 内部使用</div>
   </div>
 
   <!-- Right: logos -->
