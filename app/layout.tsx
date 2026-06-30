@@ -12,6 +12,13 @@ const montserrat = localFont({
 export const metadata: Metadata = {
   title: "MWLAB 2026 | 竞争盘面看板",
   description: "Exhibition Competitive Dashboard",
+  icons: {
+    icon: [
+      { url: "/favicon.svg", type: "image/svg+xml" },
+      { url: "/favicon.ico", type: "image/x-icon" },
+    ],
+    apple: "/favicon-192.png",
+  },
 };
 
 export default function RootLayout({
