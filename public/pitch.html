@@ -74,8 +74,8 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
     <!-- Text card (frosted glass) -->
     <div class="glass-card" style="padding:44px 40px">
       <div style="font-size:13px;font-weight:700;letter-spacing:0.35em;text-transform:uppercase;color:#FE5C00;margin-bottom:10px" data-k="what-eye">MWLAB 是什么</div>
-      <h2 style="font-size:clamp(24px,2.8vw,38px);font-weight:800;letter-spacing:-0.025em;line-height:1.15;margin:10px 0 16px;color:#fff" data-k="what-h2">为杜塞中国全员打造的<br>展会情报系统</h2>
-      <p style="font-size:16px;color:rgba(255,255,255,0.6);line-height:1.75;margin-bottom:28px;max-width:400px" data-k="what-desc">将公开市场数据转化为可执行的销售决策。覆盖行业调研、品牌尽调、客户挖掘全周期。</p>
+      <h2 style="font-size:clamp(24px,2.8vw,38px);font-weight:800;letter-spacing:-0.025em;line-height:1.15;margin:10px 0 16px;color:#fff" data-k="what-h2">为杜塞中国全员打造的<br>项目拓展平台</h2>
+      <p style="font-size:16px;color:rgba(255,255,255,0.6);line-height:1.75;margin-bottom:28px;max-width:400px" data-k="what-desc">以AI驱动的aPaaS。将公开市场数据转化为可执行的销售决策。覆盖行业调研、品牌尽调、客户挖掘全周期。</p>
       <ul style="list-style:none;display:flex;flex-direction:column;gap:12px">
         <li style="display:flex;align-items:center;gap:10px;font-size:14px;font-weight:600;color:rgba(255,255,255,0.85)">
           <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#FE5C00;flex-shrink:0"></span>
@@ -95,70 +95,136 @@ body{background:#F5F5F7;color:#1D1D1F;font-family:'Montserrat',system-ui,sans-se
     <!-- Device mockups (frosted glass card) -->
     <div class="glass-card" style="padding:36px 32px;display:flex;align-items:flex-end;gap:20px;min-height:340px">
 
-      <!-- Laptop -->
-      <div style="flex:1;display:flex;flex-direction:column">
-        <div style="background:#1A1A1C;border-radius:10px 10px 0 0;overflow:hidden">
-          <!-- topbar -->
-          <div style="height:22px;background:#2C2C2E;display:flex;align-items:center;padding:0 9px;gap:5px">
-            <span style="width:8px;height:8px;border-radius:50%;background:#FF5F57;flex-shrink:0"></span>
-            <span style="width:8px;height:8px;border-radius:50%;background:#FEBC2E;flex-shrink:0"></span>
-            <span style="width:8px;height:8px;border-radius:50%;background:#28C840;flex-shrink:0"></span>
-            <span style="flex:1;height:10px;background:rgba(255,255,255,0.06);border-radius:3px;margin-left:6px"></span>
+      <!-- MacBook mockup -->
+      <div style="flex:1;display:flex;flex-direction:column;align-items:center">
+        <!-- Screen lid -->
+        <div style="width:100%;background:#111113;border-radius:14px 14px 0 0;border:2px solid rgba(255,255,255,0.18);border-bottom:none;overflow:hidden">
+          <!-- Camera notch -->
+          <div style="height:18px;background:#111113;display:flex;justify-content:center;align-items:center">
+            <div style="width:6px;height:6px;border-radius:50%;background:#2C2C2E;border:1px solid rgba(255,255,255,0.2)"></div>
           </div>
-          <!-- screen body -->
-          <div style="display:flex;height:160px;gap:3px;padding:3px 3px 0">
-            <div style="width:19%;background:#111113;border-radius:2px 0 0 0;padding:8px 5px;display:flex;flex-direction:column;gap:5px">
-              <div style="height:7px;border-radius:2px;background:rgba(255,255,255,0.06)"></div>
-              <div style="height:7px;border-radius:2px;background:rgba(254,92,0,0.4)"></div>
-              <div style="height:7px;border-radius:2px;background:rgba(255,255,255,0.06)"></div>
-              <div style="height:7px;border-radius:2px;background:rgba(255,255,255,0.06)"></div>
-              <div style="height:7px;border-radius:2px;background:rgba(255,255,255,0.04)"></div>
+          <!-- macOS topbar -->
+          <div style="height:22px;background:#232325;border-top:1px solid rgba(255,255,255,0.1);display:flex;align-items:center;padding:0 10px;gap:5px">
+            <span style="width:9px;height:9px;border-radius:50%;background:#FF5F57;flex-shrink:0"></span>
+            <span style="width:9px;height:9px;border-radius:50%;background:#FEBC2E;flex-shrink:0"></span>
+            <span style="width:9px;height:9px;border-radius:50%;background:#28C840;flex-shrink:0"></span>
+            <span style="flex:1;height:10px;background:rgba(255,255,255,0.08);border-radius:3px;margin-left:8px"></span>
+          </div>
+          <!-- Screen content -->
+          <div style="display:flex;height:170px;gap:0">
+            <!-- Sidebar -->
+            <div style="width:20%;background:#0D0D0F;padding:10px 6px;display:flex;flex-direction:column;gap:7px;border-right:1px solid rgba(255,255,255,0.06)">
+              <div style="height:7px;width:70%;border-radius:2px;background:rgba(255,255,255,0.08)"></div>
+              <div style="height:7px;width:85%;border-radius:2px;background:rgba(254,92,0,0.55)"></div>
+              <div style="height:7px;width:75%;border-radius:2px;background:rgba(255,255,255,0.08)"></div>
+              <div style="height:7px;width:65%;border-radius:2px;background:rgba(255,255,255,0.06)"></div>
+              <div style="height:7px;width:80%;border-radius:2px;background:rgba(255,255,255,0.06)"></div>
             </div>
-            <div style="flex:1;background:#1C1C1E;border-radius:0 2px 0 0;padding:9px;display:flex;flex-direction:column;gap:6px">
+            <!-- Main area -->
+            <div style="flex:1;background:#1C1C1E;padding:10px 10px 8px;display:flex;flex-direction:column;gap:7px">
+              <!-- KPI cards row -->
               <div style="display:flex;gap:5px">
-                <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:3px;padding:5px 6px"><div style="height:10px;width:55%;background:rgba(254,92,0,0.38);border-radius:2px;margin-bottom:3px"></div><div style="height:7px;width:75%;background:rgba(255,255,255,0.07);border-radius:2px"></div></div>
-                <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:3px;padding:5px 6px"><div style="height:10px;width:45%;background:rgba(254,92,0,0.25);border-radius:2px;margin-bottom:3px"></div><div style="height:7px;width:80%;background:rgba(255,255,255,0.07);border-radius:2px"></div></div>
-                <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:3px;padding:5px 6px"><div style="height:10px;width:60%;background:rgba(254,92,0,0.18);border-radius:2px;margin-bottom:3px"></div><div style="height:7px;width:60%;background:rgba(255,255,255,0.07);border-radius:2px"></div></div>
+                <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:4px;padding:5px 7px;border:1px solid rgba(255,255,255,0.06)">
+                  <div style="height:9px;width:55%;background:rgba(254,92,0,0.55);border-radius:2px;margin-bottom:4px"></div>
+                  <div style="height:7px;width:80%;background:rgba(255,255,255,0.1);border-radius:2px"></div>
+                </div>
+                <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:4px;padding:5px 7px;border:1px solid rgba(255,255,255,0.06)">
+                  <div style="height:9px;width:45%;background:rgba(254,92,0,0.35);border-radius:2px;margin-bottom:4px"></div>
+                  <div style="height:7px;width:75%;background:rgba(255,255,255,0.1);border-radius:2px"></div>
+                </div>
+                <div style="flex:1;background:rgba(255,255,255,0.05);border-radius:4px;padding:5px 7px;border:1px solid rgba(255,255,255,0.06)">
+                  <div style="height:9px;width:60%;background:rgba(254,92,0,0.25);border-radius:2px;margin-bottom:4px"></div>
+                  <div style="height:7px;width:65%;background:rgba(255,255,255,0.1);border-radius:2px"></div>
+                </div>
               </div>
-              <div style="height:52px;background:linear-gradient(180deg,rgba(254,92,0,0.12) 0%,rgba(254,92,0,0.02) 100%);border-radius:3px;border-bottom:1px solid rgba(254,92,0,0.25)"></div>
-              <div style="display:flex;flex-direction:column;gap:3px">
-                <div style="height:7px;border-radius:2px;background:rgba(255,255,255,0.1)"></div>
-                <div style="height:7px;border-radius:2px;background:rgba(255,255,255,0.05)"></div>
-                <div style="height:7px;border-radius:2px;background:rgba(255,255,255,0.05)"></div>
+              <!-- Chart area -->
+              <div style="flex:1;background:rgba(254,92,0,0.06);border-radius:4px;border:1px solid rgba(254,92,0,0.2);padding:6px 8px;display:flex;flex-direction:column;justify-content:flex-end;gap:3px;overflow:hidden;position:relative">
+                <!-- Fake chart bars -->
+                <div style="display:flex;align-items:flex-end;gap:4px;height:55px">
+                  <div style="flex:1;background:rgba(254,92,0,0.3);border-radius:2px 2px 0 0;height:35%"></div>
+                  <div style="flex:1;background:rgba(254,92,0,0.5);border-radius:2px 2px 0 0;height:60%"></div>
+                  <div style="flex:1;background:rgba(254,92,0,0.35);border-radius:2px 2px 0 0;height:45%"></div>
+                  <div style="flex:1;background:rgba(254,92,0,0.7);border-radius:2px 2px 0 0;height:80%"></div>
+                  <div style="flex:1;background:rgba(254,92,0,0.55);border-radius:2px 2px 0 0;height:65%"></div>
+                  <div style="flex:1;background:rgba(254,92,0,0.4);border-radius:2px 2px 0 0;height:50%"></div>
+                  <div style="flex:1;background:rgba(254,92,0,0.9);border-radius:2px 2px 0 0;height:100%"></div>
+                </div>
+              </div>
+              <!-- Row list -->
+              <div style="display:flex;flex-direction:column;gap:4px">
+                <div style="height:7px;border-radius:2px;background:rgba(255,255,255,0.12)"></div>
+                <div style="height:7px;border-radius:2px;background:rgba(255,255,255,0.07)"></div>
+                <div style="height:7px;border-radius:2px;background:rgba(255,255,255,0.07)"></div>
               </div>
             </div>
           </div>
         </div>
-        <!-- chin -->
-        <div style="height:8px;background:#2C2C2E"></div>
-        <!-- keyboard base -->
-        <div style="height:16px;background:linear-gradient(180deg,#2C2C2E,#1A1A1C);border-radius:0 0 10px 10px;position:relative">
-          <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:38%;height:5px;border-radius:3px;background:rgba(255,255,255,0.05)"></div>
+        <!-- Hinge -->
+        <div style="width:102%;height:4px;background:linear-gradient(90deg,#111,#2C2C2E 20%,#3A3A3C 50%,#2C2C2E 80%,#111);border-left:2px solid rgba(255,255,255,0.12);border-right:2px solid rgba(255,255,255,0.12)"></div>
+        <!-- Keyboard base -->
+        <div style="width:105%;background:#232325;border-radius:0 0 10px 10px;border:2px solid rgba(255,255,255,0.14);border-top:none;padding:10px 14px 8px">
+          <!-- Key rows -->
+          <div style="display:flex;flex-direction:column;gap:4px;margin-bottom:6px">
+            <div style="display:flex;gap:3px">
+              <div style="flex:1;height:7px;border-radius:2px;background:rgba(255,255,255,0.08)"></div>
+              <div style="flex:1;height:7px;border-radius:2px;background:rgba(255,255,255,0.08)"></div>
+              <div style="flex:1;height:7px;border-radius:2px;background:rgba(255,255,255,0.08)"></div>
+              <div style="flex:1.4;height:7px;border-radius:2px;background:rgba(255,255,255,0.08)"></div>
+            </div>
+            <div style="display:flex;gap:3px">
+              <div style="flex:1.2;height:7px;border-radius:2px;background:rgba(255,255,255,0.06)"></div>
+              <div style="flex:1;height:7px;border-radius:2px;background:rgba(255,255,255,0.06)"></div>
+              <div style="flex:1;height:7px;border-radius:2px;background:rgba(255,255,255,0.06)"></div>
+              <div style="flex:1;height:7px;border-radius:2px;background:rgba(255,255,255,0.06)"></div>
+            </div>
+          </div>
+          <!-- Trackpad -->
+          <div style="width:36%;height:22px;border-radius:5px;background:#1A1A1C;border:1px solid rgba(255,255,255,0.12);margin:0 auto"></div>
         </div>
-        <!-- stand notch -->
-        <div style="height:4px;width:30%;margin:0 auto;background:#111;border-radius:0 0 4px 4px"></div>
+        <!-- Bottom foot notch -->
+        <div style="width:28%;height:4px;background:#0D0D0F;border-radius:0 0 4px 4px"></div>
       </div>
 
-      <!-- Phone -->
-      <div style="width:90px;background:#1A1A1C;border-radius:24px;padding:10px 7px 14px;display:flex;flex-direction:column;gap:5px;align-self:center;flex-shrink:0">
-        <!-- dynamic island -->
-        <div style="width:44%;height:10px;background:#000;border-radius:6px;margin:0 auto 4px"></div>
-        <!-- content rows -->
-        <div style="height:9px;border-radius:3px;background:rgba(254,92,0,0.22)"></div>
-        <div style="height:8px;border-radius:3px;background:rgba(255,255,255,0.07)"></div>
-        <div style="display:flex;gap:4px">
-          <div style="flex:1;height:28px;border-radius:4px;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center">
-            <div style="width:55%;height:7px;background:rgba(254,92,0,0.3);border-radius:2px"></div>
+      <!-- iPhone mockup -->
+      <div style="position:relative;align-self:center;flex-shrink:0">
+        <!-- Side buttons left -->
+        <div style="position:absolute;left:-4px;top:55px;width:3px;height:18px;background:rgba(255,255,255,0.2);border-radius:2px 0 0 2px"></div>
+        <div style="position:absolute;left:-4px;top:82px;width:3px;height:18px;background:rgba(255,255,255,0.2);border-radius:2px 0 0 2px"></div>
+        <div style="position:absolute;left:-4px;top:108px;width:3px;height:18px;background:rgba(255,255,255,0.2);border-radius:2px 0 0 2px"></div>
+        <!-- Side button right (power) -->
+        <div style="position:absolute;right:-4px;top:80px;width:3px;height:28px;background:rgba(255,255,255,0.2);border-radius:0 2px 2px 0"></div>
+        <!-- Phone body -->
+        <div style="width:118px;background:#1A1A1C;border-radius:28px;border:2px solid rgba(255,255,255,0.22);padding:12px 8px 16px;display:flex;flex-direction:column;gap:6px">
+          <!-- Dynamic Island -->
+          <div style="width:46%;height:12px;background:#000;border-radius:8px;margin:0 auto 6px;border:1px solid rgba(255,255,255,0.08)"></div>
+          <!-- KPI row -->
+          <div style="height:10px;border-radius:3px;background:rgba(254,92,0,0.5)"></div>
+          <div style="height:8px;border-radius:3px;background:rgba(255,255,255,0.1);width:80%"></div>
+          <!-- Two mini cards -->
+          <div style="display:flex;gap:5px;margin-top:2px">
+            <div style="flex:1;height:34px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+              <div style="width:55%;height:7px;background:rgba(254,92,0,0.6);border-radius:2px"></div>
+              <div style="width:70%;height:5px;background:rgba(255,255,255,0.1);border-radius:2px"></div>
+            </div>
+            <div style="flex:1;height:34px;border-radius:6px;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px">
+              <div style="width:45%;height:7px;background:rgba(254,92,0,0.35);border-radius:2px"></div>
+              <div style="width:65%;height:5px;background:rgba(255,255,255,0.1);border-radius:2px"></div>
+            </div>
           </div>
-          <div style="flex:1;height:28px;border-radius:4px;background:rgba(255,255,255,0.04);display:flex;align-items:center;justify-content:center">
-            <div style="width:45%;height:7px;background:rgba(254,92,0,0.2);border-radius:2px"></div>
+          <!-- Mini chart bars -->
+          <div style="background:rgba(254,92,0,0.06);border-radius:5px;border:1px solid rgba(254,92,0,0.18);padding:5px 6px;display:flex;align-items:flex-end;gap:3px;height:38px">
+            <div style="flex:1;background:rgba(254,92,0,0.35);border-radius:2px 2px 0 0;height:40%"></div>
+            <div style="flex:1;background:rgba(254,92,0,0.55);border-radius:2px 2px 0 0;height:65%"></div>
+            <div style="flex:1;background:rgba(254,92,0,0.4);border-radius:2px 2px 0 0;height:50%"></div>
+            <div style="flex:1;background:rgba(254,92,0,0.75);border-radius:2px 2px 0 0;height:85%"></div>
+            <div style="flex:1;background:rgba(254,92,0,0.55);border-radius:2px 2px 0 0;height:70%"></div>
           </div>
+          <!-- List rows -->
+          <div style="height:8px;border-radius:3px;background:rgba(255,255,255,0.08)"></div>
+          <div style="height:8px;border-radius:3px;background:rgba(255,255,255,0.05)"></div>
+          <!-- Home indicator -->
+          <div style="width:38%;height:4px;background:rgba(255,255,255,0.35);border-radius:2px;margin:4px auto 0"></div>
         </div>
-        <div style="height:8px;border-radius:3px;background:rgba(255,255,255,0.06)"></div>
-        <div style="height:8px;border-radius:3px;background:rgba(255,255,255,0.04)"></div>
-        <div style="height:8px;border-radius:3px;background:rgba(255,255,255,0.06)"></div>
-        <!-- home bar -->
-        <div style="width:38%;height:4px;background:rgba(255,255,255,0.28);border-radius:2px;margin:4px auto 0"></div>
       </div>
 
     </div>
@@ -464,8 +530,8 @@ class App {
       s1:'展会品牌', s2:'历史届次', s3:'细分子类别', s4:'数据来源',
       cta:'进入系统',
       'what-eye':'MWLAB 是什么',
-      'what-h2':'为杜塞中国全员打造的<br>展会情报系统',
-      'what-desc':'将公开市场数据转化为可执行的销售决策。覆盖行业调研、品牌尽调、客户挖掘全周期。',
+      'what-h2':'为杜塞中国全员打造的<br>项目拓展平台',
+      'what-desc':'以AI驱动的aPaaS。将公开市场数据转化为可执行的销售决策。覆盖行业调研、品牌尽调、客户挖掘全周期。',
       'what-b1':'5,800+ 展会品牌实时数据库',
       'what-b2':'4 层情报能力覆盖完整销售周期',
       'what-b3':'数据来源可追溯，禁止 AI 虚构',
@@ -500,8 +566,8 @@ class App {
       s1:'Exhibition Brands', s2:'Historical Editions', s3:'Sub-categories', s4:'Data Sources',
       cta:'Enter System',
       'what-eye':'What is MWLAB',
-      'what-h2':'Exhibition Intelligence<br>Built for MDiC',
-      'what-desc':'Turning public market data into actionable sales decisions. Covers industry research, brand due diligence, and prospect prospecting.',
+      'what-h2':'Business Development Platform<br>Built for MDiC',
+      'what-desc':'An AI-powered aPaaS. Turns public market data into actionable sales decisions. Covers industry research, brand due diligence, and prospect development.',
       'what-b1':'5,800+ exhibition brands in real-time database',
       'what-b2':'4 intelligence capabilities covering the full sales cycle',
       'what-b3':'All data is source-traceable — no AI hallucination',
@@ -536,8 +602,8 @@ class App {
       s1:'Messebrands', s2:'Historische Auflagen', s3:'Unterkategorien', s4:'Datenquellen',
       cta:'System öffnen',
       'what-eye':'Was ist MWLAB',
-      'what-h2':'Messe-Intelligenz<br>für MDiC',
-      'what-desc':'Öffentliche Marktdaten in umsetzbare Vertriebsentscheidungen verwandeln. Branchenanalyse, Due Diligence und Kundengewinnung in einem System.',
+      'what-h2':'Geschäftsentwicklungsplattform<br>für MDiC',
+      'what-desc':'Eine KI-gestützte aPaaS-Lösung. Öffentliche Marktdaten in umsetzbare Vertriebsentscheidungen verwandelt. Branchenanalyse, Due Diligence und Kundengewinnung in einem System.',
       'what-b1':'5.800+ Messebrands in Echtzeit-Datenbank',
       'what-b2':'4 Intelligenz-Ebenen für den gesamten Vertriebszyklus',
       'what-b3':'Alle Daten quellenrückverfolgbar — keine KI-Halluzinationen',
