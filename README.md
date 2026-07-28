@@ -21,16 +21,16 @@
 ```
 Browser
   └── Next.js 16（前端 + API Routes）
-        └── better-sqlite3 → mwlab.db（SQLite）
+        └── better-sqlite3 → data/mwlab.db（SQLite）
 ```
 
 **单进程，无外部服务依赖。** 认证、查询、写入全部在 Next.js API Routes 内完成。
 
 | 层 | 技术 |
 |----|------|
-| 前端框架 | Next.js 16 App Router + React 18 |
+| 前端框架 | Next.js 16 App Router + React 19 |
 | 样式 | Tailwind CSS |
-| 数据库 | SQLite（`mwlab.db`），`better-sqlite3` 读写 |
+| 数据库 | SQLite（`data/mwlab.db`），`better-sqlite3` 读写 |
 | 认证 | JWT（`jose` 签发/验签）+ bcryptjs 密码哈希，Cookie 存储 |
 | 鉴权 | `proxy.ts`（Next.js 16 中间件）全局路由守卫 |
 | 数据采集 | Python 爬虫（`crawlers/`），手动触发 |
@@ -58,7 +58,7 @@ npm run dev
 
 ## 用户体系
 
-用户存储于 `mwlab.db` 的 `user` 表，角色三级：
+用户存储于 `data/mwlab.db` 的 `user` 表，角色三级：
 
 | 角色 | 权限 |
 |------|------|
@@ -72,17 +72,20 @@ npm run dev
 python3 -c "
 import bcrypt, sqlite3
 pw = bcrypt.hashpw('新密码'.encode(), bcrypt.gensalt()).decode()
-conn = sqlite3.connect('mwlab.db')
-conn.execute('UPDATE user SET password_hash = ? WHERE email = ?', (pw, '账号邮箱'))
+conn = sqlite3.connect('data/mwlab.db')
+cur = conn.execute('UPDATE user SET password_hash = ? WHERE email = ?', (pw, '账号邮箱'))
+print(f'已更新 {cur.rowcount} 行')   # 0 行 = 邮箱不存在，密码未改
 conn.commit(); conn.close()
 "
 ```
+
+> 数据库位于 `data/mwlab.db`（`lib/db.ts` 解析为 `process.cwd()/data/mwlab.db`）。
 
 ---
 
 ## 数据库结构
 
-**主库**：`mwlab.db`（SQLite，WAL 模式）
+**主库**：`data/mwlab.db`（SQLite，WAL 模式，22 MB）
 
 ```
 exhibition_brand        展会品牌（主表）
@@ -90,9 +93,15 @@ exhibition_brand        展会品牌（主表）
   ├── data_provenance       数据溯源
   └── manual_tag_history    人工打标历史
 
-crawl_log               爬取批次日志
+crawl_log               爬取批次日志（由爬虫写入主库）
 user                    系统用户
+brand_geo_tag           品牌地理标签
+person / exhibition_contact / contact_relation    人物与联系
+exhibition_timeline / exhibition_relation         时间线与关系
+intel_report / customer_prospect                  Intel 调研产出
 ```
+
+Schema 迁移在 `schema/migrations/`（001–010），由 `schema/db.py:init_db()` 打开数据库时自动应用。
 
 Schema 完整定义：`schema/init_db.sql`
 
@@ -112,8 +121,16 @@ python3 crawlers/jufair_crawler.py
 python3 crawlers/cnexpo_crawler.py
 
 # 合并到主库
-python3 merge_engine.py
+python3 tools/merge_engine.py --batch ALL
+
+# 合并后必跑（否则新品牌无行业分类、展示池不更新）
+python3 scripts/classify_all_brands.py
+python3 scripts/dedup.py                 # 先看 dry-run 报告，确认后加 --execute
+python3 scripts/check_display_ready.py
 ```
+
+> `scheduler.py` 在部分历史文档中被描述为定时调度入口，但**该文件不存在于仓库**，
+> 爬虫目前只能手动触发。
 
 ---
 
@@ -137,18 +154,26 @@ python3 tools/import_tags.py \
 
 ## API Routes 一览
 
-| 方法 | 路径 | 说明 |
-|------|------|------|
-| POST | `/api/auth/login` | 登录，返回 JWT |
-| POST | `/api/auth/logout` | 退出，清除 Cookie |
-| GET | `/api/dashboard` | 看板数据（KPI + 品牌列表 + 图表数据） |
-| GET | `/api/filter-options` | 筛选项（行业 L1/L2、MDS 关联） |
-| GET | `/api/brands/[id]` | 单个品牌详情 |
-| PATCH | `/api/brands/[id]/tags` | 更新打标字段 |
-| GET | `/api/users` | 用户列表（admin） |
-| GET | `/api/setting/status` | 数据状态 + 系统信息（admin） |
-| GET | `/api/calendar/events` | 展会日历数据 |
-| GET | `/api/map/markers` | 展会地理分布数据 |
+| 方法 | 路径 | 鉴权 | 说明 |
+|------|------|------|------|
+| POST | `/api/auth/login` | 公开 | 登录，签发 JWT 写入 httpOnly Cookie |
+| POST | `/api/auth/logout` | 公开 | 退出，清除 Cookie |
+| GET | `/api/dashboard` | 登录 | 看板数据（KPI + 品牌列表 + 图表） |
+| GET | `/api/exhibition/[id]` | 登录 | 品牌详情 + 时间线 + 关系 + 联系人 |
+| POST | `/api/exhibition/[id]/timeline` | 写权限 | 新增时间线事件 |
+| DELETE | `/api/exhibition/[id]/timeline/[eventId]` | 写权限 | 删除时间线事件 |
+| POST | `/api/exhibition/[id]/relations` | 写权限 | 新增展会关系 |
+| GET · POST | `/api/people` | 登录 · 写权限 | 人物列表 / 新建人物 |
+| GET | `/api/people/[id]` | 登录 | 人物详情 |
+| POST | `/api/people/[id]/contacts` | 写权限 | 新增人物-展会联系 |
+| POST | `/api/people/[id]/relations` | 写权限 | 新增人物关系 |
+| GET · PATCH | `/api/user/preferences` | 登录 | 读写本人看板筛选偏好 |
+| GET | `/api/users` | admin | 用户列表 |
+| GET | `/api/setting/status` | admin | 数据状态 + 系统信息 |
+
+鉴权三级由 `lib/api-guard.ts` 统一实施：
+`requireUser()` 校验登录**并实时查库确认 `is_active`**（账号停用后存量 token 立即失效）；
+`requireWriter()` 拒绝 `readonly` 角色的写操作。
 
 ---
 
@@ -188,7 +213,12 @@ python3 -m pytest tests/ -v
 | 架构整改 | 移除 Supabase 和 FastAPI，统一到 Next.js 单进程 | ✅ |
 | 5 | Intel 后端（调研报告存储、DB 查询、企查查 API 接入） | ✅ |
 | 6 | 代码审计与合规清理（68 项修复，去除 XFF 绕过等） | ✅ |
-| **1b** | **全集采集（Jufair ~8.4K + cnexpo 全量）** | **⏳** |
+| 质检整改 | 脚本质检 + 数据治理 6 批，见 `docs/AUDIT-2026-07-27.md` | ✅ |
+| **1b** | **全集采集（Jufair 全量 + cnexpo 全量）** | **⏳** |
+
+> Phase 6 声称"去除 XFF 绕过"，但 `crawlers/jf_shell_crawl.sh` 晚于 Phase 6 创建、
+> 重新引入了 X-Forwarded-For 伪造 IP 池，绕开了该整改。已于 2026-07-28 清除，
+> 现两个爬虫均不做任何来源伪装，仅靠请求间隔 + 熔断控制频率。
 
 ---
 

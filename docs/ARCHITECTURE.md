@@ -13,15 +13,21 @@
 Cloudflare CDN (orange cloud)
   │  HTTP
   ▼
-Nginx (80) ── 反向代理 ──► Next.js 16 (3000) ── better-sqlite3 ──► mwlab.db
+Nginx (80) ── 反向代理 ──► Next.js 16 (3000) ── better-sqlite3 ──► data/mwlab.db
                                 │
                            JWT middleware
                            (edge runtime)
 
-定时任务（独立进程，cron 驱动）
-  scheduler.py ──► jufair_crawler.py  ──┐
-               └──► cnexpo_crawler.py ──┴──► mwlab.db (raw_* + crawl_log)
+采集（独立进程，目前手动触发）
+  crawlers/jufair_crawler.py ──► data/jufair_2026.db (raw_jufair)
+  crawlers/cnexpo_crawler.py ──► data/cnexpo_2026.db (raw_cnexpo)
+       两者的 crawl_log 均写入 data/mwlab.db（看板从主库读）
+                    │
+  tools/merge_engine.py ──► data/mwlab.db (exhibition_brand / edition / provenance)
 ```
+
+> **无调度器**：`scheduler.py` 曾在本文档与 PRD 中被标注「已完成」，但该文件不存在于仓库。
+> 采集只能手动触发，`--cron` / `--run-now` / `--status` 等描述均无对应实现。
 
 ---
 
@@ -47,14 +53,14 @@ Nginx (80) ── 反向代理 ──► Next.js 16 (3000) ── better-sqlite3
 
 | 文件 | 职责 |
 |------|------|
-| `middleware.ts` | JWT 验证 + 路由保护 + 角色守卫（Next.js 16 edge runtime） |
+| `proxy.ts` | JWT 验证 + 路由保护 + 角色守卫（Next.js 16 起由 middleware.ts 更名而来） |
 | `lib/db.ts` | better-sqlite3 单例，`getDb()` 只读 / `getWritableDb()` 写 |
 | `lib/auth.ts` | 客户端 localStorage auth state 管理 |
+| `lib/api-guard.ts` | 服务端鉴权：`requireUser()` 查库校验 is_active、`requireWriter()` 拦 readonly |
 | `app/api/dashboard/route.ts` | 核心 KPI 聚合 API，多维筛选 + gzip 压缩 |
 | `app/api/auth/login/route.ts` | 登录，bcrypt 验证，JWT 签发 |
 | `schema/init_db.sql` | 完整 Schema 定义 |
-| `schema/migrations/` | 增量迁移（001–003 已执行） |
-| `scheduler.py` | 爬虫调度入口，支持 `--cron` / `--run-now` / `--status` |
+| `schema/migrations/` | 增量迁移 001–010，由 `schema/db.py:init_db()` 打开库时自动应用 |
 | `crawlers/jufair_crawler.py` | Jufair 爬取（写 raw_jufair，timeout=30s） |
 | `crawlers/cnexpo_crawler.py` | Cnexpo 爬取（写 raw_cnexpo，timeout=30s） |
 | `requirements.txt` | Python 依赖：requests + beautifulsoup4 |
@@ -90,7 +96,8 @@ schema_version        ← 迁移版本追踪
 | 用户偏好持久化 | `/api/user/preferences` |
 | 系统状态 / 爬取日志 | `/api/setting/status` |
 | 用户管理（admin） | `/api/users` |
-| 定时爬取 | cron → `scheduler.py --cron`，每周一 02:00 |
+| 采集 | 手动执行 `crawlers/*.py`，再跑 `tools/merge_engine.py --batch ALL` |
+| 展示池标记 | cron → `scripts/check_display_ready.py`，每周一 02:00 |
 
 ---
 

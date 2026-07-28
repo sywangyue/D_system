@@ -7,8 +7,8 @@ vi.mock("jose", () => ({
 }))
 
 import { jwtVerify } from "jose"
-// Middleware is default export from root middleware.ts
-import middleware from "@/middleware"
+// Next.js 16 起中间件文件由 middleware.ts 更名为 proxy.ts（默认导出）
+import middleware from "@/proxy"
 
 function makeRequest(path: string, opts?: { token?: string; headers?: Record<string, string> }): NextRequest {
   const url = `http://localhost:3000${path}`
@@ -73,7 +73,8 @@ describe("middleware", () => {
   it("should allow valid token on /api/ and inject verified headers", async () => {
     vi.mocked(jwtVerify).mockResolvedValueOnce({
       payload: { email: "admin@mwlab.com", role: "admin" } as any,
-      protectedHeader: {},
+      protectedHeader: { alg: "HS256" },
+      key: {} as any,
     })
 
     const req = makeRequest("/api/dashboard", { token: "valid-jwt" })
@@ -89,17 +90,29 @@ describe("middleware", () => {
     expect(res.status).toBe(401)
   })
 
-  it("should redirect page routes to /login when no token", async () => {
+  // 无 token 的页面路由跳 /pitch.html（pitch 改版后的公开主入口），不是 /login
+  it("should redirect page routes to /pitch.html when no token", async () => {
     const req = makeRequest("/dashboard.html")
     const res = await middleware(req)
     expect(res.status).toBe(307) // redirect
+    expect(res.headers.get("location")).toContain("/pitch.html")
+  })
+
+  // token 存在但验签失败 → 回 /login 重新登录
+  it("should redirect page routes to /login when token is invalid", async () => {
+    vi.mocked(jwtVerify).mockRejectedValueOnce(new Error("jwt expired"))
+
+    const req = makeRequest("/dashboard.html", { token: "expired-jwt" })
+    const res = await middleware(req)
+    expect(res.status).toBe(307)
     expect(res.headers.get("location")).toContain("/login")
   })
 
   it("should redirect non-admin to /dashboard.html from /setting", async () => {
     vi.mocked(jwtVerify).mockResolvedValueOnce({
       payload: { email: "manager@mwlab.com", role: "manager" } as any,
-      protectedHeader: {},
+      protectedHeader: { alg: "HS256" },
+      key: {} as any,
     })
 
     const req = makeRequest("/setting", { token: "valid-manager-jwt" })
@@ -111,7 +124,8 @@ describe("middleware", () => {
   it("should let admin access /setting", async () => {
     vi.mocked(jwtVerify).mockResolvedValueOnce({
       payload: { email: "admin@mwlab.com", role: "admin" } as any,
-      protectedHeader: {},
+      protectedHeader: { alg: "HS256" },
+      key: {} as any,
     })
 
     const req = makeRequest("/setting", { token: "valid-admin-jwt" })

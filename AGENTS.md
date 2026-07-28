@@ -8,16 +8,22 @@
 
 ---
 
-## 项目状态（2026-05-06）
+## 项目状态（2026-07-28）
 
 | Phase | 内容 | 状态 |
 |-------|------|------|
-| Phase 1 | 数据采集器（Jufair + cnexpo 爬虫 + 调度器） | ✅ 已完成 |
-| Phase 2 | Schema + 合并引擎 + 打标工具（6 表 + merge_engine + export_for_tagging/import_tags） | ✅ 已完成 |
-| Phase 3 | Dashboard 查询 API + JWT 认证 + Docker + OpenAPI + 部署表 | ✅ 已完成 |
-| **Phase 1b** | **全集采集（Jufair 8.4K + cnexpo 全量）** | **⏳ 当前任务** |
-| **Phase 3b** | **打标批量工具（Excel 导出/导入）** | **✅ 已完成** |
-| Phase 4 | 前端 UI | ⏸ 暂缓 |
+| Phase 1 | 数据采集器（Jufair + cnexpo 爬虫） | ✅ 已完成 |
+| Phase 2 | Schema + 合并引擎 + 打标工具 | ✅ 已完成 |
+| Phase 3 | Dashboard 查询 API + JWT 认证 | ✅ 已完成 |
+| Phase 3b | 打标批量工具（Excel 导出/导入） | ✅ 已完成 |
+| Phase 4 | 前端 UI（看板、日历、地图、设置） | ✅ 已完成 |
+| Phase 5 | Intel 后端（调研报告、DB 查询、企查查接入） | ✅ 已完成 |
+| Phase 6 | 代码审计与合规清理 | ✅ 已完成 |
+| 质检整改 | 脚本质检 + 数据治理（见 `docs/AUDIT-2026-07-27.md`） | ✅ 已完成 |
+| **Phase 1b** | **全集采集（Jufair 全量 + cnexpo 全量）** | **⏳ 当前任务** |
+
+**已知缺口**：`scheduler.py`（定时调度器）在 PRD / ARCHITECTURE / DEPLOY 中均标注「✅ 完成」，
+但该文件不存在于仓库 —— 所谓「每周一 02:00 自动增量爬取」从未实现。爬虫目前只能手动触发。
 
 ---
 
@@ -66,16 +72,22 @@ crawl_log (爬取日志)           users (用户表)
 
 | 文件 | 说明 |
 |------|------|
-| MWLAB-2026-PRD-v1.1-merged.md | **整合 PRD（当前唯一权威文档）** |
-| crawlers/jufair_crawler.py | Jufair 爬虫 |
+| docs/MWLAB-2026-PRD-v1.1-merged.md | **整合 PRD（当前唯一权威文档）** |
+| docs/AUDIT-2026-07-27.md | 脚本质检审计报告 + 整改记录 |
+| crawlers/jufair_crawler.py | Jufair 爬虫（Python，curl 抓取，支持 `--proxy`） |
+| crawlers/jf_shell_crawl.sh | Jufair 爬虫（纯 shell + curl，慢速安全模式） |
 | crawlers/cnexpo_crawler.py | cnexpo 爬虫 |
-| merge_engine.py | 双源合并引擎 |
-| tools/export_for_tagging.py / import_tags.py | Phase 3b 打标批量工具（Excel 导入导出） |
+| tools/merge_engine.py | 双源合并引擎 |
 | tools/export_for_tagging.py | Phase 3b · Excel 导出待打标行 |
 | tools/import_tags.py | Phase 3b · Excel 写回 + `manual_tag_history` |
-| scheduler.py | 定时调度器 |
-| schema/init_db.sql | 6 表 Schema |
-| mwlab.db | 主数据库 |
+| tools/export_exhibitions.py | 展会清单导出（月度/区间，统一口径） |
+| scripts/classify_all_brands.py | 全品牌行业分类（l1 + l2） |
+| scripts/dedup.py | 品牌去重（默认 dry-run，`--execute` 实际合并） |
+| scripts/check_display_ready.py | 展示池标记（每周 cron） |
+| schema/init_db.sql | 主 Schema |
+| schema/migrations/ | 迁移脚本 001–010，由 `schema/db.py:init_db()` 自动应用 |
+| data/mwlab.db | 主数据库 |
+| data/jufair_2026.db · data/cnexpo_2026.db | 两个原始库 |
 
 ---
 
@@ -88,10 +100,33 @@ crawl_log (爬取日志)           users (用户表)
 
 ---
 
+## 数据现状（2026-07-28）
+
+| 库 | 表 | 行数 |
+|----|----|------|
+| `data/mwlab.db`（22 MB） | exhibition_brand | 6,946 |
+| | exhibition_edition | 7,264 |
+| | data_provenance | 7,927 |
+| | 其中 display_ready=1 | 5,954（85.7%） |
+| `data/jufair_2026.db` | raw_jufair | 5,362 |
+| `data/cnexpo_2026.db` | raw_cnexpo | 4,571 |
+
+行业分类已收敛至 8 个 l1 类别，33 条无关键词可匹配待人工兜底。
+`competition_relation` / `strategic_relevance` / `ma_potential` 三个人工打标字段仍为 0 条 ——
+此前是打标工具链因缺列而崩溃所致，现已修复可用。
+
+---
+
 ## 当前焦点：Phase 1b 全集采集
 
-Jufair 当前 3.4K 条（约 40%），目标 8.4K 条（国内 122 页 + 国际 300 页）。
+Jufair 原始库当前 5,362 条，继续补齐国内 + 国际全量。
 
-执行方式：Ralph 自治循环（Claude Code）或 Hermes 委托任务。
+采集完成后必须依次跑：
+```bash
+python3 tools/merge_engine.py --batch ALL      # 合并进主库
+python3 scripts/classify_all_brands.py          # 新品牌补分类（否则 industry_l1 为空）
+python3 scripts/dedup.py                        # 先 dry-run 看重复
+python3 scripts/check_display_ready.py          # 重算展示池
+```
 
 详见 PRD §7 Phase 1b。

@@ -15,12 +15,15 @@ import sqlite3
 import sys
 import time
 from datetime import datetime
+from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
 
 # ============ 配置 ============
 BASE_URL = "https://www.jufair.com"
+# crawl_log 落主库（看板 /api/setting/status 从这里读），与原始库分开
+MAIN_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "mwlab.db"
 BASE_DELAY = 3.0   # 基础请求间隔（秒）
 MAX_RETRIES = 3
 TARGET_YEAR = 2026
@@ -39,17 +42,9 @@ USER_AGENTS = [
     "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:128.0) Gecko/20100101 Firefox/128.0",
 ]
 
-SESSION = requests.Session()
-SESSION.headers.update({
-    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-    "Accept-Language": "zh-CN,zh;q=0.9,en;q=0.8",
-    "Referer": "https://www.jufair.com/",
-})
-
 _proxy_enabled = False
-# 运行前选定固定 UA（Session Cookie 与指纹一致）
-_fixed_ua = random.choice(USER_AGENTS) if USER_AGENTS else ""
-SESSION.headers.update({"User-Agent": _fixed_ua})
+# 运行前选定固定 UA（整轮爬取指纹一致）
+_fixed_ua = random.choice(USER_AGENTS) if USER_AGENTS else USER_AGENTS[0]
 
 
 # ====================================================================
@@ -82,69 +77,71 @@ def _log(msg: str):
     print(f"[{ts}] {msg}")
 
 
+def _curl_headers():
+    """本轮固定 UA + 常规浏览器头。"""
+    return [
+        f"User-Agent: {_fixed_ua}",
+        "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Accept-Language: zh-CN,zh;q=0.9,en;q=0.8",
+        "Referer: https://www.jufair.com/",
+    ]
+
+
+def _curl_fetch(url, timeout=25):
+    """用 curl 子进程抓取页面，绕过 requests TLS 指纹检测。
+
+    [AUDIT P0-4] --proxy 必须在此透传，否则开关只是装饰。
+    """
+    import subprocess as _sp
+    cmd = ["curl", "-sL", "--max-time", str(timeout), "--connect-timeout", "10"]
+    if _proxy_enabled:
+        # socks5h：让代理端做 DNS 解析，避免本地 DNS 泄漏
+        cmd += ["--proxy", PROXY_URL]
+    for h in _curl_headers():
+        cmd += ["-H", h]
+    cmd.append(url)
+    try:
+        r = _sp.run(cmd, capture_output=True, text=True, timeout=timeout + 5)
+        return r.stdout if r.returncode == 0 and r.stdout else None
+    except Exception:
+        return None
+
+
 def fetch_page(url, label="", timeout=25):
-    """HTTP GET + 自动重试 + 反爬缓解。支持 --proxy 走 Tor。"""
+    """HTTP GET + 自动重试 + 反爬缓解。使用 curl 绕过 TLS 指纹检测。"""
     global _consecutive_403, _global_consecutive_fail, _request_count
     _batch_pause_if_needed()
     for attempt in range(1, MAX_RETRIES + 1):
-        try:
-            kwargs = {"timeout": timeout}
-            if _proxy_enabled:
-                kwargs["proxies"] = {"http": PROXY_URL, "https": PROXY_URL}
-            resp = SESSION.get(url, **kwargs)
-
-            if resp.status_code == 200:
-                _consecutive_403 = 0
-                _global_consecutive_fail = 0
-                # 编码兜底
-                if not resp.encoding or resp.encoding == 'ISO-8859-1':
-                    resp.encoding = resp.apparent_encoding
-                # 软封禁检测：200 但无 .exh-info-wrap 和翻页结构
-                if ".exh-info-wrap" not in resp.text and "page-box" not in resp.text:
-                    _log(f"[WARN] {label} HTTP 200 但疑似封禁/验证码页")
-                    _global_consecutive_fail += 1
-                    if _global_consecutive_fail >= _CIRCUIT_BREAKER_MAX:
-                        _log(f"[ABORT] 全局连续失败 {_CIRCUIT_BREAKER_MAX} 次，终止运行")
-                        return None
-                    return None
-                return resp.text
-
-            if resp.status_code in (403, 429, 503):
-                _consecutive_403 += 1
-                _global_consecutive_fail += 1
-                retry_after = resp.headers.get("Retry-After")
-                planned_backoff = RATE_LIMIT_BACKOFF * _consecutive_403
-                if retry_after:
-                    try:
-                        planned_backoff = max(planned_backoff, float(retry_after))
-                    except ValueError:
-                        pass
-                _log(f"[!] {label} HTTP {resp.status_code} (第{attempt}次) 等待{planned_backoff:.0f}s...")
-                if _global_consecutive_fail >= _CIRCUIT_BREAKER_MAX:
-                    _log(f"[ABORT] 全局连续失败 {_CIRCUIT_BREAKER_MAX} 次，终止运行")
-                    return None
-                if attempt < MAX_RETRIES:
-                    time.sleep(planned_backoff)
-                else:
-                    _log(f"  放弃 {label}")
-                    return None
-            else:
-                _log(f"[!] {label} HTTP {resp.status_code} (第{attempt}次)")
-                if attempt < MAX_RETRIES:
-                    time.sleep(BASE_DELAY * attempt)
-                else:
-                    _log(f"  放弃 {label}")
-                    return None
-
-        except requests.RequestException as e:
-            _log(f"[!] {label} 异常: {e} (第{attempt}次)")
+        text = _curl_fetch(url, timeout)
+        if text is None:
+            _log(f"[!] {label} curl 返回空 (第{attempt}次)")
+            _global_consecutive_fail += 1
+            if _global_consecutive_fail >= _CIRCUIT_BREAKER_MAX:
+                _log(f"[ABORT] 全局连续失败 {_CIRCUIT_BREAKER_MAX} 次，终止运行")
+                return None
             if attempt < MAX_RETRIES:
-                delay = BASE_DELAY * attempt
-                _log(f"  等待{delay:.0f}s...")
-                time.sleep(delay)
+                time.sleep(BASE_DELAY * attempt)
             else:
                 _log(f"  放弃 {label}")
                 return None
+            continue
+
+        # 软封禁检测：无 .exh-info-wrap 和翻页结构（兼容新旧版）
+        has_exh = ".exh-info-wrap" in text
+        has_page = "page-box" in text or "pager-box" in text or "goods-item-container" in text
+        if not has_exh and not has_page:
+            _global_consecutive_fail += 1
+            if _global_consecutive_fail >= _CIRCUIT_BREAKER_MAX:
+                _log(f"[ABORT] 全局连续失败 {_CIRCUIT_BREAKER_MAX} 次，终止运行")
+                return None
+            if attempt < MAX_RETRIES:
+                time.sleep(BASE_DELAY * attempt)
+            continue
+
+        _consecutive_403 = 0
+        _global_consecutive_fail = 0
+        return text
+
     return None
 
 
@@ -392,15 +389,18 @@ def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batc
     - crawl_detail: 是否进详情页补爬额外字段
     - crawled: 已爬 URL 集合（由 crawl_all 统一维护，避免重复查询 DB）
     """
-    type_code = "1" if source_type == "domestic" else "0"
-    base_path = f"/exhibition-0-0-{type_code}-0-0-{month:02d}-"
+    # [v2] Jufair URL 格式变更（2026-07 发现）：/exhibition-0-0-1-0-0-08-1/ → /n-cn/m-8/
+    type_prefix = "n-cn" if source_type == "domestic" else "n-intl"
     if crawled is None:  # [CRWL-19] fallback for direct callers
         crawled = get_crawled_urls(conn)
     new_count = 0
     page = 1
 
     while True:
-        url = f"{BASE_URL}{base_path}{page}/"
+        if page == 1:
+            url = f"{BASE_URL}/{type_prefix}/m-{month}/"
+        else:
+            url = f"{BASE_URL}/{type_prefix}/m-{month}/p-{page}/"
         label = f"月{month:02d} {source_type} p{page}"
         html = fetch_page(url, label)
         if html is None:
@@ -474,25 +474,40 @@ def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batc
     return new_count
 
 
-def _write_crawl_log(conn, batch_id, status, total_fetched=0, total_inserted=0):
-    """写入 crawl_log 记录。"""
+def _write_crawl_log(_unused_conn, batch_id, status, total_fetched=0, total_inserted=0):
+    """写入 crawl_log 记录到主库 data/mwlab.db。
+
+    [AUDIT P1-10] 此前写入的是原始库（jufair_2026.db），而该库并无 crawl_log 表，
+    异常又被静默吞掉；看板 /api/setting/status 从主库读，于是"最近爬取"恒为 null。
+    crawl_log 是给看板看的运营数据，必须落主库。
+    第一个参数保留仅为兼容既有调用点，不再使用。
+    """
     from datetime import datetime as dt
     now = dt.now().strftime("%Y-%m-%d %H:%M:%S")
-    # 尝试 INSERT，若表不存在则静默跳过
+    try:
+        conn = sqlite3.connect(str(MAIN_DB_PATH))
+    except Exception as e:
+        _log(f"[WARN] crawl_log 无法连接主库 {MAIN_DB_PATH}: {e}")
+        return
     try:
         if status == "running":
             conn.execute(
-                "INSERT INTO crawl_log(batch_id, status, started_at) VALUES (?, ?, ?)",
+                "INSERT INTO crawl_log(batch_id, source_site, status, started_at) "
+                "VALUES (?, 'jufair', ?, ?)",
                 (batch_id, status, now),
             )
         else:
             conn.execute(
-                "UPDATE crawl_log SET status=?, finished_at=?, total_fetched=?, total_inserted=? WHERE batch_id=?",
+                "UPDATE crawl_log SET status=?, finished_at=?, total_fetched=?, total_inserted=? "
+                "WHERE batch_id=?",
                 (status, now, total_fetched, total_inserted, batch_id),
             )
         conn.commit()
-    except Exception:
-        pass  # crawl_log 表可能不存在（旧库）
+    except Exception as e:
+        # 不再静默：写不进日志表是运维问题，必须可见
+        _log(f"[WARN] crawl_log 写入失败 (batch={batch_id}, status={status}): {e}")
+    finally:
+        conn.close()
 
 
 def crawl_all(db_path, months=None, keyword=None, crawl_detail=False, batch_id=None):

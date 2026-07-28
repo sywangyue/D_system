@@ -1,11 +1,11 @@
 import { NextResponse } from 'next/server'
 import { getDb, getWritableDb } from '@/lib/db'
+import { requireUser } from '@/lib/api-guard'
 
 export async function GET(request: Request) {
-  const email = request.headers.get('x-user-email')
-  if (!email) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const user = requireUser(request)
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const email = user.email
 
   const db = getDb()
   const row = db.prepare(
@@ -28,10 +28,10 @@ export async function GET(request: Request) {
 }
 
 export async function PATCH(request: Request) {
-  const email = request.headers.get('x-user-email')
-  if (!email) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  // 仅 requireUser：看板筛选偏好属于用户自身 UI 状态，readonly 角色也应可保存
+  const user = requireUser(request)
+  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  const email = user.email
 
   let body: { l1s?: unknown }
   try {

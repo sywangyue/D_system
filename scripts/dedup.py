@@ -443,19 +443,79 @@ def run_execute(conn, db_path: Path):
         # 打标历史
         for bid in to_delete:
             old_name = (brand_by_id.get(bid) or {}).get("name_cn", "")
+            # brand_id 必须记 canonical：manual_tag_history 是 ON DELETE CASCADE，
+            # 若记被删品牌，这条合并痕迹会随该品牌一起被级联删除（审计自毁）。
             conn.execute("""
                 INSERT INTO manual_tag_history (brand_id, field_name, old_value, new_value, changed_by, changed_at, reason)
                 VALUES (?, 'merged_into', ?, ?, 'system/dedup', ?, 'auto-merge')
-            """, (bid, old_name, canonical, NOW))
+            """, (canonical, f"{bid}|{old_name}", canonical, NOW))
 
         # 迁移届次 & 溯源
         for bid in to_delete:
-            total_editions_migrated += conn.execute(
-                "UPDATE exhibition_edition SET brand_id = ? WHERE brand_id = ?", (canonical, bid)
-            ).rowcount
+            # 届次：edition_id 是主键且含旧 brand_id 前缀，迁移后一并重写，
+            # 避免留下 edition_id 前缀与 brand_id 不一致的行（历史上已积累 87 条）。
+            # 目标品牌已有同年届次时，保留目标方，丢弃被合并方（数值以目标为准）。
+            # 同年冲突：先把来源方的数值并入目标方（取较大值 / 补空缺，
+            # 与 merge_engine 的双源规则一致），再丢弃来源行，避免信息丢失。
+            conn.execute("""
+                UPDATE exhibition_edition AS t SET
+                    area_sqm         = MAX(COALESCE(t.area_sqm,0),         COALESCE(s.area_sqm,0)),
+                    exhibitors_count = MAX(COALESCE(t.exhibitors_count,0), COALESCE(s.exhibitors_count,0)),
+                    visitors_count   = MAX(COALESCE(t.visitors_count,0),   COALESCE(s.visitors_count,0)),
+                    date_start  = COALESCE(NULLIF(t.date_start,''),  s.date_start),
+                    date_end    = COALESCE(NULLIF(t.date_end,''),    s.date_end),
+                    venue       = COALESCE(NULLIF(t.venue,''),       s.venue),
+                    city        = COALESCE(NULLIF(t.city,''),        s.city)
+                FROM (SELECT * FROM exhibition_edition WHERE brand_id = ?) AS s
+                WHERE t.brand_id = ? AND t.year = s.year
+            """, (bid, canonical))
+            conn.execute(
+                "DELETE FROM exhibition_edition WHERE brand_id = ? AND year IN "
+                "(SELECT year FROM exhibition_edition WHERE brand_id = ?)",
+                (bid, canonical)
+            )
+            for (old_eid, yr) in conn.execute(
+                "SELECT edition_id, year FROM exhibition_edition WHERE brand_id = ?", (bid,)
+            ).fetchall():
+                new_eid = f"{canonical}-{yr}" if yr else old_eid.replace(bid, canonical, 1)
+                # 被合并方自身可能存在同年多条（历史 edition_id 错位所致），
+                # 或 new_eid 已被本轮先前迁入的行占用 —— 冲突时丢弃来源行。
+                taken = conn.execute(
+                    "SELECT 1 FROM exhibition_edition WHERE edition_id = ?", (new_eid,)
+                ).fetchone()
+                if taken:
+                    conn.execute("DELETE FROM exhibition_edition WHERE edition_id = ?", (old_eid,))
+                    continue
+                conn.execute(
+                    "UPDATE exhibition_edition SET brand_id = ?, edition_id = ? WHERE edition_id = ?",
+                    (canonical, new_eid, old_eid)
+                )
+                total_editions_migrated += 1
+
+            # 溯源：007 迁移建了 UNIQUE(brand_id, source_url)，
+            # 若目标品牌已有同一 source_url，直接 UPDATE 会撞唯一约束，先删冗余再迁移。
+            conn.execute(
+                "DELETE FROM data_provenance WHERE brand_id = ? AND source_url IN "
+                "(SELECT source_url FROM data_provenance WHERE brand_id = ?)",
+                (bid, canonical)
+            )
             total_provenance_migrated += conn.execute(
                 "UPDATE data_provenance SET brand_id = ? WHERE brand_id = ?", (canonical, bid)
             ).rowcount
+
+            # 其余引用 brand_id 的表也必须处理，否则 DELETE 撞外键：
+            #   brand_geo_tag  派生数据，canonical 已有自己的，直接丢弃
+            #   业务数据表      迁移到 canonical（这些表 ON DELETE 是 SET NULL/NO ACTION，
+            #                  不处理会静默丢失归属或直接报错）
+            conn.execute("DELETE FROM brand_geo_tag WHERE brand_id = ?", (bid,))
+            for tbl, col in (("customer_prospect", "brand_id"),
+                             ("intel_report", "brand_id"),
+                             ("exhibition_contact", "brand_id"),
+                             ("exhibition_timeline", "brand_id"),
+                             ("exhibition_relation", "from_brand_id"),
+                             ("exhibition_relation", "to_brand_id")):
+                conn.execute(f"UPDATE {tbl} SET {col} = ? WHERE {col} = ?", (canonical, bid))
+
             conn.execute("DELETE FROM exhibition_brand WHERE brand_id = ?", (bid,))
             total_deleted += 1
 
@@ -487,7 +547,9 @@ def run_execute(conn, db_path: Path):
     print(f"  最大届次/品牌: {max_eds}")
     print(f"{'='*60}")
 
-    log_path = db_path.parent / "scripts" / "dedup_audit.log"
+    # 日志固定落脚本所在目录；此前按 db_path.parent 推导，
+    # 用 --db 指向仓库外（如临时副本）时会因目录不存在而崩在收尾步骤。
+    log_path = Path(__file__).resolve().parent / "dedup_audit.log"
     with open(log_path, "w") as f:
         f.write(f"# Dedup Audit Log — {NOW}\n")
         f.write(f"# Groups: {len(merge_groups)}, Deleted: {total_deleted}\n\n")

@@ -1,4 +1,3 @@
-import { type NextRequest } from 'next/server'
 import { getDb } from '@/lib/db'
 
 export interface AuthUser {
@@ -10,8 +9,10 @@ export interface AuthUser {
  * 从 middleware 注入的请求头中提取已验证用户。
  * 同时查库校验 is_active，使被禁用用户的存量 token 即时失效。
  * 返回 null 表示未认证或已禁用，调用方应返回 401。
+ *
+ * 参数类型为 Request（NextRequest 是其子类型），使仅声明 Request 的路由也能调用。
  */
-export function requireUser(request: NextRequest): AuthUser | null {
+export function requireUser(request: Request): AuthUser | null {
   const email = request.headers.get('x-user-email')
   const role = request.headers.get('x-user-role')
   if (!email || !role) return null

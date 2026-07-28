@@ -9,6 +9,9 @@
 本项目是 **MWLAB-2026**（Exhibition Competitive Dashboard），展会竞争盘面看板。
 
 - **当前状态**：Phase 1–6 ✅ 已完成；Phase 3b（打标工具）✅；Phase 5（Intel 后端）✅；Phase 6（代码审计）✅；Phase 1b（全集采集）⏳ 待执行
+- **2026-07-28 质检整改**：脚本质检 + 数据治理已完成 6 批，详见 `docs/AUDIT-2026-07-27.md`。
+  数据现状：品牌 6,946 / 届次 7,264 / 溯源 7,927（已去重）；行业分类收敛至 8 类。
+  注意：`scheduler.py` 在多份旧文档中被描述为「已完成」，但该文件**不存在于仓库**，定时爬取能力尚未实现。
 - **权威文档**：`docs/MWLAB-2026-PRD-v1.1-merged.md`（整合版 PRD，唯一引用源）
 - **全景入口**：`AGENTS.md`（数据架构、文件索引、技术约束）
 
@@ -68,15 +71,19 @@
 | 文件 | 路径 |
 |------|------|
 | 整合 PRD | `docs/MWLAB-2026-PRD-v1.1-merged.md` |
-| 主数据库 | `mwlab.db` |
-| Jufair 原始库 | `jufair_2026.db` |
-| cnexpo 原始库 | `cnexpo_2026.db` |
+| 质检审计报告 | `docs/AUDIT-2026-07-27.md` |
+| 主数据库 | `data/mwlab.db` |
+| Jufair 原始库 | `data/jufair_2026.db` |
+| cnexpo 原始库 | `data/cnexpo_2026.db` |
 | 爬虫目录 | `crawlers/` |
-| Schema | `schema/init_db.sql` |
-| 合并引擎 | `merge_engine.py` |
+| Schema | `schema/init_db.sql` + `schema/migrations/` |
+| 合并引擎 | `tools/merge_engine.py` |
 | Phase 3b 打标工具 | `tools/export_for_tagging.py`, `tools/import_tags.py` |
+| 展会清单导出 | `tools/export_exhibitions.py` |
 | 企查查 API 客户端 | `tools/intel/qcc_client.py` |
 | Intel 工具目录 | `tools/intel/` |
+
+> 数据库一律在 `data/` 下。仓库根目录曾有一个同名空库 `mwlab.db`，是历史遗留陷阱，已删除。
 
 ## 代码风格
 

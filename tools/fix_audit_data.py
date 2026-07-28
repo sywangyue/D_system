@@ -7,8 +7,9 @@ fix_audit_data.py — 一次性生产数据清洗脚本
   - report_provenance：预览 007 迁移将删除的 data_provenance 重复行
 
 用法：
-    python3 tools/fix_audit_data.py --db mwlab.db             # dry-run（默认）
-    python3 tools/fix_audit_data.py --db mwlab.db --apply     # 实际写库
+    python3 tools/fix_audit_data.py                # dry-run（默认，作用于 data/mwlab.db）
+    python3 tools/fix_audit_data.py --apply        # 实际写库
+    python3 tools/fix_audit_data.py --db /path/to/other.db --apply
 """
 import argparse
 import sqlite3
@@ -129,7 +130,8 @@ def report_provenance(conn: sqlite3.Connection) -> dict:
 
 def main():
     parser = argparse.ArgumentParser(description='清洗生产库存量数据')
-    parser.add_argument('--db', default='mwlab.db', help='目标数据库路径')
+    parser.add_argument('--db', default=str(_project_root / 'data' / 'mwlab.db'),
+                        help='目标数据库路径（默认 data/mwlab.db）')
     parser.add_argument('--apply', action='store_true', help='实际写库（默认 dry-run）')
     args = parser.parse_args()
 

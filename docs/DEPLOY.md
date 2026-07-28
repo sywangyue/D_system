@@ -98,7 +98,6 @@ rsync -avz \
 
 rsync -avz \
   -e "ssh -i '/Volumes/databoard/AI Project/D_dashboard/MWlab.pem' -o StrictHostKeyChecking=no" \
-  "/Volumes/databoard/AI Project/D_dashboard/scheduler.py" \
   "/Volumes/databoard/AI Project/D_dashboard/requirements.txt" \
   admin@47.79.17.71:/home/admin/dashboard/
 ```
@@ -107,20 +106,30 @@ rsync -avz \
 
 ## 爬虫调度
 
+> **注意**：`scheduler.py` 不存在于仓库。本节此前描述的 `--cron` / `--run-now` / `--status`
+> 均无对应实现，「每周一 02:00 自动增量爬取」从未生效。采集目前只能手动触发。
+
 | 任务 | 时间 | 命令 |
 |------|------|------|
-| 增量爬取（每周） | 周一 02:00 | `scheduler.py --cron` |
+| 展示池标记（每周） | 周一 02:00 | `scripts/check_display_ready.py` |
 | 旧日志清理 | 每月1日 04:00 | `find logs/ -mtime +30 -delete` |
 
 ```bash
 # 查看 cron 注册
 crontab -l
 
-# 手动触发（后台运行）
-nohup .venv/bin/python3 scheduler.py --run-now >> logs/scheduler.log 2>&1 &
+# 手动采集（须在大陆 IP 节点执行）
+nohup .venv/bin/python3 crawlers/jufair_crawler.py --all --detail >> logs/crawl.log 2>&1 &
 
-# 查看最近爬取状态
-.venv/bin/python3 scheduler.py --status
+# 合并进主库 + 后处理
+.venv/bin/python3 tools/merge_engine.py --batch ALL
+.venv/bin/python3 scripts/classify_all_brands.py
+.venv/bin/python3 scripts/check_display_ready.py
+
+# 查看最近爬取状态（crawl_log 现已写入主库）
+sqlite3 data/mwlab.db "SELECT batch_id, source_site, status, started_at, finished_at,
+                              total_fetched, total_inserted
+                       FROM crawl_log ORDER BY started_at DESC LIMIT 5;"
 ```
 
 ---
@@ -180,7 +189,8 @@ pm2 reload mwlab-dashboard     # 零停机重载（推荐）
 
 ### 关键配置约束
 
-- `mwlab.db` 路径硬编码为 `process.cwd()/mwlab.db` — 必须放在 `/home/admin/dashboard/`
+- `lib/db.ts` 解析路径为 `process.cwd()/data/mwlab.db` — 数据库必须放在 `/home/admin/dashboard/data/`
+  （且 `fileMustExist: true`，放错位置服务会直接启动失败，不会静默降级）
 - `better-sqlite3` 是原生 C addon，必须在目标平台编译 — **不能**从本地上传 `node_modules`
 - 服务器加了 2GB swap（`/etc/fstab` 持久化）防内存压力，但仍不足以跑 build
 - Nginx 配置 `gzip off`（Next.js API 层已手动 gzip 压缩，不重复）
@@ -191,11 +201,11 @@ pm2 reload mwlab-dashboard     # 零停机重载（推荐）
 
 ```bash
 # 在服务器上备份（建议每周手动一次或加入 cron）
-cp /home/admin/dashboard/mwlab.db \
+cp /home/admin/dashboard/data/mwlab.db \
    /home/admin/dashboard/mwlab_backup_$(date +%Y%m%d).db
 
 # 下载到本地
 scp -i "/Volumes/databoard/AI Project/D_dashboard/MWlab.pem" \
-  admin@47.79.17.71:/home/admin/dashboard/mwlab.db \
+  admin@47.79.17.71:/home/admin/dashboard/data/mwlab.db \
   "/Volumes/databoard/AI Project/D_dashboard/mwlab_backup_$(date +%Y%m%d).db"
 ```
