@@ -24,6 +24,11 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+from tools.url_utils import canonical_source_url
+
 # ============ 配置 ============
 BASE_URL = "https://www.cnexpo.com"
 # crawl_log 落主库（看板 /api/setting/status 从这里读），与原始库分开
@@ -209,7 +214,8 @@ def parse_list_page(html):
         text = a_tag.get_text(strip=True)
         if not text or len(text) < 4:
             continue
-        full_url = BASE_URL + href
+        # 规范化：/event/{id}.html 与 /event/{id} 并存，而 source_url 是 UNIQUE 键（AUDIT）
+        full_url = canonical_source_url(BASE_URL + href)
         # 避免重复链接
         if any(r["source_url"] == full_url for r in results):
             continue

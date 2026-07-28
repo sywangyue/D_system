@@ -31,6 +31,8 @@ BASE_DIR = Path(__file__).parent.parent
 if str(BASE_DIR) not in sys.path:
     sys.path.insert(0, str(BASE_DIR))
 
+from tools.url_utils import canonical_source_url
+
 DEFAULT_JUFAIR_DB  = BASE_DIR / "data" / "jufair_2026.db"
 DEFAULT_CNEXPO_DB  = BASE_DIR / "data" / "cnexpo_2026.db"
 DEFAULT_TARGET_DB  = BASE_DIR / "data" / "mwlab.db"
@@ -409,6 +411,9 @@ def insert_provenance(
     batch_id: str,
     notes: str = ''
 ) -> None:
+    # 防御性归一：存量原始库里 .html 与尾斜杠两种写法并存，
+    # 而 data_provenance 有 UNIQUE(brand_id, source_url)，不归一会重复入库（AUDIT）
+    source_url = canonical_source_url(source_url)
     record_id = str(uuid.uuid4())
     safe_payload = {}
     for k, v in raw_row.items():
