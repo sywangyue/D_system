@@ -108,6 +108,16 @@ class TestParseDatePair(unittest.TestCase):
             ('2026-05-06', '2026-05-08')
         )
 
+    def test_chinese_range_cross_year(self):
+        """[AUDIT] 年月日格式的跨年区间：结束月<开始月 → 年份+1。
+
+        此前该分支复用开始年，产出 date_end 早于 date_start 的倒挂数据。
+        """
+        self.assertEqual(
+            parse_date_pair('2023年12月15日~06月15日'),
+            ('2023-12-15', '2024-06-15')
+        )
+
     def test_chinese_single(self):
         start, end = parse_date_pair('2026年5月1日')
         self.assertEqual(start, '2026-05-01')

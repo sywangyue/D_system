@@ -31,6 +31,8 @@ describe("GET /api/users", () => {
     vi.clearAllMocks()
     mockGetDb.mockReturnValue(
       buildMockDb([
+        // requireUser 的 is_active 查询（须排在宽泛的 "FROM user" 之前）
+        ["SELECT is_active FROM user WHERE email", "get", { is_active: 1 }],
         ["FROM user", "all", mockUsers],
       ]),
     )
@@ -38,7 +40,7 @@ describe("GET /api/users", () => {
 
   it("should return user list for admin", async () => {
     const req = new Request("http://localhost:3000/api/users", {
-      headers: { "x-user-role": "admin" },
+      headers: { "x-user-email": "t@mwlab.internal", "x-user-role": "admin" },
     })
     const res = await GET(req)
 
@@ -52,16 +54,16 @@ describe("GET /api/users", () => {
     expect(json.users[0]).toHaveProperty("role")
   })
 
-  it("should return 403 without auth headers (default readonly)", async () => {
+  it("should return 401 without auth headers", async () => {
     const req = new Request("http://localhost:3000/api/users")
     const res = await GET(req)
 
-    expect(res.status).toBe(403)
+    expect(res.status).toBe(401)
   })
 
   it("should return 403 for non-admin role", async () => {
     const req = new Request("http://localhost:3000/api/users", {
-      headers: { "x-user-role": "manager" },
+      headers: { "x-user-email": "t@mwlab.internal", "x-user-role": "manager" },
     })
     const res = await GET(req)
 
@@ -70,7 +72,7 @@ describe("GET /api/users", () => {
 
   it("should return 403 for readonly role", async () => {
     const req = new Request("http://localhost:3000/api/users", {
-      headers: { "x-user-role": "readonly" },
+      headers: { "x-user-email": "t@mwlab.internal", "x-user-role": "readonly" },
     })
     const res = await GET(req)
 

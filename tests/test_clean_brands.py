@@ -182,12 +182,16 @@ from scripts.clean_brands import parse_md_excel, match_brand_multistrategy  # no
 
 
 def test_parse_md_excel():
-    """读取实际 Excel 文件，验证返回 list 且包含关键字段。"""
-    import openpyxl
+    """读取 fixture Excel，验证返回 list 且包含关键字段。
+
+    原先指向仓库根目录的「杜塞境外展时间表_for update_2026.xlsx」，
+    该文件已归档到 _archive/（且 _archive/ 被 .gitignore 忽略），
+    故复制一份进 tests/fixtures/ 随代码入库，测试不再依赖本机文件布局。
+    """
     from pathlib import Path
 
-    excel_path = Path(__file__).parent.parent / "杜塞境外展时间表_for update_2026.xlsx"
-    assert excel_path.exists(), f"Excel 文件不存在: {excel_path}"
+    excel_path = Path(__file__).parent / "fixtures" / "md_overseas_schedule_2026.xlsx"
+    assert excel_path.exists(), f"fixture 缺失: {excel_path}"
 
     records = parse_md_excel(str(excel_path))
     assert isinstance(records, list), f"Expected list, got {type(records)}"

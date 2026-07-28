@@ -43,8 +43,12 @@ def _slugify(text: str) -> str:
     return text[:60]
 
 
-def _report_filename(report_type: str, params: dict) -> Path:
-    """生成报告文件路径（不保证唯一，带时间戳）。"""
+def _report_filename(report_type: str, params: dict, out_dir: str | Path | None = None) -> Path:
+    """生成报告文件路径（不保证唯一，带时间戳）。
+
+    out_dir 非空时覆盖 _REPORT_DIRS，供测试写入临时目录，
+    避免污染仓库内的 reports/（AUDIT P1-15）。
+    """
     ts = datetime.now().strftime("%Y%m%d_%H%M%S")
     slug_parts: list[str] = []
     if report_type == "industry_research":
@@ -58,7 +62,8 @@ def _report_filename(report_type: str, params: dict) -> Path:
 
     slug = "_".join(slug_parts) or "report"
     filename = f"{report_type}_{slug}_{ts}.md"
-    return _REPORT_DIRS[report_type] / filename
+    base = Path(out_dir) if out_dir else _REPORT_DIRS[report_type]
+    return base / filename
 
 
 def write_report(
@@ -72,6 +77,7 @@ def write_report(
     status: str = "published",
     created_by: str = "claude-code",
     db_path: str | Path | None = None,
+    out_dir: str | Path | None = None,
 ) -> int:
     """
     写入调研报告到 DB + 文件系统，返回 intel_report.id。
@@ -86,6 +92,8 @@ def write_report(
         params:         额外参数，存为 JSON
         status:         'draft' | 'published' | 'archived'
         created_by:     操作者标识
+        db_path:        目标数据库（默认 data/mwlab.db）
+        out_dir:        报告 .md 输出目录（默认按 report_type 落到 reports/*）
     """
     valid_types = {"industry_research", "brand_research", "batch_prospect", "single_prospect"}
     if report_type not in valid_types:
@@ -100,12 +108,15 @@ def write_report(
     }
 
     # 生成并写入 .md 文件
-    report_path = _report_filename(report_type, params_dict)
+    report_path = _report_filename(report_type, params_dict, out_dir)
     report_path.parent.mkdir(parents=True, exist_ok=True)
     report_path.write_text(content_md, encoding="utf-8")
 
-    # 文件路径相对于项目根
-    rel_path = str(report_path.relative_to(_REPO_ROOT))
+    # 文件路径相对于项目根；out_dir 指向仓库外时退回绝对路径
+    try:
+        rel_path = str(report_path.relative_to(_REPO_ROOT))
+    except ValueError:
+        rel_path = str(report_path)
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     target_db = db_path or DB_PATH
@@ -156,7 +167,9 @@ def main() -> None:
     parser.add_argument("--content-file", help="报告内容文件路径（--content 和 --content-file 二选一）")
     parser.add_argument("--status", default="published",
                         choices=["draft", "published", "archived"])
-    parser.add_argument("--db", default=str(DB_PATH), help="数据库路径（默认 mwlab.db）")
+    parser.add_argument("--db", default=str(DB_PATH), help="数据库路径（默认 data/mwlab.db）")
+    parser.add_argument("--out-dir", default=None,
+                        help="报告 .md 输出目录（默认按类型落到 reports/*；测试应指向临时目录）")
     args = parser.parse_args()
 
     if args.content:
@@ -175,6 +188,7 @@ def main() -> None:
         target_company=args.target_company,
         status=args.status,
         db_path=args.db,
+        out_dir=args.out_dir,
     )
     print(f"报告已写入 → intel_report.id = {report_id}")
 

@@ -14,6 +14,8 @@ describe("GET /api/setting/status", () => {
     vi.clearAllMocks()
     mockGetDb.mockReturnValue(
       buildMockDb([
+        // requireUser 的 is_active 查询
+        ["SELECT is_active FROM user WHERE email", "get", { is_active: 1 }],
         ["SELECT COUNT(*) as count FROM exhibition_brand", "get", { count: 3400 }],
         ["SELECT COUNT(*) as count FROM exhibition_edition", "get", { count: 12000 }],
         ["FROM crawl_log", "get", {
@@ -27,7 +29,7 @@ describe("GET /api/setting/status", () => {
 
   it("should return data_status and system_info for admin", async () => {
     const req = new Request("http://localhost:3000/api/setting/status", {
-      headers: { "x-user-role": "admin" },
+      headers: { "x-user-email": "t@mwlab.internal", "x-user-role": "admin" },
     })
     const res = await GET(req)
 
@@ -42,16 +44,16 @@ describe("GET /api/setting/status", () => {
     expect(json.system_info).toHaveProperty("next_version")
   })
 
-  it("should return 403 without admin role (default readonly)", async () => {
+  it("should return 401 without auth headers", async () => {
     const req = new Request("http://localhost:3000/api/setting/status")
     const res = await GET(req)
 
-    expect(res.status).toBe(403)
+    expect(res.status).toBe(401)
   })
 
   it("should return 403 for manager role", async () => {
     const req = new Request("http://localhost:3000/api/setting/status", {
-      headers: { "x-user-role": "manager" },
+      headers: { "x-user-email": "t@mwlab.internal", "x-user-role": "manager" },
     })
     const res = await GET(req)
 
@@ -60,7 +62,7 @@ describe("GET /api/setting/status", () => {
 
   it("should return 403 for readonly role", async () => {
     const req = new Request("http://localhost:3000/api/setting/status", {
-      headers: { "x-user-role": "readonly" },
+      headers: { "x-user-email": "t@mwlab.internal", "x-user-role": "readonly" },
     })
     const res = await GET(req)
 
@@ -70,13 +72,14 @@ describe("GET /api/setting/status", () => {
   it("should return null crawl data when no crawl logs exist", async () => {
     mockGetDb.mockReturnValue(
       buildMockDb([
+        ["SELECT is_active FROM user WHERE email", "get", { is_active: 1 }],
         ["SELECT COUNT(*) as count FROM exhibition_brand", "get", { count: 3400 }],
         ["SELECT COUNT(*) as count FROM exhibition_edition", "get", { count: 12000 }],
         ["FROM crawl_log", "get", null as any],
       ]),
     )
     const req = new Request("http://localhost:3000/api/setting/status", {
-      headers: { "x-user-role": "admin" },
+      headers: { "x-user-email": "t@mwlab.internal", "x-user-role": "admin" },
     })
     const res = await GET(req)
 
@@ -88,7 +91,7 @@ describe("GET /api/setting/status", () => {
 
   it("should include system_info properties", async () => {
     const req = new Request("http://localhost:3000/api/setting/status", {
-      headers: { "x-user-role": "admin" },
+      headers: { "x-user-email": "t@mwlab.internal", "x-user-role": "admin" },
     })
     const res = await GET(req)
     const json = await res.json()

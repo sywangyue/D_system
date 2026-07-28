@@ -176,7 +176,9 @@ class TestIntelExport(unittest.TestCase):
         r = subprocess.run(
             [sys.executable, 'tools/intel/report_writer.py',
              '--type', 'batch_prospect', '--brand-id', 'EXPO-EXPORT',
-             '--content-file', report_path, '--db', self.db.name],
+             '--content-file', report_path, '--db', self.db.name,
+             # 报告 .md 必须写临时目录，否则污染仓库 reports/customer/（AUDIT P1-15）
+             '--out-dir', tempfile.mkdtemp(prefix='mwlab_test_reports_')],
             capture_output=True, text=True,
             cwd=root,
         )
