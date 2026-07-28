@@ -55,22 +55,41 @@ def normalize_raw_table(conn: sqlite3.Connection, table: str, apply: bool) -> di
     dup_groups = {k: v for k, v in groups.items() if len(v) > 1}
     to_delete = sum(len(v) - 1 for v in dup_groups.values())
 
+    merged_fields = 0
     if apply:
+        # 逐字段取并集，而非整行二选一 —— 两行常各有各的非空字段
+        # （实测：保留行总字段更多但缺 visitors_str，被丢弃行恰好有值）
+        mergeable = [c for c in cols if c not in ("id", "source_url", "crawl_batch_id", "crawled_at")]
         for canon, members in groups.items():
             if not canon:
                 continue
             keep = max(members, key=lambda r: _score_raw(r, cols))
+            patch = {}
+            for c in mergeable:
+                if not keep[c]:
+                    for m in members:
+                        if m["id"] != keep["id"] and m[c]:
+                            patch[c] = m[c]
+                            merged_fields += 1
+                            break
             for m in members:
                 if m["id"] != keep["id"]:
                     conn.execute(f"DELETE FROM {table} WHERE id = ?", (m["id"],))
+            sets, params = [], []
             if keep["source_url"] != canon:
-                conn.execute(
-                    f"UPDATE {table} SET source_url = ? WHERE id = ?", (canon, keep["id"])
-                )
+                sets.append("source_url = ?")
+                params.append(canon)
+            for c, v in patch.items():
+                sets.append(f"{c} = ?")
+                params.append(v)
+            if sets:
+                params.append(keep["id"])
+                conn.execute(f"UPDATE {table} SET {', '.join(sets)} WHERE id = ?", params)
         conn.commit()
 
     return {"table": table, "rows": len(rows), "url_rewritten": changed,
-            "dup_groups": len(dup_groups), "rows_removed": to_delete}
+            "dup_groups": len(dup_groups), "rows_removed": to_delete,
+            "fields_merged": merged_fields}
 
 
 def normalize_provenance(conn: sqlite3.Connection, apply: bool) -> dict:
@@ -104,7 +123,7 @@ def normalize_provenance(conn: sqlite3.Connection, apply: bool) -> dict:
         conn.commit()
 
     return {"table": "data_provenance", "rows": len(rows), "url_rewritten": changed,
-            "dup_groups": len(dup_groups), "rows_removed": to_delete}
+            "dup_groups": len(dup_groups), "rows_removed": to_delete, "fields_merged": 0}
 
 
 def main() -> int:
@@ -139,11 +158,11 @@ def main() -> int:
         finally:
             conn.close()
 
-    print(f"  {'表':<18}{'总行':>8}{'URL改写':>10}{'重复组':>8}{'将删行':>8}")
-    print("  " + "-" * 52)
+    print(f"  {'表':<18}{'总行':>8}{'URL改写':>10}{'重复组':>8}{'将删行':>8}{'字段并入':>10}")
+    print("  " + "-" * 62)
     for r in results:
         print(f"  {r['table']:<18}{r['rows']:>8}{r['url_rewritten']:>10}"
-              f"{r['dup_groups']:>8}{r['rows_removed']:>8}")
+              f"{r['dup_groups']:>8}{r['rows_removed']:>8}{r.get('fields_merged', 0):>10}")
     if not args.apply:
         print("\n  （dry-run，未写库；确认后加 --apply）")
     return 0
