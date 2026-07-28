@@ -27,6 +27,10 @@ from pathlib import Path
 from typing import Optional
 
 BASE_DIR = Path(__file__).parent.parent
+# 以脚本方式直接调用时 sys.path[0] 是 tools/，需补仓库根目录才能 import schema
+if str(BASE_DIR) not in sys.path:
+    sys.path.insert(0, str(BASE_DIR))
+
 DEFAULT_JUFAIR_DB  = BASE_DIR / "data" / "jufair_2026.db"
 DEFAULT_CNEXPO_DB  = BASE_DIR / "data" / "cnexpo_2026.db"
 DEFAULT_TARGET_DB  = BASE_DIR / "data" / "mwlab.db"
@@ -119,12 +123,14 @@ def parse_date_pair(raw: Optional[str]) -> tuple[Optional[str], Optional[str]]:
         return f"{y}-{int(mo):02d}-{int(d):02d}", None
 
     # "2026年5月1日~5月5日" 或 "2026年05月06日~05月08日"
+    # [AUDIT] 与上方点分格式一致，结束月<开始月时年份+1（跨年展会）
     m = re.match(
         r'(\d{4})年(\d{1,2})月(\d{1,2})日[~\-–至](\d{1,2})月(\d{1,2})日', s
     )
     if m:
         y, sm, sd, em, ed = m.groups()
-        return f"{y}-{int(sm):02d}-{int(sd):02d}", f"{y}-{int(em):02d}-{int(ed):02d}"
+        ey = int(y) + 1 if int(em) < int(sm) else int(y)
+        return f"{y}-{int(sm):02d}-{int(sd):02d}", f"{ey}-{int(em):02d}-{int(ed):02d}"
 
     # "2026年5月1日"（仅开始日期）
     m = re.match(r'(\d{4})年(\d{1,2})月(\d{1,2})日', s)
@@ -307,19 +313,25 @@ def merge_two_sources(j: dict, c: dict) -> dict:
 
 # ─── 写入目标库 ────────────────────────────────────────────────────────────────
 def upsert_brand(conn: sqlite3.Connection, brand_id: str, norm: dict) -> None:
+    """写入品牌主表。
+
+    [AUDIT P0-1] 爬虫原始 industry 只写 industry_raw，绝不触碰 industry_l1/l2。
+    分类字段是治理产物（scripts/classify_all_brands.py + 人工打标），
+    合并引擎写入会造成每跑一次污染一次。
+    """
     conn.execute(
         """
         INSERT INTO exhibition_brand
             (brand_id, name_cn, name_en, organizer, city, frequency,
-             industry_l1, industry_l2, updated_at)
-        VALUES (?,?,?,?,?,?,?,?,datetime('now','localtime'))
+             industry_raw, updated_at)
+        VALUES (?,?,?,?,?,?,?,datetime('now','localtime'))
         ON CONFLICT(brand_id) DO UPDATE SET
-            name_en    = COALESCE(NULLIF(excluded.name_en,''),    name_en),
-            organizer  = COALESCE(NULLIF(excluded.organizer,''),  organizer),
-            city       = COALESCE(NULLIF(excluded.city,''),       city),
-            frequency  = COALESCE(NULLIF(excluded.frequency,''),  frequency),
-            industry_l1= COALESCE(NULLIF(excluded.industry_l1,''),industry_l1),
-            updated_at = datetime('now','localtime')
+            name_en     = COALESCE(NULLIF(excluded.name_en,''),     name_en),
+            organizer   = COALESCE(NULLIF(excluded.organizer,''),   organizer),
+            city        = COALESCE(NULLIF(excluded.city,''),        city),
+            frequency   = COALESCE(NULLIF(excluded.frequency,''),   frequency),
+            industry_raw= COALESCE(NULLIF(excluded.industry_raw,''),industry_raw),
+            updated_at  = datetime('now','localtime')
         """,
         (
             brand_id,
@@ -328,8 +340,7 @@ def upsert_brand(conn: sqlite3.Connection, brand_id: str, norm: dict) -> None:
             norm['organizer'],
             norm['city'],
             norm['frequency'],
-            norm['industry'],   # 存到 industry_l1，l2 留人工打标
-            '',
+            norm['industry'],
         )
     )
 
@@ -529,7 +540,7 @@ def run_merge(
 
     # 处理仅存在于 cnexpo 的记录（jufair 无对应）
     jufair_names = {normalize_row(r, 'jufair')['cn_name'] for r in jufair_rows}
-    for cn_name, norm_c in cnexpo_index.items():
+    for cn_name, (norm_c, raw_c) in cnexpo_index.items():
         if cn_name in jufair_names:
             continue  # 已在上面处理
         brand_id = match_brand(target_conn, cn_name)

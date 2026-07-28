@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { getDb, getWritableDb } from '@/lib/db'
-import { requireUser } from '@/lib/api-guard'
+import { requireUser, requireWriter } from '@/lib/api-guard'
 
 export async function GET(request: NextRequest) {
   if (!requireUser(request)) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
@@ -18,8 +18,9 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const userEmail = req.headers.get('x-user-email')
-  if (!userEmail) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  const user = requireUser(req)
+  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (!requireWriter(user)) return NextResponse.json({ error: 'forbidden' }, { status: 403 })
 
   const body = await req.json()
   const { name, title, company, linkedin, email, phone, notes } = body

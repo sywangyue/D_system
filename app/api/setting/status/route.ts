@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
+import { requireUser } from '@/lib/api-guard'
 
 type CrawlLogRow = {
   started_at: string
@@ -8,9 +9,10 @@ type CrawlLogRow = {
 }
 
 export async function GET(request: Request) {
-  // Admin-only check from middleware-injected headers
-  const role = request.headers.get('x-user-role') || 'readonly'
-  if (role !== 'admin') {
+  // requireUser 同时校验 is_active，使被禁用账号的存量 token 立即失效
+  const user = requireUser(request)
+  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
+  if (user.role !== 'admin') {
     return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
   }
 

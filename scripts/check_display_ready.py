@@ -7,12 +7,21 @@ display_ready 检查脚本
 条件：
   - name_cn 非空
   - organizer 非空
-  - name_cn 不含中英文混排（排除数据异常）
   - industry_l1 非空
-  - competition_relation 非空
 
 满足全部条件的设 display_ready = 1，否则设 0。
 加入 crontab 每周跑一次，数据补全后自动进入展示池。
+
+[AUDIT P1-11] 原条件含 competition_relation 非空。该字段属人工打标范畴，
+全库 0 条已填，导致 display_ready 恒为 0 —— 这个每周 cron 自建立起从未产出
+任何可展示记录。把一个从未启动的人工字段当作"最低条件"是设计错误，故移除。
+competition_relation 的打标进度应单独跟踪，不应阻断展示池。
+
+[AUDIT 追加] 原条件还含 name_cn NOT GLOB '*[A-Za-z]*[! -~]*'（"排除中英文混排"）。
+该规则误伤 829 条正常记录 —— 中文展会名带英文缩写后缀是行业惯例
+（上海国际储能技术展览会SNEC / 北京亚洲消费电子技术展览会CES /
+香港亚洲主题公园及游乐设备展览会IAAPA / 春季广交会二期canton fair），
+并非数据异常，故一并移除。
 
 用法：
   python3 scripts/check_display_ready.py        # 正常执行
@@ -30,9 +39,7 @@ DB_PATH = os.path.join(PROJECT_ROOT, "data", "mwlab.db")
 CONDITIONS = """
     (name_cn IS NOT NULL AND name_cn != '')
     AND (organizer IS NOT NULL AND organizer != '')
-    AND name_cn NOT GLOB '*[A-Za-z]*[! -~]*'
     AND (industry_l1 IS NOT NULL AND industry_l1 != '')
-    AND (competition_relation IS NOT NULL AND competition_relation != '')
 """
 
 
@@ -101,4 +108,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    # [AUDIT P1-11] main() 的返回值此前未传给 sys.exit()，退出码恒为 0，cron 无法感知异常
+    sys.exit(main())

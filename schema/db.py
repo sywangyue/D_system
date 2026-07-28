@@ -3,8 +3,8 @@ schema/db.py — SQLite 连接与初始化工具
 
 使用方式：
     from schema.db import init_db, get_conn
-    conn = init_db("mwlab.db")
-    with get_conn("mwlab.db") as conn:
+    conn = init_db("data/mwlab.db")
+    with get_conn("data/mwlab.db") as conn:
         ...
 """
 import sqlite3
@@ -61,6 +61,26 @@ def _reconcile_production(conn: sqlite3.Connection) -> list[tuple[int, str]]:
                 (datetime.now().isoformat(),)
             )
             backfilled.append((3, '003_user_prefs'))
+
+    # 版本 9: exhibition_brand.industry_raw
+    if 9 not in registered:
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(exhibition_brand)").fetchall()}
+        if 'industry_raw' in cols:
+            conn.execute(
+                "INSERT INTO schema_version(version, description, applied_at) VALUES (9, '009_industry_raw', ?)",
+                (datetime.now().isoformat(),)
+            )
+            backfilled.append((9, '009_industry_raw'))
+
+    # 版本 10: exhibition_brand.first_year
+    if 10 not in registered:
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(exhibition_brand)").fetchall()}
+        if 'first_year' in cols:
+            conn.execute(
+                "INSERT INTO schema_version(version, description, applied_at) VALUES (10, '010_first_year', ?)",
+                (datetime.now().isoformat(),)
+            )
+            backfilled.append((10, '010_first_year'))
 
     # 版本 6: intel_report / customer_prospect 表
     if 6 not in registered:

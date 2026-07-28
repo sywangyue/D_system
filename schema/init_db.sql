@@ -15,8 +15,9 @@ CREATE TABLE IF NOT EXISTS exhibition_brand (
     co_organizer          TEXT    NOT NULL DEFAULT '',
     city                  TEXT    NOT NULL DEFAULT '',
     frequency             TEXT    NOT NULL DEFAULT '',               -- 年展/双年展
-    industry_l1           TEXT    NOT NULL DEFAULT '',
+    industry_l1           TEXT    NOT NULL DEFAULT '',               -- 仅分类脚本/人工打标可写
     industry_l2           TEXT    NOT NULL DEFAULT '',
+    industry_raw          TEXT    NOT NULL DEFAULT '',               -- 爬虫原始行业串，勿直接展示
     competition_relation  TEXT    NOT NULL DEFAULT ''
                               CHECK (competition_relation IN ('是', '否', '')),
     mds_related           TEXT    NOT NULL DEFAULT '',               -- 无/MFC/Reha China 等

@@ -19,12 +19,15 @@ import sqlite3
 import sys
 import time
 from datetime import datetime
+from pathlib import Path
 
 import requests
 from bs4 import BeautifulSoup
 
 # ============ 配置 ============
 BASE_URL = "https://www.cnexpo.com"
+# crawl_log 落主库（看板 /api/setting/status 从这里读），与原始库分开
+MAIN_DB_PATH = Path(__file__).resolve().parent.parent / "data" / "mwlab.db"
 BASE_DELAY = 2.5   # 基础请求间隔（秒）
 MAX_RETRIES = 3
 RATE_LIMIT_BACKOFF = 15.0
@@ -420,23 +423,38 @@ def crawl_list_pages(conn, max_pages=100, keyword=None, batch_id=""):
     return new_count
 
 
-def _write_crawl_log(conn, batch_id, status, total_fetched=0, total_inserted=0):
+def _write_crawl_log(_unused_conn, batch_id, status, total_fetched=0, total_inserted=0):
+    """写入 crawl_log 记录到主库 data/mwlab.db。
+
+    [AUDIT P1-10] 此前写入原始库（cnexpo_2026.db），而该库并无 crawl_log 表，
+    异常又被静默吞掉；看板从主库读，于是"最近爬取"恒为 null。
+    第一个参数保留仅为兼容既有调用点，不再使用。
+    """
+    from datetime import datetime as dt
+    now = dt.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
-        from datetime import datetime as dt
-        now = dt.now().strftime("%Y-%m-%d %H:%M:%S")
+        conn = sqlite3.connect(str(MAIN_DB_PATH))
+    except Exception as e:
+        _log(f"[WARN] crawl_log 无法连接主库 {MAIN_DB_PATH}: {e}")
+        return
+    try:
         if status == "running":
             conn.execute(
-                "INSERT INTO crawl_log(batch_id, status, started_at) VALUES (?, ?, ?)",
+                "INSERT INTO crawl_log(batch_id, source_site, status, started_at) "
+                "VALUES (?, 'cnexpo', ?, ?)",
                 (batch_id, status, now),
             )
         else:
             conn.execute(
-                "UPDATE crawl_log SET status=?, finished_at=?, total_fetched=?, total_inserted=? WHERE batch_id=?",
+                "UPDATE crawl_log SET status=?, finished_at=?, total_fetched=?, total_inserted=? "
+                "WHERE batch_id=?",
                 (status, now, total_fetched, total_inserted, batch_id),
             )
         conn.commit()
-    except Exception:
-        pass
+    except Exception as e:
+        _log(f"[WARN] crawl_log 写入失败 (batch={batch_id}, status={status}): {e}")
+    finally:
+        conn.close()
 
 
 def crawl_all(db_path, max_pages=100, keyword=None, batch_id=None):
