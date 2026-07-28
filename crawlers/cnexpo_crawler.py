@@ -358,6 +358,7 @@ def crawl_list_pages(conn, max_pages=100, keyword=None, batch_id=""):
     crawled = get_crawled_urls(conn)
     new_count = 0
     blanks = 0
+    pages_ok = 0   # 成功抓到的页数 —— 用于区分「抓取失败」与「无新增」
 
     for page in range(1, max_pages + 1):
         url = f"{BASE_URL}/events/1000/0/{page}"
@@ -370,6 +371,7 @@ def crawl_list_pages(conn, max_pages=100, keyword=None, batch_id=""):
                 break
             continue
         blanks = 0
+        pages_ok += 1
 
         items = parse_list_page(html)
         if not items:
@@ -426,7 +428,7 @@ def crawl_list_pages(conn, max_pages=100, keyword=None, batch_id=""):
         _log(f"    → 新增{page_new}条")
         time.sleep(_jitter_delay())
 
-    return new_count
+    return new_count, pages_ok
 
 
 def _write_crawl_log(_unused_conn, batch_id, status, total_fetched=0, total_inserted=0):
@@ -471,14 +473,14 @@ def crawl_all(db_path, max_pages=100, keyword=None, batch_id=None):
     conn = init_db(db_path)
     _write_crawl_log(conn, batch_id, "running")
     try:
-        total = crawl_list_pages(conn, max_pages=max_pages, keyword=keyword, batch_id=batch_id)
+        total, pages_ok = crawl_list_pages(conn, max_pages=max_pages, keyword=keyword, batch_id=batch_id)
     except Exception as e:
         _log(f"  [EXCEPTION] {e}")
         _write_crawl_log(conn, batch_id, "failed", total_fetched=0, total_inserted=0)
         conn.close()
         raise
     conn.close()
-    return total, batch_id
+    return total, pages_ok, batch_id
 
 
 # ====================================================================
@@ -592,26 +594,31 @@ def main():
         export_csv(args.db)
         return
 
-    total, batch_id = crawl_all(
+    total, pages_ok, batch_id = crawl_all(
         args.db,
         max_pages=args.max_pages,
         keyword=args.keyword,
         batch_id=args.batch_id,
     )
 
+    # [AUDIT] 此前用 total>0 判定成败：源站已被完整收录时新增必然为 0，
+    # 会被误报为「全部失败」并 exit 1，cron 里看就是每次都失败。
+    # 真正的失败是「一页都抓不到」，与「抓到了但没有新东西」是两回事。
+    status = "success" if pages_ok > 0 else "failed"
     conn = sqlite3.connect(args.db)
-    _write_crawl_log(conn, batch_id, "success" if total > 0 else "failed",
-                     total_fetched=0, total_inserted=total)
+    _write_crawl_log(conn, batch_id, status,
+                     total_fetched=pages_ok, total_inserted=total)
     conn.close()
 
     _log(f"\n{'='*55}")
-    if total == 0:
-        _log(f"⚠ 全部失败（批次: {batch_id}）")
-        sys.exit(1)
-    else:
-        _log(f"✅ 任务完成！批次: {batch_id}")
-        _log(f"   共计新增 {total} 条")
+    if pages_ok == 0:
+        _log(f"⚠ 抓取失败：一页都没取到（批次: {batch_id}）")
         _log(f"{'='*55}")
+        sys.exit(1)
+    _log(f"✅ 任务完成！批次: {batch_id}")
+    _log(f"   抓取 {pages_ok} 页，新增 {total} 条"
+         + ("（源站数据已完整收录）" if total == 0 else ""))
+    _log(f"{'='*55}")
 
 
 if __name__ == "__main__":
