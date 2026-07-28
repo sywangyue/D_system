@@ -73,6 +73,12 @@ reports/customer/
 # Archived root clutter
 _archive/
 
+# 分析/导出产出物（由脚本再生成，不入库）
+ma_candidates*.json
+/*_中国境内展会清单.xlsx
+/*_全部品牌展会.xlsx
+reports/*.xlsx
+
 # Backup / temp files
 backups/
 *.bak

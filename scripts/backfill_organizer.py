@@ -23,8 +23,10 @@ import re
 from datetime import datetime
 
 # === 配置 ===
-DB_PATH = "/Volumes/databoard/AI Project/D_dashboard/data/mwlab.db"
-CHECKPOINT_FILE = "/Volumes/databoard/AI Project/D_dashboard/scripts/organizer_checkpoint.txt"
+from pathlib import Path
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+DB_PATH = str(_REPO_ROOT / "data" / "mwlab.db")
+CHECKPOINT_FILE = str(_REPO_ROOT / "scripts" / "organizer_checkpoint.txt")
 SESSION_NAME = "jufair_backfill"
 PAGE_DELAY = 3  # 页面加载等待秒数
 INTER_PAGE_DELAY = 2  # 页面间延迟秒数
