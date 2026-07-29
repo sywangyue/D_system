@@ -82,6 +82,30 @@ def _reconcile_production(conn: sqlite3.Connection) -> list[tuple[int, str]]:
             )
             backfilled.append((10, '010_first_year'))
 
+    # 版本 11: exhibition_edition.data_source 的 CHECK 约束
+    # init_db.sql 已是目标态，新建库无需再重建表 —— 不登记的话 011 会去
+    # SELECT 早已删掉的 overseas_exhibitor_pct 而崩溃。
+    if 11 not in registered:
+        sql = conn.execute(
+            "SELECT sql FROM sqlite_master WHERE type='table' AND name='exhibition_edition'"
+        ).fetchone()
+        if sql and sql[0] and 'jufair+cnexpo' in sql[0]:
+            conn.execute(
+                "INSERT INTO schema_version(version, description, applied_at) VALUES (11, '011_edition_data_source', ?)",
+                (datetime.now().isoformat(),)
+            )
+            backfilled.append((11, '011_edition_data_source'))
+
+    # 版本 12: manual_tag_history.change_source（同理，012 的 DROP COLUMN 会崩）
+    if 12 not in registered:
+        cols = {r[1] for r in conn.execute("PRAGMA table_info(manual_tag_history)").fetchall()}
+        if 'change_source' in cols:
+            conn.execute(
+                "INSERT INTO schema_version(version, description, applied_at) VALUES (12, '012_change_source', ?)",
+                (datetime.now().isoformat(),)
+            )
+            backfilled.append((12, '012_change_source'))
+
     # 版本 6: intel_report / customer_prospect 表
     if 6 not in registered:
         tables = {
