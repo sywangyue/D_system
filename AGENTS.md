@@ -53,9 +53,23 @@ crawl_log (爬取日志)           users (用户表)
 
 ### 字段来源分类
 
-**自动填充（爬虫）**: name_cn/en, first_year, city, frequency, website, date_start/end, venue, area_sqm, exhibitors_count, visitors_count, organizer（需人工核验）
+**自动填充（爬虫）**: name_cn/en, city, frequency, date_start/end, venue, area_sqm, exhibitors_count, visitors_count, organizer（需人工核验）
 
-**必须人工打标（系统无法推断）**: competition_relation, mds_related, strategic_relevance (1-5), ma_potential (1-5), competitor_group, industry_l1/l2, yoy_trend, anomaly_flag
+**脚本派生（不要手填，会被下次重跑覆盖）**:
+- `industry_l1/l2` ← `scripts/classify_all_brands.py`（jufair 分类映射表 + 品牌名关键词）
+- `display_ready` ← `scripts/check_display_ready.py`（每周 cron）
+- `status` ← `scripts/refresh_edition_status.py`（按 date_end 派生，**尚未接 cron**）
+- `anomaly_flag` ← 目前为一次性标记，无周期任务
+
+**必须人工打标（系统无法推断）**: competition_relation, mds_related, strategic_relevance (1-5), ma_potential (1-5), competitor_group, scale_score, yoy_trend
+
+**定义了但从未被填充**（2026-07-29 实测，schema 里有、代码里被引用、库里全空）:
+
+| 字段 | 非空行数 | 说明 |
+|---|--:|---|
+| `first_year` | 0 / 7,179 | 无任何写入方。`dedup.py:410` / `export_for_tagging.py:41` / `import_tags.py:38` 都在读它，所以**保留此列**，但别指望它有值 |
+| `website` | 2 / 7,179 | 同上，爬虫与 merge_engine 均不写 |
+| `yoy_trend` | 0 / 7,476 | 需人工打标 |
 
 ### 双源冲突规则
 
