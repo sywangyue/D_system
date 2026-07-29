@@ -651,7 +651,8 @@ def backup_table(conn: sqlite3.Connection) -> None:
         log.info(f"备份表 {backup_name} 已存在，跳过")
 
 
-def classify_all(dry_run: bool = False, db_path: str = str(DB_PATH)) -> dict:
+def classify_all(dry_run: bool = False, db_path: str = str(DB_PATH),
+                 only_empty: bool = False) -> dict:
     """执行全品牌分类。
 
     Returns:
@@ -703,9 +704,19 @@ def classify_all(dry_run: bool = False, db_path: str = str(DB_PATH)) -> dict:
 
     # ── Step 3: Keyword match for remaining brands (cnexpo + orphans) ──
     log.info("Step 3: 关键词匹配剩余品牌...")
-    all_brands = conn.execute(
-        "SELECT brand_id, name_cn FROM exhibition_brand"
-    ).fetchall()
+    # only_empty：只处理尚无 industry_l1 的品牌，不动已有分类。
+    # 详情补爬让 industry_raw 大规模填充后，jufair 官方分类会对 720 个已分类品牌
+    # 提出改判，但抽查显示好坏参半（如「台北电脑展 科技+→生活方式」明显退化），
+    # 属映射表质量问题，需单独评审，不应随例行补分类一起冲掉。
+    if only_empty:
+        all_brands = conn.execute(
+            "SELECT brand_id, name_cn FROM exhibition_brand "
+            "WHERE industry_l1 IS NULL OR TRIM(industry_l1) = ''"
+        ).fetchall()
+    else:
+        all_brands = conn.execute(
+            "SELECT brand_id, name_cn FROM exhibition_brand"
+        ).fetchall()
 
     keyword_matched = 0
     unmatched = 0
@@ -793,9 +804,12 @@ def main() -> None:
     )
     parser.add_argument("--db", default=str(DB_PATH), help="目标数据库路径")
     parser.add_argument("--dry-run", action="store_true", help="预览模式")
+    parser.add_argument("--only-empty", action="store_true",
+                        help="只给 industry_l1 为空的品牌分类，不改动已有分类")
     args = parser.parse_args()
 
-    result = classify_all(dry_run=args.dry_run, db_path=args.db)
+    result = classify_all(dry_run=args.dry_run, db_path=args.db,
+                          only_empty=args.only_empty)
 
     print(f"\n总计: {result['total']} 品牌")
     print(f"  Jufair 来源匹配: {result['jufair_matched']}")
