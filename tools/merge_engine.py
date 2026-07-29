@@ -511,7 +511,9 @@ def run_merge(
             conflict_notes = norm.pop('conflict_notes', '')
             source_urls    = norm.pop('source_urls', [])
             batch_ids      = norm.pop('batch_ids', [])
-            data_source = 'jufair/cnexpo'
+            # 迁移 011 起 data_source 有 CHECK 约束，双源统一写 jufair+cnexpo
+            # （此前 jufair/cnexpo 与 cnexpo/jufair 两种写法并存，含义相同）
+            data_source = 'jufair+cnexpo'
         else:
             norm = {**norm_j}
             conflict_notes = ''

@@ -60,7 +60,9 @@ CREATE TABLE IF NOT EXISTS exhibition_edition (
     yoy_trend               TEXT    NOT NULL DEFAULT ''
                                 CHECK (yoy_trend IN ('上升', '平稳', '下降', '')),
     anomaly_flag            INTEGER NOT NULL DEFAULT 0,
-    data_source             TEXT    NOT NULL DEFAULT '',             -- jufair/cnexpo/官网/手工
+    data_source             TEXT    NOT NULL DEFAULT ''
+                                CHECK (data_source IN ('jufair', 'cnexpo', 'jufair+cnexpo',
+                                                       '官网', '手工', '')),
     recorded_at             TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
     notes                   TEXT    NOT NULL DEFAULT ''
 );
