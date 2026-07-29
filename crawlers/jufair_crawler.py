@@ -197,6 +197,7 @@ RAW_JUFAIR_SCHEMA = """
 def init_db(db_path):
     """创建/打开数据库，确保 raw_jufair 表存在。"""
     conn = sqlite3.connect(db_path, timeout=30)
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.execute(RAW_JUFAIR_SCHEMA)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_rj_source_url ON raw_jufair(source_url)")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_rj_batch ON raw_jufair(crawl_batch_id)")
@@ -547,6 +548,7 @@ def _write_crawl_log(_unused_conn, batch_id, status, total_fetched=0, total_inse
     now = dt.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         conn = sqlite3.connect(str(MAIN_DB_PATH))
+        conn.execute("PRAGMA foreign_keys = ON")
     except Exception as e:
         _log(f"[WARN] crawl_log 无法连接主库 {MAIN_DB_PATH}: {e}")
         return
@@ -617,6 +619,7 @@ def crawl_all(db_path, months=None, keyword=None, crawl_detail=False, batch_id=N
 def show_stats(db_path):
     """输出 raw_jufair 表统计信息。"""
     conn = sqlite3.connect(db_path, timeout=30)
+    conn.execute("PRAGMA foreign_keys = ON")
     total = conn.execute("SELECT COUNT(*) FROM raw_jufair").fetchone()[0]
     detail_crawled = conn.execute("SELECT COUNT(*) FROM raw_jufair WHERE detail_crawled=1").fetchone()[0]
     by_type = conn.execute(
@@ -657,6 +660,7 @@ def export_json(db_path, output_path=None):
         output_path = db_path.replace(".db", "_all.json")
 
     conn = sqlite3.connect(db_path, timeout=30)
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.row_factory = sqlite3.Row
     rows = conn.execute(
         "SELECT cn_name, en_name, date_str, year, venue, city, "
@@ -678,6 +682,7 @@ def export_csv(db_path, output_path=None):
         output_path = db_path.replace(".db", "_all.csv")
 
     conn = sqlite3.connect(db_path, timeout=30)
+    conn.execute("PRAGMA foreign_keys = ON")
     rows = conn.execute(
         "SELECT cn_name, en_name, date_str, year, venue, city, "
         "area_str, visitors_str, exhibitors_str, organizer, cycle, industry, source_type "
@@ -784,6 +789,7 @@ def main():
     )
 
     conn = sqlite3.connect(args.db)
+    conn.execute("PRAGMA foreign_keys = ON")
     _write_crawl_log(conn, batch_id, "failed" if aborted else ("success" if total > 0 else "partial"),
                      total_fetched=0, total_inserted=total)
     conn.close()

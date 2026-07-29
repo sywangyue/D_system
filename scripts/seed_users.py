@@ -41,6 +41,7 @@ USERS = [
 
 def main() -> None:
     conn = sqlite3.connect(str(DB_PATH))
+    conn.execute("PRAGMA foreign_keys = ON")
     try:
         existing = set(
             row[0]

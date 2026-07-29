@@ -120,6 +120,7 @@ def update_db(db_path, brand_id, organizer):
     """Update organizer in DB."""
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.execute("PRAGMA busy_timeout = 30000")  # [CORE-12] 30s wait on concurrent writes
     try:
         conn.execute(

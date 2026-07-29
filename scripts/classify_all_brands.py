@@ -897,8 +897,10 @@ def classify_all(dry_run: bool = False, db_path: str = str(DB_PATH),
         {"total": int, "jufair_matched": int, "keyword_matched": int, "unmatched": int}
     """
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.row_factory = sqlite3.Row
     jufair_conn = sqlite3.connect(str(JUFAIR_DB_PATH))
+    jufair_conn.execute("PRAGMA foreign_keys = ON")
     jufair_conn.row_factory = sqlite3.Row
 
     if not dry_run:

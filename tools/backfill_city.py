@@ -31,6 +31,7 @@ def extract_city(venue):
 
 def run(db_path, apply_changes):
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.row_factory = sqlite3.Row
     try:
         brands = conn.execute(

@@ -71,6 +71,7 @@ def cmd_name_en(args: argparse.Namespace) -> None:
     from scripts.data.name_en_patterns import extract_embedded_en, generate_name_en
 
     conn = sqlite3.connect(str(args.db))
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.row_factory = sqlite3.Row
 
     if not args.dry_run:
@@ -165,6 +166,7 @@ def cmd_industry(args: argparse.Namespace) -> None:
     from scripts.data.md_category_rules import classify_industry_l1, list_nonempty_categories
 
     conn = sqlite3.connect(str(args.db))
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.row_factory = sqlite3.Row
 
     if not args.dry_run:
@@ -402,6 +404,7 @@ def cmd_mds(args: argparse.Namespace) -> None:
     Step 4: 未匹配的母展 → INSERT 新品牌到 exhibition_brand
     """
     conn = sqlite3.connect(str(args.db))
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.row_factory = sqlite3.Row
 
     if not args.dry_run:
@@ -529,6 +532,7 @@ def cmd_jufair_l2(args: argparse.Namespace) -> None:
 
         data = load_categories(str(import_path))
         conn = sqlite3.connect(str(args.db))
+        conn.execute("PRAGMA foreign_keys = ON")
         conn.row_factory = sqlite3.Row
 
         if not args.dry_run:

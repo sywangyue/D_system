@@ -77,6 +77,7 @@ def main():
     dry_run = "--dry" in sys.argv
 
     conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA foreign_keys = ON")
     ensure_column(conn)
 
     total, display_ready, pending = scan(conn)

@@ -150,6 +150,7 @@ def main() -> int:
             print(f"  [跳过] {path} 不存在")
             continue
         conn = sqlite3.connect(str(path))
+        conn.execute("PRAGMA foreign_keys = ON")
         try:
             if raw_table:
                 results.append(normalize_raw_table(conn, raw_table, args.apply))
