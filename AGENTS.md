@@ -104,12 +104,19 @@ crawl_log (爬取日志)           users (用户表)
 
 | 库 | 表 | 行数 |
 |----|----|------|
-| `data/mwlab.db`（22 MB） | exhibition_brand | 6,946 |
-| | exhibition_edition | 7,264 |
-| | data_provenance | 7,927 |
-| | 其中 display_ready=1 | 5,954（85.7%） |
-| `data/jufair_2026.db` | raw_jufair | 5,362 |
-| `data/cnexpo_2026.db` | raw_cnexpo | 4,571 |
+| `data/mwlab.db`（18 MB） | exhibition_brand | 7,179 |
+| | exhibition_edition | 7,476 |
+| | data_provenance | 9,477 |
+| | 其中 display_ready=1 | 7,154（99.7%） |
+| `data/jufair_2026.db` | raw_jufair | 6,843 |
+| `data/cnexpo_2026.db` | raw_cnexpo | 2,286 |
+
+> 2026-07-29 整改（`docs/REMEDIATION-DRAFT-2026-07-29.md`）：
+> jufair 分类改用 217 条显式映射表（改判 1,291 品牌）；合并 29 组重复届次；
+> 清 38 条溯源孤儿并给裸连接补外键；迁移 011/012（data_source CHECK、
+> manual_tag_history.change_source、删两个全空列）；备份表移出主库（28→18 MB）。
+> `status` 现按日期派生，需与 `check_display_ready.py` 同频每周重跑
+> （`scripts/refresh_edition_status.py`，**尚未接 cron**）。
 
 行业分类已收敛至 8 个 l1 类别，33 条无关键词可匹配待人工兜底。
 `competition_relation` / `strategic_relevance` / `ma_potential` 三个人工打标字段仍为 0 条 ——
