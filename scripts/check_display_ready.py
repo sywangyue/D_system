@@ -40,6 +40,10 @@ CONDITIONS = """
     (name_cn IS NOT NULL AND name_cn != '')
     AND (organizer IS NOT NULL AND organizer != '')
     AND (industry_l1 IS NOT NULL AND industry_l1 != '')
+    -- 无届次的品牌在看板上是一条没有日期/城市/数字的空记录，不该进展示池
+    -- （REMEDIATION-DRAFT-2026-07-29 P2-7：实测有 7 条这样的品牌 display_ready=1）
+    AND EXISTS (SELECT 1 FROM exhibition_edition e
+                 WHERE e.brand_id = exhibition_brand.brand_id)
 """
 
 
@@ -77,6 +81,7 @@ def main():
     dry_run = "--dry" in sys.argv
 
     conn = sqlite3.connect(DB_PATH)
+    conn.execute("PRAGMA foreign_keys = ON")
     ensure_column(conn)
 
     total, display_ready, pending = scan(conn)

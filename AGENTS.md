@@ -53,9 +53,23 @@ crawl_log (爬取日志)           users (用户表)
 
 ### 字段来源分类
 
-**自动填充（爬虫）**: name_cn/en, first_year, city, frequency, website, date_start/end, venue, area_sqm, exhibitors_count, visitors_count, organizer（需人工核验）
+**自动填充（爬虫）**: name_cn/en, city, frequency, date_start/end, venue, area_sqm, exhibitors_count, visitors_count, organizer（需人工核验）
 
-**必须人工打标（系统无法推断）**: competition_relation, mds_related, strategic_relevance (1-5), ma_potential (1-5), competitor_group, industry_l1/l2, yoy_trend, anomaly_flag
+**脚本派生（不要手填，会被下次重跑覆盖）**:
+- `industry_l1/l2` ← `scripts/classify_all_brands.py`（jufair 分类映射表 + 品牌名关键词）
+- `display_ready` ← `scripts/check_display_ready.py`（每周 cron）
+- `status` ← `scripts/refresh_edition_status.py`（按 date_end 派生，**尚未接 cron**）
+- `anomaly_flag` ← 目前为一次性标记，无周期任务
+
+**必须人工打标（系统无法推断）**: competition_relation, mds_related, strategic_relevance (1-5), ma_potential (1-5), competitor_group, scale_score, yoy_trend
+
+**定义了但从未被填充**（2026-07-29 实测，schema 里有、代码里被引用、库里全空）:
+
+| 字段 | 非空行数 | 说明 |
+|---|--:|---|
+| `first_year` | 0 / 7,179 | 无任何写入方。`dedup.py:410` / `export_for_tagging.py:41` / `import_tags.py:38` 都在读它，所以**保留此列**，但别指望它有值 |
+| `website` | 2 / 7,179 | 同上，爬虫与 merge_engine 均不写 |
+| `yoy_trend` | 0 / 7,476 | 需人工打标 |
 
 ### 双源冲突规则
 
@@ -104,12 +118,19 @@ crawl_log (爬取日志)           users (用户表)
 
 | 库 | 表 | 行数 |
 |----|----|------|
-| `data/mwlab.db`（22 MB） | exhibition_brand | 6,946 |
-| | exhibition_edition | 7,264 |
-| | data_provenance | 7,927 |
-| | 其中 display_ready=1 | 5,954（85.7%） |
-| `data/jufair_2026.db` | raw_jufair | 5,362 |
-| `data/cnexpo_2026.db` | raw_cnexpo | 4,571 |
+| `data/mwlab.db`（18 MB） | exhibition_brand | 7,179 |
+| | exhibition_edition | 7,476 |
+| | data_provenance | 9,477 |
+| | 其中 display_ready=1 | 7,154（99.7%） |
+| `data/jufair_2026.db` | raw_jufair | 6,843 |
+| `data/cnexpo_2026.db` | raw_cnexpo | 2,286 |
+
+> 2026-07-29 整改（`docs/REMEDIATION-DRAFT-2026-07-29.md`）：
+> jufair 分类改用 217 条显式映射表（改判 1,291 品牌）；合并 29 组重复届次；
+> 清 38 条溯源孤儿并给裸连接补外键；迁移 011/012（data_source CHECK、
+> manual_tag_history.change_source、删两个全空列）；备份表移出主库（28→18 MB）。
+> `status` 现按日期派生，需与 `check_display_ready.py` 同频每周重跑
+> （`scripts/refresh_edition_status.py`，**尚未接 cron**）。
 
 行业分类已收敛至 8 个 l1 类别，33 条无关键词可匹配待人工兜底。
 `competition_relation` / `strategic_relevance` / `ma_potential` 三个人工打标字段仍为 0 条 ——

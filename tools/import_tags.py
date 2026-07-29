@@ -196,8 +196,9 @@ def main() -> int:
             conn.execute(
                 """
                 INSERT INTO manual_tag_history
-                    (brand_id, field_name, old_value, new_value, changed_by, reason)
-                VALUES (?,?,?,?,?,?)
+                    (brand_id, field_name, old_value, new_value, changed_by, reason,
+                     change_source)
+                VALUES (?,?,?,?,?,?,'manual')
                 """,
                 (brand_id, field, old_s, new_s, changed_by, args.reason or ""),
             )

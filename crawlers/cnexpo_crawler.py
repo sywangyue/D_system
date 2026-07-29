@@ -160,6 +160,7 @@ RAW_CNEXPO_SCHEMA = """
 
 def init_db(db_path):
     conn = sqlite3.connect(db_path, timeout=30)
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.execute(RAW_CNEXPO_SCHEMA)
     conn.execute("CREATE INDEX IF NOT EXISTS idx_rc_source_url ON raw_cnexpo(source_url)")
     conn.execute("CREATE INDEX IF NOT EXISTS idx_rc_batch ON raw_cnexpo(crawl_batch_id)")
@@ -442,6 +443,7 @@ def _write_crawl_log(_unused_conn, batch_id, status, total_fetched=0, total_inse
     now = dt.now().strftime("%Y-%m-%d %H:%M:%S")
     try:
         conn = sqlite3.connect(str(MAIN_DB_PATH))
+        conn.execute("PRAGMA foreign_keys = ON")
     except Exception as e:
         _log(f"[WARN] crawl_log 无法连接主库 {MAIN_DB_PATH}: {e}")
         return
@@ -490,6 +492,7 @@ def crawl_all(db_path, max_pages=100, keyword=None, batch_id=None):
 def show_stats(db_path):
     """输出 raw_cnexpo 表统计信息。"""
     conn = sqlite3.connect(db_path, timeout=30)
+    conn.execute("PRAGMA foreign_keys = ON")
     total = conn.execute("SELECT COUNT(*) FROM raw_cnexpo").fetchone()[0]
 
     fields = ["en_name", "date_str", "venue", "city", "area_str", "visitors_str", "exhibitors_str", "organizer", "cycle"]
@@ -528,6 +531,7 @@ def export_json(db_path, output_path=None):
     if output_path is None:
         output_path = db_path.replace(".db", "_all.json")
     conn = sqlite3.connect(db_path, timeout=30)
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.row_factory = sqlite3.Row
     rows = conn.execute(
         "SELECT cn_name, en_name, date_str, year, venue, city, "
@@ -547,6 +551,7 @@ def export_csv(db_path, output_path=None):
     if output_path is None:
         output_path = db_path.replace(".db", "_all.csv")
     conn = sqlite3.connect(db_path, timeout=30)
+    conn.execute("PRAGMA foreign_keys = ON")
     rows = conn.execute(
         "SELECT cn_name, en_name, date_str, year, venue, city, "
         "area_str, visitors_str, exhibitors_str, organizer, cycle, industry "
@@ -606,6 +611,7 @@ def main():
     # 真正的失败是「一页都抓不到」，与「抓到了但没有新东西」是两回事。
     status = "success" if pages_ok > 0 else "failed"
     conn = sqlite3.connect(args.db)
+    conn.execute("PRAGMA foreign_keys = ON")
     _write_crawl_log(conn, batch_id, status,
                      total_fetched=pages_ok, total_inserted=total)
     conn.close()

@@ -60,10 +60,12 @@ class TestSchemaCreation(unittest.TestCase):
         required = {
             "edition_id", "brand_id", "edition_num", "year", "date_start", "date_end",
             "city", "venue", "status", "area_sqm", "exhibitors_count", "visitors_count",
-            "overseas_exhibitor_pct", "booth_price_per_sqm", "heat_score", "yoy_trend",
+            "heat_score", "yoy_trend",
             "anomaly_flag", "data_source", "recorded_at", "notes"
         }
         self.assertEqual(required, required & cols, f"edition 表缺少字段: {required - cols}")
+        # 迁移 012 删除：全库 100% NULL 且无任何代码引用
+        self.assertEqual(set(), {"overseas_exhibitor_pct", "booth_price_per_sqm"} & cols)
 
     def test_provenance_columns(self):
         cols = get_table_columns(self.conn, "data_provenance")

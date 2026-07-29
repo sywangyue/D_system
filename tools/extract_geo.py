@@ -218,6 +218,7 @@ def update_db(db_path, brand_id, city_cn, city_en, country_cn, country_en, dry_r
 
     now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     conn = sqlite3.connect(db_path)
+    conn.execute("PRAGMA foreign_keys = ON")
     try:
         updates = []
         params = []
@@ -284,6 +285,7 @@ def main():
     print(f"词典加载: {len(city_patterns)} 城市/省份词条, {len(country_patterns)} 国家词条")
     
     conn = sqlite3.connect(args.db)
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.row_factory = sqlite3.Row
     
     # Get brands needing geo fill
@@ -383,6 +385,7 @@ def main():
     else:
         # Show final stats
         conn = sqlite3.connect(args.db)
+        conn.execute("PRAGMA foreign_keys = ON")
         city_empty = conn.execute("SELECT COUNT(*) FROM exhibition_brand WHERE city = ''").fetchone()[0]
         country_empty = conn.execute("SELECT COUNT(*) FROM exhibition_brand WHERE country_cn = ''").fetchone()[0]
         conn.close()

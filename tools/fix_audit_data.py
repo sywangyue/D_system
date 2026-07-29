@@ -144,6 +144,7 @@ def main():
     print(f"{'DRY-RUN' if dry_run else 'APPLY'} | 数据库: {db_path}")
 
     conn = sqlite3.connect(str(db_path))
+    conn.execute("PRAGMA foreign_keys = ON")
     conn.row_factory = sqlite3.Row
 
     try:

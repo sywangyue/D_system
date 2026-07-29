@@ -212,6 +212,7 @@ def infer_country(city_cn: str, province_cn: str, country_from_note: str) -> tup
 
 def main():
     db = sqlite3.connect(DB_PATH)
+    db.execute("PRAGMA foreign_keys = ON")
     db.row_factory = sqlite3.Row
     cur = db.cursor()
     
@@ -321,6 +322,7 @@ if __name__ == "__main__":
     
     # Step 5: 清空 notes
     db2 = sqlite3.connect(DB_PATH)
+    db2.execute("PRAGMA foreign_keys = ON")
     db2.execute("UPDATE exhibition_brand SET notes = ''")
     db2.commit()
     print("notes 已清空")

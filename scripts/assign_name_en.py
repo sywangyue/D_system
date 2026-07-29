@@ -802,6 +802,7 @@ def generate_name_en(name_cn: str, industry_l2: str) -> str:
 def dry_run():
     """预览模式：生成 CSV 不写入数据库"""
     db = sqlite3.connect(DB_PATH)
+    db.execute("PRAGMA foreign_keys = ON")
     db.row_factory = sqlite3.Row
     cur = db.cursor()
     
@@ -891,6 +892,7 @@ def dry_run():
 def apply(results):
     """批量写入数据库"""
     db = sqlite3.connect(DB_PATH)
+    db.execute("PRAGMA foreign_keys = ON")
     cur = db.cursor()
     
     # 开始事务

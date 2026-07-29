@@ -53,14 +53,14 @@ CREATE TABLE IF NOT EXISTS exhibition_edition (
     area_sqm                INTEGER,
     exhibitors_count        INTEGER,
     visitors_count          INTEGER,
-    overseas_exhibitor_pct  REAL,
-    booth_price_per_sqm     INTEGER,
     heat_score              INTEGER
                                 CHECK (heat_score IS NULL OR (heat_score BETWEEN 1 AND 5)),
     yoy_trend               TEXT    NOT NULL DEFAULT ''
                                 CHECK (yoy_trend IN ('上升', '平稳', '下降', '')),
     anomaly_flag            INTEGER NOT NULL DEFAULT 0,
-    data_source             TEXT    NOT NULL DEFAULT '',             -- jufair/cnexpo/官网/手工
+    data_source             TEXT    NOT NULL DEFAULT ''
+                                CHECK (data_source IN ('jufair', 'cnexpo', 'jufair+cnexpo',
+                                                       '官网', '手工', '')),
     recorded_at             TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
     notes                   TEXT    NOT NULL DEFAULT ''
 );
@@ -117,7 +117,10 @@ CREATE TABLE IF NOT EXISTS manual_tag_history (
     new_value   TEXT    NOT NULL,
     changed_by  TEXT    NOT NULL,                                    -- user email
     changed_at  TEXT    NOT NULL DEFAULT (datetime('now', 'localtime')),
-    reason      TEXT    NOT NULL DEFAULT ''
+    reason      TEXT    NOT NULL DEFAULT '',
+    -- 区分人工打标与脚本回填：本表 12,294 行里真人写的只有 1 行（见迁移 012）
+    change_source TEXT  NOT NULL DEFAULT 'script'
+                    CHECK (change_source IN ('manual', 'script', 'merge'))
 );
 
 -- ─── 索引 ─────────────────────────────────────────────────────────
