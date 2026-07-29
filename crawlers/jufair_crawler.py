@@ -20,6 +20,11 @@ from pathlib import Path
 import requests
 from bs4 import BeautifulSoup
 
+_REPO_ROOT = Path(__file__).resolve().parent.parent
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
+from tools.url_utils import canonical_source_url
+
 # ============ 配置 ============
 BASE_URL = "https://www.jufair.com"
 # crawl_log 落主库（看板 /api/setting/status 从这里读），与原始库分开
@@ -107,8 +112,22 @@ def _curl_fetch(url, timeout=25):
         return None
 
 
-def fetch_page(url, label="", timeout=25):
-    """HTTP GET + 自动重试 + 反爬缓解。使用 curl 绕过 TLS 指纹检测。"""
+# 软封禁判定所用的正常页面特征，按页面类型区分。
+# [AUDIT] 此前不分类型，一律用列表页特征判定，导致每个详情页都被误判为封禁、
+# 连续 5 次即触发熔断 —— --detail 从来没有成功过（详情覆盖率长期停在 124/5362）。
+# 另外原条件写的是 ".exh-info-wrap"（带点的 CSS 选择器），而 HTML 里是
+# class="exh-info-wrap" 不带点，该子条件对列表页也恒为假，只是被 pager-box 兜住了。
+_PAGE_MARKERS = {
+    "list":   ("exh-info-wrap", "pager-box", "page-box", "goods-item-container"),
+    "detail": ("content-line", "主办单位", "举办城市", "application/ld+json"),
+}
+
+
+def fetch_page(url, label="", timeout=25, kind="list"):
+    """HTTP GET + 自动重试 + 反爬缓解。使用 curl 绕过 TLS 指纹检测。
+
+    kind: 'list' | 'detail' —— 决定用哪组特征判断页面是否正常返回。
+    """
     global _consecutive_403, _global_consecutive_fail, _request_count
     _batch_pause_if_needed()
     for attempt in range(1, MAX_RETRIES + 1):
@@ -126,10 +145,10 @@ def fetch_page(url, label="", timeout=25):
                 return None
             continue
 
-        # 软封禁检测：无 .exh-info-wrap 和翻页结构（兼容新旧版）
-        has_exh = ".exh-info-wrap" in text
-        has_page = "page-box" in text or "pager-box" in text or "goods-item-container" in text
-        if not has_exh and not has_page:
+        # 软封禁检测：按页面类型匹配对应特征，命中任一即视为正常
+        markers = _PAGE_MARKERS.get(kind, _PAGE_MARKERS["list"])
+        if not any(m in text for m in markers):
+            _log(f"[WARN] {label} HTTP 200 但无 {kind} 页特征，疑似封禁/验证码页")
             _global_consecutive_fail += 1
             if _global_consecutive_fail >= _CIRCUIT_BREAKER_MAX:
                 _log(f"[ABORT] 全局连续失败 {_CIRCUIT_BREAKER_MAX} 次，终止运行")
@@ -275,7 +294,9 @@ def parse_list_page(html, source_type, crawl_batch_id):
 
         cn_name = a_tag.get_text(strip=True)
         href = a_tag.get("href", "")
-        detail_url = BASE_URL + href if href.startswith("/") else href
+        # 规范化：站点改版后 /exhibition/{id}.html 与 /exhibition/{id}/ 并存，
+        # 而 source_url 是 UNIQUE 键，不归一会把同一展会收成两条（AUDIT）
+        detail_url = canonical_source_url(BASE_URL + href if href.startswith("/") else href)
 
         en_name = art.select_one(".En_name")
         time_tag = art.select_one("time")
@@ -331,7 +352,7 @@ def parse_detail_page(detail_url):
     从详情页提取额外字段：主办方、周期、城市、行业、统计数据。
     返回值 dict，仅含非空字段。
     """
-    html = fetch_page(detail_url, label=f"详情 {detail_url[-40:]}")
+    html = fetch_page(detail_url, label=f"详情 {detail_url[-40:]}", kind="detail")
     if not html:
         return None
 
@@ -433,37 +454,15 @@ def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batc
         n = insert_batch(conn, new_records, crawled)
         new_count += n
 
-        # 详情页补爬
+        # 详情页补爬 —— 只处理本页新增
+        #
+        # [AUDIT] 原实现在这里额外拉取全表 detail_crawled=0 的记录一并重爬。
+        # 该集合当前有 5,238 条，意味着「每爬一个列表页就把全表详情页重扫一遍」：
+        # 单页约 4.4 小时，全量 12 个月约 44 天，且 commit 在整个循环之后，
+        # 进度完全不可见。存量补爬已拆为独立的 backfill_details()，用 --backfill-detail 触发。
         detail_ok = 0
         if crawl_detail and new_records:
-            # 补爬存量 detail_crawled=0 记录
-            backfill_records = conn.execute(
-                "SELECT source_url FROM raw_jufair WHERE detail_crawled=0"
-            ).fetchall()
-            backfill_urls = [r[0] for r in backfill_records]
-            all_detail_urls = [r["source_url"] for r in new_records] + [
-                u for u in backfill_urls if u not in {r["source_url"] for r in new_records}
-            ]
-            for surl in all_detail_urls:
-                extra = parse_detail_page(surl)
-                if extra:
-                    non_empty = {k: v for k, v in extra.items() if v}
-                    if not non_empty:
-                        continue
-                    set_parts = [f"{k}=:_{k}" for k in non_empty if k in
-                                 ["organizer", "city", "cycle", "industry", "area_str", "visitors_str", "exhibitors_str"]]
-                    if not set_parts:
-                        continue
-                    set_clause = ", ".join(set_parts)
-                    params = {f"_{k}": v for k, v in non_empty.items()}
-                    params["_source_url"] = surl
-                    conn.execute(
-                        f"UPDATE raw_jufair SET {set_clause}, detail_crawled=1 WHERE source_url=:_source_url",
-                        params,
-                    )
-                    detail_ok += 1
-                time.sleep(_jitter_delay())
-            conn.commit()
+            detail_ok = _crawl_details(conn, [r["source_url"] for r in new_records])
 
         detail_msg = f" 详情{detail_ok}/{len(new_records)}" if crawl_detail else ""
         _log(f"  [p{page}] {len(items)}条 → 新增{n}{detail_msg}")
@@ -472,6 +471,68 @@ def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batc
         time.sleep(_jitter_delay())
 
     return new_count
+
+
+_DETAIL_FIELDS = ("organizer", "city", "cycle", "industry",
+                  "area_str", "visitors_str", "exhibitors_str")
+
+
+def _crawl_details(conn, urls, commit_every=20, label=""):
+    """抓取给定 URL 的详情页并回写。返回成功条数。
+
+    每 commit_every 条提交一次，保证长任务中途可见进度、可安全中断。
+    """
+    ok = 0
+    total = len(urls)
+    for i, surl in enumerate(urls, 1):
+        extra = parse_detail_page(surl)
+        if extra:
+            non_empty = {k: v for k, v in extra.items() if v and k in _DETAIL_FIELDS}
+            if non_empty:
+                set_clause = ", ".join(f"{k}=:_{k}" for k in non_empty)
+                params = {f"_{k}": v for k, v in non_empty.items()}
+                params["_source_url"] = surl
+                conn.execute(
+                    f"UPDATE raw_jufair SET {set_clause}, detail_crawled=1 "
+                    f"WHERE source_url=:_source_url",
+                    params,
+                )
+                ok += 1
+            else:
+                # 页面取不到任何字段也标记已处理，避免下次重复抓
+                conn.execute(
+                    "UPDATE raw_jufair SET detail_crawled=1 WHERE source_url=?", (surl,)
+                )
+        if i % commit_every == 0:
+            conn.commit()
+            if label:
+                _log(f"  {label} 详情进度 {i}/{total}（成功 {ok}）")
+        time.sleep(_jitter_delay())
+    conn.commit()
+    return ok
+
+
+def backfill_details(db_path, limit=None):
+    """独立补爬存量 detail_crawled=0 的记录。
+
+    此前这段逻辑嵌在列表页循环里，每翻一页就全表重扫一次（见 crawl_month 注释）。
+    拆出来后可单独运行、可断点续跑（已处理的会置 detail_crawled=1）。
+    """
+    conn = init_db(db_path)
+    try:
+        sql = "SELECT source_url FROM raw_jufair WHERE detail_crawled=0"
+        if limit:
+            sql += f" LIMIT {int(limit)}"
+        urls = [r[0] for r in conn.execute(sql).fetchall()]
+        if not urls:
+            _log("无待补爬记录")
+            return 0
+        _log(f"待补爬 {len(urls)} 条详情页，预计 {len(urls) * BASE_DELAY / 60:.0f} 分钟")
+        ok = _crawl_details(conn, urls, label="[backfill]")
+        _log(f"补爬完成：成功 {ok}/{len(urls)}")
+        return ok
+    finally:
+        conn.close()
 
 
 def _write_crawl_log(_unused_conn, batch_id, status, total_fetched=0, total_inserted=0):
@@ -638,6 +699,9 @@ def export_csv(db_path, output_path=None):
 # ====================================================================
 
 def main():
+    # 必须在任何读取之前声明（argparse 的 default=TARGET_YEAR 就是一次读取）
+    global TARGET_YEAR, _proxy_enabled
+
     parser = argparse.ArgumentParser(
         description="jufair.com 聚展网展会数据采集器 (Phase 1 · Hermes 任务1)"
     )
@@ -659,6 +723,10 @@ def main():
                         help="爬取全部12个月")
     parser.add_argument("--stats", action="store_true",
                         help="显示数据库统计")
+    parser.add_argument("--backfill-detail", action="store_true",
+                        help="只补爬存量 detail_crawled=0 的详情页（可断点续跑）")
+    parser.add_argument("--limit", type=int, default=None,
+                        help="配合 --backfill-detail 限制本次条数")
     parser.add_argument("--export", action="store_true",
                         help="导出 JSON + CSV")
 
@@ -666,6 +734,10 @@ def main():
 
     if args.stats:
         show_stats(args.db)
+        return
+
+    if args.backfill_detail:
+        backfill_details(args.db, limit=args.limit)
         return
 
     if args.export:
@@ -681,10 +753,11 @@ def main():
     if args.all:
         args.months = list(range(1, 13))
 
-    import crawlers.jufair_crawler as _self
-    _self.TARGET_YEAR = args.year
-
-    global _proxy_enabled
+    # [AUDIT] 原为 `import crawlers.jufair_crawler as _self` 再改其属性。
+    # 以脚本方式执行时 sys.path[0] 是 crawlers/，crawlers 包不可导入 →
+    # ModuleNotFoundError，即 `python3 crawlers/jufair_crawler.py` 从来跑不通。
+    # 自身模块的模块级变量用 global 改即可（已在函数首行声明），无需自导入。
+    TARGET_YEAR = args.year
     if args.proxy:
         _proxy_enabled = True
         try:
