@@ -7,9 +7,7 @@
     "build": "next build",
     "start": "next start -p ${PORT:-3000}",
     "lint": "next lint",
-    "test": "vitest run",
-    "seed-users": "tsx --env-file=.env.local scripts/seed-users.ts",
-    "migrate-data": "tsx --env-file=.env.local scripts/migrate-data.ts"
+    "test": "vitest run"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

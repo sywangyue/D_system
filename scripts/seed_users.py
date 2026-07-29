@@ -1,10 +1,12 @@
 """
-seed_db_users.py — 向 mwlab.db user 表插入初始用户（bcrypt 密码哈希）。
+seed_users.py — 向 data/mwlab.db 的 user 表插入初始开发账号（bcrypt 密码哈希）。
 
 用法:
-    python3 scripts/seed_db_users.py
+    python3 scripts/seed_users.py
 
-依赖: bcrypt (pip install bcrypt)
+幂等：已存在的 email 会跳过。
+
+⚠️ 下列为本地开发用弱口令，生产环境务必改密（见 README「用户与权限」）。
 """
 from __future__ import annotations
 
@@ -13,7 +15,7 @@ from pathlib import Path
 
 import bcrypt
 
-DB_PATH = Path(__file__).parent.parent / "mwlab.db"
+DB_PATH = Path(__file__).resolve().parent.parent / "data" / "mwlab.db"
 
 USERS = [
     {
