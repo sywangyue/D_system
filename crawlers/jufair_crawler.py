@@ -24,6 +24,7 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT) not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT))
 from tools.url_utils import canonical_source_url
+from tools.text_utils import normalize_cjk_spaces
 
 # ============ 配置 ============
 BASE_URL = "https://www.jufair.com"
@@ -395,7 +396,11 @@ def parse_detail_page(detail_url):
         elif label == "观众数量" and "visitors_str" not in data:
             data["visitors_str"] = value
 
-    return data
+    # [AUDIT 2026-07-29] 「印度新德里」这类词被 HTML 标签从中间切开，
+    # get_text() 在标签边界补空格，入库成「印 度新德里」（全库 539 处），
+    # 在打标 Excel 里直接暴露给人看。只删汉字之间的空白，英文名的空格保留。
+    return {k: normalize_cjk_spaces(v) if isinstance(v, str) else v
+            for k, v in data.items()}
 
 
 # ====================================================================

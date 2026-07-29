@@ -310,7 +310,13 @@ def parse_detail_page(detail_url):
             m_vis = re.search(r"观众数量[：:]\s*([\d,]+人)", t)
             if m_vis:
                 data["visitors_str"] = "观众:" + m_vis.group(1)
-            m_cyc = re.search(r"举办周期[：:]\s*([^\s]+)", t)
+            # [AUDIT 2026-07-29] 原为 ([^\s]+)：详情页里「举办周期」后面紧跟
+            # 「会展面积…展商数量…观众数量…」且中间没有空白，贪婪匹配把四项全吞了，
+            # merge_engine:257 再原样拷进 exhibition_brand.frequency ——
+            # 全库 1,979/7,179 个品牌的 frequency 长成
+            # 「1年1届会展面积：30,000平方米展商数量：500家观众数量：20,000人」。
+            # 改为只取周期本身，遇到下一个标签即停。
+            m_cyc = re.search(r"举办周期[：:]\s*(\d+年\d+届|年展|双年展|[^\s]{1,4}?届)", t)
             if m_cyc:
                 data["cycle"] = m_cyc.group(1)
 
