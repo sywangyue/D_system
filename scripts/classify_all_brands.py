@@ -870,23 +870,34 @@ def jufair_cat_to_l1l2(jufair_cat: str) -> tuple[str, str]:
     return "", ""
 
 
+BACKUP_DB = BASE_DIR / "data" / "backups" / "exhibition_brand_backups.db"
+
+
 def backup_table(conn: sqlite3.Connection) -> None:
-    """创建 exhibition_brand 备份表（如不存在）。"""
+    """把 exhibition_brand 备份到外部归档库（每天一张，已存在则跳过）。
+
+    此前备份表建在主库里，攒到 5 张 34,397 行，占了主库 10MB
+    （REMEDIATION-DRAFT-2026-07-29 P2-1）。改为写 data/backups/。
+    """
     import datetime
     today = datetime.date.today().strftime("%Y%m%d")
     backup_name = f"exhibition_brand_backup_{today}"
-    exists = conn.execute(
-        "SELECT name FROM sqlite_master WHERE type='table' AND name=?",
-        (backup_name,)
-    ).fetchone()
-    if not exists:
-        conn.execute(
-            f"CREATE TABLE {backup_name} AS SELECT * FROM exhibition_brand"
-        )
-        cnt = conn.execute(f"SELECT COUNT(*) FROM {backup_name}").fetchone()[0]
-        log.info(f"已创建备份表 {backup_name}（{cnt} 行）")
-    else:
-        log.info(f"备份表 {backup_name} 已存在，跳过")
+    BACKUP_DB.parent.mkdir(parents=True, exist_ok=True)
+    conn.execute("ATTACH DATABASE ? AS arc", (str(BACKUP_DB),))
+    try:
+        exists = conn.execute(
+            "SELECT name FROM arc.sqlite_master WHERE type='table' AND name=?",
+            (backup_name,)
+        ).fetchone()
+        if exists:
+            log.info(f"备份表 {backup_name} 已存在于归档库，跳过")
+            return
+        conn.execute(f"CREATE TABLE arc.{backup_name} AS SELECT * FROM main.exhibition_brand")
+        cnt = conn.execute(f"SELECT COUNT(*) FROM arc.{backup_name}").fetchone()[0]
+        conn.commit()
+        log.info(f"已备份 {cnt} 行到 {BACKUP_DB.name}::{backup_name}")
+    finally:
+        conn.execute("DETACH DATABASE arc")
 
 
 def classify_all(dry_run: bool = False, db_path: str = str(DB_PATH),
