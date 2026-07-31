@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>MWLAB LinkedIn Banner</title>
+<style>
+@font-face {
+  font-family: 'Montserrat';
+  font-style: normal;
+  font-weight: 300 800;
+  src: url('../fonts/montserrat-latin.woff2') format('woff2');
+}
+:root {
+  --accent: #FE5C00;
+  --bg:      #F5F5F7;
+  --ink:     #1D1D1F;
+  --ink3:    #AEAEB2;
+  --chip-a:  rgba(29,29,31,0.11);
+  --chip-b:  rgba(29,29,31,0.05);
+  --dot:     rgba(29,29,31,0.11);
+  --glow:    rgba(254,92,0,0.09);
+  --rule:    rgba(254,92,0,0.28);
+}
+html[data-theme="dark"] {
+  --bg:      #1D1D1F;
+  --ink:     #FFFFFF;
+  --ink3:    #6E6E73;
+  --chip-a:  rgba(255,255,255,0.13);
+  --chip-b:  rgba(255,255,255,0.055);
+  --dot:     rgba(255,255,255,0.10);
+  --glow:    rgba(254,92,0,0.22);
+  --rule:    rgba(254,92,0,0.40);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:1584px;height:396px;overflow:hidden}
+body{
+  font-family:'Montserrat',-apple-system,BlinkMacSystemFont,system-ui,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  background:var(--bg);
+  position:relative;
+}
+
+/* 右侧暖色光晕 */
+.glow{
+  position:absolute;inset:0;
+  background:radial-gradient(760px 460px at 78% 46%, var(--glow), transparent 70%);
+}
+
+/* 点阵网格，向左淡出 */
+.grid{
+  position:absolute;top:0;right:0;width:1000px;height:396px;
+  background-image:radial-gradient(circle, var(--dot) 1px, transparent 1px);
+  background-size:22px 22px;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 32% 82%,transparent);
+}
+
+/* 数据条带（甘特/日历事件条的抽象） */
+.field{position:absolute;left:648px;top:66px;width:872px;height:264px}
+.chip{position:absolute;height:14px;border-radius:7px}
+.chip.n1{background:var(--chip-a)}
+.chip.n2{background:var(--chip-b)}
+.chip.a1{background:var(--accent)}
+.chip.a2{background:rgba(254,92,0,0.30)}
+
+/* 竖向标线 */
+.rule{
+  position:absolute;left:1088px;top:44px;width:1px;height:308px;
+  background:linear-gradient(180deg,transparent,var(--rule) 18%,var(--rule) 82%,transparent);
+}
+.rule::after{
+  content:"";position:absolute;left:-3.5px;top:50px;
+  width:8px;height:8px;border-radius:50%;background:var(--accent);
+}
+
+/* 品牌锁定区 */
+.lockup{position:absolute;left:88px;top:104px}
+.mark{display:flex;align-items:center;gap:20px}
+.mark .dot{width:22px;height:22px;border-radius:50%;background:var(--accent);flex-shrink:0}
+.mark .word{
+  font-size:76px;font-weight:800;letter-spacing:-2.6px;
+  color:var(--ink);line-height:1;
+}
+.mark .badge{
+  font-size:22px;font-weight:500;color:var(--ink3);
+  letter-spacing:0.4px;align-self:flex-start;margin-top:8px;
+}
+.divline{
+  width:322px;height:1px;margin:26px 0 0 42px;
+  background:linear-gradient(90deg,var(--rule),rgba(254,92,0,0.06));
+}
+.tagline{
+  margin:16px 0 0 42px;
+  font-size:13px;font-weight:600;letter-spacing:3.4px;
+  text-transform:uppercase;color:var(--ink3);
+}
+</style>
+</head>
+<body>
+  <div class="glow"></div>
+  <div class="grid"></div>
+  <div class="field" id="field"></div>
+  <div class="rule"></div>
+
+  <div class="lockup">
+    <div class="mark">
+      <div class="dot"></div>
+      <div class="word">MWLAB</div>
+      <div class="badge">2026</div>
+    </div>
+    <div class="divline"></div>
+    <div class="tagline">Exhibition Competitive Intelligence</div>
+  </div>
+
+<script>
+if (new URLSearchParams(location.search).get('theme') === 'dark') {
+  document.documentElement.dataset.theme = 'dark';
+}
+// [row, left, width, tone]
+const CHIPS = [
+  [0,  0,120,'n1'],[0,136, 64,'n2'],[0,216,180,'a2'],[0,412, 52,'n1'],[0,480, 96,'n2'],[0,592,140,'n1'],[0,748,112,'a1'],
+  [1, 48, 88,'n2'],[1,152,148,'a1'],[1,316, 72,'n1'],[1,404,196,'n2'],[1,616, 60,'a2'],[1,692,168,'n1'],
+  [2,  0, 72,'n1'],[2, 88,168,'n2'],[2,272,104,'a1'],[2,392, 80,'n1'],[2,488,132,'n2'],[2,636, 88,'n1'],[2,744,128,'n2'],
+  [3, 24,140,'n2'],[3,180, 60,'a2'],[3,256,116,'n1'],[3,388,152,'n2'],[3,556, 92,'a1'],[3,664,196,'n1'],
+  [4,  0, 96,'n1'],[4,112,124,'n2'],[4,252, 88,'n1'],[4,356,168,'a2'],[4,540, 72,'n1'],[4,628,144,'n2'],[4,788, 84,'n1'],
+];
+const field = document.getElementById('field');
+for (const [row, left, width, tone] of CHIPS) {
+  const el = document.createElement('div');
+  el.className = 'chip ' + tone;
+  el.style.cssText = `top:${row * 54}px;left:${left}px;width:${width}px`;
+  field.appendChild(el);
+}
+</script>
+</body>
+</html>
