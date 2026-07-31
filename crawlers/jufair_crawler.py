@@ -211,29 +211,78 @@ def get_crawled_urls(conn):
     return {r[0] for r in conn.execute("SELECT source_url FROM raw_jufair").fetchall()}
 
 
-def insert_batch(conn, records, crawled_urls):
-    """批量写入 raw_jufair（INSERT OR IGNORE 防重复），返回真实新增行数。"""
+_UPSERT_SQL = """
+    INSERT INTO raw_jufair
+       (cn_name, en_name, date_str, year, venue, city,
+        area_str, visitors_str, exhibitors_str,
+        organizer, cycle, industry,
+        source_type, source_url, detail_crawled, crawl_batch_id)
+    VALUES (:cn_name, :en_name, :date_str, :year, :venue, :city,
+            :area_str, :visitors_str, :exhibitors_str,
+            :organizer, :cycle, :industry,
+            :source_type, :source_url, :detail_crawled, :crawl_batch_id)
+    ON CONFLICT(source_url) DO UPDATE SET
+        cn_name        = COALESCE(NULLIF(excluded.cn_name,''),        cn_name),
+        en_name        = COALESCE(NULLIF(excluded.en_name,''),        en_name),
+        date_str       = COALESCE(NULLIF(excluded.date_str,''),       date_str),
+        year           = COALESCE(NULLIF(excluded.year,0),            year),
+        venue          = COALESCE(NULLIF(excluded.venue,''),          venue),
+        city           = COALESCE(NULLIF(excluded.city,''),           city),
+        area_str       = COALESCE(NULLIF(excluded.area_str,''),       area_str),
+        visitors_str   = COALESCE(NULLIF(excluded.visitors_str,''),   visitors_str),
+        exhibitors_str = COALESCE(NULLIF(excluded.exhibitors_str,''), exhibitors_str),
+        organizer      = COALESCE(NULLIF(excluded.organizer,''),      organizer),
+        cycle          = COALESCE(NULLIF(excluded.cycle,''),          cycle),
+        industry       = COALESCE(NULLIF(excluded.industry,''),       industry),
+        -- 列表页写入时 detail_crawled=0，取 MAX 以免把详情页已爬的标记冲掉
+        detail_crawled = MAX(detail_crawled, excluded.detail_crawled),
+        crawl_batch_id = excluded.crawl_batch_id
+"""
+
+# 变更报告只跟踪这几个字段：源站最常修正的就是档期与场地
+_TRACKED = ("date_str", "venue", "city", "organizer")
+
+
+def insert_batch(conn, records, crawled_urls, refresh=False):
+    """写入 raw_jufair，返回 (新增行数, 更新行数, 变更明细)。
+
+    refresh=False（默认）：只写新 URL，已存在的原样跳过 —— 与改造前行为一致。
+    refresh=True：已存在的记录走 UPSERT，用非空新值覆盖旧值。
+                  源站修正档期后能同步进来（原实现只增不更，改期永远同步不到）。
+    """
     if not records:
-        return 0
-    before = conn.total_changes
-    conn.executemany(
-        """INSERT OR IGNORE INTO raw_jufair
-           (cn_name, en_name, date_str, year, venue, city,
-            area_str, visitors_str, exhibitors_str,
-            organizer, cycle, industry,
-            source_type, source_url, detail_crawled, crawl_batch_id)
-           VALUES (:cn_name, :en_name, :date_str, :year, :venue, :city,
-                   :area_str, :visitors_str, :exhibitors_str,
-                   :organizer, :cycle, :industry,
-                   :source_type, :source_url, :detail_crawled, :crawl_batch_id)""",
-        records,
-    )
-    conn.commit()
-    after = conn.total_changes
-    actual = after - before
-    for r in records:
+        return 0, 0, []
+
+    fresh = [r for r in records if r["source_url"] not in crawled_urls]
+    stale = [r for r in records if r["source_url"] in crawled_urls] if refresh else []
+
+    changes = []
+    if stale:
+        urls = [r["source_url"] for r in stale]
+        ph = ",".join("?" * len(urls))
+        cols = ", ".join(_TRACKED)
+        old = {
+            row[0]: dict(zip(_TRACKED, row[1:]))
+            for row in conn.execute(
+                f"SELECT source_url, {cols} FROM raw_jufair WHERE source_url IN ({ph})", urls
+            )
+        }
+        for r in stale:
+            prev = old.get(r["source_url"], {})
+            for f in _TRACKED:
+                new_val = (r.get(f) or "").strip()
+                old_val = (prev.get(f) or "").strip()
+                if new_val and old_val and new_val != old_val:
+                    changes.append((r["source_url"], f, old_val, new_val))
+
+    payload = fresh + stale
+    if payload:
+        conn.executemany(_UPSERT_SQL, payload)
+        conn.commit()
+
+    for r in payload:
         crawled_urls.add(r["source_url"])
-    return actual
+    return len(fresh), len(stale), changes
 
 
 # ====================================================================
@@ -407,7 +456,7 @@ def parse_detail_page(detail_url):
 # 爬取逻辑
 # ====================================================================
 
-def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batch_id="", crawled=None):
+def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batch_id="", crawled=None, refresh=False):
     """
     爬取指定月份的全部展会列表页。
     - month: 1-12
@@ -455,10 +504,13 @@ def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batc
             time.sleep(_jitter_delay())
             continue
 
-        # 去重写入
+        # 写入：refresh 模式下已存在的记录也送进 UPSERT，否则只送新 URL
         new_records = [it for it in items if it["source_url"] not in crawled]
-        n = insert_batch(conn, new_records, crawled)
+        payload = items if refresh else new_records
+        n, updated, changes = insert_batch(conn, payload, crawled, refresh=refresh)
         new_count += n
+        for url, field, old_v, new_v in changes:
+            _log(f"    [变更] {url} {field}: {old_v!r} → {new_v!r}")
 
         # 详情页补爬 —— 只处理本页新增
         #
@@ -471,7 +523,8 @@ def crawl_month(conn, month, source_type, keyword=None, crawl_detail=False, batc
             detail_ok = _crawl_details(conn, [r["source_url"] for r in new_records])
 
         detail_msg = f" 详情{detail_ok}/{len(new_records)}" if crawl_detail else ""
-        _log(f"  [p{page}] {len(items)}条 → 新增{n}{detail_msg}")
+        upd_msg = f" 更新{updated}" if refresh else ""
+        _log(f"  [p{page}] {len(items)}条 → 新增{n}{upd_msg}{detail_msg}")
 
         page += 1
         time.sleep(_jitter_delay())
@@ -578,7 +631,7 @@ def _write_crawl_log(_unused_conn, batch_id, status, total_fetched=0, total_inse
         conn.close()
 
 
-def crawl_all(db_path, months=None, keyword=None, crawl_detail=False, batch_id=None):
+def crawl_all(db_path, months=None, keyword=None, crawl_detail=False, batch_id=None, refresh=False):
     """全量爬取入口。遍历指定月份，每个月份爬国内+国际。"""
     if batch_id is None:
         batch_id = datetime.now().strftime("jufair_%Y%m%d_%H%M%S")
@@ -599,7 +652,7 @@ def crawl_all(db_path, months=None, keyword=None, crawl_detail=False, batch_id=N
                     break
                 label = "国内" if st == "domestic" else "国际"
                 _log(f"  [{label}]")
-                n = crawl_month(conn, m, st, keyword=keyword, crawl_detail=crawl_detail, batch_id=batch_id, crawled=crawled)
+                n = crawl_month(conn, m, st, keyword=keyword, crawl_detail=crawl_detail, batch_id=batch_id, crawled=crawled, refresh=refresh)
                 total += n
                 if n:
                     _log(f"  ✅ 新增 {n} 条")
@@ -727,6 +780,9 @@ def main():
                         help="爬取批次标识")
     parser.add_argument("--year", type=int, default=TARGET_YEAR,
                         help="目标年份（默认 2026）")
+    parser.add_argument("--refresh", action="store_true",
+                        help="已存在的记录也重新写入（UPSERT 更新变化字段）。"
+                             "默认只写新增，源站改档期同步不进来")
     parser.add_argument("--proxy", action="store_true",
                         help="通过 Tor SOCKS5 代理请求（需提前启动 Tor）")
     parser.add_argument("--all", action="store_true",
@@ -790,6 +846,7 @@ def main():
         months=args.months,
         keyword=args.keyword,
         crawl_detail=args.detail,
+        refresh=args.refresh,
         batch_id=args.batch_id,
     )
 

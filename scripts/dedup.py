@@ -23,12 +23,19 @@ DEFAULT_DB = Path(__file__).parent.parent / "data" / "mwlab.db"
 
 # ── 标准化函数 ──────────────────────────────────────────────────────────────
 
+# 中文数字（届次用）
+_CN_NUM = '一二三四五六七八九十百千零〇两'
+
+
 def strip_years(text: str) -> str:
-    return re.sub(r'^\s*20[2-9]\d\s*', '', text)
+    # 年份不只出现在行首（"CBST2025第十三届…"），也可能带"年"后缀（"2024年第二十七届…"）
+    return re.sub(r'20[2-9]\d\s*年?', '', text)
 
 
 def strip_edition(text: str) -> str:
-    return re.sub(r'^第\s*\d+\s*届\s*', '', text)
+    # 中文展会名普遍写"第二十四届"，原正则只认阿拉伯数字且只认行首，导致同一展会
+    # 的新旧两批采集记录归一化后仍不相等 —— 实测 58 对重复因此漏网
+    return re.sub(rf'第\s*[{_CN_NUM}\d]+\s*届', '', text)
 
 
 def strip_city_parens(text: str) -> str:

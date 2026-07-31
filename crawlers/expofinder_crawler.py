@@ -54,6 +54,7 @@ BASE_DELAY = 3.0          # 实测 2.5s 稳定，留余量
 RENDER_WAIT = 6.0         # 等 hydration 把解锁字段渲染出来
 MAX_WALL_RETRY = 4        # 疑似限流时的重试次数（指数退避）
 SESSION_CHECK_EVERY = 50  # 每 N 条校验一次登录态
+CIRCUIT_BREAKER = 8       # 连续这么多条异常即判定系统性故障并终止
 
 
 def _log(msg):
@@ -247,16 +248,37 @@ def main():
     batch = f"ef_{args.locale}_{datetime.now():%Y%m%d_%H%M%S}"
     _log(f"批次 {batch}，{len(ids)} 条，间隔 {args.delay}s，预计 "
          f"{len(ids)*(args.delay+RENDER_WAIT)/3600:.1f} 小时")
-    ok = wall = 0
+    ok = wall = err = 0
+    consecutive_bad = 0
     for i, pid in enumerate(ids, 1):
         if i % SESSION_CHECK_EVERY == 0 and not session_alive():
-            _log("✗ 登录态已失效，停止。重新登录后直接重跑即可断点续采。")
+            _log("✗ 停止原因：登录态已失效。重新登录后直接重跑即可断点续采。")
             break
-        status, rec = crawl_one(conn, pid, args.locale, batch)
+        try:
+            status, rec = crawl_one(conn, pid, args.locale, batch)
+        except Exception as e:
+            # 单页异常不能拖垮整批 —— 记下来继续，但连续失败要熔断
+            err += 1
+            consecutive_bad += 1
+            _log(f"  [{i}/{len(ids)}] {pid} 异常：{type(e).__name__}: {str(e)[:120]}")
+            conn.execute("INSERT INTO crawl_state (public_id, locale, status, attempts, note) "
+                         "VALUES (?,?,'error',1,?) ON CONFLICT(public_id, locale) DO UPDATE SET "
+                         "status='error', note=excluded.note, "
+                         "updated_at=datetime('now','localtime')",
+                         (pid, args.locale, f"{type(e).__name__}: {str(e)[:200]}"))
+            conn.commit()
+            if consecutive_bad >= CIRCUIT_BREAKER:
+                _log(f"✗ 停止原因：连续 {CIRCUIT_BREAKER} 条异常/失败，判定为系统性故障"
+                     f"（站点变更、浏览器挂死或网络中断），已终止。"
+                     f"排查后重跑即可断点续采。")
+                break
+            time.sleep(args.delay * 3)
+            continue
         if status == "session_lost":
-            _log("✗ 登录态已失效，停止。重新登录后直接重跑即可断点续采。")
+            _log("✗ 停止原因：登录态已失效。重新登录后直接重跑即可断点续采。")
             break
         if status == "ok":
+            consecutive_bad = 0
             ok += 1
             st = rec.get("stats") or {}
             _log(f"  [{i}/{len(ids)}] {pid} {(rec.get('name_cn') or '')[:24]} "
@@ -264,10 +286,16 @@ def main():
                  f"面积{st.get('展出面积(m2)','—')} | 名单{len(rec.get('exhibitors') or [])}")
         else:
             wall += 1
+            consecutive_bad += 1
             _log(f"  [{i}/{len(ids)}] {pid} 真·需登录，跳过")
+            if consecutive_bad >= CIRCUIT_BREAKER:
+                _log(f"✗ 停止原因：连续 {CIRCUIT_BREAKER} 条判定为墙。正常情况下真·需登录"
+                     f"的展会是零星分布的，连续命中说明是站点整体策略变更或限流未能恢复，"
+                     f"已终止以免把公开数据误标成需登录。")
+                break
         time.sleep(args.delay + random.uniform(0, 1.5))
 
-    _log(f"完成：成功 {ok} · 需登录 {wall}")
+    _log(f"完成：成功 {ok} · 需登录 {wall} · 异常 {err}")
     conn.close()
 
 

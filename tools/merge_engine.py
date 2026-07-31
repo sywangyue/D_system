@@ -347,6 +347,31 @@ def upsert_brand(conn: sqlite3.Connection, brand_id: str, norm: dict) -> None:
     )
 
 
+# schema 的 CHECK 约束只认这几个值，且组合分隔符是 '+' 而非 '/'
+_MANUAL_SOURCES = {'官网', '手工'}
+
+
+def merge_data_source(existing: str, incoming: str) -> str:
+    """合并 data_source，结果保证落在 schema CHECK 白名单内。
+
+    原实现用 '/' 拼接，与 CHECK 约束的 '+' 不一致：已是 'jufair+cnexpo' 的届次再合并
+    会拼出 'jufair+cnexpo/jufair' 而抛 IntegrityError。以前只合新批次碰不到双源行，
+    爬虫加 --refresh 后老记录会重新过一遍合并，必现。
+    """
+    existing = (existing or '').strip()
+    incoming = (incoming or '').strip()
+    # 人工核过的来源不被爬虫降级
+    if existing in _MANUAL_SOURCES:
+        return existing
+    parts = {p for p in existing.split('+') + incoming.split('+') if p}
+    if {'jufair', 'cnexpo'} <= parts:
+        return 'jufair+cnexpo'
+    for candidate in ('jufair', 'cnexpo'):
+        if candidate in parts:
+            return candidate
+    return existing or incoming or ''
+
+
 def upsert_edition(
     conn: sqlite3.Connection,
     brand_id: str,
@@ -363,12 +388,7 @@ def upsert_edition(
         "SELECT data_source FROM exhibition_edition WHERE edition_id = ?",
         (edition_id,)
     ).fetchone()
-    if existing:
-        merged_ds = '/'.join(dict.fromkeys(
-            (existing[0] + '/' + data_source).split('/')
-        ))
-    else:
-        merged_ds = data_source
+    merged_ds = merge_data_source(existing[0] if existing else '', data_source)
 
     conn.execute(
         """
