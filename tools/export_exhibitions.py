@@ -50,6 +50,11 @@ HEADERS = ["序号", "展会名称", "城市", "开展日期", "结束日期", "
            "面积(㎡)", "展商数", "观众数", "行业L1", "行业L2", "同期同馆子展"]
 COL_WIDTHS = [6, 45, 10, 13, 13, 32, 12, 10, 12, 14, 14, 46]
 
+# brief 布局：对外群发的月度清单口径（展会名称/时间/地点/城市/主办方/观众/展商/面积）
+BRIEF_HEADERS = ["序号", "展会名称", "时间", "地点", "城市", "主办方",
+                 "观众数", "展商数", "面积(㎡)"]
+BRIEF_COL_WIDTHS = [6, 45, 26, 32, 12, 40, 12, 10, 12]
+
 
 # ── 日期范围 ────────────────────────────────────────────────────────────────
 def resolve_range(args) -> tuple[str, str, str]:
@@ -70,7 +75,7 @@ def fetch_rows(db_path: Path, date_from: str, date_to: str, mainland_only: bool)
                    COALESCE(NULLIF(e.city,''), b.city) AS city,
                    e.date_start, e.date_end, e.venue,
                    e.area_sqm, e.exhibitors_count, e.visitors_count,
-                   b.industry_l1, b.industry_l2, b.brand_id
+                   b.industry_l1, b.industry_l2, b.brand_id, b.organizer
             FROM exhibition_edition e
             JOIN exhibition_brand b ON b.brand_id = e.brand_id
             WHERE e.date_start >= ? AND e.date_start <= ?
@@ -140,7 +145,7 @@ def _fold(entries: list[tuple], ds: str, de: str, venue: str) -> tuple:
     areas = [r[5] for r in entries if r[5]]
     return (primary[0], primary[1], ds, de, venue,
             max(areas) if areas else None, None, None,
-            primary[8], primary[9], primary[10], "；".join(aliases))
+            primary[8], primary[9], primary[10], primary[11], "；".join(aliases))
 
 
 def merge_colocated(rows: list[tuple]) -> list[tuple]:
@@ -176,6 +181,50 @@ def merge_colocated(rows: list[tuple]) -> list[tuple]:
 
 
 # ── 写 Excel ────────────────────────────────────────────────────────────────
+def fmt_period(ds: str, de: str) -> str:
+    """开展/结束日期折成一列：跨月给完整区间，同月省略后半的年月，单日只写一次。"""
+    ds, de = ds or "", de or ""
+    if not de or ds == de:
+        return ds
+    if ds[:7] == de[:7]:
+        return f"{ds}~{de[8:]}"
+    return f"{ds}~{de}"
+
+
+def write_brief_xlsx(rows: list[tuple], out_path: Path, sheet_title: str) -> None:
+    """群发口径：展会名称/时间/地点/城市/主办方/观众/展商/面积。"""
+    wb = Workbook()
+    ws = wb.active
+    ws.title = sheet_title[:31]
+
+    hfont = Font(name="微软雅黑", bold=True, size=11, color="FFFFFF")
+    hfill = PatternFill(start_color="2F5496", end_color="2F5496", fill_type="solid")
+    dfont = Font(name="微软雅黑", size=10)
+    bdr = Border(left=Side("thin"), right=Side("thin"), top=Side("thin"), bottom=Side("thin"))
+    center = Alignment(horizontal="center", vertical="center", wrap_text=True)
+    left = Alignment(vertical="center", wrap_text=True)
+
+    for col, h in enumerate(BRIEF_HEADERS, 1):
+        c = ws.cell(row=1, column=col, value=h)
+        c.font, c.fill, c.alignment, c.border = hfont, hfill, center, bdr
+
+    for i, r in enumerate(rows):
+        vals = [i + 1, r[0] or "", fmt_period(r[2], r[3]), r[4] or "", r[1] or "",
+                r[11] or "", r[7] or "", r[6] or "", r[5] or ""]
+        for col, v in enumerate(vals, 1):
+            c = ws.cell(row=i + 2, column=col, value=v)
+            c.font, c.border = dfont, bdr
+            c.alignment = center if col in (1, 3, 5, 7, 8, 9) else left
+
+    for col, w in enumerate(BRIEF_COL_WIDTHS, 1):
+        ws.column_dimensions[get_column_letter(col)].width = w
+
+    ws.freeze_panes = "A2"
+    ws.auto_filter.ref = f"A1:{get_column_letter(len(BRIEF_HEADERS))}{len(rows) + 1}"
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    wb.save(out_path)
+
+
 def write_xlsx(rows: list[tuple], out_path: Path, sheet_title: str) -> None:
     wb = Workbook()
     ws = wb.active
@@ -193,7 +242,7 @@ def write_xlsx(rows: list[tuple], out_path: Path, sheet_title: str) -> None:
         c.font, c.fill, c.alignment, c.border = hfont, hfill, center, bdr
 
     for i, r in enumerate(rows):
-        aliases = r[11] if len(r) == 12 else ""
+        aliases = r[12] if len(r) == 13 else ""
         name_cn, city, ds, de, venue, area, exh, vis, l1, l2 = r[0:10]
         vals = [i + 1, name_cn or "", city or "", ds or "", de or "", venue or "",
                 area or "", exh or "", vis or "", l1 or "", l2 or "", aliases]
@@ -221,6 +270,8 @@ def main() -> int:
     ap.add_argument("--region", choices=["mainland", "all"], default="mainland",
                     help="mainland=仅中国大陆（默认），all=不做地区过滤")
     ap.add_argument("--no-merge", action="store_true", help="不合并同期同馆子展")
+    ap.add_argument("--layout", choices=["full", "brief"], default="full",
+                    help="full=完整列（默认）；brief=群发口径 8 列，含主办方，强制不合并")
     ap.add_argument("--db", default=str(DB_PATH), help="数据库路径（默认 data/mwlab.db）")
     ap.add_argument("-o", "--out", default="", help="输出 .xlsx 路径")
     args = ap.parse_args()
@@ -244,14 +295,18 @@ def main() -> int:
         return 1
 
     raw_count = len(rows)
-    if not args.no_merge:
+    # brief 用于对外群发，合并同期展会把展商/观众置空，与该口径要求的字段冲突，故不合并
+    if not args.no_merge and args.layout == "full":
         rows = merge_colocated(rows)
 
     scope = "中国境内" if mainland else "全部地区"
     slug = args.month if args.month else f"{date_from}_{date_to}"
     out_path = Path(args.out) if args.out else _REPO_ROOT / "exports" / f"{slug}_{scope}展会清单.xlsx"
 
-    write_xlsx(rows, out_path, f"{label}展会清单")
+    if args.layout == "brief":
+        write_brief_xlsx(rows, out_path, f"{label}展会清单")
+    else:
+        write_xlsx(rows, out_path, f"{label}展会清单")
 
     print(f"[OK] {out_path}")
     print(f"  范围: {date_from} ~ {date_to} | 地区: {scope}")
