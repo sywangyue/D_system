@@ -55,10 +55,11 @@
 >    该业务沿用 ITE 品牌延续至今**（ite.group，总部迪拜）。
 >    因此 2022 年之后，「ITE」与「Hyve」是**两家不同的公司**，不能按名称一律合并。
 >
-> 本库的处理：按 `country_cn` 路由——俄罗斯 → `ITE Group（俄罗斯，2022 年自 Hyve 剥离）`；
-> 印度/土耳其/英国/巴西/印尼等 → `Hyve Group`；
-> 哈萨克斯坦/乌兹别克斯坦/阿塞拜疆/乌克兰 → `ITE/Hyve 待判定（独联体·中亚）`（39 条，`confidence=check`）。
-> 中亚归属未能查证：Hyve 官网仍列 Central Asia 事业部，但另有 ICA Group 承接该区域的报道，暂不归并。
+> 本库的处理：按 `country_cn` 路由——**仅俄罗斯**（14 条）→ `ITE Group（俄罗斯，2022 年自 Hyve 剥离）`，
+> 其余全部（68 条，含哈萨克斯坦/乌兹别克斯坦/阿塞拜疆/乌克兰及印度/土耳其/英国/巴西/印尼等）→ `Hyve Group`。
+>
+> 中亚·独联体的归属由 Max 于 2026-08-05 拍定归 Hyve（与 Hyve 官网仍列 Central Asia 事业部一致）。
+> 注：该批 39 条中，阿塞拜疆(9) 属高加索、乌克兰(4) 属东欧，严格讲不是中亚，一并按 Hyve 处理。
 >
 > 另注意 **Iteca**（阿拉木图，哈萨克斯坦本土公司）与 ITE 是不同实体，`ITE` 的正则必须前锚定，
 > 否则会误吞 Iteca / CITEXPO / HITEX / 埃及国际展览贸易公司ITE。
@@ -115,9 +116,9 @@ SELECT o.canonical, SUM(e.area_sqm)/10000.0 AS 万平米, COUNT(*) AS 展会数
 
 ## 6. 待办
 
-1. 复核 `tools/organizer_alias.json` 中 `confidence=check` 的条目：
-   `ITE/Hyve 待判定（独联体·中亚）`(39)、`汉诺威米兰展览（合资）`(25)、
-   `中国机械国际合作（CMEC/国机）`(22)、`爱博`(12)、`Mack Brooks`(2)
+1. 复核 `tools/organizer_alias.json` 中剩余 61 条 `confidence=check`：
+   `汉诺威米兰展览（合资）`(25)、`中国机械国际合作（CMEC/国机）`(22)、`爱博`(12)、`Mack Brooks`(2)
+   （ITE/Hyve 中亚归属已于 2026-08-05 定案归 Hyve）
 2. ~~清理 8 条 `organizer='test'`~~ ✅ 已在 013 迁移中完成，写入 `manual_tag_history`
 3. 处理 700 组重复品牌（与 `dedup_review_in_progress` 的 1,753 对复核合并推进）
 4. 修正 `EXPO-3210` 等跨记录串味的 874 个品牌
