@@ -84,10 +84,21 @@ def split_organizer(raw: str) -> list[str]:
     out, seen = [], set()
     for t in merged:
         t = t.strip().strip("　 \t·•")
-        # 仅剥去整体包裹的一对括号，保留 "XX（YY）" 中成对的括号
+        # 仅剥去真正包裹全串的一对括号。"（上海）会展公司（Hyve）" 首尾虽都是括号
+        # 但不是同一对，必须保留。
         while len(t) > 1 and t[0] in BRACKETS and t[-1] == BRACKETS[t[0]]:
-            t = t[1:-1].strip()
-        t = t.strip("（(【[")  # 剩余的孤立左括号
+            close, depth = BRACKETS[t[0]], 0
+            for i, ch in enumerate(t):
+                depth += (ch == t[0]) - (ch == close)
+                if depth == 0 and i < len(t) - 1:
+                    break           # 首括号在中途就闭合了，说明不是整体包裹
+            else:
+                t = t[1:-1].strip()
+                continue
+            break
+        # 剩余的孤立左括号（仅在括号数量不平衡时剥，否则会打断 "（上海）XX（YY）"）
+        while t and t[0] in BRACKETS and t.count(t[0]) > t.count(BRACKETS[t[0]]):
+            t = t[1:].strip()
         t = re.sub(r"\s+", " ", t)
         if t and t not in seen:
             seen.add(t)
@@ -107,15 +118,25 @@ class Aliases:
                 g.get("confidence", "high"),
                 [re.compile(p, re.I) for p in g["patterns"]],
                 [re.compile(p, re.I) for p in g.get("exclude", [])],
+                g.get("country_split"),
             ))
 
-    def lookup(self, token: str):
-        """返回 (canonical, type, confidence) 或 None。"""
-        for canonical, typ, conf, pats, excs in self.groups:
+    def lookup(self, token: str, country: str = ""):
+        """返回 (canonical, type, confidence) 或 None。
+
+        country 用于同名品牌因资产剥离而分属不同公司的情形（见 ITE/Hyve）。
+        """
+        for canonical, typ, conf, pats, excs, split in self.groups:
             if any(e.search(token) for e in excs):
                 continue
-            if any(p.search(token) for p in pats):
-                return canonical, typ, conf
+            if not any(p.search(token) for p in pats):
+                continue
+            if split and country:
+                if country in split["map"]:
+                    return split["map"][country], typ, "high"
+                if country in split["ambiguous"]:
+                    return split["ambiguous_canonical"], typ, "check"
+            return canonical, typ, conf
         return None
 
 
@@ -156,7 +177,7 @@ def main():
     aliases = Aliases(ALIAS_FILE)
     db = sqlite3.connect(DB)
     rows = db.execute(
-        """SELECT b.brand_id, b.name_cn, b.organizer, e.area_sqm, e.city, e.exhibitors_count
+        """SELECT b.brand_id, b.name_cn, b.organizer, e.area_sqm, e.city, e.exhibitors_count, b.country_cn
            FROM exhibition_brand b JOIN exhibition_edition e ON e.brand_id = b.brand_id
            WHERE e.year = ? AND e.area_sqm > 0 AND b.organizer != ''""",
         (args.year,),
@@ -178,11 +199,11 @@ def main():
     unmapped = defaultdict(lambda: {"area": 0, "n": 0})
     skipped_area = defaultdict(int)
 
-    for brand_id, name_cn, organizer, area, _city, _exh in rows:
+    for brand_id, name_cn, organizer, area, _city, _exh, country in rows:
         for token in split_organizer(organizer):
             if token.lower() in aliases.drop:
                 continue
-            hit = aliases.lookup(token)
+            hit = aliases.lookup(token, country)
             if hit:
                 canonical, typ, conf = hit
             else:

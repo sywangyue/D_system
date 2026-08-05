@@ -15,8 +15,15 @@
      "note": "UBM 2018 并入 Informa；上海博华(Sinoexpo)为其中国合资平台"},
 
     {"canonical": "Hyve Group", "type": "企业", "confidence": "high",
-     "patterns": ["^ITE(\\s|集团|展览|$)", "英国ITE", "ITE Group", "^Hyve", "英国国际贸易与展览有限公司", "Hyve India"],
-     "note": "ITE Group 2019 更名 Hyve，与 Informa 无股权关系"},
+     "patterns": ["^ITE(\\s|集团|展览|HCMC|Moscow|$)", "英国ITE", "ITE Group", "Hyve", "英国国际贸易与展览有限公司"],
+     "_pattern_note": "ITE 必须前锚定：Iteca(哈萨克独立公司)、CITEXPO、HITEX、埃及国际展览贸易公司ITE 都不是同一家。Hyve 不锚定，因存在「（上海）会展会务有限公司（Hyve展览集团）」这类内嵌写法。",
+     "note": "ITE Group plc(LSE:ITE, 1991 年成立, 英国总部但业务重心在俄罗斯/独联体) 2019-09 更名 Hyve Group plc。与 Informa 无股权关系。2022 年 Hyve 将俄罗斯业务售予 Rise Expo Ltd，该业务沿用 ITE 品牌延续至今(ite.group, 迪拜)，因此 2022 年后「ITE」与「Hyve」是两家公司，须按国家拆分。",
+     "country_split": {
+       "map": {"俄罗斯": "ITE Group（俄罗斯，2022 年自 Hyve 剥离）"},
+       "ambiguous": ["哈萨克斯坦", "乌兹别克斯坦", "阿塞拜疆", "乌克兰", "格鲁吉亚", "白俄罗斯", "吉尔吉斯斯坦", "土库曼斯坦", "塔吉克斯坦"],
+       "ambiguous_canonical": "ITE/Hyve 待判定（独联体·中亚）",
+       "ambiguous_note": "Hyve 官网仍将哈萨克斯坦/乌兹别克斯坦/阿塞拜疆列为 Central Asia 事业部，但 2022 年后该区域另有 ICA Group 承接的报道，未能确认，暂不归并"
+     }},
 
     {"canonical": "法兰克福展览（Messe Frankfurt）", "type": "企业", "confidence": "high",
      "patterns": ["法兰克福展览", "messe\\s*frankfurt", "法兰克福.*展览"]},

@@ -31,16 +31,17 @@ def main():
     if not db.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='brand_organizer'").fetchone():
         sys.exit("brand_organizer 表不存在，请先执行 schema/migrations/013_brand_organizer.sql")
 
-    rows = db.execute("SELECT brand_id, organizer FROM exhibition_brand WHERE organizer != ''").fetchall()
+    rows = db.execute(
+        "SELECT brand_id, organizer, country_cn FROM exhibition_brand WHERE organizer != ''").fetchall()
     records, types, confs, dropped = [], Counter(), Counter(), 0
 
-    for brand_id, organizer in rows:
+    for brand_id, organizer, country in rows:
         seq = 0
         for token in split_organizer(organizer):
             if token.lower() in aliases.drop:
                 dropped += 1
                 continue
-            hit = aliases.lookup(token)
+            hit = aliases.lookup(token, country)
             if hit:
                 canonical, org_type, conf = hit
             else:

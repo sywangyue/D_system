@@ -47,7 +47,22 @@
 2. **粒度**：集团级（`国药励展`、`励展华博` 并入 `RX 励展`）
 3. **年份**：2026
 
-> 注意：ITE Group 2019 年更名 **Hyve Group**，与 Informa 无股权关系，两者**不可合并**。
+> **ITE / Hyve 的两次断裂（2026-08-05 全网核实后修正）**
+>
+> 1. ITE Group plc（LSE:ITE，1991 年成立，英国总部但业务重心在俄罗斯/独联体）
+>    2019-09-20 更名 **Hyve Group plc**，24 日起以 HYVE 代码交易。与 Informa 无股权关系，**不可与 Informa 合并**。
+> 2. **2022 年 Hyve 将俄罗斯业务（15 个展会，含 MosBuild / RosUpack / YugAgro）售予 Rise Expo Ltd，
+>    该业务沿用 ITE 品牌延续至今**（ite.group，总部迪拜）。
+>    因此 2022 年之后，「ITE」与「Hyve」是**两家不同的公司**，不能按名称一律合并。
+>
+> 本库的处理：按 `country_cn` 路由——俄罗斯 → `ITE Group（俄罗斯，2022 年自 Hyve 剥离）`；
+> 印度/土耳其/英国/巴西/印尼等 → `Hyve Group`；
+> 哈萨克斯坦/乌兹别克斯坦/阿塞拜疆/乌克兰 → `ITE/Hyve 待判定（独联体·中亚）`（39 条，`confidence=check`）。
+> 中亚归属未能查证：Hyve 官网仍列 Central Asia 事业部，但另有 ICA Group 承接该区域的报道，暂不归并。
+>
+> 另注意 **Iteca**（阿拉木图，哈萨克斯坦本土公司）与 ITE 是不同实体，`ITE` 的正则必须前锚定，
+> 否则会误吞 Iteca / CITEXPO / HITEX / 埃及国际展览贸易公司ITE。
+>
 > UBM（博闻）2018 年并入 Informa Markets，上海博华（Sinoexpo）为其中国合资平台，归入 Informa。
 
 ## 5. 交付物
@@ -100,8 +115,9 @@ SELECT o.canonical, SUM(e.area_sqm)/10000.0 AS 万平米, COUNT(*) AS 展会数
 
 ## 6. 待办
 
-1. 复核 `tools/organizer_alias.json` 中 4 条 `confidence=check`：
-   `中国机械国际合作（CMEC/国机）`(22)、`汉诺威米兰展览（合资）`(25)、`爱博`(12)、`Mack Brooks`(2)
+1. 复核 `tools/organizer_alias.json` 中 `confidence=check` 的条目：
+   `ITE/Hyve 待判定（独联体·中亚）`(39)、`汉诺威米兰展览（合资）`(25)、
+   `中国机械国际合作（CMEC/国机）`(22)、`爱博`(12)、`Mack Brooks`(2)
 2. ~~清理 8 条 `organizer='test'`~~ ✅ 已在 013 迁移中完成，写入 `manual_tag_history`
 3. 处理 700 组重复品牌（与 `dedup_review_in_progress` 的 1,753 对复核合并推进）
 4. 修正 `EXPO-3210` 等跨记录串味的 874 个品牌
