@@ -55,13 +55,44 @@
 | 文件 | 用途 |
 |---|---|
 | `tools/organizer_alias.json` | 集团级别名词典，`confidence=check` 的条目待人工确认 |
-| `tools/rank_organizers.py` | 拆分 → 分类 → 归并 → 按面积排序 |
+| `tools/rank_organizers.py` | 拆分 → 分类 → 归并 → 按面积排序（只读，不改库） |
+| `schema/migrations/013_brand_organizer.sql` | 建 `brand_organizer` 索引表 + 清理 8 条 `organizer='test'` |
+| `tools/build_organizer_index.py` | 重建 `brand_organizer`（全量覆写，可反复重跑） |
 
 ```bash
 python3 tools/rank_organizers.py --dedup --top 30      # 去重后排行榜（推荐）
 python3 tools/rank_organizers.py --unmapped 50         # 未进词典的高面积 token
 python3 tools/rank_organizers.py --dedup --out rank.csv --top 0
+
+sqlite3 data/mwlab.db < schema/migrations/013_brand_organizer.sql
+python3 tools/build_organizer_index.py --dry-run       # 先看统计
+python3 tools/build_organizer_index.py                 # 重建索引表
 ```
+
+### brand_organizer 落库结果（2026-08-05）
+
+`organizer` 原始字段保持不动（保留可回溯性），另建一对多索引表：
+
+- 7,275 个品牌 → **9,740 行**参与单位
+- 类型：企业 4,240 / 协会 3,471 / 其他 938 / 政府 676 / 组委会 415
+- 置信：auto 7,943 / high 1,736 / check 61
+- 规范名去重后 4,990 家，**其中企业型 1,656 家**（原始自由文本为 4,652 个取值）
+
+归并效果（原始写法数 → 1 个 canonical）：
+RX 励展 22→1（330 个品牌）、Informa Markets 23→1（303）、法兰克福 18→1（121）、Hyve 15→1（81）
+
+查询示例：
+```sql
+SELECT o.canonical, SUM(e.area_sqm)/10000.0 AS 万平米, COUNT(*) AS 展会数
+  FROM brand_organizer o
+  JOIN exhibition_edition e ON e.brand_id = o.brand_id AND e.year = 2026
+ WHERE o.org_type = '企业' AND e.area_sqm > 0
+ GROUP BY 1 ORDER BY 2 DESC LIMIT 20;
+```
+
+> `app/api/dashboard/route.ts` 里的 `COUNT(DISTINCT b.organizer)` 目前返回 4,652（无意义），
+> 可改为 `SELECT COUNT(DISTINCT canonical) FROM brand_organizer WHERE org_type='企业'`。
+> 前端改动本次未做。
 
 技术要点（`split_organizer`）：
 - 英文逗号右侧是公司后缀（Ltd/Inc/LLC…）时不切分，避免 `ABC Co., Ltd.` 被切出裸 `Ltd.`
@@ -69,8 +100,9 @@ python3 tools/rank_organizers.py --dedup --out rank.csv --top 0
 
 ## 6. 待办
 
-1. 复核 `tools/organizer_alias.json` 中 4 条 `confidence=check`
-2. 清理 8 条 `organizer='test'`
+1. 复核 `tools/organizer_alias.json` 中 4 条 `confidence=check`：
+   `中国机械国际合作（CMEC/国机）`(22)、`汉诺威米兰展览（合资）`(25)、`爱博`(12)、`Mack Brooks`(2)
+2. ~~清理 8 条 `organizer='test'`~~ ✅ 已在 013 迁移中完成，写入 `manual_tag_history`
 3. 处理 700 组重复品牌（与 `dedup_review_in_progress` 的 1,753 对复核合并推进）
 4. 修正 `EXPO-3210` 等跨记录串味的 874 个品牌
 5. 补 `first_year` / `scale_score`，否则 PRD 中相关看板无数据
