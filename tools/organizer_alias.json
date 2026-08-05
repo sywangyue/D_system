@@ -1,0 +1,180 @@
+{
+  "_meta": {
+    "desc": "主办方集团级别名词典。patterns 为正则（re.IGNORECASE），命中即归入该 canonical group。",
+    "type_values": "企业 | 协会 | 政府 | 组委会 | 其他",
+    "confidence": "high = 已确认; check = 待 Max 人工确认"
+  },
+  "groups": [
+    {"canonical": "RX 励展（RX Global）", "type": "企业", "confidence": "high",
+     "patterns": ["励展", "^reed\\s*exhibitions", "^RX\\s+(Japan|Global|Tradex|France|Italy)", "^reed\\s*k\\s*fairs"],
+     "exclude": ["William Reed"],
+     "note": "含 国药励展 / 励展华博 / 北京励展 等中国合资实体"},
+
+    {"canonical": "Informa Markets", "type": "企业", "confidence": "high",
+     "patterns": ["英富曼", "^informa", "博闻(集团|企阳|公司)?$", "亚洲博闻", "北京博闻", "^UBM", "上海博华国际展览", "^博华$", "英富曼天一"],
+     "note": "UBM 2018 并入 Informa；上海博华(Sinoexpo)为其中国合资平台"},
+
+    {"canonical": "Hyve Group", "type": "企业", "confidence": "high",
+     "patterns": ["^ITE(\\s|集团|展览|$)", "英国ITE", "ITE Group", "^Hyve", "英国国际贸易与展览有限公司", "Hyve India"],
+     "note": "ITE Group 2019 更名 Hyve，与 Informa 无股权关系"},
+
+    {"canonical": "法兰克福展览（Messe Frankfurt）", "type": "企业", "confidence": "high",
+     "patterns": ["法兰克福展览", "messe\\s*frankfurt", "法兰克福.*展览"]},
+
+    {"canonical": "杜塞尔多夫展览（Messe Düsseldorf）", "type": "企业", "confidence": "high",
+     "patterns": ["杜塞尔多夫", "messe\\s*d(ü|u)sseldorf", "^MEDICA$"],
+     "note": "MEDICA 为杜塞尔多夫旗下展会品牌，原始数据误填为主办方"},
+
+    {"canonical": "慕尼黑展览（Messe München）", "type": "企业", "confidence": "high",
+     "patterns": ["慕尼黑.*展览", "messe\\s*m(ü|u)nchen", "慕尼黑博览"]},
+
+    {"canonical": "汉诺威展览（Deutsche Messe）", "type": "企业", "confidence": "high",
+     "patterns": ["汉诺威展览", "deutsche\\s*messe", "^hannover\\s*messe"]},
+
+    {"canonical": "汉诺威米兰展览（合资）", "type": "企业", "confidence": "check",
+     "patterns": ["汉诺威米兰", "米兰汉诺威"],
+     "note": "Deutsche Messe 与 Fiera Milano 的中国合资公司，是否并入汉诺威由 Max 决定"},
+
+    {"canonical": "科隆展览（Koelnmesse）", "type": "企业", "confidence": "high",
+     "patterns": ["科隆.*展览", "^koelnmesse"]},
+
+    {"canonical": "斯图加特展览（Messe Stuttgart）", "type": "企业", "confidence": "high",
+     "patterns": ["斯图加特展览", "messe\\s*stuttgart"]},
+
+    {"canonical": "纽伦堡展览（NürnbergMesse）", "type": "企业", "confidence": "high",
+     "patterns": ["纽伦堡展览", "n(ü|u)rnberg\\s*messe"]},
+
+    {"canonical": "柏林展览（Messe Berlin）", "type": "企业", "confidence": "high",
+     "patterns": ["柏林.*展览", "messe\\s*berlin"]},
+
+    {"canonical": "埃森展览（Messe Essen）", "type": "企业", "confidence": "high",
+     "patterns": ["埃森展览", "messe\\s*essen"]},
+
+    {"canonical": "意大利展览集团（IEG）", "type": "企业", "confidence": "high",
+     "patterns": ["意大利展览集团", "^IEG", "italian\\s*exhibition\\s*group", "里米尼展览"]},
+
+    {"canonical": "Fiera Milano", "type": "企业", "confidence": "high",
+     "patterns": ["^fiera\\s*milano", "米兰展览"], "exclude": ["汉诺威米兰", "米兰汉诺威"]},
+
+    {"canonical": "博洛尼亚展览（BolognaFiere）", "type": "企业", "confidence": "high",
+     "patterns": ["博洛尼亚展览", "bolognafiere"]},
+
+    {"canonical": "高美爱博（Comexposium）", "type": "企业", "confidence": "high",
+     "patterns": ["高美(爱|艾)博", "comexposium"]},
+
+    {"canonical": "IFEMA 马德里", "type": "企业", "confidence": "high",
+     "patterns": ["IFEMA", "马德里国际展览中心"]},
+
+    {"canonical": "DMG Events", "type": "企业", "confidence": "high",
+     "patterns": ["^DMG", "英国DMG", "dmg\\s*world\\s*media", "dmg\\s*media", "DMG传媒"]},
+
+    {"canonical": "阿姆斯特丹 RAI", "type": "企业", "confidence": "high",
+     "patterns": ["阿姆斯特丹RAI", "^RAI\\s*Amsterdam", "^AMSTERDAM$"]},
+
+    {"canonical": "Ptak Warsaw Expo", "type": "企业", "confidence": "high",
+     "patterns": ["ptak\\s*warsaw"]},
+
+    {"canonical": "Emerald Expositions", "type": "企业", "confidence": "high",
+     "patterns": ["^emerald\\s*exposition"]},
+
+    {"canonical": "Clarion Events", "type": "企业", "confidence": "high",
+     "patterns": ["^clarion\\s*events"]},
+
+    {"canonical": "Diversified Communications", "type": "企业", "confidence": "high",
+     "patterns": ["^diversified\\s*communications"]},
+
+    {"canonical": "Tüyap", "type": "企业", "confidence": "high",
+     "patterns": ["T(Ü|U)YAP", "tuyap"]},
+
+    {"canonical": "中国机械国际合作（CMEC/国机）", "type": "企业", "confidence": "check",
+     "patterns": ["中国机械国际合作", "中国机械工业集团", "^国机集团"],
+     "note": "中国机械国际合作 与 中国机械工业集团(国机) 是母子关系，是否合并请确认"},
+
+    {"canonical": "中国国际展览中心集团（CIEC）", "type": "企业", "confidence": "high",
+     "patterns": ["中国国际展览中心集团", "^CIEC", "中国国际贸易中心股份"]},
+
+    {"canonical": "环球资源（Global Sources）", "type": "企业", "confidence": "high",
+     "patterns": ["环球资源", "global\\s*sources"]},
+
+    {"canonical": "雅式展览", "type": "企业", "confidence": "high",
+     "patterns": ["雅式"]},
+
+    {"canonical": "米奥兰特", "type": "企业", "confidence": "high",
+     "patterns": ["米奥兰特", "meorient"]},
+
+    {"canonical": "海名国际会展", "type": "企业", "confidence": "high",
+     "patterns": ["海名国际会展"]},
+
+    {"canonical": "华巨臣", "type": "企业", "confidence": "high",
+     "patterns": ["华巨臣"]},
+
+    {"canonical": "鸿威国际会展", "type": "企业", "confidence": "high",
+     "patterns": ["鸿威国际会展"]},
+
+    {"canonical": "灵硕展览", "type": "企业", "confidence": "high",
+     "patterns": ["灵硕"]},
+
+    {"canonical": "世信会展", "type": "企业", "confidence": "high",
+     "patterns": ["世信国际会展", "^贵州世信", "^世信"]},
+
+    {"canonical": "展昭国际", "type": "企业", "confidence": "high",
+     "patterns": ["展昭"]},
+
+    {"canonical": "万耀企龙（VNU）", "type": "企业", "confidence": "high",
+     "patterns": ["万耀企龙", "^VNU"]},
+
+    {"canonical": "东浩兰生", "type": "企业", "confidence": "high",
+     "patterns": ["东浩兰生", "上海工业商务展览"]},
+
+    {"canonical": "中国对外贸易中心（广交会）", "type": "企业", "confidence": "high",
+     "patterns": ["中国对外贸易中心"]},
+
+    {"canonical": "香港贸发局（HKTDC）", "type": "协会", "confidence": "high",
+     "patterns": ["香港贸易发展局", "HKTDC", "香港贸发局"]},
+
+    {"canonical": "外贸协会（TAITRA）", "type": "协会", "confidence": "high",
+     "patterns": ["TAITRA", "对外贸易发展协会"]},
+
+    {"canonical": "Coex 韩国国际会展中心", "type": "企业", "confidence": "high",
+     "patterns": ["^Coex", "韩国国际会展中心"]},
+
+    {"canonical": "迪拜世界贸易中心", "type": "企业", "confidence": "high",
+     "patterns": ["迪拜世界贸易中心", "dubai\\s*world\\s*trade"]},
+
+    {"canonical": "Encore Media Group", "type": "企业", "confidence": "high",
+     "patterns": ["^encore\\s*media"]},
+
+    {"canonical": "Terrapinn", "type": "企业", "confidence": "high",
+     "patterns": ["^terrapinn"]},
+
+    {"canonical": "Mack Brooks（RX 旗下）", "type": "企业", "confidence": "check",
+     "patterns": ["mack\\s*brooks"],
+     "note": "2018 年被 RX 收购，是否并入 RX 请确认"},
+
+    {"canonical": "纺客控股", "type": "企业", "confidence": "high",
+     "patterns": ["纺客"]},
+
+    {"canonical": "北京世博威", "type": "企业", "confidence": "high",
+     "patterns": ["世博威"]},
+
+    {"canonical": "闻信展览", "type": "企业", "confidence": "high",
+     "patterns": ["闻信展览"]},
+
+    {"canonical": "青岛金诺", "type": "企业", "confidence": "high",
+     "patterns": ["青岛金诺"]},
+
+    {"canonical": "广东琦亚", "type": "企业", "confidence": "high",
+     "patterns": ["琦亚"]},
+
+    {"canonical": "爱博（北京爱博国际/爱博西雅）", "type": "企业", "confidence": "check",
+     "patterns": ["北京爱博国际展览", "爱博西雅"],
+     "note": "两家是否同一实体请确认"}
+  ],
+
+  "drop_tokens": [
+    "test", "Ltd.", "Ltd", "Inc.", "Inc", "LLC", "GmbH", "S.A.", "Co.", "Corp.",
+    "Pvt. Ltd", "Pte Ltd", "组委会", "主办单位", "承办单位", "待定", "未知", "无", "-",
+    "日本株式会社", "株式会社"
+  ],
+  "_drop_note": "拆分残片与占位值，不参与统计。日本株式会社/株式会社 为无公司名的裸后缀残片。"
+}
