@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1440, initial-scale=1.0" />
+  <title>MWLAB 万象 — 内部登录 (Sign In - Default State)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #0A0A0B;
+      color: #FAFAFA;
+      font-family: 'Geist', 'Noto Sans SC', sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .num-tabular {
+      font-variant-numeric: tabular-nums;
+      font-family: 'Geist', 'JetBrains Mono', monospace;
+    }
+    .cjk-light {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 300;
+    }
+    .hairline-b { border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .hairline-t { border-top: 1px solid rgba(255,255,255,0.07); }
+    .hairline-r { border-right: 1px solid rgba(255,255,255,0.07); }
+    .hairline-all { border: 1px solid rgba(255,255,255,0.07); }
+  </style>
+</head>
+<body class="bg-[#0A0A0B] text-[#FAFAFA] w-[1440px] h-[900px] overflow-hidden flex">
+
+  <!-- LEFT PANE (58%) — Brand and Proof (#0A0A0B) -->
+  <div class="w-[58%] h-full bg-[#0A0A0B] hairline-r relative flex flex-col justify-between p-12 select-none">
+    
+    <!-- Fine dot matrix background at 3% white opacity -->
+    <div class="absolute inset-0 pointer-events-none opacity-[0.03]" style="background-image: radial-gradient(#ffffff 1px, transparent 1px); background-size: 24px 24px;"></div>
+
+    <!-- Top-left: Brand Lockup (MWLAB heavy grotesque, thin hairline, 万象 lighter CJK) -->
+    <div class="relative z-10 flex items-center gap-3">
+      <span class="text-[20px] font-bold tracking-tight text-white font-mono">MWLAB</span>
+      <span class="w-[1px] h-4 bg-white/20"></span>
+      <span class="text-[17px] cjk-light text-[#FAFAFA] tracking-wide">万象</span>
+    </div>
+
+    <!-- Vertically Centered Block -->
+    <div class="relative z-10 max-w-[500px] my-auto">
+      <div class="text-[11px] font-mono uppercase tracking-widest text-[#56565B] mb-3">
+        MESSE DÜSSELDORF SHANGHAI · BUSINESS DEVELOPMENT
+      </div>
+      <h1 class="text-[44px] font-semibold leading-[1.1] tracking-[-0.03em] text-white mb-2">
+        中国展会市场的<br>
+        <span class="text-[#FE5C00]">结构化盘面</span>
+      </h1>
+      <p class="text-[15px] text-[#8A8A8F] font-normal mb-10">
+        7,401 个展会品牌 · 9,740 家主办方
+      </p>
+
+      <!-- Compact 2×2 Statistics Block, hairline dividers, 28px tabular numbers, 11px uppercase labels -->
+      <div class="grid grid-cols-2 hairline-all rounded-[8px] bg-[#0E0E10]/40 overflow-hidden divide-x divide-y divide-white/[0.07]">
+        <!-- Cell 1 -->
+        <div class="p-5">
+          <div class="text-[28px] font-semibold tracking-tight text-white num-tabular leading-tight">7,401</div>
+          <div class="text-[11px] font-mono uppercase tracking-wider text-[#56565B] mt-1">展会品牌</div>
+        </div>
+        <!-- Cell 2 -->
+        <div class="p-5">
+          <div class="text-[28px] font-semibold tracking-tight text-white num-tabular leading-tight">9,740</div>
+          <div class="text-[11px] font-mono uppercase tracking-wider text-[#56565B] mt-1">主办方索引</div>
+        </div>
+        <!-- Cell 3 -->
+        <div class="p-5">
+          <div class="text-[28px] font-semibold tracking-tight text-white num-tabular leading-tight">7,703</div>
+          <div class="text-[11px] font-mono uppercase tracking-wider text-[#56565B] mt-1">历史届次</div>
+        </div>
+        <!-- Cell 4 -->
+        <div class="p-5">
+          <div class="text-[28px] font-semibold tracking-tight text-white num-tabular leading-tight">2,061</div>
+          <div class="text-[11px] font-mono uppercase tracking-wider text-[#56565B] mt-1">白地信号</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom-left: 11px #56565B on two lines -->
+    <div class="relative z-10 text-[11px] text-[#56565B] font-mono leading-relaxed">
+      内部工具 · 不对外发布<br>
+      © 2026 杜塞尔多夫展览（上海）有限公司
+    </div>
+  </div>
+
+  <!-- RIGHT PANE (42%) — The Form (#0E0E10) -->
+  <div class="w-[42%] h-full bg-[#0E0E10] relative flex flex-col justify-between p-8 select-none">
+    
+    <!-- Top-right: 3-way language segmented control, 28px tall, active #FE5C00 -->
+    <div class="w-full flex justify-end">
+      <div class="flex items-center h-[28px] bg-[#141416] p-0.5 rounded-[6px] hairline-all text-[11px] font-medium text-[#8A8A8F]">
+        <span class="px-2.5 py-0.5 rounded-[4px] bg-[#FE5C00] text-white font-semibold cursor-default">中文</span>
+        <span class="px-2.5 py-0.5 hover:text-white cursor-pointer transition-colors">EN</span>
+        <span class="px-2.5 py-0.5 hover:text-white cursor-pointer transition-colors">DE</span>
+      </div>
+    </div>
+
+    <!-- Vertically Centered Form Column (max width 360px) -->
+    <div class="w-full max-w-[360px] mx-auto my-auto text-left">
+      <!-- Reserved 40px space above form title for errors to prevent layout shift -->
+      <div class="h-[40px] mb-2 flex items-center">
+        <!-- Invisible placeholder in default state -->
+      </div>
+
+      <h2 class="text-[28px] font-semibold tracking-tight text-white mb-1.5">欢迎回来</h2>
+      <p class="text-[14px] text-[#8A8A8F] mb-8">请使用内部账号登录</p>
+
+      <form class="space-y-5" onsubmit="return false;">
+        <!-- Field 1: Email -->
+        <div>
+          <label class="block text-[11px] font-mono uppercase tracking-wider text-[#8A8A8F] mb-2">邮箱</label>
+          <input 
+            type="email" 
+            placeholder="name@mds.cn" 
+            value=""
+            class="w-full h-[44px] px-3.5 bg-[#141416] border border-white/[0.09] rounded-[8px] text-[14px] text-white placeholder-[#56565B] focus:outline-none transition-colors"
+          />
+        </div>
+
+        <!-- Field 2: Password -->
+        <div>
+          <label class="block text-[11px] font-mono uppercase tracking-wider text-[#8A8A8F] mb-2">密码</label>
+          <div class="relative w-full">
+            <input 
+              type="password" 
+              placeholder="••••••••" 
+              value=""
+              class="w-full h-[44px] px-3.5 pr-10 bg-[#141416] border border-white/[0.09] rounded-[8px] text-[14px] text-white placeholder-[#56565B] focus:outline-none transition-colors"
+            />
+            <!-- Show/hide eye affordance (16px) -->
+            <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-[#8A8A8F] hover:text-white">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </button>
+          </div>
+          <!-- 8px beneath: Forgot password link -->
+          <div class="mt-2 text-right">
+            <a href="#" class="text-[12px] text-[#8A8A8F] hover:text-white transition-colors">忘记密码？</a>
+          </div>
+        </div>
+
+        <!-- 24px gap before button -->
+        <div class="pt-1">
+          <button 
+            type="button" 
+            class="w-full h-[44px] bg-[#FE5C00] hover:bg-[#ff6f1f] text-white text-[14px] font-semibold rounded-[8px] tracking-[0.2em] transition-colors flex items-center justify-center"
+          >
+            登 录
+          </button>
+          <p class="text-[12px] text-[#56565B] text-center mt-3 font-mono">
+            账号由管理员统一分配
+          </p>
+        </div>
+      </form>
+    </div>
+
+    <!-- Bottom-right: Return to landing link -->
+    <div class="w-full flex justify-end">
+      <a href="/" class="text-[13px] text-[#8A8A8F] hover:text-white transition-colors font-mono">
+        ← 回到官网
+      </a>
+    </div>
+
+  </div>
+
+</body>
+</html>

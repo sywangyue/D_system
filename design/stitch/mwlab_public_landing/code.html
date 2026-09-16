@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1440, initial-scale=1.0" />
+  <title>MWLAB 万象 — 杜塞尔多夫展览（上海）市场智能平台</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700;800&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      background-color: #0A0A0B;
+      color: #FAFAFA;
+      font-family: 'Geist', 'Noto Sans SC', sans-serif;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+    }
+    .num-tabular {
+      font-variant-numeric: tabular-nums;
+      font-family: 'Geist', 'JetBrains Mono', monospace;
+    }
+    .cjk-light {
+      font-family: 'Noto Sans SC', sans-serif;
+      font-weight: 300;
+    }
+    .hairline-b { border-bottom: 1px solid rgba(255,255,255,0.07); }
+    .hairline-t { border-top: 1px solid rgba(255,255,255,0.07); }
+    .hairline-r { border-right: 1px solid rgba(255,255,255,0.07); }
+    .hairline-l { border-left: 1px solid rgba(255,255,255,0.07); }
+    .hairline-all { border: 1px solid rgba(255,255,255,0.07); }
+    .accent-orange { color: #FE5C00; }
+    .bg-accent-orange { background-color: #FE5C00; }
+    .surface-raised { background-color: #141416; }
+  </style>
+</head>
+<body class="bg-[#0A0A0B] text-[#FAFAFA] min-w-[1440px] overflow-x-hidden selection:bg-[#FE5C00]/30 selection:text-white">
+
+  <!-- SECTION 1 — Fixed Nav Bar (56px) -->
+  <header class="fixed top-0 left-0 w-full h-[56px] z-50 bg-[#0A0A0B]/80 backdrop-blur-md hairline-b flex items-center justify-between px-12">
+    <!-- Brand Lockup: MWLAB FIRST (heavy grotesque), vertical hairline, 万象 SECOND (lighter CJK) -->
+    <div class="flex items-center gap-2.5">
+      <span class="text-[17px] font-bold tracking-tight text-white font-mono">MWLAB</span>
+      <span class="w-[1px] h-3.5 bg-white/20"></span>
+      <span class="text-[15px] cjk-light text-[#FAFAFA] tracking-wide">万象</span>
+    </div>
+
+    <!-- Right Controls -->
+    <div class="flex items-center gap-8">
+      <nav class="flex items-center gap-6 text-[13px] text-[#8A8A8F]">
+        <a href="#coverage" class="hover:text-white transition-colors">数据</a>
+        <a href="#slices" class="hover:text-white transition-colors">能力</a>
+        <a href="#business" class="hover:text-white transition-colors">业务</a>
+      </nav>
+
+      <!-- 3-way Language Segmented Control -->
+      <div class="flex items-center bg-[#141416] p-0.5 rounded-[6px] hairline-all text-[11px] font-medium text-[#8A8A8F]">
+        <span class="px-2 py-0.5 rounded-[4px] bg-[#FE5C00] text-white font-semibold cursor-default">中文</span>
+        <span class="px-2 py-0.5 hover:text-white cursor-pointer transition-colors">EN</span>
+        <span class="px-2 py-0.5 hover:text-white cursor-pointer transition-colors">DE</span>
+      </div>
+
+      <!-- 32px Button -->
+      <a href="/login" class="h-[32px] px-3.5 flex items-center justify-center bg-[#FE5C00] hover:bg-[#ff6f1f] text-white text-[12px] font-semibold rounded-[6px] transition-colors tracking-wide">
+        进入系统
+      </a>
+    </div>
+  </header>
+
+  <!-- MAIN CONTENT CONTAINER -->
+  <main class="w-full flex flex-col items-center">
+
+    <!-- SECTION 2 — Hero (180px top padding) -->
+    <section class="w-full flex flex-col items-center pt-[180px] pb-[100px]">
+      <div class="w-full max-w-[1200px] px-8 flex flex-col items-start text-left">
+        <!-- 72px Headline, tight -3% tracking -->
+        <h1 class="text-[72px] leading-[1.05] tracking-[-0.03em] font-semibold text-white mb-6">
+          中国展会市场的<br>
+          <span class="text-white">结构化盘面</span>
+        </h1>
+
+        <!-- Factual Sub-line -->
+        <p class="text-[18px] text-[#8A8A8F] leading-relaxed max-w-[900px] mb-8 font-normal">
+          7,401 个展会品牌 · 9,740 家主办方 · 十年届次数据。为杜塞尔多夫展览的业务拓展提供事实基础。
+        </p>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-6 mb-16">
+          <a href="/login" class="h-[44px] px-6 flex items-center justify-center bg-[#FE5C00] hover:bg-[#ff6f1f] text-white text-[14px] font-semibold rounded-[8px] transition-colors">
+            进入系统
+          </a>
+          <a href="#coverage" class="text-[15px] text-[#8A8A8F] hover:text-white transition-colors flex items-center gap-1">
+            查看数据覆盖 <span class="text-[13px] font-mono">→</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Large Product Surface (1320px wide, Linear-style, hairline border, 12px radius, fading bottom) -->
+      <div class="w-[1320px] rounded-[12px] hairline-all bg-[#0E0E10] overflow-hidden shadow-2xl relative">
+        <!-- Dashboard Top Bar Mockup -->
+        <div class="h-[40px] px-4 bg-[#141416] hairline-b flex items-center justify-between text-[11px] text-[#8A8A8F]">
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-1.5">
+              <span class="w-2.5 h-2.5 rounded-full bg-[#2A2A2E]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#2A2A2E]"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-[#2A2A2E]"></span>
+            </div>
+            <span class="text-white/20">|</span>
+            <span class="font-mono text-white/60">MWLAB INTEL // WORKSTATION v4.19</span>
+          </div>
+          <div class="flex items-center gap-4 font-mono text-[11px]">
+            <span class="flex items-center gap-1.5 text-white/80"><span class="w-1.5 h-1.5 rounded-full bg-[#FE5C00]"></span> 实时同步 99.8%</span>
+            <span class="text-white/40">AUDIT_CONFIDENTIAL_L2</span>
+          </div>
+        </div>
+
+        <!-- Dashboard Body Mockup -->
+        <div class="flex w-full h-[520px]">
+          <!-- Sidebar (200px) -->
+          <div class="w-[200px] h-full bg-[#0E0E10] hairline-r p-3 flex flex-col justify-between shrink-0">
+            <div class="space-y-1">
+              <div class="px-2.5 py-1.5 rounded text-[12px] bg-[#141416] text-[#FE5C00] font-medium flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-sm bg-[#FE5C00]"></span> 盘面 Overview
+              </div>
+              <div class="px-2.5 py-1.5 rounded text-[12px] text-[#8A8A8F] hover:text-white flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-sm bg-white/20"></span> 机会台 Pipeline
+              </div>
+              <div class="px-2.5 py-1.5 rounded text-[12px] text-[#8A8A8F] hover:text-white flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-sm bg-white/20"></span> 公司库 Entities
+              </div>
+              <div class="px-2.5 py-1.5 rounded text-[12px] text-[#8A8A8F] hover:text-white flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-sm bg-white/20"></span> 调研库 Reports
+              </div>
+              <div class="px-2.5 py-1.5 rounded text-[12px] text-[#8A8A8F] hover:text-white flex items-center gap-2">
+                <span class="w-1.5 h-1.5 rounded-sm bg-white/20"></span> 展会底图 Basemap
+              </div>
+            </div>
+            <div class="px-2.5 py-2 hairline-t text-[10px] text-[#56565B] font-mono">
+              7,401 标的在库<br>MDS BD 专署系统
+            </div>
+          </div>
+
+          <!-- Main Table Surface (820px) -->
+          <div class="flex-1 h-full bg-[#0A0A0B] overflow-hidden flex flex-col hairline-r">
+            <!-- Filter Strip -->
+            <div class="h-[36px] px-4 hairline-b bg-[#0E0E10]/50 flex items-center justify-between text-[11px]">
+              <div class="flex items-center gap-2 text-[#8A8A8F]">
+                <span class="px-2 py-0.5 rounded bg-[#141416] hairline-all text-white">全部标的 (7,401)</span>
+                <span class="px-2 py-0.5 rounded bg-[#141416] hairline-all">华东/华南</span>
+                <span class="px-2 py-0.5 rounded bg-[#141416] hairline-all">规模 ≥30,000㎡</span>
+                <span class="px-2 py-0.5 rounded bg-[#141416] hairline-all">控股并购意向</span>
+              </div>
+              <span class="text-[#56565B] font-mono">第 1-12 行 / 共 7,401 行</span>
+            </div>
+
+            <!-- 11-column Dense Table Header -->
+            <div class="grid grid-cols-12 h-[30px] items-center px-4 bg-[#141416] hairline-b text-[10px] font-mono uppercase tracking-wider text-[#56565B]">
+              <div class="col-span-3">机会 / 品牌名称</div>
+              <div class="col-span-1">类型</div>
+              <div class="col-span-1">阶段</div>
+              <div class="col-span-2">对标 MD 品牌</div>
+              <div class="col-span-2">关联运营主体</div>
+              <div class="col-span-1 text-right">规模(㎡)</div>
+              <div class="col-span-1 text-center">优先级</div>
+              <div class="col-span-1 text-right">负责人</div>
+            </div>
+
+            <!-- Table Rows (Realistic Software Data) -->
+            <div class="divide-y divide-white/[0.06] text-[12px] font-normal">
+              <!-- Row 1 -->
+              <div class="grid grid-cols-12 h-[36px] items-center px-4 hover:bg-[#141416] transition-colors">
+                <div class="col-span-3 font-medium text-white truncate flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-[#FE5C00]"></span> 国际半导体先进进程博览会
+                </div>
+                <div class="col-span-1 text-[#8A8A8F]">控股并购</div>
+                <div class="col-span-1 font-mono text-[10px] text-[#FE5C00]">S3 尽调</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">Electronica China</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">华创展览科技(上海)</div>
+                <div class="col-span-1 text-right num-tabular font-medium text-white">85,000</div>
+                <div class="col-span-1 flex justify-center gap-0.5">
+                  <span class="w-1.5 h-1.5 bg-[#FE5C00]"></span><span class="w-1.5 h-1.5 bg-[#FE5C00]"></span><span class="w-1.5 h-1.5 bg-[#FE5C00]"></span><span class="w-1.5 h-1.5 bg-[#FE5C00]"></span><span class="w-1.5 h-1.5 bg-[#FE5C00]"></span>
+                </div>
+                <div class="col-span-1 text-right text-[#8A8A8F]">陈立衡</div>
+              </div>
+
+              <!-- Row 2 -->
+              <div class="grid grid-cols-12 h-[36px] items-center px-4 hover:bg-[#141416] transition-colors">
+                <div class="col-span-3 font-medium text-white truncate flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span> 亚太数字医疗器械巡展
+                </div>
+                <div class="col-span-1 text-[#8A8A8F]">少数股权</div>
+                <div class="col-span-1 font-mono text-[10px] text-[#8A8A8F]">S2 意向</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">MEDICA / CMEF</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">新博会展集团</div>
+                <div class="col-span-1 text-right num-tabular font-medium text-white">120,000</div>
+                <div class="col-span-1 flex justify-center gap-0.5">
+                  <span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/20"></span>
+                </div>
+                <div class="col-span-1 text-right text-[#8A8A8F]">宋子乔</div>
+              </div>
+
+              <!-- Row 3 -->
+              <div class="grid grid-cols-12 h-[36px] items-center px-4 hover:bg-[#141416] transition-colors">
+                <div class="col-span-3 font-medium text-white truncate flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span> 华南工业智能制造技术展
+                </div>
+                <div class="col-span-1 text-[#8A8A8F]">独家承办</div>
+                <div class="col-span-1 font-mono text-[10px] text-[#8A8A8F]">S4 谈判</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">Hannover Messe</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">博览天下传媒</div>
+                <div class="col-span-1 text-right num-tabular font-medium text-white">62,500</div>
+                <div class="col-span-1 flex justify-center gap-0.5">
+                  <span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span>
+                </div>
+                <div class="col-span-1 text-right text-[#8A8A8F]">顾言风</div>
+              </div>
+
+              <!-- Row 4 -->
+              <div class="grid grid-cols-12 h-[36px] items-center px-4 hover:bg-[#141416] transition-colors">
+                <div class="col-span-3 font-medium text-white truncate flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span> 新能源储能与电池应用展
+                </div>
+                <div class="col-span-1 text-[#8A8A8F]">控股并购</div>
+                <div class="col-span-1 font-mono text-[10px] text-[#8A8A8F]">S1 接触</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">SNEC PV / Energy</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">蓝海联合会展</div>
+                <div class="col-span-1 text-right num-tabular font-medium text-white">210,000</div>
+                <div class="col-span-1 flex justify-center gap-0.5">
+                  <span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/20"></span>
+                </div>
+                <div class="col-span-1 text-right text-[#8A8A8F]">陆明德</div>
+              </div>
+
+              <!-- Row 5 -->
+              <div class="grid grid-cols-12 h-[36px] items-center px-4 hover:bg-[#141416] transition-colors">
+                <div class="col-span-3 font-medium text-white truncate flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span> 全球冷链物流与跨境枢纽展
+                </div>
+                <div class="col-span-1 text-[#8A8A8F]">品牌收购</div>
+                <div class="col-span-1 font-mono text-[10px] text-[#8A8A8F]">S3 尽调</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">CeMAT Asia</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">国展东方实业</div>
+                <div class="col-span-1 text-right num-tabular font-medium text-white">45,000</div>
+                <div class="col-span-1 flex justify-center gap-0.5">
+                  <span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/20"></span><span class="w-1.5 h-1.5 bg-white/20"></span>
+                </div>
+                <div class="col-span-1 text-right text-[#8A8A8F]">赵以诺</div>
+              </div>
+
+              <!-- Row 6 -->
+              <div class="grid grid-cols-12 h-[36px] items-center px-4 hover:bg-[#141416] transition-colors">
+                <div class="col-span-3 font-medium text-white truncate flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span> 全国商业航天与卫星通信展
+                </div>
+                <div class="col-span-1 text-[#8A8A8F]">联营孵化</div>
+                <div class="col-span-1 font-mono text-[10px] text-[#8A8A8F]">S1 接触</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">SpaceTech China</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">航天科工数字</div>
+                <div class="col-span-1 text-right num-tabular font-medium text-white">38,000</div>
+                <div class="col-span-1 flex justify-center gap-0.5">
+                  <span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/20"></span>
+                </div>
+                <div class="col-span-1 text-right text-[#8A8A8F]">周文瑄</div>
+              </div>
+
+              <!-- Row 7 -->
+              <div class="grid grid-cols-12 h-[36px] items-center px-4 hover:bg-[#141416] transition-colors">
+                <div class="col-span-3 font-medium text-white truncate flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span> 国际智慧电力与电网互联峰会
+                </div>
+                <div class="col-span-1 text-[#8A8A8F]">控股并购</div>
+                <div class="col-span-1 font-mono text-[10px] text-[#8A8A8F]">S2 意向</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">EP China / Wire</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">经纬会展股份</div>
+                <div class="col-span-1 text-right num-tabular font-medium text-white">72,000</div>
+                <div class="col-span-1 flex justify-center gap-0.5">
+                  <span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/20"></span><span class="w-1.5 h-1.5 bg-white/20"></span>
+                </div>
+                <div class="col-span-1 text-right text-[#8A8A8F]">陈立衡</div>
+              </div>
+
+              <!-- Row 8 -->
+              <div class="grid grid-cols-12 h-[36px] items-center px-4 hover:bg-[#141416] transition-colors">
+                <div class="col-span-3 font-medium text-white truncate flex items-center gap-1.5">
+                  <span class="w-1.5 h-1.5 rounded-full bg-white/20"></span> 华东精细化工及表面活性剂博览
+                </div>
+                <div class="col-span-1 text-[#8A8A8F]">少数股权</div>
+                <div class="col-span-1 font-mono text-[10px] text-[#8A8A8F]">S4 审计</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">CPHI China / K</div>
+                <div class="col-span-2 text-[#8A8A8F] truncate">恒合展览科技</div>
+                <div class="col-span-1 text-right num-tabular font-medium text-white">54,000</div>
+                <div class="col-span-1 flex justify-center gap-0.5">
+                  <span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span><span class="w-1.5 h-1.5 bg-white/60"></span>
+                </div>
+                <div class="col-span-1 text-right text-[#8A8A8F]">顾言风</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- World Map Basemap Panel (300px Right Panel) -->
+          <div class="w-[300px] h-full bg-[#0E0E10] p-4 flex flex-col justify-between shrink-0">
+            <div>
+              <div class="flex items-center justify-between mb-3 text-[11px] font-mono text-[#8A8A8F]">
+                <span>全球核心枢纽底图</span>
+                <span class="text-[#FE5C00]">辐射圈 450KM</span>
+              </div>
+              <!-- Dark stylized reference map vector -->
+              <div class="w-full h-[220px] bg-[#0A0A0B] rounded-[8px] hairline-all relative overflow-hidden flex items-center justify-center">
+                <!-- Grid background lines -->
+                <div class="absolute inset-0 grid grid-cols-6 grid-rows-6 opacity-10">
+                  <div class="border-r border-b border-white"></div>
+                  <div class="border-r border-b border-white"></div>
+                  <div class="border-r border-b border-white"></div>
+                  <div class="border-r border-b border-white"></div>
+                  <div class="border-r border-b border-white"></div>
+                  <div class="border-b border-white"></div>
+                  <div class="border-r border-b border-white"></div>
+                  <div class="border-r border-b border-white"></div>
+                  <div class="border-r border-b border-white"></div>
+                  <div class="border-r border-b border-white"></div>
+                  <div class="border-r border-b border-white"></div>
+                  <div class="border-b border-white"></div>
+                </div>
+
+                <!-- Abstract landmass shapes -->
+                <svg class="w-full h-full opacity-40 p-2" viewBox="0 0 200 140" fill="none">
+                  <!-- East Asia Landmass -->
+                  <path d="M120,40 Q140,45 160,70 Q150,90 130,95 Q110,80 115,60 Z" fill="#1C1B1C" stroke="#2A2A2E" stroke-width="0.8"/>
+                  <!-- Europe Landmass -->
+                  <path d="M40,30 Q60,35 65,55 Q50,65 35,55 Q30,40 40,30 Z" fill="#1C1B1C" stroke="#2A2A2E" stroke-width="0.8"/>
+                  <!-- Unfilled City Circles sized by area -->
+                  <circle cx="50" cy="42" r="6" stroke="#8A8A8F" stroke-width="0.75" />
+                  <circle cx="50" cy="42" r="1.5" fill="#8A8A8F" />
+                  <text x="58" y="44" fill="#56565B" font-size="6" font-family="monospace">DUS [110k]</text>
+
+                  <circle cx="142" cy="72" r="9" stroke="#FE5C00" stroke-width="1" />
+                  <circle cx="142" cy="72" r="2" fill="#FE5C00" />
+                  <text x="110" y="86" fill="#FE5C00" font-size="6.5" font-family="monospace">SHANGHAI [85k]</text>
+
+                  <circle cx="138" cy="85" r="5" stroke="#8A8A8F" stroke-width="0.75" />
+                  <text x="145" y="88" fill="#56565B" font-size="5.5" font-family="monospace">SZX [60k]</text>
+
+                  <!-- Coordination line between Dusseldorf HQ and Shanghai MWLAB -->
+                  <path d="M50,42 Q96,30 142,72" stroke="#FE5C00" stroke-dasharray="2 2" stroke-width="0.75" opacity="0.6"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Basemap Meta -->
+            <div class="space-y-2 text-[11px] font-mono">
+              <div class="flex justify-between text-[#56565B]">
+                <span>坐标体系</span>
+                <span class="text-[#8A8A8F]">WGS84 PROJECTION</span>
+              </div>
+              <div class="flex justify-between text-[#56565B]">
+                <span>覆盖展馆</span>
+                <span class="text-white">8,145 物理锚点</span>
+              </div>
+              <div class="flex justify-between text-[#56565B]">
+                <span>巡回航线</span>
+                <span class="text-white">18 条全球主干</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Linear fade out gradient overlay at the bottom -->
+        <div class="absolute bottom-0 left-0 w-full h-[120px] bg-gradient-to-t from-[#0A0A0B] via-[#0A0A0B]/80 to-transparent pointer-events-none"></div>
+      </div>
+    </section>
+
+    <!-- SECTION 3 — Data coverage band (Full width, 4 lines total, hairline borders) -->
+    <section id="coverage" class="w-full my-[60px]">
+      <div class="w-full hairline-t hairline-b py-8">
+        <div class="w-full max-w-[1200px] mx-auto px-8">
+          <div class="grid grid-cols-6 divide-x divide-white/[0.07]">
+            <!-- Cell 1 -->
+            <div class="pr-6">
+              <div class="text-[36px] font-semibold tracking-tight text-white num-tabular leading-tight">7,401</div>
+              <div class="text-[11px] font-mono uppercase tracking-wider text-[#56565B] mt-1">展会品牌</div>
+            </div>
+            <!-- Cell 2 -->
+            <div class="px-6">
+              <div class="text-[36px] font-semibold tracking-tight text-white num-tabular leading-tight">9,740</div>
+              <div class="text-[11px] font-mono uppercase tracking-wider text-[#56565B] mt-1">主办方</div>
+            </div>
+            <!-- Cell 3 -->
+            <div class="px-6">
+              <div class="text-[36px] font-semibold tracking-tight text-white num-tabular leading-tight">7,703</div>
+              <div class="text-[11px] font-mono uppercase tracking-wider text-[#56565B] mt-1">历史届次</div>
+            </div>
+            <!-- Cell 4 -->
+            <div class="px-6">
+              <div class="text-[36px] font-semibold tracking-tight text-white num-tabular leading-tight">8,145</div>
+              <div class="text-[11px] font-mono uppercase tracking-wider text-[#56565B] mt-1">地理标签</div>
+            </div>
+            <!-- Cell 5 -->
+            <div class="px-6">
+              <div class="text-[36px] font-semibold tracking-tight text-white num-tabular leading-tight">495</div>
+              <div class="text-[11px] font-mono uppercase tracking-wider text-[#56565B] mt-1">企业档案</div>
+            </div>
+            <!-- Cell 6 -->
+            <div class="pl-6">
+              <div class="text-[36px] font-semibold tracking-tight text-white num-tabular leading-tight">12,302</div>
+              <div class="text-[11px] font-mono uppercase tracking-wider text-[#56565B] mt-1">人工核验</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <!-- Footnote line beneath -->
+      <div class="w-full max-w-[1200px] mx-auto px-8 mt-4 text-left">
+        <p class="text-[13px] text-[#56565B] font-mono">
+          数据来源全程可溯 · 每月两次增量更新
+        </p>
+      </div>
+    </section>
+
+    <!-- 160px VERTICAL RHYTHM SPACING -->
+    <div class="h-[100px]"></div>
+
+    <!-- SECTION 4 — What the data can show (THE MAIN SECTION) -->
+    <section id="slices" class="w-full max-w-[1200px] px-8 text-left">
+      <!-- Section Header -->
+      <div class="mb-12">
+        <div class="text-[11px] font-mono uppercase tracking-widest text-[#FE5C00] mb-3">数据切面</div>
+        <h2 class="text-[40px] font-semibold tracking-tight text-white">同一份数据，六种读法</h2>
+      </div>
+
+      <!-- 3×2 Grid of Six Panels (Hex's style, 280px tall, 28px padding, 12px radius, #141416) -->
+      <div class="grid grid-cols-3 gap-6">
+
+        <!-- Panel 1: 地理分布 -->
+        <div class="surface-raised hairline-all rounded-[12px] p-[28px] h-[280px] flex flex-col justify-between">
+          <div>
+            <h3 class="text-[15px] font-medium text-white mb-1">地理分布</h3>
+            <p class="text-[12px] text-[#8A8A8F]">全球 8,145 个展会地理标签</p>
+          </div>
+          <!-- Hex-style data visual: dark dot-matrix world map, cities as unfilled circles, orange nodes -->
+          <div class="w-full h-[140px] bg-[#0A0A0B] rounded-[6px] hairline-all relative p-2 overflow-hidden flex items-center justify-center">
+            <svg class="w-full h-full opacity-70" viewBox="0 0 240 110" fill="none">
+              <!-- Dot grid points simulating dot-matrix continents -->
+              <g fill="#2A2A2E">
+                <!-- Asia -->
+                <circle cx="160" cy="40" r="1.5"/><circle cx="168" cy="42" r="1.5"/><circle cx="176" cy="45" r="1.5"/><circle cx="184" cy="42" r="1.5"/>
+                <circle cx="155" cy="48" r="1.5"/><circle cx="163" cy="50" r="1.5"/><circle cx="171" cy="52" r="1.5"/><circle cx="179" cy="54" r="1.5"/><circle cx="187" cy="50" r="1.5"/>
+                <circle cx="160" cy="58" r="1.5"/><circle cx="168" cy="60" r="1.5"/><circle cx="176" cy="62" r="1.5"/><circle cx="184" cy="60" r="1.5"/>
+                <circle cx="165" cy="68" r="1.5"/><circle cx="173" cy="70" r="1.5"/>
+                <!-- Europe -->
+                <circle cx="85" cy="35" r="1.5"/><circle cx="93" cy="38" r="1.5"/><circle cx="101" cy="40" r="1.5"/><circle cx="109" cy="38" r="1.5"/>
+                <circle cx="88" cy="46" r="1.5"/><circle cx="96" cy="48" r="1.5"/><circle cx="104" cy="50" r="1.5"/>
+                <!-- Americas -->
+                <circle cx="30" cy="40" r="1.5"/><circle cx="38" cy="42" r="1.5"/><circle cx="46" cy="44" r="1.5"/><circle cx="54" cy="40" r="1.5"/>
+                <circle cx="35" cy="50" r="1.5"/><circle cx="43" cy="52" r="1.5"/>
+              </g>
+              <!-- Unfilled City Circles & Orange Nodes -->
+              <circle cx="171" cy="52" r="9" stroke="#FE5C00" stroke-width="1.2" />
+              <circle cx="171" cy="52" r="2.5" fill="#FE5C00" />
+              <circle cx="96" cy="48" r="6" stroke="#8A8A8F" stroke-width="0.8" />
+              <circle cx="46" cy="44" r="5" stroke="#8A8A8F" stroke-width="0.8" />
+              <!-- Direct value labels on extremes -->
+              <text x="8" y="102" fill="#56565B" font-size="9" font-family="monospace">WGS84 L1</text>
+              <text x="175" y="102" fill="#8A8A8F" font-size="9" font-family="monospace">SH: 85,000㎡</text>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Panel 2: 主办方集团结构 -->
+        <div class="surface-raised hairline-all rounded-[12px] p-[28px] h-[280px] flex flex-col justify-between">
+          <div>
+            <h3 class="text-[15px] font-medium text-white mb-1">主办方集团结构</h3>
+            <p class="text-[12px] text-[#8A8A8F]">9,740 条主办方索引归并到集团</p>
+          </div>
+          <!-- Hex-style data visual: horizontal bar list, Informa / RX / Hyve / Frankfurt / Koelnmesse / MDS -->
+          <div class="w-full space-y-1.5 font-mono text-[10px]">
+            <div class="flex items-center justify-between text-[#8A8A8F]">
+              <span class="w-[85px] truncate">Informa</span>
+              <div class="flex-1 mx-2 h-2.5 bg-[#1C1B1C] rounded-sm overflow-hidden">
+                <div class="h-full bg-[#56565B]" style="width: 88%;"></div>
+              </div>
+              <span class="w-[28px] text-right num-tabular">612</span>
+            </div>
+            <div class="flex items-center justify-between text-[#8A8A8F]">
+              <span class="w-[85px] truncate">RX 励展</span>
+              <div class="flex-1 mx-2 h-2.5 bg-[#1C1B1C] rounded-sm overflow-hidden">
+                <div class="h-full bg-[#56565B]" style="width: 76%;"></div>
+              </div>
+              <span class="w-[28px] text-right num-tabular">528</span>
+            </div>
+            <div class="flex items-center justify-between text-[#8A8A8F]">
+              <span class="w-[85px] truncate">Messe Frankfurt</span>
+              <div class="flex-1 mx-2 h-2.5 bg-[#1C1B1C] rounded-sm overflow-hidden">
+                <div class="h-full bg-[#56565B]" style="width: 58%;"></div>
+              </div>
+              <span class="w-[28px] text-right num-tabular">390</span>
+            </div>
+            <div class="flex items-center justify-between text-[#8A8A8F]">
+              <span class="w-[85px] truncate">Koelnmesse</span>
+              <div class="flex-1 mx-2 h-2.5 bg-[#1C1B1C] rounded-sm overflow-hidden">
+                <div class="h-full bg-[#56565B]" style="width: 44%;"></div>
+              </div>
+              <span class="w-[28px] text-right num-tabular">280</span>
+            </div>
+            <div class="flex items-center justify-between text-white font-medium">
+              <span class="w-[85px] truncate text-[#FE5C00]">MDS 杜塞上海</span>
+              <div class="flex-1 mx-2 h-2.5 bg-[#1C1B1C] rounded-sm overflow-hidden">
+                <div class="h-full bg-[#FE5C00]" style="width: 32%;"></div>
+              </div>
+              <span class="w-[28px] text-right num-tabular text-[#FE5C00]">214</span>
+            </div>
+            <div class="flex items-center justify-between text-[#8A8A8F]">
+              <span class="w-[85px] truncate">Hyve Group</span>
+              <div class="flex-1 mx-2 h-2.5 bg-[#1C1B1C] rounded-sm overflow-hidden">
+                <div class="h-full bg-[#3A393A]" style="width: 25%;"></div>
+              </div>
+              <span class="w-[28px] text-right num-tabular">165</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 3: 行业结构 -->
+        <div class="surface-raised hairline-all rounded-[12px] p-[28px] h-[280px] flex flex-col justify-between">
+          <div>
+            <h3 class="text-[15px] font-medium text-white mb-1">行业结构</h3>
+            <p class="text-[12px] text-[#8A8A8F]">8 个一级品类的规模构成</p>
+          </div>
+          <!-- Hex-style data visual: Single horizontal stacked bar with 8 muted segments & labels beneath -->
+          <div class="w-full flex flex-col justify-center">
+            <!-- Stacked bar -->
+            <div class="w-full h-8 flex rounded-sm overflow-hidden hairline-all">
+              <div class="h-full bg-[#FE5C00]" style="width: 28%;" title="工业智能制造 28%"></div>
+              <div class="h-full bg-[#8A8A8F]" style="width: 20%;" title="医疗医药 20%"></div>
+              <div class="h-full bg-[#6E6E73]" style="width: 16%;" title="电子半导体 16%"></div>
+              <div class="h-full bg-[#56565B]" style="width: 12%;" title="汽车与交通 12%"></div>
+              <div class="h-full bg-[#48484A]" style="width: 9%;" title="能源环保 9%"></div>
+              <div class="h-full bg-[#3A3A3C]" style="width: 6%;" title="消费电子 6%"></div>
+              <div class="h-full bg-[#2C2C2E]" style="width: 5%;" title="包装印刷 5%"></div>
+              <div class="h-full bg-[#1C1C1E]" style="width: 4%;" title="其他 4%"></div>
+            </div>
+            <!-- Labels beneath -->
+            <div class="mt-4 grid grid-cols-2 gap-y-1 text-[11px] font-mono text-[#8A8A8F]">
+              <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-[#FE5C00]"></span> 工业制造 <span class="text-white num-tabular">28%</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-[#8A8A8F]"></span> 医疗医药 <span class="text-white num-tabular">20%</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-[#6E6E73]"></span> 电子半导体 <span class="text-white num-tabular">16%</span></div>
+              <div class="flex items-center gap-1.5"><span class="w-1.5 h-1.5 bg-[#56565B]"></span> 汽车交通 <span class="text-white num-tabular">12%</span></div>
+            </div>
+            <div class="mt-2 text-[10px] text-[#56565B] font-mono text-right">
+              TOTAL 8 品类 · 7,401 标的
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 4: 规模排名 -->
+        <div class="surface-raised hairline-all rounded-[12px] p-[28px] h-[280px] flex flex-col justify-between">
+          <div>
+            <h3 class="text-[15px] font-medium text-white mb-1">规模排名</h3>
+            <p class="text-[12px] text-[#8A8A8F]">按展览面积排序的品牌榜</p>
+          </div>
+          <!-- Hex-style data visual: Compact 6-row table, 32px height, hairline dividers, right-aligned numbers -->
+          <div class="w-full font-mono text-[11px] divide-y divide-white/[0.06]">
+            <div class="flex items-center justify-between py-1 text-[#56565B] text-[10px] uppercase">
+              <span class="w-[110px]">品牌名</span>
+              <span class="w-[45px]">城市</span>
+              <span class="w-[60px] text-right">面积㎡</span>
+              <span class="w-[45px] text-right">展商</span>
+            </div>
+            <div class="flex items-center justify-between py-1.5">
+              <span class="w-[110px] truncate text-white">中国国际工博会</span>
+              <span class="w-[45px] text-[#8A8A8F]">上海</span>
+              <span class="w-[60px] text-right text-white num-tabular">280k</span>
+              <span class="w-[45px] text-right text-[#8A8A8F] num-tabular">2,800</span>
+            </div>
+            <div class="flex items-center justify-between py-1.5">
+              <span class="w-[110px] truncate text-white">SNEC 光伏储能展</span>
+              <span class="w-[45px] text-[#8A8A8F]">上海</span>
+              <span class="w-[60px] text-right text-white num-tabular">210k</span>
+              <span class="w-[45px] text-right text-[#8A8A8F] num-tabular">3,100</span>
+            </div>
+            <div class="flex items-center justify-between py-1.5">
+              <span class="w-[110px] truncate text-white">CMEF 医疗展</span>
+              <span class="w-[45px] text-[#8A8A8F]">深圳</span>
+              <span class="w-[60px] text-right text-white num-tabular">160k</span>
+              <span class="w-[45px] text-right text-[#8A8A8F] num-tabular">4,200</span>
+            </div>
+            <div class="flex items-center justify-between py-1.5">
+              <span class="w-[110px] truncate text-white">半导体先进博览</span>
+              <span class="w-[45px] text-[#8A8A8F]">上海</span>
+              <span class="w-[60px] text-right text-[#FE5C00] num-tabular font-medium">85k</span>
+              <span class="w-[45px] text-right text-[#8A8A8F] num-tabular">3,420</span>
+            </div>
+            <div class="flex items-center justify-between py-1.5">
+              <span class="w-[110px] truncate text-white">智能工业制造展</span>
+              <span class="w-[45px] text-[#8A8A8F]">广州</span>
+              <span class="w-[60px] text-right text-white num-tabular">62k</span>
+              <span class="w-[45px] text-right text-[#8A8A8F] num-tabular">1,850</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 5: 档期分布 -->
+        <div class="surface-raised hairline-all rounded-[12px] p-[28px] h-[280px] flex flex-col justify-between">
+          <div>
+            <h3 class="text-[15px] font-medium text-white mb-1">档期分布</h3>
+            <p class="text-[12px] text-[#8A8A8F]">全年展会档期密度</p>
+          </div>
+          <!-- Hex-style data visual: 12-column bar chart by month, one month highlighted orange -->
+          <div class="w-full flex flex-col justify-end h-[140px] pt-4">
+            <div class="flex items-end justify-between h-[100px] w-full gap-1.5 px-1">
+              <!-- M1 -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#2A2A2E] rounded-t-sm" style="height: 18%;"></div>
+              </div>
+              <!-- M2 -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#2A2A2E] rounded-t-sm" style="height: 25%;"></div>
+              </div>
+              <!-- M3 (Spring peak) -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#56565B] rounded-t-sm" style="height: 72%;"></div>
+              </div>
+              <!-- M4 -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#56565B] rounded-t-sm" style="height: 85%;"></div>
+              </div>
+              <!-- M5 -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#56565B] rounded-t-sm" style="height: 60%;"></div>
+              </div>
+              <!-- M6 -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#2A2A2E] rounded-t-sm" style="height: 45%;"></div>
+              </div>
+              <!-- M7 -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#2A2A2E] rounded-t-sm" style="height: 30%;"></div>
+              </div>
+              <!-- M8 -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#2A2A2E] rounded-t-sm" style="height: 38%;"></div>
+              </div>
+              <!-- M9 -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#56565B] rounded-t-sm" style="height: 78%;"></div>
+              </div>
+              <!-- M10 (Autumn gold month - HIGHLIGHTED ORANGE) -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#FE5C00] rounded-t-sm" style="height: 98%;"></div>
+              </div>
+              <!-- M11 -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#56565B] rounded-t-sm" style="height: 65%;"></div>
+              </div>
+              <!-- M12 -->
+              <div class="flex-1 flex flex-col items-center gap-1">
+                <div class="w-full bg-[#2A2A2E] rounded-t-sm" style="height: 22%;"></div>
+              </div>
+            </div>
+            <!-- Month labels on extremes -->
+            <div class="flex justify-between items-center text-[9px] font-mono text-[#56565B] mt-2 pt-1 hairline-t">
+              <span>01月 (谷底 18%)</span>
+              <span class="text-[#FE5C00]">10月黄金档 (峰值 98%)</span>
+              <span>12月</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Panel 6: 白地信号 -->
+        <div class="surface-raised hairline-all rounded-[12px] p-[28px] h-[280px] flex flex-col justify-between">
+          <div>
+            <h3 class="text-[15px] font-medium text-white mb-1">白地信号</h3>
+            <p class="text-[12px] text-[#8A8A8F]">2,061 个停办品牌 = 需求存在过的赛道</p>
+          </div>
+          <!-- Hex-style visual: Two-tone horizontal bar (在办 vs 停办) plus 3 example rows -->
+          <div class="w-full space-y-3">
+            <div>
+              <div class="h-3 w-full rounded-sm overflow-hidden flex hairline-all">
+                <div class="h-full bg-[#56565B]" style="width: 72%;" title="在办品牌 72%"></div>
+                <div class="h-full bg-[#FE5C00]" style="width: 28%;" title="停办白地 28%"></div>
+              </div>
+              <div class="flex justify-between text-[10px] font-mono text-[#8A8A8F] mt-1.5">
+                <span>在办品牌 5,340</span>
+                <span class="text-[#FE5C00]">停办白地 2,061</span>
+              </div>
+            </div>
+
+            <!-- 3 Example Rows in 12px text -->
+            <div class="space-y-1.5 font-mono text-[11px] pt-1">
+              <div class="flex items-center justify-between text-[#8A8A8F]">
+                <span class="text-white truncate w-[140px]">· 华东紧固件与冲压展</span>
+                <span class="text-[#56565B]">停办 2023 · 无竞品</span>
+              </div>
+              <div class="flex items-center justify-between text-[#8A8A8F]">
+                <span class="text-white truncate w-[140px]">· 华南特种纸与纸塑包装</span>
+                <span class="text-[#56565B]">停办 2024 · 需求真实</span>
+              </div>
+              <div class="flex items-center justify-between text-[#8A8A8F]">
+                <span class="text-white truncate w-[140px]">· 成渝智慧仓储与AGV峰会</span>
+                <span class="text-[#56565B]">停办 2022 · 赛道空置</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 160px VERTICAL RHYTHM SPACING -->
+    <div class="h-[160px]"></div>
+
+    <!-- SECTION 5 — Business Lines (Shortest section on page, vertical hairlines ONLY, no cards/fill) -->
+    <section id="business" class="w-full max-w-[1200px] px-8 text-left">
+      <div class="mb-10">
+        <div class="text-[11px] font-mono uppercase tracking-widest text-[#FE5C00] mb-2">应用</div>
+        <h2 class="text-[40px] font-semibold tracking-tight text-white">三条业务线</h2>
+      </div>
+
+      <!-- Three equal columns separated ONLY by vertical hairlines -->
+      <div class="grid grid-cols-3 divide-x divide-white/[0.07] pt-2">
+        <!-- Col 1 -->
+        <div class="pr-8">
+          <div class="text-[44px] font-semibold text-[#2A2A2E] leading-none mb-4 font-mono">01</div>
+          <h3 class="text-[20px] font-medium text-white mb-2">并购标的</h3>
+          <p class="text-[15px] text-[#8A8A8F] leading-relaxed mb-6">
+            为杜塞已有品牌寻找中国延展的收购与合作标的。
+          </p>
+          <div class="space-y-2 text-[13px] text-white/90">
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-sm bg-[#FE5C00]"></span> 主办方企业穿透
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-sm bg-[#FE5C00]"></span> 规模与估值锚定
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-sm bg-[#FE5C00]"></span> 深度尽调报告
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 2 -->
+        <div class="px-8">
+          <div class="text-[44px] font-semibold text-[#2A2A2E] leading-none mb-4 font-mono">02</div>
+          <h3 class="text-[20px] font-medium text-white mb-2">全新品类</h3>
+          <p class="text-[15px] text-[#8A8A8F] leading-relaxed mb-6">
+            杜塞全球没有、中国市场应该有的空白赛道。
+          </p>
+          <div class="space-y-2 text-[13px] text-white/90">
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-sm bg-[#FE5C00]"></span> 停办信号识别
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-sm bg-[#FE5C00]"></span> 现有玩家盘点
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-sm bg-[#FE5C00]"></span> 可行性评估
+            </div>
+          </div>
+        </div>
+
+        <!-- Col 3 -->
+        <div class="pl-8">
+          <div class="text-[44px] font-semibold text-[#2A2A2E] leading-none mb-4 font-mono">03</div>
+          <h3 class="text-[20px] font-medium text-white mb-2">项目组支持</h3>
+          <p class="text-[15px] text-[#8A8A8F] leading-relaxed mb-6">
+            为各项目组提供数据工具与合作方对接。
+          </p>
+          <div class="space-y-2 text-[13px] text-white/90">
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-sm bg-[#FE5C00]"></span> 展商线索挖掘
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-sm bg-[#FE5C00]"></span> 合作方撮合
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="w-1.5 h-1.5 rounded-sm bg-[#FE5C00]"></span> 定制数据工具
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 160px VERTICAL RHYTHM SPACING -->
+    <div class="h-[160px]"></div>
+
+    <!-- SECTION 6 — Footer (Top hairline, 64px padding, 2 columns) -->
+    <footer class="w-full hairline-t py-[64px] bg-[#0A0A0B]">
+      <div class="w-full max-w-[1200px] mx-auto px-8 flex items-start justify-between">
+        <!-- LEFT: Brand Lockup & 2 lines -->
+        <div class="flex flex-col items-start text-left">
+          <div class="flex items-center gap-2.5 mb-4">
+            <span class="text-[16px] font-bold tracking-tight text-white font-mono">MWLAB</span>
+            <span class="w-[1px] h-3 bg-white/20"></span>
+            <span class="text-[14px] cjk-light text-[#FAFAFA] tracking-wide">万象</span>
+          </div>
+          <div class="text-[12px] text-[#56565B] space-y-1 font-mono">
+            <p>Messe Düsseldorf Shanghai · Business Development</p>
+            <p>© 2026 杜塞尔多夫展览（上海）有限公司 · 内部系统</p>
+          </div>
+        </div>
+
+        <!-- RIGHT: 进入系统 link & access note -->
+        <div class="flex flex-col items-end text-right">
+          <a href="/login" class="text-[13px] text-white hover:text-[#FE5C00] transition-colors flex items-center gap-1 font-medium mb-1">
+            进入系统 <span class="font-mono">→</span>
+          </a>
+          <span class="text-[12px] text-[#56565B] font-mono">
+            访问需内部账号
+          </span>
+        </div>
+      </div>
+    </footer>
+
+  </main>
+
+</body>
+</html>

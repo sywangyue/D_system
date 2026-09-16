@@ -1,0 +1,718 @@
+<!DOCTYPE html><html class="dark" lang="zh-CN"><head><meta charset="utf-8"><meta content="width=device-width, initial-scale=1.0" name="viewport"><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "on-secondary-container": "#ff9c75",
+        "surface-tint": "#ffb599",
+        "on-secondary-fixed": "#370e00",
+        "surface-container": "#201f20",
+        "on-error-container": "#ffdad6",
+        "text-secondary": "#8A8A93",
+        "secondary-container": "#7e2c05",
+        "accent-active": "#FE5C00",
+        "bg-surface": "#141416",
+        "secondary": "#ffb599",
+        "surface-container-highest": "#353436",
+        "surface-variant": "#353436",
+        "border-active": "rgba(255, 255, 255, 0.14)",
+        "bg-sidebar": "#0E0E10",
+        "inverse-primary": "#a73a00",
+        "text-primary": "#F5F5F7",
+        "on-tertiary-fixed": "#001c37",
+        "outline": "#ab897d",
+        "surface-bright": "#3a393a",
+        "border-hairline": "rgba(255, 255, 255, 0.07)",
+        "on-tertiary-fixed-variant": "#00497e",
+        "accent-dim": "rgba(254, 92, 0, 0.12)",
+        "tertiary": "#a0caff",
+        "background": "#131314",
+        "accent-hover": "#FF7324",
+        "inverse-on-surface": "#313031",
+        "on-background": "#e5e2e3",
+        "on-secondary-fixed-variant": "#7e2c05",
+        "primary-fixed": "#ffdbce",
+        "on-tertiary-container": "#002d51",
+        "tertiary-container": "#0096fc",
+        "bg-canvas": "#0A0A0B",
+        "on-primary-fixed": "#370e00",
+        "surface-container-low": "#1c1b1c",
+        "on-secondary": "#5a1b00",
+        "tertiary-fixed": "#d2e4ff",
+        "error": "#ffb4ab",
+        "on-primary-fixed-variant": "#802a00",
+        "primary-container": "#fe5c00",
+        "tertiary-fixed-dim": "#a0caff",
+        "secondary-fixed-dim": "#ffb599",
+        "text-tertiary": "#52525A",
+        "inverse-surface": "#e5e2e3",
+        "bg-surface-elevated": "#1A1A1E",
+        "secondary-fixed": "#ffdbce",
+        "on-tertiary": "#003259",
+        "primary": "#ffb599",
+        "surface": "#131314",
+        "primary-fixed-dim": "#ffb599",
+        "outline-variant": "#5b4137",
+        "surface-container-high": "#2a2a2b",
+        "error-container": "#93000a",
+        "surface-container-lowest": "#0e0e0f",
+        "on-surface-variant": "#e4beb1",
+        "on-primary": "#5a1b00",
+        "on-primary-container": "#511800",
+        "on-surface": "#e5e2e3",
+        "surface-dim": "#131314",
+        "on-error": "#690005",
+        "bg-surface-hover": "#1F1F24"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.125rem",
+        "lg": "0.25rem",
+        "xl": "0.5rem",
+        "full": "0.75rem"
+      },
+      "spacing": {
+        "margin": "1rem",
+        "space-sm": "0.375rem",
+        "space-md": "0.5rem",
+        "gutter": "0.75rem",
+        "space-2xs": "0.125rem",
+        "space-xl": "1rem",
+        "space-2xl": "1.5rem",
+        "space-lg": "0.75rem",
+        "space-xs": "0.25rem"
+      },
+      "fontFamily": {
+        "data-tabular": [
+          "JetBrains Mono"
+        ],
+        "data-tabular-lg": [
+          "JetBrains Mono"
+        ],
+        "body-sm": [
+          "Geist"
+        ],
+        "headline-lg": [
+          "Geist"
+        ],
+        "body-md": [
+          "Geist"
+        ],
+        "headline-md": [
+          "Geist"
+        ],
+        "headline-xl": [
+          "Geist"
+        ],
+        "label-caps": [
+          "Geist"
+        ],
+        "label-code": [
+          "JetBrains Mono"
+        ]
+      },
+      "fontSize": {
+        "data-tabular": [
+          "12px",
+          {
+            "lineHeight": "16px",
+            "letterSpacing": "-0.01em",
+            "fontWeight": "400"
+          }
+        ],
+        "data-tabular-lg": [
+          "16px",
+          {
+            "lineHeight": "20px",
+            "letterSpacing": "-0.02em",
+            "fontWeight": "500"
+          }
+        ],
+        "body-sm": [
+          "12px",
+          {
+            "lineHeight": "16px",
+            "letterSpacing": "0",
+            "fontWeight": "400"
+          }
+        ],
+        "headline-lg": [
+          "18px",
+          {
+            "lineHeight": "24px",
+            "letterSpacing": "-0.015em",
+            "fontWeight": "600"
+          }
+        ],
+        "body-md": [
+          "13px",
+          {
+            "lineHeight": "18px",
+            "letterSpacing": "-0.005em",
+            "fontWeight": "400"
+          }
+        ],
+        "headline-md": [
+          "15px",
+          {
+            "lineHeight": "20px",
+            "letterSpacing": "-0.01em",
+            "fontWeight": "500"
+          }
+        ],
+        "headline-xl": [
+          "24px",
+          {
+            "lineHeight": "32px",
+            "letterSpacing": "-0.02em",
+            "fontWeight": "600"
+          }
+        ],
+        "label-caps": [
+          "10px",
+          {
+            "lineHeight": "12px",
+            "letterSpacing": "0.06em",
+            "fontWeight": "600"
+          }
+        ],
+        "label-code": [
+          "11px",
+          {
+            "lineHeight": "14px",
+            "letterSpacing": "0.02em",
+            "fontWeight": "500"
+          }
+        ]
+      }
+    }
+  }
+};</script></head><body class="bg-bg-canvas text-text-primary antialiased select-none"><aside class="fixed left-0 top-0 h-full w-[200px] bg-bg-sidebar border-r border-border-hairline z-50 flex flex-col justify-between"><div class="flex flex-col"><div class="h-12 px-4 flex items-center border-b border-border-hairline"><div class="flex items-center tracking-tight leading-none"><span class="text-[14px] text-text-primary tracking-normal"><span class="font-bold">万</span><span class="font-medium">象</span></span><div class="h-3.5 mx-2 border-l border-white/20"></div><span class="text-[11px] font-headline-md text-text-secondary tracking-widest font-mono">MWLAB</span></div></div><nav class="flex flex-col py-2 px-1.5 space-y-0.5" data-active-classes="bg-accent-dim text-accent-active border-l-2 border-accent-active font-medium"><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md hover:bg-bg-surface-hover hover:text-text-primary transition-colors bg-accent-dim text-accent-active font-medium" data-path="panmian-overview" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-accent-active">dashboard</span>盘面</a><a aria-current="page" class="flex items-center h-8 px-2.5 rounded transition-colors border-l-2 border-accent-active" data-path="jihuitai-pipeline" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">conversion_path</span>机会台</a><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="gongsiku-company-base" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">corporate_fare</span>公司库</a><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="diaoyanku-research-dd" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">folder_managed</span>调研库</a><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="zhanhuiditu-master-map" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">map</span>展会底图</a></nav></div><div class="p-1.5 border-t border-border-hairline"><nav class="flex flex-col" data-active-classes="bg-accent-dim text-accent-active border-l-2 border-accent-active font-medium"><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="shezhi-settings" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">settings</span>设置</a></nav></div></aside><div class="pl-[200px]"><header class="fixed top-0 left-[200px] right-0 h-12 bg-bg-canvas border-b border-border-hairline z-40 px-4 flex items-center justify-between"><div class="flex items-center gap-1.5 text-body-sm font-body-sm"><span class="text-text-secondary">机会台</span><span class="text-text-tertiary text-[11px]">/</span><span class="text-text-primary font-medium">并购标的</span></div><div class="flex-1 max-w-md mx-6"><div class="relative flex items-center h-7 bg-bg-sidebar border border-border-hairline rounded px-2.5 focus-within:border-text-secondary transition-colors"><span class="material-symbols-outlined text-text-tertiary text-[15px] mr-2">search</span><input class="w-full bg-transparent text-text-primary placeholder-text-tertiary text-body-sm font-body-sm outline-none border-none" placeholder="搜索机会、公司、报告…" type="text"><div class="flex items-center ml-2 px-1 py-0.5 rounded bg-surface-variant/40 border border-border-hairline text-text-tertiary text-[10px] font-label-code leading-none">⌘K</div></div></div><div class="flex items-center gap-3"><div class="flex items-center gap-1.5 px-2 py-1 rounded bg-bg-sidebar border border-border-hairline"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span class="text-[11px] font-label-code text-text-secondary leading-none">实时同步 99.8%</span></div><button class="flex items-center h-7 px-2.5 rounded bg-bg-surface border border-border-hairline text-body-sm font-body-sm text-text-primary hover:bg-bg-surface-hover hover:border-border-active transition-colors"><span class="material-symbols-outlined text-[14px] mr-1 text-text-secondary">ios_share</span>导出</button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative pt-12 w-full bg-bg-canvas min-h-screen text-text-primary"><div class="flex flex-col w-full">
+<!-- SCRIPT: Navigation active state alignment -->
+<script>
+    (function () {
+      const links = document.querySelectorAll('aside nav a[data-path]');
+      links.forEach((link) => {
+        if (link.getAttribute('data-path') === 'panmian-overview') {
+          link.classList.add('bg-accent-dim', 'text-accent-active', 'font-medium');
+          link.classList.remove('text-text-secondary');
+          const icon = link.querySelector('.material-symbols-outlined');
+          if (icon) {
+            icon.classList.remove('text-text-tertiary');
+            icon.classList.add('text-accent-active');
+          }
+        } else {
+          link.classList.remove('bg-accent-dim', 'text-accent-active', 'font-medium');
+        }
+      });
+    })();
+  </script>
+<!-- 1. TOP METRIC STRIP (4-Column Strict Grid, Hairline Border Delineated) -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 bg-bg-canvas border-b border-border-hairline">
+<!-- METRIC 1 -->
+<div class="flex flex-col justify-between p-3.5 bg-bg-surface xl:border-r border-b xl:border-b-0 border-border-hairline hover:bg-bg-surface-hover transition-colors group">
+<div>
+<div class="flex items-center justify-between h-4">
+<span class="font-label-caps text-label-caps text-text-tertiary tracking-wider uppercase">在跟进机会 / TRACKED PIPELINE</span>
+<span class="font-label-code text-label-code text-accent-active bg-accent-dim px-1 py-0.5 rounded leading-none">+12.4% MoM</span>
+</div>
+<div class="mt-2.5 flex items-baseline gap-2">
+<span class="font-data-tabular-lg text-[40px] leading-none font-semibold text-text-primary tracking-tight">142</span>
+<span class="font-body-sm text-body-sm text-text-tertiary">标的席位</span>
+</div>
+</div>
+<div class="mt-3 w-full h-[38px] flex items-end">
+<svg class="w-full h-[36px] overflow-visible" preserveAspectRatio="none" viewBox="0 0 240 36">
+<path class="text-text-secondary group-hover:text-text-primary transition-colors" d="M0,28 Q30,24 60,20 T120,18 T180,9 T240,4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.2"></path>
+<circle class="fill-accent-active" cx="240" cy="4" r="2"></circle>
+<line class="text-border-hairline" stroke="currentColor" stroke-dasharray="2 2" stroke-width="0.75" x1="0" x2="240" y1="35" y2="35"></line>
+</svg>
+</div>
+</div>
+<!-- METRIC 2 -->
+<div class="flex flex-col justify-between p-3.5 bg-bg-surface xl:border-r border-b xl:border-b-0 border-border-hairline hover:bg-bg-surface-hover transition-colors group">
+<div>
+<div class="flex items-center justify-between h-4">
+<span class="font-label-caps text-label-caps text-text-tertiary tracking-wider uppercase">并购标的 / M&amp;A TARGETS</span>
+<span class="font-label-code text-label-code text-text-secondary bg-surface-variant/40 px-1 py-0.5 rounded leading-none">估值 ¥14.28B</span>
+</div>
+<div class="mt-2.5 flex items-baseline gap-2">
+<span class="font-data-tabular-lg text-[40px] leading-none font-semibold text-text-primary tracking-tight">24</span>
+<span class="font-body-sm text-body-sm text-text-tertiary">核心审计库</span>
+</div>
+</div>
+<div class="mt-3 w-full h-[38px] flex items-end">
+<svg class="w-full h-[36px] overflow-visible" preserveAspectRatio="none" viewBox="0 0 240 36">
+<path class="text-text-secondary group-hover:text-text-primary transition-colors" d="M0,30 L40,26 L80,27 L120,19 L160,15 L200,11 L240,6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.2"></path>
+<circle class="fill-text-primary" cx="240" cy="6" r="2"></circle>
+<line class="text-border-hairline" stroke="currentColor" stroke-dasharray="2 2" stroke-width="0.75" x1="0" x2="240" y1="35" y2="35"></line>
+</svg>
+</div>
+</div>
+<!-- METRIC 3 -->
+<div class="flex flex-col justify-between p-3.5 bg-bg-surface md:border-r border-b md:border-b-0 border-border-hairline hover:bg-bg-surface-hover transition-colors group">
+<div>
+<div class="flex items-start justify-between gap-1.5 min-h-[16px]"><span class="font-label-caps text-label-caps text-text-tertiary tracking-wider uppercase">白地品类 / GREENFIELD NICHES</span><span class="font-label-code text-label-code text-tertiary bg-tertiary/10 px-1.5 py-0.5 rounded leading-tight break-words text-right max-w-full">商业航天·半导体</span></div>
+<div class="mt-2.5 flex items-baseline gap-2">
+<span class="font-data-tabular-lg text-[40px] leading-none font-semibold text-text-primary tracking-tight">9</span>
+<span class="font-body-sm text-body-sm text-text-tertiary">无主力会展赛道</span>
+</div>
+</div>
+<div class="mt-3 w-full h-[38px] flex items-end">
+<svg class="w-full h-[36px] overflow-visible" preserveAspectRatio="none" viewBox="0 0 240 36">
+<path class="text-text-secondary group-hover:text-text-primary transition-colors" d="M0,22 L45,20 L90,24 L135,16 L180,18 L215,8 L240,10" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.2"></path>
+<circle class="fill-tertiary" cx="240" cy="10" r="2"></circle>
+<line class="text-border-hairline" stroke="currentColor" stroke-dasharray="2 2" stroke-width="0.75" x1="0" x2="240" y1="35" y2="35"></line>
+</svg>
+</div>
+</div>
+<!-- METRIC 4 -->
+<div class="flex flex-col justify-between p-3.5 bg-bg-surface hover:bg-bg-surface-hover transition-colors group">
+<div>
+<div class="flex items-center justify-between h-4">
+<span class="font-label-caps text-label-caps text-text-tertiary tracking-wider uppercase">本周待办 / ACTION SCHEDULE</span>
+<span class="font-label-code text-label-code text-error bg-error-container/30 px-1 py-0.5 rounded leading-none">逾期 2 · 今日 7</span>
+</div>
+<div class="mt-2.5 flex items-baseline gap-2">
+<span class="font-data-tabular-lg text-[40px] leading-none font-semibold text-text-primary tracking-tight">38</span>
+<span class="font-body-sm text-body-sm text-text-tertiary">决议动作</span>
+</div>
+</div>
+<div class="mt-3 w-full h-[38px] flex items-end">
+<svg class="w-full h-[36px] overflow-visible" preserveAspectRatio="none" viewBox="0 0 240 36">
+<path class="text-text-secondary group-hover:text-text-primary transition-colors" d="M0,32 L40,29 L75,20 L115,22 L160,12 L200,16 L240,5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.2"></path>
+<circle class="fill-error" cx="240" cy="5" r="2"></circle>
+<line class="text-border-hairline" stroke="currentColor" stroke-dasharray="2 2" stroke-width="0.75" x1="0" x2="240" y1="35" y2="35"></line>
+</svg>
+</div>
+</div>
+</div>
+<!-- 2. MAIN 2-COLUMN ASYMMETRIC SPLIT (62% LEFT / 38% RIGHT) -->
+<div class="grid grid-cols-1 lg:grid-cols-12 w-full border-b border-border-hairline">
+<!-- LEFT COLUMN: 本周待办 (62% -> lg:col-span-7 or 8; precision col-span-7.5 approximated via 7/12 & 5/12 grid or custom flex) -->
+<div class="lg:col-span-7 flex flex-col bg-bg-canvas border-b lg:border-b-0 lg:border-r border-border-hairline">
+<!-- Section Header Bar -->
+<div class="h-9 px-3.5 bg-bg-sidebar border-b border-border-hairline flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-text-primary">本周待办动作</span>
+<span class="font-label-code text-[11px] px-1.5 py-0.2 rounded bg-error-container/40 text-error border border-error/30 font-medium">10 宗急需处置</span>
+</div>
+<div class="flex flex-wrap items-center gap-1"><button class="h-5 px-2 rounded text-[11px] font-label-code bg-bg-surface text-text-primary border border-border-active">全部 (38)</button><button class="h-5 px-2 rounded text-[11px] font-label-code text-text-secondary hover:text-text-primary transition-colors">临期 (10)</button><button class="h-5 px-2 rounded text-[11px] font-label-code text-text-secondary hover:text-text-primary transition-colors">重点 P1</button></div>
+</div>
+<!-- Action Items Subheader Table Head -->
+<div class="h-6 px-3.5 bg-bg-surface flex items-center justify-between text-text-tertiary font-label-caps text-label-caps uppercase border-b border-border-hairline">
+<div class="w-24 shrink-0">排期 / DUE</div>
+<div class="flex-1 px-2 min-w-0">标的业务全称 / TARGET EVENT</div>
+<div class="w-36 shrink-0 text-left">节点任务 / TASK</div>
+<div class="w-14 shrink-0 text-center">阶段</div>
+<div class="w-10 shrink-0 text-right">负责人</div>
+</div>
+<!-- Compact List of 10 Actions (Height 34px-36px each) -->
+<div class="divide-y divide-border-hairline bg-bg-canvas font-body-sm text-body-sm">
+<!-- Item 1 -->
+<div class="h-[35px] px-3.5 flex items-center justify-between hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<span class="w-24 shrink-0 font-label-code text-error font-medium">04-18 14:00</span>
+<div class="flex-1 px-2 min-w-0 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-active shrink-0"></span>
+<span class="truncate text-text-primary group-hover:text-white transition-colors font-medium">2025 国际半导体先进进程博览会</span>
+</div>
+<span class="w-36 shrink-0 truncate font-label-code text-[11px] text-text-secondary">签署意向协议 (LOI)</span>
+<div class="w-14 shrink-0 flex items-center justify-center gap-0.5" title="阶段 3/5">
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+</div>
+<div class="w-10 shrink-0 flex justify-end">
+<span class="w-5 h-5 rounded-full bg-surface-variant text-[10px] font-medium text-text-secondary flex items-center justify-center border border-border-hairline">陈</span>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="h-[35px] px-3.5 flex items-center justify-between hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<span class="w-24 shrink-0 font-label-code text-error font-medium">04-18 17:30</span>
+<div class="flex-1 px-2 min-w-0 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-active shrink-0"></span>
+<span class="truncate text-text-primary group-hover:text-white transition-colors font-medium">亚太数字医疗器械巡展</span>
+</div>
+<span class="w-36 shrink-0 truncate font-label-code text-[11px] text-text-secondary">尽调财务复核</span>
+<div class="w-14 shrink-0 flex items-center justify-center gap-0.5" title="阶段 4/5">
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+</div>
+<div class="w-10 shrink-0 flex justify-end">
+<span class="w-5 h-5 rounded-full bg-surface-variant text-[10px] font-medium text-text-secondary flex items-center justify-center border border-border-hairline">宋</span>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="h-[35px] px-3.5 flex items-center justify-between hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<span class="w-24 shrink-0 font-label-code text-text-tertiary">04-19 10:00</span>
+<div class="flex-1 px-2 min-w-0 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-border-active shrink-0"></span>
+<span class="truncate text-text-primary group-hover:text-white transition-colors">华南工业智能制造技术展</span>
+</div>
+<span class="w-36 shrink-0 truncate font-label-code text-[11px] text-text-secondary">法务边界谈判</span>
+<div class="w-14 shrink-0 flex items-center justify-center gap-0.5" title="阶段 4/5">
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+</div>
+<div class="w-10 shrink-0 flex justify-end">
+<span class="w-5 h-5 rounded-full bg-surface-variant text-[10px] font-medium text-text-secondary flex items-center justify-center border border-border-hairline">顾</span>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="h-[35px] px-3.5 flex items-center justify-between hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<span class="w-24 shrink-0 font-label-code text-text-tertiary">04-19 14:30</span>
+<div class="flex-1 px-2 min-w-0 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-border-active shrink-0"></span>
+<span class="truncate text-text-primary group-hover:text-white transition-colors">新能源储能与电池应用展</span>
+</div>
+<span class="w-36 shrink-0 truncate font-label-code text-[11px] text-text-secondary">团队访谈纪要</span>
+<div class="w-14 shrink-0 flex items-center justify-center gap-0.5" title="阶段 2/5">
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+</div>
+<div class="w-10 shrink-0 flex justify-end">
+<span class="w-5 h-5 rounded-full bg-surface-variant text-[10px] font-medium text-text-secondary flex items-center justify-center border border-border-hairline">陆</span>
+</div>
+</div>
+<!-- Item 5 -->
+<div class="h-[35px] px-3.5 flex items-center justify-between hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<span class="w-24 shrink-0 font-label-code text-text-tertiary">04-20 09:30</span>
+<div class="flex-1 px-2 min-w-0 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-border-active shrink-0"></span>
+<span class="truncate text-text-primary group-hover:text-white transition-colors">全球冷链物流与跨境枢纽展</span>
+</div>
+<span class="w-36 shrink-0 truncate font-label-code text-[11px] text-text-secondary">西部展馆排期确认</span>
+<div class="w-14 shrink-0 flex items-center justify-center gap-0.5" title="阶段 3/5">
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+</div>
+<div class="w-10 shrink-0 flex justify-end">
+<span class="w-5 h-5 rounded-full bg-surface-variant text-[10px] font-medium text-text-secondary flex items-center justify-center border border-border-hairline">赵</span>
+</div>
+</div>
+<!-- Item 6 -->
+<div class="h-[35px] px-3.5 flex items-center justify-between hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<span class="w-24 shrink-0 font-label-code text-text-tertiary">04-20 16:00</span>
+<div class="flex-1 px-2 min-w-0 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-border-active shrink-0"></span>
+<span class="truncate text-text-primary group-hover:text-white transition-colors">全国商业航天与卫星通信展</span>
+</div>
+<span class="w-36 shrink-0 truncate font-label-code text-[11px] text-text-secondary">发函询价与对标</span>
+<div class="w-14 shrink-0 flex items-center justify-center gap-0.5" title="阶段 1/5">
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+</div>
+<div class="w-10 shrink-0 flex justify-end">
+<span class="w-5 h-5 rounded-full bg-surface-variant text-[10px] font-medium text-text-secondary flex items-center justify-center border border-border-hairline">周</span>
+</div>
+</div>
+<!-- Item 7 -->
+<div class="h-[35px] px-3.5 flex items-center justify-between hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<span class="w-24 shrink-0 font-label-code text-text-tertiary">04-21 11:00</span>
+<div class="flex-1 px-2 min-w-0 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-border-active shrink-0"></span>
+<span class="truncate text-text-primary group-hover:text-white transition-colors">国际智慧电力与电网互联峰会</span>
+</div>
+<span class="w-36 shrink-0 truncate font-label-code text-[11px] text-text-secondary">三年期营收测算</span>
+<div class="w-14 shrink-0 flex items-center justify-center gap-0.5" title="阶段 4/5">
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+</div>
+<div class="w-10 shrink-0 flex justify-end">
+<span class="w-5 h-5 rounded-full bg-surface-variant text-[10px] font-medium text-text-secondary flex items-center justify-center border border-border-hairline">陈</span>
+</div>
+</div>
+<!-- Item 8 -->
+<div class="h-[35px] px-3.5 flex items-center justify-between hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<span class="w-24 shrink-0 font-label-code text-text-tertiary">04-21 15:30</span>
+<div class="flex-1 px-2 min-w-0 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-border-active shrink-0"></span>
+<span class="truncate text-text-primary group-hover:text-white transition-colors">华东精细化工及表面活性剂博览</span>
+</div>
+<span class="w-36 shrink-0 truncate font-label-code text-[11px] text-text-secondary">股东背景核查</span>
+<div class="w-14 shrink-0 flex items-center justify-center gap-0.5" title="阶段 2/5">
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+</div>
+<div class="w-10 shrink-0 flex justify-end">
+<span class="w-5 h-5 rounded-full bg-surface-variant text-[10px] font-medium text-text-secondary flex items-center justify-center border border-border-hairline">宋</span>
+</div>
+</div>
+<!-- Item 9 -->
+<div class="h-[35px] px-3.5 flex items-center justify-between hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<span class="w-24 shrink-0 font-label-code text-text-tertiary">04-22 09:00</span>
+<div class="flex-1 px-2 min-w-0 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-border-active shrink-0"></span>
+<span class="truncate text-text-primary group-hover:text-white transition-colors">中南智能激光焊接与切割装备展</span>
+</div>
+<span class="w-36 shrink-0 truncate font-label-code text-[11px] text-text-secondary">商标争议澄清</span>
+<div class="w-14 shrink-0 flex items-center justify-center gap-0.5" title="阶段 3/5">
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-surface-variant"></span>
+</div>
+<div class="w-10 shrink-0 flex justify-end">
+<span class="w-5 h-5 rounded-full bg-surface-variant text-[10px] font-medium text-text-secondary flex items-center justify-center border border-border-hairline">顾</span>
+</div>
+</div>
+<!-- Item 10 -->
+<div class="h-[35px] px-3.5 flex items-center justify-between hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<span class="w-24 shrink-0 font-label-code text-text-tertiary">04-22 17:00</span>
+<div class="flex-1 px-2 min-w-0 flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full bg-border-active shrink-0"></span>
+<span class="truncate text-text-primary group-hover:text-white transition-colors">中国国际重型工程机械展</span>
+</div>
+<span class="w-36 shrink-0 truncate font-label-code text-[11px] text-text-secondary">室外展区扩容论证</span>
+<div class="w-14 shrink-0 flex items-center justify-center gap-0.5" title="阶段 5/5">
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+<span class="w-1.5 h-2 rounded-[0.5px] bg-accent-active"></span>
+</div>
+<div class="w-10 shrink-0 flex justify-end">
+<span class="w-5 h-5 rounded-full bg-surface-variant text-[10px] font-medium text-text-secondary flex items-center justify-center border border-border-hairline">陆</span>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT COLUMN: 最近调研 (38% -> lg:col-span-5) -->
+<div class="lg:col-span-5 flex flex-col bg-bg-canvas">
+<!-- Section Header Bar -->
+<div class="h-9 px-3.5 bg-bg-sidebar border-b border-border-hairline flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-text-primary">最近尽调与研报</span>
+<span class="font-label-code text-[11px] text-text-tertiary">5 份已签署归档</span>
+</div>
+<a class="font-label-code text-label-code text-text-secondary hover:text-accent-active flex items-center gap-1 transition-colors" href="#">
+          查看调研库
+          <span class="material-symbols-outlined text-[12px]">arrow_forward</span>
+</a>
+</div>
+<!-- 5 Analytical Report Cards with Strict Hairlines -->
+<div class="divide-y divide-border-hairline bg-bg-canvas">
+<!-- Report Entry 1 -->
+<div class="p-3 hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<div class="flex items-center justify-between gap-2 leading-tight">
+<div class="flex items-center gap-2 min-w-0">
+<span class="font-body-md text-body-md font-semibold text-text-primary truncate group-hover:text-accent-active transition-colors">华创展览科技 (上海)</span>
+<span class="font-label-code text-[10px] px-1.5 py-0.5 rounded bg-accent-dim text-accent-active border border-accent-active/20 shrink-0">财务深度尽调</span>
+</div>
+<span class="font-data-tabular text-[11px] text-text-tertiary shrink-0">04-17 09:20</span>
+</div>
+<p class="mt-1.5 text-[12px] leading-relaxed text-text-secondary line-clamp-3 font-body-sm">
+            EBIT Margin 持续稳定在 31.4%，但展位平方净留存率自 88% 回调至 79.2%。重点风险集中在华东地方性政府会展定向补贴的政策性退坡，需在对赌条款中附加净利润兜底协议。
+          </p>
+</div>
+<!-- Report Entry 2 -->
+<div class="p-3 hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<div class="flex items-center justify-between gap-2 leading-tight">
+<div class="flex items-center gap-2 min-w-0">
+<span class="font-body-md text-body-md font-semibold text-text-primary truncate group-hover:text-accent-active transition-colors">新博会展集团</span>
+<span class="font-label-code text-[10px] px-1.5 py-0.5 rounded bg-surface-variant/50 text-text-secondary shrink-0">竞争壁垒审计</span>
+</div>
+<span class="font-data-tabular text-[11px] text-text-tertiary shrink-0">04-16 16:45</span>
+</div>
+<p class="mt-1.5 text-[12px] leading-relaxed text-text-secondary line-clamp-3 font-body-sm">
+            其拥有的华南唯一 12 万平米重载地坪排期掌控权构成强防御护城河；复展客户占比 84%，客单价同比微升 4.2%。潜在隐患为管理团队二代接班不确定性及高管持股比例分散。
+          </p>
+</div>
+<!-- Report Entry 3 -->
+<div class="p-3 hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<div class="flex items-center justify-between gap-2 leading-tight">
+<div class="flex items-center gap-2 min-w-0">
+<span class="font-body-md text-body-md font-semibold text-text-primary truncate group-hover:text-accent-active transition-colors">博览天下传媒</span>
+<span class="font-label-code text-[10px] px-1.5 py-0.5 rounded bg-surface-variant/50 text-text-secondary shrink-0">展位销售率抽查</span>
+</div>
+<span class="font-data-tabular text-[11px] text-text-tertiary shrink-0">04-15 11:15</span>
+</div>
+<p class="mt-1.5 text-[12px] leading-relaxed text-text-secondary line-clamp-3 font-body-sm">
+            核验合同 420 份，现场实销率 91.8%，未见虚假挂单痕迹。特装展位溢价水平超出行业基准 18%，但海外展商邀约受到签证审批周期拉长影响，需跟踪第四季度国际展商定金结算。
+          </p>
+</div>
+<!-- Report Entry 4 -->
+<div class="p-3 hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<div class="flex items-center justify-between gap-2 leading-tight">
+<div class="flex items-center gap-2 min-w-0">
+<span class="font-body-md text-body-md font-semibold text-text-primary truncate group-hover:text-accent-active transition-colors">蓝海联合会展</span>
+<span class="font-label-code text-[10px] px-1.5 py-0.5 rounded bg-surface-variant/50 text-text-secondary shrink-0">历史客商留存核验</span>
+</div>
+<span class="font-data-tabular text-[11px] text-text-tertiary shrink-0">04-14 14:02</span>
+</div>
+<p class="mt-1.5 text-[12px] leading-relaxed text-text-secondary line-clamp-3 font-body-sm">
+            专业买家数据库 24.6 万条，有效触达率 62.1%。近三年跨行业流失率由 9% 爬升至 14%，主因下游电子元器件去库存导致中小参展商预算收窄，建议调减并购估值乘数至 6.8x EV/EBITDA。
+          </p>
+</div>
+<!-- Report Entry 5 -->
+<div class="p-3 hover:bg-bg-surface-hover transition-colors group cursor-pointer">
+<div class="flex items-center justify-between gap-2 leading-tight">
+<div class="flex items-center gap-2 min-w-0">
+<span class="font-body-md text-body-md font-semibold text-text-primary truncate group-hover:text-accent-active transition-colors">国展东方实业</span>
+<span class="font-label-code text-[10px] px-1.5 py-0.5 rounded bg-surface-variant/50 text-text-secondary shrink-0">团队股权结构剖析</span>
+</div>
+<span class="font-data-tabular text-[11px] text-text-tertiary shrink-0">04-13 18:30</span>
+</div>
+<p class="mt-1.5 text-[12px] leading-relaxed text-text-secondary line-clamp-3 font-body-sm">
+            核心创办人持股 58.2%，合伙人平台预留 15% 期权池。未发现隐性代持协议或对外担保连带责任。建议在并购框架中设置不少于 36 个月的锁定期及竞业禁止兜底条款。
+          </p>
+</div>
+</div>
+</div>
+</div>
+<!-- 3. FULL-WIDTH HORIZONTAL STAGE-FUNNEL (BOTTOM PIPELINE DYNAMICS) -->
+<div class="w-full bg-bg-surface flex flex-col">
+<!-- Funnel Header -->
+<div class="h-9 px-3.5 bg-bg-sidebar border-b border-border-hairline flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="font-headline-md text-headline-md text-text-primary">机会阶段流转分布 (M&amp;A Pipeline Stage Funnel)</span>
+<span class="h-3 mx-1 border-l border-border-hairline"></span>
+<span class="font-label-code text-[11px] text-text-secondary">142 宗在库机会 · 行业转化周期均值 42 天</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-[1px] bg-accent-active"></span>
+<span class="font-label-caps text-[10px] text-text-secondary uppercase">审计堵点阶段 (Bottleneck)</span>
+</div>
+</div>
+</div>
+<!-- Funnel Visualization Canvas -->
+<div class="p-3.5 flex flex-col gap-3">
+<!-- Proportional Segmented Horizontal Bar -->
+<div class="w-full h-8 flex rounded-[2px] overflow-hidden border border-border-hairline p-0.5 bg-bg-canvas gap-0.5">
+<!-- Stage 1: 初步接触 (34%) -->
+<div class="h-full bg-surface-variant/70 hover:bg-surface-variant transition-colors flex items-center justify-between px-2 text-text-secondary group relative" style="width: 33.8%;">
+<span class="font-label-code text-[11px] font-medium text-text-primary truncate">1. 初步接触</span>
+<span class="font-data-tabular text-[11px] text-text-tertiary">48 宗 (34%)</span>
+</div>
+<!-- Stage 2: 意向签署 (25%) -->
+<div class="h-full bg-surface-variant/90 hover:bg-surface-bright transition-colors flex items-center justify-between px-2 text-text-secondary group relative" style="width: 25.3%;">
+<span class="font-label-code text-[11px] font-medium text-text-primary truncate">2. 意向签署 (LOI)</span>
+<span class="font-data-tabular text-[11px] text-text-tertiary">36 宗 (25%)</span>
+</div>
+<!-- Stage 3: 尽调审计 (20%) - HIGHLIGHTED BOTTLENECK -->
+<div class="h-full bg-accent-dim border border-accent-active/40 hover:bg-accent-active/20 transition-colors flex items-center justify-between px-2 text-accent-active relative" style="width: 19.7%;">
+<span class="font-label-code text-[11px] font-semibold text-accent-active truncate flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-active animate-ping"></span>
+            3. 尽调审计
+          </span>
+<span class="font-data-tabular text-[11px] font-semibold text-accent-active">28 宗 (20%)</span>
+</div>
+<!-- Stage 4: 协议交割 (13%) -->
+<div class="h-full bg-surface-bright hover:bg-surface-bright/80 transition-colors flex items-center justify-between px-2 text-text-secondary group relative" style="width: 12.7%;">
+<span class="font-label-code text-[11px] font-medium text-text-primary truncate">4. 协议交割</span>
+<span class="font-data-tabular text-[11px] text-text-tertiary">18 宗 (13%)</span>
+</div>
+<!-- Stage 5: 投后整合 (8%) -->
+<div class="h-full bg-border-active hover:bg-white/20 transition-colors flex items-center justify-between px-2 text-text-secondary group relative" style="width: 8.5%;">
+<span class="font-label-code text-[11px] font-medium text-text-primary truncate">5. 投后整合</span>
+<span class="font-data-tabular text-[11px] text-text-tertiary">12 宗</span>
+</div>
+</div>
+<!-- Funnel Metrics & Stage Dwell Time Metadata Breakdown -->
+<div class="grid grid-cols-2 md:grid-cols-5 gap-2 pt-1 font-label-code text-[11px]">
+<!-- Stage 1 Meta -->
+<div class="p-2 rounded bg-bg-canvas border border-border-hairline flex flex-col justify-between">
+<div class="flex items-center justify-between text-text-tertiary">
+<span class="">初步接触</span>
+<span class="text-text-secondary">48 项</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="text-text-tertiary text-[10px]">均值驻留:</span>
+<span class="text-text-primary font-data-tabular">12 天</span>
+</div>
+<div class="flex items-baseline justify-between text-[10px]">
+<span class="text-text-tertiary">转化率:</span>
+<span class="text-text-secondary font-data-tabular">75.0%</span>
+</div>
+</div>
+<!-- Stage 2 Meta -->
+<div class="p-2 rounded bg-bg-canvas border border-border-hairline flex flex-col justify-between">
+<div class="flex items-center justify-between text-text-tertiary">
+<span class="">意向签署 (LOI)</span>
+<span class="text-text-secondary">36 项</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="text-text-tertiary text-[10px]">均值驻留:</span>
+<span class="text-text-primary font-data-tabular">14 天</span>
+</div>
+<div class="flex items-baseline justify-between text-[10px]">
+<span class="text-text-tertiary">转化率:</span>
+<span class="text-text-secondary font-data-tabular">77.8%</span>
+</div>
+</div>
+<!-- Stage 3 Meta (Bottleneck Callout) -->
+<div class="p-2 rounded bg-accent-dim/40 border border-accent-active/30 flex flex-col justify-between">
+<div class="flex items-center justify-between text-accent-active font-medium">
+<span class="">尽调审计 (堵点)</span>
+<span class="text-accent-active">28 项</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="text-text-secondary text-[10px]">均值驻留:</span>
+<span class="text-error font-data-tabular font-medium">21 天 ⚠️</span>
+</div>
+<div class="flex items-baseline justify-between text-[10px]">
+<span class="text-text-secondary">转化率:</span>
+<span class="text-accent-active font-data-tabular">64.2%</span>
+</div>
+</div>
+<!-- Stage 4 Meta -->
+<div class="p-2 rounded bg-bg-canvas border border-border-hairline flex flex-col justify-between">
+<div class="flex items-center justify-between text-text-tertiary">
+<span class="">协议交割</span>
+<span class="text-text-secondary">18 项</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="text-text-tertiary text-[10px]">均值驻留:</span>
+<span class="text-text-primary font-data-tabular">8 天</span>
+</div>
+<div class="flex items-baseline justify-between text-[10px]">
+<span class="text-text-tertiary">转化率:</span>
+<span class="text-text-secondary font-data-tabular">66.7%</span>
+</div>
+</div>
+<!-- Stage 5 Meta -->
+<div class="p-2 rounded bg-bg-canvas border border-border-hairline flex flex-col justify-between">
+<div class="flex items-center justify-between text-text-tertiary">
+<span class="">投后整合</span>
+<span class="text-text-secondary">12 项</span>
+</div>
+<div class="mt-1 flex items-baseline justify-between">
+<span class="text-text-tertiary text-[10px]">并表运营:</span>
+<span class="text-text-primary font-data-tabular">稳态</span>
+</div>
+<div class="flex items-baseline justify-between text-[10px]">
+<span class="text-text-tertiary">周期复盘:</span>
+<span class="text-emerald-500 font-data-tabular">按计划</span>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div></main></div>
+
+</body></html>

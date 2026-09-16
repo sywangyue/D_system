@@ -1,0 +1,1085 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "on-secondary-container": "#ff9c75",
+        "surface-tint": "#ffb599",
+        "on-secondary-fixed": "#370e00",
+        "surface-container": "#201f20",
+        "on-error-container": "#ffdad6",
+        "text-secondary": "#8A8A93",
+        "secondary-container": "#7e2c05",
+        "accent-active": "#FE5C00",
+        "bg-surface": "#141416",
+        "secondary": "#ffb599",
+        "surface-container-highest": "#353436",
+        "surface-variant": "#353436",
+        "border-active": "rgba(255, 255, 255, 0.14)",
+        "bg-sidebar": "#0E0E10",
+        "inverse-primary": "#a73a00",
+        "text-primary": "#F5F5F7",
+        "on-tertiary-fixed": "#001c37",
+        "outline": "#ab897d",
+        "surface-bright": "#3a393a",
+        "border-hairline": "rgba(255, 255, 255, 0.07)",
+        "on-tertiary-fixed-variant": "#00497e",
+        "accent-dim": "rgba(254, 92, 0, 0.12)",
+        "tertiary": "#a0caff",
+        "background": "#131314",
+        "accent-hover": "#FF7324",
+        "inverse-on-surface": "#313031",
+        "on-background": "#e5e2e3",
+        "on-secondary-fixed-variant": "#7e2c05",
+        "primary-fixed": "#ffdbce",
+        "on-tertiary-container": "#002d51",
+        "tertiary-container": "#0096fc",
+        "bg-canvas": "#0A0A0B",
+        "on-primary-fixed": "#370e00",
+        "surface-container-low": "#1c1b1c",
+        "on-secondary": "#5a1b00",
+        "tertiary-fixed": "#d2e4ff",
+        "error": "#ffb4ab",
+        "on-primary-fixed-variant": "#802a00",
+        "primary-container": "#fe5c00",
+        "tertiary-fixed-dim": "#a0caff",
+        "secondary-fixed-dim": "#ffb599",
+        "text-tertiary": "#52525A",
+        "inverse-surface": "#e5e2e3",
+        "bg-surface-elevated": "#1A1A1E",
+        "secondary-fixed": "#ffdbce",
+        "on-tertiary": "#003259",
+        "primary": "#ffb599",
+        "surface": "#131314",
+        "primary-fixed-dim": "#ffb599",
+        "outline-variant": "#5b4137",
+        "surface-container-high": "#2a2a2b",
+        "error-container": "#93000a",
+        "surface-container-lowest": "#0e0e0f",
+        "on-surface-variant": "#e4beb1",
+        "on-primary": "#5a1b00",
+        "on-primary-container": "#511800",
+        "on-surface": "#e5e2e3",
+        "surface-dim": "#131314",
+        "on-error": "#690005",
+        "bg-surface-hover": "#1F1F24"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.125rem",
+        "lg": "0.25rem",
+        "xl": "0.5rem",
+        "full": "0.75rem"
+      },
+      "spacing": {
+        "margin": "1rem",
+        "space-sm": "0.375rem",
+        "space-md": "0.5rem",
+        "gutter": "0.75rem",
+        "space-2xs": "0.125rem",
+        "space-xl": "1rem",
+        "space-2xl": "1.5rem",
+        "space-lg": "0.75rem",
+        "space-xs": "0.25rem"
+      },
+      "fontFamily": {
+        "data-tabular": [
+          "JetBrains Mono"
+        ],
+        "data-tabular-lg": [
+          "JetBrains Mono"
+        ],
+        "body-sm": [
+          "Geist"
+        ],
+        "headline-lg": [
+          "Geist"
+        ],
+        "body-md": [
+          "Geist"
+        ],
+        "headline-md": [
+          "Geist"
+        ],
+        "headline-xl": [
+          "Geist"
+        ],
+        "label-caps": [
+          "Geist"
+        ],
+        "label-code": [
+          "JetBrains Mono"
+        ]
+      },
+      "fontSize": {
+        "data-tabular": [
+          "12px",
+          {
+            "lineHeight": "16px",
+            "letterSpacing": "-0.01em",
+            "fontWeight": "400"
+          }
+        ],
+        "data-tabular-lg": [
+          "16px",
+          {
+            "lineHeight": "20px",
+            "letterSpacing": "-0.02em",
+            "fontWeight": "500"
+          }
+        ],
+        "body-sm": [
+          "12px",
+          {
+            "lineHeight": "16px",
+            "letterSpacing": "0",
+            "fontWeight": "400"
+          }
+        ],
+        "headline-lg": [
+          "18px",
+          {
+            "lineHeight": "24px",
+            "letterSpacing": "-0.015em",
+            "fontWeight": "600"
+          }
+        ],
+        "body-md": [
+          "13px",
+          {
+            "lineHeight": "18px",
+            "letterSpacing": "-0.005em",
+            "fontWeight": "400"
+          }
+        ],
+        "headline-md": [
+          "15px",
+          {
+            "lineHeight": "20px",
+            "letterSpacing": "-0.01em",
+            "fontWeight": "500"
+          }
+        ],
+        "headline-xl": [
+          "24px",
+          {
+            "lineHeight": "32px",
+            "letterSpacing": "-0.02em",
+            "fontWeight": "600"
+          }
+        ],
+        "label-caps": [
+          "10px",
+          {
+            "lineHeight": "12px",
+            "letterSpacing": "0.06em",
+            "fontWeight": "600"
+          }
+        ],
+        "label-code": [
+          "11px",
+          {
+            "lineHeight": "14px",
+            "letterSpacing": "0.02em",
+            "fontWeight": "500"
+          }
+        ]
+      }
+    }
+  }
+};</script></head><body class="bg-bg-canvas text-text-primary antialiased select-none"><aside class="fixed left-0 top-0 h-full w-[200px] bg-bg-sidebar border-r border-border-hairline z-50 flex flex-col justify-between"><div class="flex flex-col"><div class="h-12 px-4 flex items-center border-b border-border-hairline"><div class="flex items-center tracking-tight leading-none"><span class="text-[14px] text-text-primary tracking-normal"><span class="font-bold">万</span><span class="font-medium">象</span></span><div class="h-3.5 mx-2 border-l border-white/20"></div><span class="text-[11px] font-headline-md text-text-secondary tracking-widest font-mono">MWLAB</span></div></div><nav class="flex flex-col py-2 px-1.5 space-y-0.5" data-active-classes="bg-accent-dim text-accent-active border-l-2 border-accent-active font-medium"><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="panmian-overview" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">dashboard</span>盘面</a><a aria-current="page" class="flex items-center h-8 px-2.5 rounded transition-colors bg-accent-dim text-accent-active border-l-2 border-accent-active font-medium" data-path="jihuitai-pipeline" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">conversion_path</span>机会台</a><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="gongsiku-company-base" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">corporate_fare</span>公司库</a><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="diaoyanku-research-dd" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">folder_managed</span>调研库</a><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="zhanhuiditu-master-map" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">map</span>展会底图</a></nav></div><div class="p-1.5 border-t border-border-hairline"><nav class="flex flex-col" data-active-classes="bg-accent-dim text-accent-active border-l-2 border-accent-active font-medium"><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="shezhi-settings" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">settings</span>设置</a></nav></div></aside><div class="pl-[200px]"><header class="fixed top-0 left-[200px] right-0 h-12 bg-bg-canvas border-b border-border-hairline z-40 px-4 flex items-center justify-between"><div class="flex items-center gap-1.5 text-body-sm font-body-sm"><span class="text-text-secondary">机会台</span><span class="text-text-tertiary text-[11px]">/</span><span class="text-text-primary font-medium">并购标的</span></div><div class="flex-1 max-w-md mx-6"><div class="relative flex items-center h-7 bg-bg-sidebar border border-border-hairline rounded px-2.5 focus-within:border-text-secondary transition-colors"><span class="material-symbols-outlined text-text-tertiary text-[15px] mr-2">search</span><input class="w-full bg-transparent text-text-primary placeholder-text-tertiary text-body-sm font-body-sm outline-none border-none" placeholder="搜索机会、公司、报告…" type="text"/><div class="flex items-center ml-2 px-1 py-0.5 rounded bg-surface-variant/40 border border-border-hairline text-text-tertiary text-[10px] font-label-code leading-none">⌘K</div></div></div><div class="flex items-center gap-3"><div class="flex items-center gap-1.5 px-2 py-1 rounded bg-bg-sidebar border border-border-hairline"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span class="text-[11px] font-label-code text-text-secondary leading-none">实时同步 99.8%</span></div><button class="flex items-center h-7 px-2.5 rounded bg-bg-surface border border-border-hairline text-body-sm font-body-sm text-text-primary hover:bg-bg-surface-hover hover:border-border-active transition-colors"><span class="material-symbols-outlined text-[14px] mr-1 text-text-secondary">ios_share</span>导出</button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative pt-12 w-full bg-bg-canvas min-h-screen text-text-primary"><div class="flex flex-col w-full">
+<!-- Command Header Strip -->
+<section class="w-full bg-bg-surface border-b border-border-hairline px-4 py-3 flex items-center justify-between">
+<div class="flex items-baseline gap-3">
+<h1 class="font-headline-lg text-headline-lg text-text-primary tracking-tight font-medium">机会台</h1>
+<span class="font-label-code text-label-code text-text-tertiary tracking-normal px-1.5 py-0.5 bg-surface-container-lowest border border-border-hairline">
+        24 宗活跃标的 / 实时监视
+      </span>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex items-center gap-1.5 mr-2">
+<button class="h-7 px-2.5 bg-surface-container-low border border-border-hairline hover:bg-bg-surface-hover hover:border-border-active text-text-secondary hover:text-text-primary text-body-sm font-body-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">file_download</span>
+<span>导出 CSV</span>
+</button>
+<button class="h-7 px-2.5 bg-surface-container-low border border-border-hairline hover:bg-bg-surface-hover hover:border-border-active text-text-secondary hover:text-text-primary text-body-sm font-body-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">tune</span>
+<span>视图配置</span>
+</button>
+<button class="h-7 px-2.5 bg-surface-container-low border border-border-hairline hover:bg-bg-surface-hover hover:border-border-active text-text-secondary hover:text-text-primary text-body-sm font-body-sm transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[13px]">filter_list</span>
+<span>列过滤</span>
+</button>
+</div>
+<button class="h-7 px-3 bg-accent-active hover:bg-accent-hover text-bg-canvas font-medium text-body-sm font-body-sm tracking-wide transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px] font-bold">add</span>
+<span>录入机会</span>
+</button>
+</div>
+</section>
+<!-- Segmented Navigation Row -->
+<section class="w-full bg-bg-sidebar border-b border-border-hairline px-4 flex items-center justify-between">
+<div class="flex items-center gap-6">
+<button class="relative py-2 text-body-md font-body-md text-text-primary font-medium border-b-2 border-accent-active">
+        并购标的
+        <span class="ml-1.5 font-label-code text-label-code text-accent-active font-normal">24</span>
+</button>
+<button class="relative py-2 text-body-md font-body-md text-text-secondary hover:text-text-primary transition-colors border-b-2 border-transparent">
+        全新品类
+        <span class="ml-1.5 font-label-code text-label-code text-text-tertiary">9</span>
+</button>
+<button class="relative py-2 text-body-md font-body-md text-text-secondary hover:text-text-primary transition-colors border-b-2 border-transparent">
+        项目组支持
+        <span class="ml-1.5 font-label-code text-label-code text-text-tertiary">15</span>
+</button>
+</div>
+<div class="flex items-center gap-4 text-label-code font-label-code text-text-tertiary">
+<span>基准汇率: <span class="text-text-secondary">USD/CNY 7.2405</span></span>
+<span>•</span>
+<span>标的底稿加密级别: <span class="text-text-secondary">CONFIDENTIAL-L2</span></span>
+</div>
+</section>
+<!-- Multi-dimension Filter Strip -->
+<section class="w-full bg-bg-surface border-b border-border-hairline px-4 py-2 flex items-center justify-between">
+<div class="flex items-center gap-1.5 flex-wrap">
+<button class="h-6 px-2 bg-surface-container-lowest border border-border-hairline text-text-secondary hover:border-border-active hover:text-text-primary text-body-sm font-body-sm flex items-center gap-1">
+<span class="text-text-tertiary">阶段:</span> 全部
+        <span class="material-symbols-outlined text-[12px] text-text-tertiary">arrow_drop_down</span>
+</button>
+<button class="h-6 px-2 bg-surface-container-lowest border border-border-hairline text-text-secondary hover:border-border-active hover:text-text-primary text-body-sm font-body-sm flex items-center gap-1">
+<span class="text-text-tertiary">规模:</span> ≥20,000㎡
+        <span class="material-symbols-outlined text-[12px] text-text-tertiary">arrow_drop_down</span>
+</button>
+<button class="h-6 px-2 bg-surface-container-lowest border border-border-hairline text-text-secondary hover:border-border-active hover:text-text-primary text-body-sm font-body-sm flex items-center gap-1">
+<span class="text-text-tertiary">区域:</span> 华东/华南
+        <span class="material-symbols-outlined text-[12px] text-text-tertiary">arrow_drop_down</span>
+</button>
+<button class="h-6 px-2 bg-surface-container-lowest border border-border-hairline text-text-secondary hover:border-border-active hover:text-text-primary text-body-sm font-body-sm flex items-center gap-1">
+<span class="text-text-tertiary">优先级:</span> P1-P2
+        <span class="material-symbols-outlined text-[12px] text-text-tertiary">arrow_drop_down</span>
+</button>
+<button class="h-6 px-2 bg-surface-container-lowest border border-border-hairline text-text-secondary hover:border-border-active hover:text-text-primary text-body-sm font-body-sm flex items-center gap-1">
+<span class="text-text-tertiary">对标类型:</span> 工业/科技
+        <span class="material-symbols-outlined text-[12px] text-text-tertiary">arrow_drop_down</span>
+</button>
+<button class="h-6 px-2 border border-border-hairline text-text-tertiary hover:text-text-secondary hover:border-border-active text-body-sm font-body-sm flex items-center gap-1 ml-1">
+<span class="material-symbols-outlined text-[12px]">refresh</span>
+<span>重置筛选</span>
+</button>
+</div>
+<div class="flex items-center text-label-code font-label-code text-text-tertiary gap-2 shrink-0">
+<span>总标的估算规模: <span class="text-text-primary font-medium font-data-tabular">1,428,000 ㎡</span></span>
+<span class="text-border-hairline">|</span>
+<span>平均推进周期: <span class="text-text-primary font-medium font-data-tabular">42 天</span></span>
+</div>
+</section>
+<!-- Dense Data Workstation Table -->
+<main class="w-full bg-bg-canvas px-4 py-3">
+<div class="w-full border border-border-hairline bg-surface-container-lowest overflow-x-auto">
+<table class="w-full text-left border-collapse min-w-[1360px]">
+<thead>
+<tr class="h-8 bg-surface-container border-b border-border-hairline text-text-tertiary font-label-caps text-label-caps select-none">
+<th class="px-3 font-semibold text-text-secondary w-[230px]">机会名称</th>
+<th class="px-2 font-semibold text-text-secondary w-[90px]">类型</th>
+<th class="px-2 font-semibold text-text-secondary w-[130px]">阶段</th>
+<th class="px-2 font-semibold text-text-secondary w-[110px]">对标MD品牌</th>
+<th class="px-2 font-semibold text-text-secondary w-[140px]">关联公司</th>
+<th class="px-2 font-semibold text-text-secondary w-[60px]">城市</th>
+<th class="px-3 font-semibold text-text-secondary text-right w-[95px]">规模(㎡)</th>
+<th class="px-2 font-semibold text-text-secondary w-[80px]">优先级</th>
+<th class="px-2 font-semibold text-text-secondary w-[75px]">负责人</th>
+<th class="px-3 font-semibold text-text-secondary w-[210px]">下一步</th>
+<th class="px-3 font-semibold text-text-secondary text-right w-[140px]">更新时间</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-hairline text-body-md font-body-md">
+<!-- Row 1 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">2025 国际半导体先进制程博览会</td>
+<td class="px-2 py-1.5 text-text-secondary">控股并购</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-accent-active"></div>
+<div class="w-2 h-1 bg-accent-active"></div>
+<div class="w-2 h-1 bg-accent-active"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">3/5 意向</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">Electronica</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">华创展览科技(上海)</td>
+<td class="px-2 py-1.5 text-text-secondary">上海</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">85,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-accent-active">■■■■■</span></td>
+<td class="px-2 py-1.5 text-text-primary">陈立衡</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">签署估值排他意向书 (LOI)</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-24 16:40</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">亚太数字医疗器械巡展</td>
+<td class="px-2 py-1.5 text-text-secondary">少数股权</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">2/5 DD</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">CMEF</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">新博会展集团</td>
+<td class="px-2 py-1.5 text-text-secondary">深圳</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">120,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-primary">■■■■</span><span class="text-surface-variant">□</span></td>
+<td class="px-2 py-1.5 text-text-primary">宋子乔</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">完成Q3主办方审计底稿梳理</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-24 14:15</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">华南工业智能制造技术展</td>
+<td class="px-2 py-1.5 text-text-secondary">独家商业承办</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-accent-active"></div>
+<div class="w-2 h-1 bg-accent-active"></div>
+<div class="w-2 h-1 bg-accent-active"></div>
+<div class="w-2 h-1 bg-accent-active"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">4/5 审计</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">Hannover</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">博览天下传媒</td>
+<td class="px-2 py-1.5 text-text-secondary">广州</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">62,500</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-accent-active">■■■■■</span></td>
+<td class="px-2 py-1.5 text-text-primary">顾言风</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">法务合规备忘录第二轮审查</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-24 11:20</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">新能源储能与电池应用展</td>
+<td class="px-2 py-1.5 text-text-secondary">控股并购</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">1/5 接洽</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">SNEC PV</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">蓝海联合会展</td>
+<td class="px-2 py-1.5 text-text-secondary">上海</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">210,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-primary">■■■■</span><span class="text-surface-variant">□</span></td>
+<td class="px-2 py-1.5 text-text-primary">陆明德</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">团队管理层闭门访谈</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-23 18:05</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 5 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">全球冷链物流与跨境枢纽展</td>
+<td class="px-2 py-1.5 text-text-secondary">品牌收购</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">3/5 意向</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">CeMAT</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">国展东方</td>
+<td class="px-2 py-1.5 text-text-secondary">成都</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">45,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-secondary">■■■</span><span class="text-surface-variant">□□</span></td>
+<td class="px-2 py-1.5 text-text-primary">赵以诺</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">西部博览城2026馆期锁定</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-23 15:30</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 6 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">全国商业航天与卫星通信展</td>
+<td class="px-2 py-1.5 text-text-secondary">联营孵化</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">1/5 接洽</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">SpaceTech</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">航天科工数字</td>
+<td class="px-2 py-1.5 text-text-secondary">北京</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">38,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-primary">■■■■</span><span class="text-surface-variant">□</span></td>
+<td class="px-2 py-1.5 text-text-primary">周文瑄</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">发改与航天主管部门批复征询</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-23 12:10</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 7 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">国际智慧电力与电网互联峰会</td>
+<td class="px-2 py-1.5 text-text-secondary">控股并购</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">2/5 DD</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">EP China</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">经纬会展股份</td>
+<td class="px-2 py-1.5 text-text-secondary">上海</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">72,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-secondary">■■■</span><span class="text-surface-variant">□□</span></td>
+<td class="px-2 py-1.5 text-text-primary">陈立衡</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">三年前二十大展商复购率核实</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-23 09:45</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 8 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">华东精细化工及表面活性剂博览</td>
+<td class="px-2 py-1.5 text-text-secondary">少数股权</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">4/5 审计</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">CPHI China</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">恒合展览科技</td>
+<td class="px-2 py-1.5 text-text-secondary">杭州</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">54,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-accent-active">■■■■■</span></td>
+<td class="px-2 py-1.5 text-text-primary">顾言风</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">股东大会关联交易清理条款</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-22 17:15</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 9 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">国际消费电子元器件交易会</td>
+<td class="px-2 py-1.5 text-text-secondary">独家商业承办</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">1/5 接洽</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">CES Asia</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">深港国际联展</td>
+<td class="px-2 py-1.5 text-text-secondary">深圳</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">92,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-secondary">■■■</span><span class="text-surface-variant">□□</span></td>
+<td class="px-2 py-1.5 text-text-primary">宋子乔</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">海外协会联合署名意愿摸底</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-22 14:00</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 10 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">中南智能激光焊接与切削装备展</td>
+<td class="px-2 py-1.5 text-text-secondary">品牌收购</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">5/5 交割</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">LASER World</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">光谷科创会展</td>
+<td class="px-2 py-1.5 text-text-secondary">武汉</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">35,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-primary">■■■■</span><span class="text-surface-variant">□</span></td>
+<td class="px-2 py-1.5 text-text-primary">赵以诺</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">商标权证与软著官方变更过户</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-22 10:20</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 11 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">大湾区合成生物学与生物制造展</td>
+<td class="px-2 py-1.5 text-text-secondary">联营孵化</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">2/5 DD</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">BIO China</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">前海科展投资</td>
+<td class="px-2 py-1.5 text-text-secondary">深圳</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">28,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-secondary">■■■</span><span class="text-surface-variant">□□</span></td>
+<td class="px-2 py-1.5 text-text-primary">周文瑄</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">核实科学家顾问委员会独家协议</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-21 16:50</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 12 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">中国国际重型工程机械展</td>
+<td class="px-2 py-1.5 text-text-secondary">控股并购</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">3/5 意向</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">Bauma China</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">重工汇展联合</td>
+<td class="px-2 py-1.5 text-text-secondary">上海</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">160,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-accent-active">■■■■■</span></td>
+<td class="px-2 py-1.5 text-text-primary">陈立衡</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">室外重型场地载荷认证复验</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-21 14:10</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 13 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">华北水处理及工业膜技术大会</td>
+<td class="px-2 py-1.5 text-text-secondary">少数股权</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">1/5 接洽</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">Aquatech</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">环球北方展览</td>
+<td class="px-2 py-1.5 text-text-secondary">北京</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">32,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-secondary">■■</span><span class="text-surface-variant">□□□</span></td>
+<td class="px-2 py-1.5 text-text-primary">陆明德</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">发函索取历年主办成本明细</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-21 11:30</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 14 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">华西现代农业灌溉与智慧农机展</td>
+<td class="px-2 py-1.5 text-text-secondary">品牌收购</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">3/5 意向</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">Agritechnica</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">天府博览管理</td>
+<td class="px-2 py-1.5 text-text-secondary">成都</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">48,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-secondary">■■■</span><span class="text-surface-variant">□□</span></td>
+<td class="px-2 py-1.5 text-text-primary">赵以诺</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">农机补贴目录联动方案校准</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-20 18:00</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 15 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">国际特种玻璃与陶瓷前沿展</td>
+<td class="px-2 py-1.5 text-text-secondary">控股并购</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">4/5 审计</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">Glasstec</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">中材博览发展</td>
+<td class="px-2 py-1.5 text-text-secondary">广州</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">42,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-primary">■■■■</span><span class="text-surface-variant">□</span></td>
+<td class="px-2 py-1.5 text-text-primary">顾言风</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">反垄断事前申报合规评估</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-20 15:40</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 16 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">长三角智能车载传感器峰会</td>
+<td class="px-2 py-1.5 text-text-secondary">联营孵化</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">1/5 接洽</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">AutoSens</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">智行联展传媒</td>
+<td class="px-2 py-1.5 text-text-secondary">上海</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">22,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-secondary">■■■</span><span class="text-surface-variant">□□</span></td>
+<td class="px-2 py-1.5 text-text-primary">宋子乔</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">整车厂采购团特约支持确认</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-20 11:05</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 17 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">国际包装印刷与智能印后工艺展</td>
+<td class="px-2 py-1.5 text-text-secondary">少数股权</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">2/5 DD</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">Drupa China</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">雅式联创投资</td>
+<td class="px-2 py-1.5 text-text-secondary">广州</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">68,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-secondary">■■</span><span class="text-surface-variant">□□□</span></td>
+<td class="px-2 py-1.5 text-text-primary">陈立衡</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">展商应收账款账龄专项审计</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-19 17:35</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 18 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">华东预制食品与工业化餐饮展</td>
+<td class="px-2 py-1.5 text-text-secondary">独家商业承办</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">3/5 意向</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">SIAL China</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">食博国际实业</td>
+<td class="px-2 py-1.5 text-text-secondary">杭州</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">51,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-primary">■■■■</span><span class="text-surface-variant">□</span></td>
+<td class="px-2 py-1.5 text-text-primary">陆明德</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">预付租金担保函条件谈判</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-19 15:20</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 19 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">华南公共安全及应急救援设备博览</td>
+<td class="px-2 py-1.5 text-text-secondary">控股并购</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">4/5 审计</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">Intersec</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">鼎安智联科技</td>
+<td class="px-2 py-1.5 text-text-secondary">深圳</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">57,500</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-accent-active">■■■■■</span></td>
+<td class="px-2 py-1.5 text-text-primary">顾言风</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">安防行业协会支持函正式盖印</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-19 11:15</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 20 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">华中微电子清洗与超纯水制备展</td>
+<td class="px-2 py-1.5 text-text-secondary">联营孵化</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">1/5 接洽</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">Semicon</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">光谷科创会展</td>
+<td class="px-2 py-1.5 text-text-secondary">武汉</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">24,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-secondary">■■</span><span class="text-surface-variant">□□□</span></td>
+<td class="px-2 py-1.5 text-text-primary">周文瑄</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">晶圆制造配套展区招展模型验证</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-18 16:40</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 21 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">西部智能仓储与搬运机器人大会</td>
+<td class="px-2 py-1.5 text-text-secondary">品牌收购</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">2/5 DD</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">LogiMAT</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">川渝会展联合</td>
+<td class="px-2 py-1.5 text-text-secondary">成都</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">36,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-secondary">■■■</span><span class="text-surface-variant">□□</span></td>
+<td class="px-2 py-1.5 text-text-primary">赵以诺</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">展位平米单价收益弹性测算</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-18 14:10</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 22 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">国际特种碳纤维及复合材料展</td>
+<td class="px-2 py-1.5 text-text-secondary">控股并购</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">3/5 意向</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">JEC World</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">经纬会展股份</td>
+<td class="px-2 py-1.5 text-text-secondary">上海</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">49,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-primary">■■■■</span><span class="text-surface-variant">□</span></td>
+<td class="px-2 py-1.5 text-text-primary">宋子乔</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">原团队核心招商销售竞业协议锁定</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-18 09:50</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 23 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">华南工业机器视觉与自动化技术展</td>
+<td class="px-2 py-1.5 text-text-secondary">少数股权</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">4/5 审计</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">Vision China</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">博览天下传媒</td>
+<td class="px-2 py-1.5 text-text-secondary">广州</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">58,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-accent-active">■■■■■</span></td>
+<td class="px-2 py-1.5 text-text-primary">顾言风</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">专项税务追溯责任豁免备忘录</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-17 17:00</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+<!-- Row 24 -->
+<tr class="group h-9 hover:bg-bg-surface-hover transition-colors">
+<td class="px-3 py-1.5 font-medium text-text-primary truncate max-w-[230px]">华东数字安防与智慧园区博览</td>
+<td class="px-2 py-1.5 text-text-secondary">独家商业承办</td>
+<td class="px-2 py-1.5">
+<div class="flex items-center gap-1.5">
+<div class="flex gap-0.5">
+<div class="w-2 h-1 bg-text-secondary"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+<div class="w-2 h-1 bg-surface-variant"></div>
+</div>
+<span class="font-label-code text-label-code text-text-tertiary">1/5 接洽</span>
+</div>
+</td>
+<td class="px-2 py-1.5 text-text-secondary font-label-code text-label-code">Secutech</td>
+<td class="px-2 py-1.5 text-text-secondary truncate max-w-[140px]">新博会展集团</td>
+<td class="px-2 py-1.5 text-text-secondary">杭州</td>
+<td class="px-3 py-1.5 text-right font-data-tabular text-data-tabular text-text-primary">31,000</td>
+<td class="px-2 py-1.5 text-text-secondary font-data-tabular tracking-widest text-[11px]"><span class="text-text-secondary">■■</span><span class="text-surface-variant">□□□</span></td>
+<td class="px-2 py-1.5 text-text-primary">陈立衡</td>
+<td class="px-3 py-1.5 text-text-secondary truncate max-w-[210px]">展馆续租排他性条款核验</td>
+<td class="px-3 py-1.5 text-right relative">
+<span class="font-data-tabular text-data-tabular text-text-tertiary group-hover:hidden">10-17 14:20</span>
+<div class="hidden group-hover:flex items-center justify-end gap-1 text-text-secondary">
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="查看图谱"><span class="material-symbols-outlined text-[15px]">account_tree</span></button>
+<button class="p-1 hover:text-text-primary hover:bg-surface-container" title="尽调纪要"><span class="material-symbols-outlined text-[15px]">description</span></button>
+<button class="p-1 hover:text-accent-active hover:bg-surface-container" title="推进阶段"><span class="material-symbols-outlined text-[15px]">trending_flat</span></button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Status Bar / Workstation Footer -->
+<div class="w-full mt-2 flex items-center justify-between text-label-code font-label-code text-text-tertiary px-1 select-none">
+<div class="flex items-center gap-4">
+<span>当前加载: 24 / 24 标的</span>
+<span>•</span>
+<span>更新引擎: MW-FEED v4.19</span>
+<span>•</span>
+<span class="text-text-secondary">数据哈希: 7f89b4..d901</span>
+</div>
+<div class="flex items-center gap-3">
+<span class="text-text-secondary">快捷键: <kbd class="px-1 bg-surface-container border border-border-hairline text-[10px]">J</kbd> 下一行 / <kbd class="px-1 bg-surface-container border border-border-hairline text-[10px]">K</kbd> 上一行 / <kbd class="px-1 bg-surface-container border border-border-hairline text-[10px]">SPACE</kbd> 调出标的图谱</span>
+<span>•</span>
+<span>延迟: 18ms</span>
+</div>
+</div>
+</main>
+</div></main></div></body></html>

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="zh-CN"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      "colors": {
+        "on-secondary-container": "#ff9c75",
+        "surface-tint": "#ffb599",
+        "on-secondary-fixed": "#370e00",
+        "surface-container": "#201f20",
+        "on-error-container": "#ffdad6",
+        "text-secondary": "#8A8A93",
+        "secondary-container": "#7e2c05",
+        "accent-active": "#FE5C00",
+        "bg-surface": "#141416",
+        "secondary": "#ffb599",
+        "surface-container-highest": "#353436",
+        "surface-variant": "#353436",
+        "border-active": "rgba(255, 255, 255, 0.14)",
+        "bg-sidebar": "#0E0E10",
+        "inverse-primary": "#a73a00",
+        "text-primary": "#F5F5F7",
+        "on-tertiary-fixed": "#001c37",
+        "outline": "#ab897d",
+        "surface-bright": "#3a393a",
+        "border-hairline": "rgba(255, 255, 255, 0.07)",
+        "on-tertiary-fixed-variant": "#00497e",
+        "accent-dim": "rgba(254, 92, 0, 0.12)",
+        "tertiary": "#a0caff",
+        "background": "#131314",
+        "accent-hover": "#FF7324",
+        "inverse-on-surface": "#313031",
+        "on-background": "#e5e2e3",
+        "on-secondary-fixed-variant": "#7e2c05",
+        "primary-fixed": "#ffdbce",
+        "on-tertiary-container": "#002d51",
+        "tertiary-container": "#0096fc",
+        "bg-canvas": "#0A0A0B",
+        "on-primary-fixed": "#370e00",
+        "surface-container-low": "#1c1b1c",
+        "on-secondary": "#5a1b00",
+        "tertiary-fixed": "#d2e4ff",
+        "error": "#ffb4ab",
+        "on-primary-fixed-variant": "#802a00",
+        "primary-container": "#fe5c00",
+        "tertiary-fixed-dim": "#a0caff",
+        "secondary-fixed-dim": "#ffb599",
+        "text-tertiary": "#52525A",
+        "inverse-surface": "#e5e2e3",
+        "bg-surface-elevated": "#1A1A1E",
+        "secondary-fixed": "#ffdbce",
+        "on-tertiary": "#003259",
+        "primary": "#ffb599",
+        "surface": "#131314",
+        "primary-fixed-dim": "#ffb599",
+        "outline-variant": "#5b4137",
+        "surface-container-high": "#2a2a2b",
+        "error-container": "#93000a",
+        "surface-container-lowest": "#0e0e0f",
+        "on-surface-variant": "#e4beb1",
+        "on-primary": "#5a1b00",
+        "on-primary-container": "#511800",
+        "on-surface": "#e5e2e3",
+        "surface-dim": "#131314",
+        "on-error": "#690005",
+        "bg-surface-hover": "#1F1F24"
+      },
+      "borderRadius": {
+        "DEFAULT": "0.125rem",
+        "lg": "0.25rem",
+        "xl": "0.5rem",
+        "full": "0.75rem"
+      },
+      "spacing": {
+        "margin": "1rem",
+        "space-sm": "0.375rem",
+        "space-md": "0.5rem",
+        "gutter": "0.75rem",
+        "space-2xs": "0.125rem",
+        "space-xl": "1rem",
+        "space-2xl": "1.5rem",
+        "space-lg": "0.75rem",
+        "space-xs": "0.25rem"
+      },
+      "fontFamily": {
+        "data-tabular": [
+          "JetBrains Mono"
+        ],
+        "data-tabular-lg": [
+          "JetBrains Mono"
+        ],
+        "body-sm": [
+          "Geist"
+        ],
+        "headline-lg": [
+          "Geist"
+        ],
+        "body-md": [
+          "Geist"
+        ],
+        "headline-md": [
+          "Geist"
+        ],
+        "headline-xl": [
+          "Geist"
+        ],
+        "label-caps": [
+          "Geist"
+        ],
+        "label-code": [
+          "JetBrains Mono"
+        ]
+      },
+      "fontSize": {
+        "data-tabular": [
+          "12px",
+          {
+            "lineHeight": "16px",
+            "letterSpacing": "-0.01em",
+            "fontWeight": "400"
+          }
+        ],
+        "data-tabular-lg": [
+          "16px",
+          {
+            "lineHeight": "20px",
+            "letterSpacing": "-0.02em",
+            "fontWeight": "500"
+          }
+        ],
+        "body-sm": [
+          "12px",
+          {
+            "lineHeight": "16px",
+            "letterSpacing": "0",
+            "fontWeight": "400"
+          }
+        ],
+        "headline-lg": [
+          "18px",
+          {
+            "lineHeight": "24px",
+            "letterSpacing": "-0.015em",
+            "fontWeight": "600"
+          }
+        ],
+        "body-md": [
+          "13px",
+          {
+            "lineHeight": "18px",
+            "letterSpacing": "-0.005em",
+            "fontWeight": "400"
+          }
+        ],
+        "headline-md": [
+          "15px",
+          {
+            "lineHeight": "20px",
+            "letterSpacing": "-0.01em",
+            "fontWeight": "500"
+          }
+        ],
+        "headline-xl": [
+          "24px",
+          {
+            "lineHeight": "32px",
+            "letterSpacing": "-0.02em",
+            "fontWeight": "600"
+          }
+        ],
+        "label-caps": [
+          "10px",
+          {
+            "lineHeight": "12px",
+            "letterSpacing": "0.06em",
+            "fontWeight": "600"
+          }
+        ],
+        "label-code": [
+          "11px",
+          {
+            "lineHeight": "14px",
+            "letterSpacing": "0.02em",
+            "fontWeight": "500"
+          }
+        ]
+      }
+    }
+  }
+};</script></head><body class="bg-bg-canvas text-text-primary antialiased select-none"><aside class="fixed left-0 top-0 h-full w-[200px] bg-bg-sidebar border-r border-border-hairline z-50 flex flex-col justify-between"><div class="flex flex-col"><div class="h-12 px-4 flex items-center border-b border-border-hairline"><div class="flex items-center tracking-tight leading-none"><span class="text-[14px] text-text-primary tracking-normal"><span class="font-bold">万</span><span class="font-medium">象</span></span><div class="h-3.5 mx-2 border-l border-white/20"></div><span class="text-[11px] font-headline-md text-text-secondary tracking-widest font-mono">MWLAB</span></div></div><nav class="flex flex-col py-2 px-1.5 space-y-0.5" data-active-classes="bg-accent-dim text-accent-active border-l-2 border-accent-active font-medium"><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="panmian-overview" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">dashboard</span>盘面</a><a aria-current="page" class="flex items-center h-8 px-2.5 rounded transition-colors bg-accent-dim text-accent-active border-l-2 border-accent-active font-medium" data-path="jihuitai-pipeline" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">conversion_path</span>机会台</a><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="gongsiku-company-base" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">corporate_fare</span>公司库</a><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="diaoyanku-research-dd" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">folder_managed</span>调研库</a><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="zhanhuiditu-master-map" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">map</span>展会底图</a></nav></div><div class="p-1.5 border-t border-border-hairline"><nav class="flex flex-col" data-active-classes="bg-accent-dim text-accent-active border-l-2 border-accent-active font-medium"><a class="flex items-center h-8 px-2.5 rounded text-body-md font-body-md text-text-secondary hover:bg-bg-surface-hover hover:text-text-primary transition-colors" data-path="shezhi-settings" href="#"><span class="material-symbols-outlined text-[16px] mr-2.5 text-text-tertiary">settings</span>设置</a></nav></div></aside><div class="pl-[200px]"><header class="fixed top-0 left-[200px] right-0 h-12 bg-bg-canvas border-b border-border-hairline z-40 px-4 flex items-center justify-between"><div class="flex items-center gap-1.5 text-body-sm font-body-sm"><span class="text-text-secondary">机会台</span><span class="text-text-tertiary text-[11px]">/</span><span class="text-text-primary font-medium">并购标的</span></div><div class="flex-1 max-w-md mx-6"><div class="relative flex items-center h-7 bg-bg-sidebar border border-border-hairline rounded px-2.5 focus-within:border-text-secondary transition-colors"><span class="material-symbols-outlined text-text-tertiary text-[15px] mr-2">search</span><input class="w-full bg-transparent text-text-primary placeholder-text-tertiary text-body-sm font-body-sm outline-none border-none" placeholder="搜索机会、公司、报告…" type="text"/><div class="flex items-center ml-2 px-1 py-0.5 rounded bg-surface-variant/40 border border-border-hairline text-text-tertiary text-[10px] font-label-code leading-none">⌘K</div></div></div><div class="flex items-center gap-3"><div class="flex items-center gap-1.5 px-2 py-1 rounded bg-bg-sidebar border border-border-hairline"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span><span class="text-[11px] font-label-code text-text-secondary leading-none">实时同步 99.8%</span></div><button class="flex items-center h-7 px-2.5 rounded bg-bg-surface border border-border-hairline text-body-sm font-body-sm text-text-primary hover:bg-bg-surface-hover hover:border-border-active transition-colors"><span class="material-symbols-outlined text-[14px] mr-1 text-text-secondary">ios_share</span>导出</button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></header><main class="relative pt-12 w-full bg-bg-canvas min-h-screen text-text-primary"><div class="flex flex-col w-full text-text-primary">
+<!-- Top Breadcrumb Context Sub-Bar -->
+<div class="w-full h-9 px-4 flex items-center justify-between border-b border-border-hairline bg-bg-canvas select-none">
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center w-5 h-5 rounded hover:bg-bg-surface-hover text-text-tertiary hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined text-[15px]">arrow_back</span>
+</button>
+<div class="flex items-center gap-1.5 text-body-sm font-body-sm tracking-tight text-text-tertiary">
+<span class="hover:text-text-secondary cursor-pointer transition-colors">机会台</span>
+<span class="text-[10px] text-text-tertiary">/</span>
+<span class="hover:text-text-secondary cursor-pointer transition-colors">并购标的</span>
+<span class="text-[10px] text-text-tertiary">/</span>
+<span class="text-text-primary font-medium">2025 国际半导体先进进程博览会</span>
+</div>
+<span class="ml-2 px-1.5 py-0.2 rounded border border-border-hairline bg-bg-surface text-[10px] font-label-code text-text-secondary tracking-widest uppercase">OPP-2025-089</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 text-[11px] font-label-code text-text-tertiary">
+<span class="material-symbols-outlined text-[13px] text-emerald-500">lock</span>
+<span>L2_RESTRICTED</span>
+</div>
+<div class="h-3 w-px bg-border-hairline"></div>
+<span class="text-body-sm font-label-code text-text-tertiary">更新于 18 分钟前</span>
+</div>
+</div>
+<!-- Header Band: Title, Process Stepper & Actions -->
+<div class="w-full px-4 py-3.5 border-b border-border-hairline bg-bg-surface flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+<!-- Left: Opportunity Metadata -->
+<div class="flex items-center gap-3">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2.5">
+<h1 class="text-[20px] leading-[26px] font-semibold text-text-primary tracking-tight font-headline-lg">
+            2025 国际半导体先进进程博览会
+          </h1>
+<span class="px-2 py-0.5 rounded border border-border-hairline bg-bg-surface-elevated text-body-sm font-body-sm text-text-secondary font-medium">
+            控股并购 (51%控股)
+          </span>
+<span class="px-1.5 py-0.2 rounded border border-accent-active/30 bg-accent-dim text-accent-active text-[11px] font-label-code font-medium">
+            PRIORITY-A
+          </span>
+</div>
+<div class="flex items-center gap-3 text-body-sm font-body-sm text-text-secondary">
+<span class="flex items-center gap-1 font-label-code text-text-tertiary">
+<span class="material-symbols-outlined text-[13px]">location_on</span>上海新国际博览中心 (SNIEC)
+          </span>
+<span class="text-border-hairline">|</span>
+<span class="font-label-code text-text-tertiary">周期：2025-10-18 ~ 10-21</span>
+<span class="text-border-hairline">|</span>
+<span class="font-label-code text-text-tertiary">对价区间：¥2.80亿 - ¥3.20亿</span>
+</div>
+</div>
+</div>
+<!-- Middle: Linear Progress Pipeline Stepper -->
+<div class="flex items-center self-start xl:self-center py-1 px-2.5 rounded bg-bg-sidebar border border-border-hairline">
+<!-- Step 1 -->
+<div class="flex items-center gap-1.5 group cursor-default">
+<div class="w-4 h-4 rounded-full bg-surface-variant flex items-center justify-center text-text-secondary">
+<span class="material-symbols-outlined text-[12px] text-text-primary">check</span>
+</div>
+<span class="text-body-sm font-body-sm text-text-secondary">初步接触</span>
+</div>
+<div class="w-5 h-px bg-border-hairline mx-2"></div>
+<!-- Step 2 -->
+<div class="flex items-center gap-1.5 group cursor-default">
+<div class="w-4 h-4 rounded-full bg-surface-variant flex items-center justify-center text-text-secondary">
+<span class="material-symbols-outlined text-[12px] text-text-primary">check</span>
+</div>
+<span class="text-body-sm font-body-sm text-text-secondary">意向签署</span>
+</div>
+<div class="w-5 h-px bg-border-hairline mx-2"></div>
+<!-- Step 3: Current -->
+<div class="flex items-center gap-1.5">
+<div class="relative flex items-center justify-center">
+<span class="w-2 h-2 rounded-full bg-accent-active animate-ping absolute opacity-75"></span>
+<span class="w-2 h-2 rounded-full bg-accent-active relative"></span>
+</div>
+<span class="text-body-sm font-body-sm font-semibold text-accent-active tracking-tight">尽调审计</span>
+<span class="text-[10px] font-label-code px-1 py-0.2 rounded bg-accent-dim text-accent-active">S3</span>
+</div>
+<div class="w-5 h-px bg-border-hairline mx-2"></div>
+<!-- Step 4 -->
+<div class="flex items-center gap-1.5 opacity-40">
+<div class="w-1.5 h-1.5 rounded-full bg-text-tertiary"></div>
+<span class="text-body-sm font-body-sm text-text-tertiary">协议交割</span>
+</div>
+<div class="w-5 h-px bg-border-hairline mx-2 opacity-40"></div>
+<!-- Step 5 -->
+<div class="flex items-center gap-1.5 opacity-40">
+<div class="w-1.5 h-1.5 rounded-full bg-text-tertiary"></div>
+<span class="text-body-sm font-body-sm text-text-tertiary">投后整合</span>
+</div>
+</div>
+<!-- Right: Assignment & Primary Actions -->
+<div class="flex items-center gap-2.5">
+<div class="flex items-center gap-2 pl-1 pr-2 py-0.5 rounded bg-bg-sidebar border border-border-hairline">
+<div class="w-5 h-5 rounded-full bg-surface-variant flex items-center justify-center text-[10px] font-label-code text-text-primary">
+          陈
+        </div>
+<span class="text-body-sm font-body-sm text-text-secondary">负责人：<span class="text-text-primary font-medium">陈立衡</span></span>
+</div>
+<button class="h-7 px-2 border border-border-hairline rounded bg-bg-surface hover:bg-bg-surface-hover hover:border-border-active text-text-secondary hover:text-text-primary transition-colors flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">more_horiz</span>
+</button>
+<button class="h-7 px-3 bg-accent-active hover:bg-accent-hover text-bg-canvas font-semibold text-body-sm font-body-sm rounded flex items-center gap-1.5 transition-colors">
+<span class="material-symbols-outlined text-[15px] font-bold">assignment_turned_in</span>
+<span>更新尽调结论</span>
+</button>
+</div>
+</div>
+<!-- Main Workstation Layout: 65% Longform Report / 35% Rigorous Metric Rail -->
+<div class="w-full grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-106px)]">
+<!-- LEFT PANEL: 65% (8 Columns) Editorial Markdown Due Diligence Dossier -->
+<div class="lg:col-span-8 border-r border-border-hairline flex flex-col bg-bg-canvas">
+<!-- Segmented Navigation Tabs -->
+<div class="h-10 px-6 border-b border-border-hairline flex items-center justify-between bg-bg-surface select-none">
+<div class="flex items-center gap-6 h-full">
+<button class="h-full flex items-center text-body-sm font-body-sm text-text-tertiary hover:text-text-secondary transition-colors">
+            概览总览
+          </button>
+<button class="h-full flex items-center text-body-sm font-body-sm text-text-primary font-medium relative transition-colors">
+            深度调研 (Deep Research &amp; DD)
+            <div class="absolute bottom-0 left-0 right-0 h-[2px] bg-accent-active"></div>
+</button>
+<button class="h-full flex items-center text-body-sm font-body-sm text-text-tertiary hover:text-text-secondary transition-colors gap-1.5">
+            时间线
+            <span class="text-[10px] font-label-code px-1 rounded bg-bg-surface-elevated text-text-tertiary">14</span>
+</button>
+<button class="h-full flex items-center text-body-sm font-body-sm text-text-tertiary hover:text-text-secondary transition-colors gap-1.5">
+            关联展会
+            <span class="text-[10px] font-label-code px-1 rounded bg-bg-surface-elevated text-text-tertiary">3</span>
+</button>
+<button class="h-full flex items-center text-body-sm font-body-sm text-text-tertiary hover:text-text-secondary transition-colors">
+            交易条款备忘录
+          </button>
+</div>
+<div class="flex items-center gap-2">
+<span class="text-[11px] font-label-code text-text-tertiary">Markdown 阅读视图</span>
+<button class="text-text-tertiary hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined text-[15px]">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- Long-form Analytical Dossier Body -->
+<div class="p-8 lg:px-12 max-w-4xl flex flex-col text-[#d4d4d8]">
+<!-- Document Title & Header Meta -->
+<div class="pb-6 mb-8 border-b border-border-hairline">
+<div class="flex items-center gap-2 text-[11px] font-label-code text-accent-active tracking-wider uppercase mb-2">
+<span>AUDIT-TASK-ID: DD-2025-SH04</span>
+<span class="text-border-hairline">•</span>
+<span>STAGE: PHASE-II COMPLETE</span>
+</div>
+<h2 class="text-headline-xl font-headline-xl text-text-primary tracking-tight font-semibold mb-3">
+            项目尽调报告：标的运营壁垒、财税真实性与并购整合估值重构
+          </h2>
+<div class="flex flex-wrap items-center gap-4 text-body-sm font-body-sm text-text-secondary">
+<span>执笔分析师：<strong class="text-text-primary font-normal">顾言风</strong></span>
+<span>法务审计核验：<strong class="text-text-primary font-normal">上海方达合规组</strong></span>
+<span>评估基准日：<strong class="text-text-primary font-data-tabular">2024-12-31</strong></span>
+</div>
+</div>
+<!-- Executive Summary Callout Box -->
+<div class="p-4 mb-8 rounded bg-bg-surface border border-border-hairline text-body-md font-body-md leading-relaxed">
+<div class="flex items-center gap-2 mb-2 text-accent-active">
+<span class="material-symbols-outlined text-[17px]">verified</span>
+<span class="text-[12px] font-label-code tracking-wide font-semibold uppercase">项目尽调核心结论（财务及法务合规审计）</span>
+</div>
+<p class="text-text-primary text-[14px] leading-6 font-normal">
+            标的展会于华东半导体装备领域占据 <span class="font-data-tabular font-medium text-text-primary">38%</span> 独占展位排期，历年客商复展率达 <span class="font-data-tabular font-medium text-text-primary">84.6%</span>，但需重点关注地方产业专项补贴退坡风险（占扣非利润约 <span class="font-data-tabular font-medium text-text-primary">12.4%</span>）与历史联办协议中的双重开票合规性瑕疵。建议在首期交割款中扣留 <span class="font-data-tabular font-medium text-text-primary">15%</span> 质保金作为交割后税务追溯赔偿兜底。
+          </p>
+</div>
+<!-- Section 1 -->
+<div class="mb-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="text-accent-active font-label-code text-headline-md font-semibold">01 /</span>
+<h3 class="text-headline-md font-headline-md text-text-primary tracking-tight font-semibold">
+              核心财务指标与 EBITDA 模拟测算
+            </h3>
+</div>
+<p class="text-[15px] leading-[27px] text-[#a1a1aa] mb-4">
+            我们针对标的公司（华创展览科技）2022至2024连续三个完整展期财报进行了穿行测试与银行流水盲抽。扣除两笔未向场馆申报的第三方搭建居间服务溢价后，标的展会底层主营业务毛利率保持在行业高位，其展位单平米净销售创收力（RevPAS）达到 <span class="text-text-primary font-data-tabular">¥1,640/㎡</span>，超出华东同题材同档次展会中位数 <span class="text-text-primary font-data-tabular">22.8%</span>。
+          </p>
+<!-- Hairline Financial Data Table -->
+<div class="mt-4 mb-6 rounded border border-border-hairline overflow-hidden bg-bg-surface">
+<table class="w-full border-collapse text-left">
+<thead>
+<tr class="h-7 bg-bg-sidebar border-b border-border-hairline">
+<th class="px-4 text-label-caps font-label-caps text-text-tertiary">财务核算展期</th>
+<th class="px-4 text-right text-label-caps font-label-caps text-text-tertiary">核实主营净收入 (CNY)</th>
+<th class="px-4 text-right text-label-caps font-label-caps text-text-tertiary">模拟调整后 EBITDA</th>
+<th class="px-4 text-right text-label-caps font-label-caps text-text-tertiary">真实综合毛利率</th>
+<th class="px-4 text-right text-label-caps font-label-caps text-text-tertiary">审计置信度</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-hairline font-data-tabular text-data-tabular">
+<tr class="h-8 hover:bg-bg-surface-hover transition-colors">
+<td class="px-4 font-body-sm text-text-primary">2022 届 (第 3 届)</td>
+<td class="px-4 text-right text-text-primary font-data-tabular">¥ 48,210,500</td>
+<td class="px-4 text-right text-text-primary font-data-tabular">¥ 19,420,000</td>
+<td class="px-4 text-right text-text-secondary font-data-tabular">54.2%</td>
+<td class="px-4 text-right text-text-tertiary font-label-code">HIGH (P95)</td>
+</tr>
+<tr class="h-8 hover:bg-bg-surface-hover transition-colors">
+<td class="px-4 font-body-sm text-text-primary">2023 届 (第 4 届)</td>
+<td class="px-4 text-right text-text-primary font-data-tabular">¥ 61,540,000</td>
+<td class="px-4 text-right text-text-primary font-data-tabular">¥ 27,800,000</td>
+<td class="px-4 text-right text-text-secondary font-data-tabular">57.8%</td>
+<td class="px-4 text-right text-text-tertiary font-label-code">VERIFIED</td>
+</tr>
+<tr class="h-8 hover:bg-bg-surface-hover transition-colors">
+<td class="px-4 font-body-sm text-text-primary">2024 届 (第 5 届基准)</td>
+<td class="px-4 text-right text-text-primary font-medium font-data-tabular">¥ 78,920,000</td>
+<td class="px-4 text-right text-accent-active font-medium font-data-tabular">¥ 38,150,000</td>
+<td class="px-4 text-right text-text-primary font-medium font-data-tabular">59.6%</td>
+<td class="px-4 text-right text-emerald-500 font-label-code">FINAL AUDITED</td>
+</tr>
+<tr class="h-8 bg-bg-surface-elevated/40">
+<td class="px-4 font-body-sm text-text-secondary">CAGR (2022-2024)</td>
+<td class="px-4 text-right font-medium text-emerald-400 font-data-tabular">+27.9%</td>
+<td class="px-4 text-right font-medium text-emerald-400 font-data-tabular">+40.1%</td>
+<td class="px-4 text-right text-text-secondary font-data-tabular">+540 bps</td>
+<td class="px-4 text-right text-text-tertiary font-label-code">NORMALIZED</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p class="text-body-sm font-body-sm text-text-tertiary leading-normal">
+            * 注：2024年模拟调整EBITDA剔除了由当地产业发展母基金按平米发放的阶段性招商奖补 ¥4,800,000，反映纯粹市场化商贸撮合变现能力。
+          </p>
+</div>
+<!-- Section 2 -->
+<div class="mb-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="text-accent-active font-label-code text-headline-md font-semibold">02 /</span>
+<h3 class="text-headline-md font-headline-md text-text-primary tracking-tight font-semibold">
+              竞争壁垒与展馆排期排他性分析
+            </h3>
+</div>
+<p class="text-[15px] leading-[27px] text-[#a1a1aa] mb-4">
+            展馆关键排期占有是展会行业核心护城河。标的主办方已与上海新国际博览中心（SNIEC）签订了锁定至 2028 年底的 N1-N7 展馆 10 月中旬黄金排期主协议。同题材其他竞品（如慕尼黑博览集团同类型设备展）只能在每年 3 月或 7 月淡季使用深圳宝安或国家会展中心（上海）的非连续展厅，档期与下游芯片采购决策周期错位。
+          </p>
+<p class="text-[15px] leading-[27px] text-[#a1a1aa] mb-4">
+            经对 1,200 家核心参展商（Top 20% 展位面积贡献者）问卷盲测，同时参加德系同类竞品展会的重合率仅为 <span class="text-text-primary font-data-tabular">18.4%</span>。超过 <span class="text-text-primary font-data-tabular">72%</span> 的刻蚀、薄膜沉积及前道清洗设备厂商将该博览会作为年度唯一首发首展平台，粘性极高。
+          </p>
+</div>
+<!-- Section 3 -->
+<div class="mb-10">
+<div class="flex items-center gap-2 mb-4">
+<span class="text-accent-active font-label-code text-headline-md font-semibold">03 /</span>
+<h3 class="text-headline-md font-headline-md text-text-primary tracking-tight font-semibold">
+              潜在风险与交易结构谈判底线
+            </h3>
+</div>
+<div class="flex flex-col gap-3">
+<div class="flex items-start gap-3 p-3 rounded bg-bg-surface border border-border-hairline">
+<span class="material-symbols-outlined text-[16px] text-accent-active mt-0.5">warning</span>
+<div class="text-body-sm font-body-sm leading-relaxed">
+<span class="font-medium text-text-primary">技术管制清单波及风险：</span>
+                标的展会约 14% 的特装展商涉及美国 BIS 实体清单或受限出口外资企业。在交易协议中需明确“因地缘不可抗力导致展商流失超过 25% 时对当年业绩承诺考核目标（Earn-out）进行等权调减”的保护性条款。
+              </div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded bg-bg-surface border border-border-hairline">
+<span class="material-symbols-outlined text-[16px] text-text-secondary mt-0.5">verified_user</span>
+<div class="text-body-sm font-body-sm leading-relaxed">
+<span class="font-medium text-text-primary">核心团队竞业禁止与排他锁定：</span>
+                主办团队张培源等 4 名关键管理人员需签署不少于 5 年的全职服务协议与 3 年行业竞业限制，其个人持有的剩余 49% 股权需分三期解锁（第 1/2/3 年对应解锁 30%、30%、40%）。
+              </div>
+</div>
+<div class="flex items-start gap-3 p-3 rounded bg-bg-surface border border-border-hairline">
+<span class="material-symbols-outlined text-[16px] text-text-secondary mt-0.5">gavel</span>
+<div class="text-body-sm font-body-sm leading-relaxed">
+<span class="font-medium text-text-primary">知识产权与品牌归属：</span>
+                “SEMIC-ADV”注册商标目前存在 3 件与行业协会的联名共有人争议，需在正式交割前将全部 41 类商贸服务注册商标全权剥离并无偿转让至拟收购的目标控股实体旗下。
+              </div>
+</div>
+</div>
+</div>
+<!-- Document Footer Metadata Bar -->
+<div class="pt-6 mt-4 border-t border-border-hairline flex flex-col md:flex-row md:items-center justify-between text-body-sm font-body-sm text-text-tertiary gap-2">
+<div class="flex items-center gap-2">
+<span>编写：顾言风 (高级投资分析师)</span>
+<span>•</span>
+<span>复核：宋子乔 (董事总经理)</span>
+<span>•</span>
+<span class="font-data-tabular">2025-04-18 10:24</span>
+</div>
+<div class="flex items-center gap-1.5 font-label-code text-[11px] text-text-secondary">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-active"></span>
+<span>INTERNAL_MWLAB_VERIFIED_MEMO</span>
+</div>
+</div>
+</div>
+</div>
+<!-- RIGHT RAIL: 35% (4 Columns) Structured Entity, Financial & Operational Metrics -->
+<div class="lg:col-span-4 bg-bg-sidebar flex flex-col divide-y divide-border-hairline">
+<!-- Block 1: Operating Entity (工商及穿透) -->
+<div class="p-4 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-text-tertiary">apartment</span>
+<span class="text-label-caps font-label-caps text-text-secondary uppercase">关联运营主体 (Entity)</span>
+</div>
+<span class="px-1.5 py-0.2 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-label-code">
+            存续 / 在营
+          </span>
+</div>
+<div class="flex flex-col gap-1">
+<span class="text-headline-md font-headline-md text-text-primary font-medium tracking-tight">
+            华创展览科技（上海）有限公司
+          </span>
+<span class="font-data-tabular text-data-tabular text-text-tertiary tracking-tight">
+            USCC: 91310115MA1K8XX99X
+          </span>
+</div>
+<div class="grid grid-cols-2 gap-2.5 pt-1 text-body-sm font-body-sm">
+<div class="flex flex-col">
+<span class="text-text-tertiary">法定代表人</span>
+<span class="text-text-primary font-medium">张培源</span>
+</div>
+<div class="flex flex-col">
+<span class="text-text-tertiary">成立时间</span>
+<span class="text-text-primary font-data-tabular">2018-06-12</span>
+</div>
+<div class="flex flex-col">
+<span class="text-text-tertiary">注册资本</span>
+<span class="text-text-primary font-data-tabular">¥ 5,000 万</span>
+</div>
+<div class="flex flex-col">
+<span class="text-text-tertiary">实缴资本</span>
+<span class="text-text-primary font-data-tabular">¥ 4,200 万 (84%)</span>
+</div>
+</div>
+<div class="mt-1 pt-2 border-t border-border-hairline flex flex-col gap-1.5">
+<div class="flex items-center justify-between text-body-sm font-body-sm">
+<span class="text-text-tertiary">股权穿透结构</span>
+<span class="text-text-secondary font-label-code">穿透层级: 2层</span>
+</div>
+<!-- Shareholder distribution bar -->
+<div class="w-full h-1.5 rounded-full bg-surface-container flex overflow-hidden">
+<div class="h-full bg-accent-active" style="width: 62%;"></div>
+<div class="h-full bg-blue-500" style="width: 38%;"></div>
+</div>
+<div class="flex items-center justify-between text-[11px] font-body-sm text-text-secondary">
+<span>核心管理团队 (62.0%)</span>
+<span>外部财务机构股东 (38.0%)</span>
+</div>
+</div>
+</div>
+<!-- Block 2: Global Benchmark 对标分析 -->
+<div class="p-4 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-text-tertiary">analytics</span>
+<span class="text-label-caps font-label-caps text-text-secondary uppercase">全球品牌对标 (Benchmark)</span>
+</div>
+<span class="text-[11px] font-label-code text-text-tertiary">TOP 2 SECTOR</span>
+</div>
+<div class="flex flex-col gap-2">
+<div class="flex items-center justify-between p-2 rounded bg-bg-surface border border-border-hairline">
+<div class="flex flex-col">
+<span class="text-body-sm font-body-sm text-text-tertiary">国际直接对标品牌</span>
+<span class="text-body-md font-body-md text-text-primary font-medium">SEMICON China / Electronica</span>
+</div>
+<span class="text-[10px] font-label-code px-1.5 py-0.5 rounded bg-bg-surface-elevated text-text-secondary">GLOBAL-A</span>
+</div>
+<div class="flex flex-col gap-1 text-body-sm font-body-sm">
+<div class="flex justify-between py-1 border-b border-border-hairline/60">
+<span class="text-text-tertiary">差异化赛道切口</span>
+<span class="text-text-primary text-right">聚焦 14nm 及以下设备与先进封装</span>
+</div>
+<div class="flex justify-between py-1 border-b border-border-hairline/60">
+<span class="text-text-tertiary">华东区域排位</span>
+<span class="text-accent-active font-medium">同题材自办展前 2 席</span>
+</div>
+<div class="flex justify-between py-1">
+<span class="text-text-tertiary">UFI 国际认证</span>
+<span class="text-text-primary font-label-code">审定中 (ETA 2025Q4)</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Block 3: Exhibition Physical & Traction Metrics -->
+<div class="p-4 flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-text-tertiary">straighten</span>
+<span class="text-label-caps font-label-caps text-text-secondary uppercase">展会物理规模 (Metrics)</span>
+</div>
+<span class="text-[11px] font-label-code text-text-tertiary">AUDITED-2024</span>
+</div>
+<!-- 3-Metrics Inline Trio -->
+<div class="grid grid-cols-3 border border-border-hairline rounded bg-bg-surface overflow-hidden">
+<div class="p-2.5 flex flex-col border-r border-border-hairline">
+<span class="text-[10px] font-label-caps text-text-tertiary uppercase">展览面积</span>
+<span class="text-[18px] leading-6 font-semibold font-data-tabular text-text-primary mt-1">85,000</span>
+<span class="text-[10px] font-label-code text-text-tertiary">平方米 (㎡)</span>
+</div>
+<div class="p-2.5 flex flex-col border-r border-border-hairline">
+<span class="text-[10px] font-label-caps text-text-tertiary uppercase">标准展位</span>
+<span class="text-[18px] leading-6 font-semibold font-data-tabular text-text-primary mt-1">3,420</span>
+<span class="text-[10px] font-label-code text-text-tertiary">个 9㎡ 标准展位</span>
+</div>
+<div class="p-2.5 flex flex-col">
+<span class="text-[10px] font-label-caps text-text-tertiary uppercase">专业观众</span>
+<span class="text-[18px] leading-6 font-semibold font-data-tabular text-text-primary mt-1">64,800</span>
+<span class="text-[10px] font-label-code text-emerald-400">+14.2% YoY</span>
+</div>
+</div>
+</div>
+<!-- Block 4: Next Action Box (Interactivity Hook) -->
+<div class="p-4 flex flex-col gap-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-accent-active">notification_important</span>
+<span class="text-label-caps font-label-caps text-text-primary uppercase">下一步关键行动 (Next Action)</span>
+</div>
+<button class="flex items-center gap-1 text-[11px] font-body-sm text-text-tertiary hover:text-text-primary transition-colors">
+<span class="material-symbols-outlined text-[13px]">edit</span>
+<span>编辑动作</span>
+</button>
+</div>
+<div class="p-3 rounded bg-bg-surface border border-border-active flex flex-col gap-2 relative">
+<div class="flex items-center justify-between text-body-sm font-label-code">
+<span class="text-accent-active font-medium flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-accent-active"></span>
+              2025-04-22 17:00
+            </span>
+<span class="text-text-tertiary text-[11px]">剩余 4 天倒计时</span>
+</div>
+<p class="text-body-sm font-body-sm text-text-primary leading-snug">
+            完成与实控人（张培源）关于核心技术团队服务排他期（5年）及知识产权无偿剥离协议条款的面签谈判。
+          </p>
+<div class="flex items-center justify-between pt-2 mt-1 border-t border-border-hairline text-[11px] font-body-sm text-text-tertiary">
+<span>责任人：陈立衡、李知行 (律所)</span>
+<span class="cursor-pointer text-text-secondary hover:text-text-primary">标记为已完成 ✓</span>
+</div>
+</div>
+</div>
+<!-- Block 5: Raw Attachments & Due Diligence Exhibits -->
+<div class="p-4 flex flex-col gap-2.5">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[15px] text-text-tertiary">attach_file</span>
+<span class="text-label-caps font-label-caps text-text-secondary uppercase">底层尽调底稿与协议 (2)</span>
+</div>
+<button class="text-body-sm font-body-sm text-text-tertiary hover:text-text-primary transition-colors">
+            全部上传
+          </button>
+</div>
+<div class="flex flex-col gap-1.5">
+<!-- File 1 -->
+<a class="p-2 rounded bg-bg-surface hover:bg-bg-surface-hover border border-border-hairline flex items-center justify-between group transition-colors" href="#">
+<div class="flex items-center gap-2.5 truncate">
+<span class="material-symbols-outlined text-[18px] text-emerald-400">table_view</span>
+<div class="flex flex-col truncate">
+<span class="text-body-sm font-body-sm text-text-primary truncate group-hover:text-accent-active transition-colors">
+                  2024年四期展商现场核验抽样底表.xlsx
+                </span>
+<span class="text-[10px] font-label-code text-text-tertiary">14.2 MB · 经现场公证签章</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-text-tertiary group-hover:text-text-primary">download</span>
+</a>
+<!-- File 2 -->
+<a class="p-2 rounded bg-bg-surface hover:bg-bg-surface-hover border border-border-hairline flex items-center justify-between group transition-colors" href="#">
+<div class="flex items-center gap-2.5 truncate">
+<span class="material-symbols-outlined text-[18px] text-red-400">picture_as_pdf</span>
+<div class="flex flex-col truncate">
+<span class="text-body-sm font-body-sm text-text-primary truncate group-hover:text-accent-active transition-colors">
+                  展馆N1-N7馆排期租赁主协议扫描件.pdf
+                </span>
+<span class="text-[10px] font-label-code text-text-tertiary">38.7 MB · SNIEC 盖章存档本</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-[16px] text-text-tertiary group-hover:text-text-primary">download</span>
+</a>
+</div>
+</div>
+</div>
+</div>
+</div></main></div></body></html>
