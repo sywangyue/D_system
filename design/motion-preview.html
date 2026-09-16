@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<title>MWLAB 万象 · 交互动效预览</title>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="./motion.css">
+<style>
+:root{
+  --color-canvas:#0A0A0B; --color-sidebar:#0E0E10; --color-surface:#141416;
+  --color-surface-elevated:#1A1A1E; --color-surface-hover:#1F1F24;
+  --color-hairline:rgb(255 255 255/7%); --color-hairline-active:rgb(255 255 255/14%);
+  --color-fg:#F5F5F7; --color-fg-muted:#8A8A93; --color-fg-faint:#52525A;
+  --color-accent:#FE5C00; --color-accent-hover:#FF7324;
+  --radius-control:4px; --radius-panel:6px; --radius-card:8px; --radius-badge:2px;
+  --font-sans:'Geist',system-ui,sans-serif;
+  --font-cjk:'Noto Sans SC','PingFang SC',sans-serif;
+  --font-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--color-canvas);color:var(--color-fg);
+  font-family:var(--font-sans),var(--font-cjk);font-size:13px;line-height:1.5;padding:40px}
+.wrap{max-width:1080px;margin:0 auto}
+h1{font-size:24px;font-weight:600;letter-spacing:-.02em;margin-bottom:4px}
+.lede{color:var(--color-fg-muted);margin-bottom:40px;font-size:13px}
+section{border-top:1px solid var(--color-hairline);padding:28px 0}
+h2{font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+  color:var(--color-fg-faint);margin-bottom:6px}
+.hint{color:var(--color-fg-faint);font-size:12px;margin-bottom:16px}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.btn{height:28px;padding:0 12px;border-radius:var(--radius-control);border:1px solid var(--color-hairline);
+  background:var(--color-surface);color:var(--color-fg);font:inherit;font-size:12px;cursor:pointer}
+.btn:hover{background:var(--color-surface-hover);border-color:var(--color-hairline-active)}
+.btn-primary{background:var(--color-accent);border-color:var(--color-accent);color:var(--color-canvas);font-weight:600}
+.btn-primary:hover{background:var(--color-accent-hover);border-color:var(--color-accent-hover)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+th{height:28px;background:var(--color-sidebar);color:var(--color-fg-faint);font-size:10px;
+  font-weight:600;letter-spacing:.06em;text-transform:uppercase;text-align:left;padding:0 12px;
+  border-bottom:1px solid var(--color-hairline)}
+td{height:32px;padding:0 12px;border-bottom:1px solid var(--color-hairline)}
+.num{font-family:var(--font-mono);font-variant-numeric:tabular-nums;text-align:right}
+.row{cursor:pointer}
+.row-actions{display:flex;gap:6px;justify-content:flex-end}
+.mini{height:20px;padding:0 6px;font-size:11px;border-radius:var(--radius-badge);
+  border:1px solid var(--color-hairline);background:transparent;color:var(--color-fg-muted);cursor:pointer}
+.tabs{display:flex;gap:20px;border-bottom:1px solid var(--color-hairline);padding-bottom:9px}
+.tab{background:none;border:none;color:var(--color-fg-muted);font:inherit;font-size:13px;cursor:pointer;padding:0}
+.tab[aria-selected="true"]{color:var(--color-fg)}
+.input{height:28px;width:260px;padding:0 10px;border-radius:var(--radius-control);
+  border:1px solid var(--color-hairline);background:var(--color-sidebar);color:var(--color-fg);font:inherit;font-size:12px}
+.input::placeholder{color:var(--color-fg-faint)}
+.skeleton{height:12px}
+.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:var(--color-surface);border:1px solid var(--color-hairline);
+  border-radius:var(--radius-card);padding:16px}
+.k{font-family:var(--font-mono);font-size:24px;font-variant-numeric:tabular-nums}
+.kl{font-size:10px;letter-spacing:.06em;text-transform:uppercase;color:var(--color-fg-faint);margin-top:4px}
+.overlay{position:absolute;top:34px;left:0;width:280px;background:var(--color-surface-elevated);
+  border:1px solid var(--color-hairline-active);border-radius:var(--radius-panel);padding:6px;
+  box-shadow:0 8px 24px -4px rgb(0 0 0/80%)}
+.oi{padding:7px 10px;border-radius:var(--radius-control);color:var(--color-fg-muted);font-size:12px}
+.oi:hover{background:var(--color-surface-hover);color:var(--color-fg)}
+.toast{position:fixed;right:24px;bottom:24px;background:var(--color-surface-elevated);
+  border:1px solid var(--color-hairline-active);border-radius:var(--radius-panel);
+  padding:12px 16px;font-size:12px;box-shadow:0 8px 24px -4px rgb(0 0 0/80%)}
+.sidebar{width:200px;background:var(--color-sidebar);border:1px solid var(--color-hairline);
+  border-radius:var(--radius-panel);padding:8px;overflow:hidden}
+.sidebar[data-collapsed="true"]{width:56px}
+.nav{display:flex;align-items:center;gap:10px;height:32px;padding:0 10px;
+  color:var(--color-fg-muted);font-size:12px;white-space:nowrap}
+.dot{width:14px;height:14px;border-radius:3px;background:var(--color-hairline-active);flex-shrink:0}
+</style></head><body><div class="wrap">
+
+<h1>MWLAB 万象 · 交互动效预览</h1>
+<p class="lede">全部数值抄自 Vercel Geist / Radix UI / cmdk / Sonner。用键盘 Tab 走一遍，看焦点环。</p>
+
+<section><h2>按钮</h2><p class="hint">hover 换色 120ms · 按下 scale(0.97) · loading 锁宽只换内容</p>
+<div class="bar">
+  <button class="btn btn-primary">录入机会</button>
+  <button class="btn">导出 CSV</button>
+  <button class="btn btn-primary" data-loading="true" style="width:92px">载入中</button>
+  <button class="btn" disabled>不可用</button>
+</div></section>
+
+<section><h2>表格行</h2><p class="hint">hover 80ms 必须跟手 · 点击选中：左侧 2px 橙条 scaleY 长出 · 行内操作 hover 才出现 · 刻意不做逐行入场</p>
+<table><thead><tr><th>机会名称</th><th>阶段</th><th class="num">规模 ㎡</th><th style="width:120px"></th></tr></thead>
+<tbody id="tb">
+<tr class="row"><td>示例机会 A</td><td style="color:var(--color-fg-muted)">3/5 意向</td><td class="num">85,000</td><td><div class="row-actions"><button class="mini">详情</button><button class="mini">指派</button></div></td></tr>
+<tr class="row"><td>示例机会 B</td><td style="color:var(--color-fg-muted)">2/5 尽调</td><td class="num">120,000</td><td><div class="row-actions"><button class="mini">详情</button><button class="mini">指派</button></div></td></tr>
+<tr class="row"><td>示例机会 C</td><td style="color:var(--color-fg-muted)">4/5 审计</td><td class="num">62,500</td><td><div class="row-actions"><button class="mini">详情</button><button class="mini">指派</button></div></td></tr>
+</tbody></table></section>
+
+<section><h2>Tab 滑动指示条</h2><p class="hint">共享指示器 transform 位移 160ms，不是各自淡入淡出</p>
+<div class="tabs" id="tabs">
+  <button class="tab" aria-selected="true">并购标的</button>
+  <button class="tab" aria-selected="false">全新品类</button>
+  <button class="tab" aria-selected="false">项目组支持</button>
+  <div class="tab-indicator" id="ind"></div>
+</div></section>
+
+<section><h2>输入框</h2><p class="hint">焦点用边框表达不用外环 · 校验失败抖动 2px（超过 4px 就变游戏反馈了）</p>
+<div class="bar">
+  <input class="input" placeholder="搜索机会、公司、报告…">
+  <button class="btn" id="errBtn">触发校验失败</button>
+</div></section>
+
+<section><h2>浮层 / 命令面板</h2><p class="hint">scale(0.96)+位移 4px 进场，200ms expo-out — Radix 默认值</p>
+<div class="bar" style="position:relative">
+  <button class="btn" id="popBtn">打开下拉</button>
+  <div id="pop" style="display:none"><div class="overlay">
+    <div class="oi">按负责人筛选</div><div class="oi">按阶段筛选</div><div class="oi">按对标品牌筛选</div>
+  </div></div>
+</div></section>
+
+<section><h2>骨架屏</h2><p class="hint">1.4s 横向扫光，取代"空白 + 转圈"</p>
+<div class="cards">
+  <div class="card"><div class="skeleton" style="width:60%"></div><div class="skeleton" style="width:40%;margin-top:10px;height:24px"></div></div>
+  <div class="card"><div class="skeleton" style="width:50%"></div><div class="skeleton" style="width:70%;margin-top:10px;height:24px"></div></div>
+  <div class="card"><div class="k">7,401</div><div class="kl">展会品牌</div></div>
+</div></section>
+
+<section><h2>面板进场</h2><p class="hint">只在首次挂载播一次，切筛选不重播</p>
+<div class="bar"><button class="btn" id="panelBtn">重放</button></div>
+<div class="cards panel-enter" id="panels" style="margin-top:12px">
+  <div class="card"><div class="k">24</div><div class="kl">在跟进机会</div></div>
+  <div class="card"><div class="k">9,740</div><div class="kl">主办方索引</div></div>
+  <div class="card"><div class="k">2,061</div><div class="kl">白地信号</div></div>
+</div></section>
+
+<section><h2>侧栏收展</h2><p class="hint">宽度 240ms · 文字 120ms 先淡出，避免挤压</p>
+<div class="bar"><button class="btn" id="sbBtn">切换收起</button></div>
+<div class="sidebar" id="sb" style="margin-top:12px">
+  <div class="nav"><span class="dot"></span><span class="nav-label">盘面</span></div>
+  <div class="nav"><span class="dot"></span><span class="nav-label">机会台</span></div>
+  <div class="nav"><span class="dot"></span><span class="nav-label">公司库</span></div>
+</div></section>
+
+<section><h2>Toast</h2><p class="hint">右下角上浮 200ms — Sonner 默认</p>
+<div class="bar"><button class="btn" id="toastBtn">触发</button></div></section>
+
+<section style="padding-bottom:60px"><h2>明确不做</h2>
+<p class="hint">KPI 数字 count-up · 表格逐行 stagger · 视差滚动 · 悬停辉光 · 页面切换转场<br>
+Linear 和 Vercel 都没有这些。加了就不是"国际规格"，是"模板感"。</p></section>
+
+</div><script>
+document.querySelectorAll('#tb .row').forEach(r=>r.onclick=()=>{
+  document.querySelectorAll('#tb .row').forEach(x=>x.removeAttribute('aria-selected'));
+  r.setAttribute('aria-selected','true');});
+const tabs=[...document.querySelectorAll('#tabs .tab')],ind=document.getElementById('ind');
+function moveInd(t){ind.style.width=t.offsetWidth+'px';ind.style.transform=`translateX(${t.offsetLeft}px)`;}
+tabs.forEach(t=>t.onclick=()=>{tabs.forEach(x=>x.setAttribute('aria-selected','false'));
+  t.setAttribute('aria-selected','true');moveInd(t);});
+requestAnimationFrame(()=>moveInd(tabs[0]));
+const inp=document.querySelector('.input');
+document.getElementById('errBtn').onclick=()=>{inp.setAttribute('aria-invalid','true');
+  setTimeout(()=>inp.removeAttribute('aria-invalid'),600);};
+const pop=document.getElementById('pop');
+document.getElementById('popBtn').onclick=()=>{pop.style.display=pop.style.display==='none'?'block':'none';};
+document.getElementById('panelBtn').onclick=()=>{const p=document.getElementById('panels');
+  p.classList.remove('panel-enter');void p.offsetWidth;p.classList.add('panel-enter');};
+const sb=document.getElementById('sb');
+document.getElementById('sbBtn').onclick=()=>sb.setAttribute('data-collapsed',
+  sb.getAttribute('data-collapsed')==='true'?'false':'true');
+document.getElementById('toastBtn').onclick=()=>{const t=document.createElement('div');
+  t.className='toast';t.textContent='已导出 24 条机会到 CSV';document.body.appendChild(t);
+  setTimeout(()=>{t.setAttribute('data-state','closed');setTimeout(()=>t.remove(),200);},2400);};
+</script></body></html>

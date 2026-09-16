@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="_ds/mwlab-design-system-a8c02174-0957-4177-a2c5-54f691653890/colors_and_type.css">
+<script src="_ds/mwlab-design-system-a8c02174-0957-4177-a2c5-54f691653890/_ds_bundle.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  html, body { margin:0; padding:0; background:#0A0A0B; color:#F5F5F7; -webkit-font-smoothing:antialiased; }
+  body { font-family:'Geist','Noto Sans SC',system-ui,sans-serif; }
+  a { color:#F5F5F7; text-decoration:none; }
+  a:hover { color:#FF7324; }
+  code { background:#1F1F24; border:1px solid rgba(255,255,255,.07); border-radius:2px; padding:1px 4px; }
+  @keyframes sk { 0%{opacity:.30} 50%{opacity:.70} 100%{opacity:.30} }
+  @keyframes spin { to { transform:rotate(360deg) } }
+  @keyframes pulse { 0%{opacity:1} 50%{opacity:.35} 100%{opacity:1} }
+  ::-webkit-scrollbar { width:6px; height:6px }
+  ::-webkit-scrollbar-thumb { background:#2A2A30; border-radius:0 }
+</style>
+</helmet>
+
+<div style="width:1440px;box-sizing:border-box;padding:56px 56px 140px">
+
+  <header style="display:flex;align-items:flex-end;justify-content:space-between;gap:48px;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:28px;margin-bottom:56px">
+    <div>
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:24px">
+        <span style="font:600 20px/1 'Geist',sans-serif;letter-spacing:-.02em;color:#F5F5F7">MWLAB</span>
+        <span style="width:1px;height:15px;background:rgba(255,255,255,.18)"></span>
+        <span style="font:400 17px/1 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">万象</span>
+      </div>
+      <h1 style="margin:0;font:600 28px/1.2 'Geist',sans-serif;letter-spacing:-.02em;color:#F5F5F7">设计语言与状态系统 · 重做规范</h1>
+      <p style="margin:10px 0 0;font:400 15px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;max-width:640px">结构不动。本板只定三件事：token 层清污染、中英混排纪律、组件全状态。</p>
+    </div>
+    <div style="text-align:right;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.7;color:#52525A;flex:none">
+      <div>REV 2026-09-16</div>
+      <div>SOURCE sywangyue/D_system</div>
+      <div>BRIEF docs/CLAUDE-DESIGN-BRIEF.md</div>
+      <div>SUPERSEDES stitch/DESIGN.md L1–50</div>
+    </div>
+  </header>
+
+  <section style="margin-bottom:96px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:12px;margin-bottom:32px">
+      <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:#52525A">01</span>
+      <h2 style="margin:0;font:600 24px/1.3 'Geist',sans-serif;letter-spacing:-.015em;color:#F5F5F7">Token 表</h2>
+      <span style="font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">12 色 · 8 级字阶 · 圆角 · 间距 — Tailwind v4 <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F5F5F7">@theme</code> 口径</span>
+    </div>
+
+    <div style="border:1px solid rgba(254,92,0,.28);background:rgba(254,92,0,.05);border-radius:6px;padding:16px 18px;margin-bottom:32px;display:flex;gap:16px;align-items:flex-start">
+      <span style="flex:none;width:6px;height:6px;border-radius:9999px;background:#FE5C00;margin-top:7px"></span>
+      <div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7;margin-bottom:6px">P0-4 · Material 3 色板已整段删除</div>
+        <div style="font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">
+          <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8A93">primary #ffb599</code> ·
+          <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8A93">outline #ab897d</code> ·
+          <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8A93">on-surface-variant #e4beb1</code> ·
+          <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8A93">tertiary #a0caff</code> ·
+          <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8A93">surface-tint</code> ·
+          M3 tonal 全族 —— 不再存在。品牌色不再藏在 <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#8A8A93">primary-container</code>，它就是 <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F5F5F7">accent</code>。
+        </div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden;margin-bottom:16px">
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#0A0A0B;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">bg-canvas</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#0A0A0B</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">主画布 · 分栏沟槽 · 表格奇数带</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#0E0E10;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">bg-sidebar</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#0E0E10</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">侧栏 · 表头 · 输入框底</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#141416;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">bg-surface</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#141416</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">面板 · 卡片 · 表格容器</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#1A1A1E;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">bg-surface-elevated</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#1A1A1E</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">浮层 · 下拉 · 命令面板</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#1F1F24;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">bg-surface-hover</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#1F1F24</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">hover · 选中行底 · 激活 tab</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#0E0E10;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">border-hairline</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">rgba(255,255,255,.07)</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">默认发丝线 · 唯一分隔手段</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#0E0E10;border:1px solid rgba(255,255,255,.14);margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">border-active</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">rgba(255,255,255,.14)</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">hover 边 · focus-visible 边</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#F5F5F7;margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">text-primary</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#F5F5F7</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">标题 · 数值 · 主字段</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#8A8A93;margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">text-secondary</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#8A8A93</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">正文 · 次字段 · 图标默认</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#52525A;margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">text-tertiary</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#52525A</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">表头 · 占位符 · 元数据</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#FE5C00;margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">accent</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#FE5C00</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">每屏最多 3 次 — 见 05</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#FF7324;margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">accent-hover</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#FF7324</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">仅 accent 元素的 hover</div>
+      </div>
+    </div>
+
+    <p style="margin:0 0 40px;font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A">12 个，不多不少。没有语义色族、没有第二强调色、没有 tonal palette。成功 / 失败 / 警告一律用中性灰 + 文案承担，只有「错误」允许借 accent 的红向邻位（见 04 输入框 error 态）。</p>
+
+    <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:12px;margin-bottom:28px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:#52525A">02</span>
+      <h3 style="margin:0;font:600 18px/1.3 'Geist',sans-serif;letter-spacing:-.015em;color:#F5F5F7">8 级字阶</h3>
+      <span style="font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">应用域 11–24px · 营销域 13–72px。级与级之间最小 2px 落差 —— 原来 13/12 那种 1px 层级已合并。</span>
+    </div>
+
+    <div style="border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden;margin-bottom:24px">
+      <div style="display:grid;grid-template-columns:150px 78px 78px 96px 96px 104px 96px 1fr;background:#0E0E10;border-bottom:1px solid rgba(255,255,255,.07);font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">
+        <div style="padding:10px 14px">Token</div>
+        <div style="padding:10px 14px">拉丁</div>
+        <div style="padding:10px 14px">中文</div>
+        <div style="padding:10px 14px">拉丁字重</div>
+        <div style="padding:10px 14px">中文字重</div>
+        <div style="padding:10px 14px">行高 拉/中</div>
+        <div style="padding:10px 14px">字距 拉/中</div>
+        <div style="padding:10px 14px">域 / 用途</div>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 78px 78px 96px 96px 104px 96px 1fr;background:#141416;border-bottom:1px solid rgba(255,255,255,.07);font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93;align-items:center">
+        <div style="padding:11px 14px;color:#F5F5F7">display</div>
+        <div style="padding:11px 14px;color:#F5F5F7">72</div>
+        <div style="padding:11px 14px">68</div>
+        <div style="padding:11px 14px">600</div>
+        <div style="padding:11px 14px">500</div>
+        <div style="padding:11px 14px">1.05 / 1.15</div>
+        <div style="padding:11px 14px">-.03 / 0</div>
+        <div style="padding:11px 14px;font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0">营销 — 落地页 Hero，全站仅此一处</div>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 78px 78px 96px 96px 104px 96px 1fr;background:#0A0A0B;border-bottom:1px solid rgba(255,255,255,.07);font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93;align-items:center">
+        <div style="padding:11px 14px;color:#F5F5F7">hero</div>
+        <div style="padding:11px 14px;color:#F5F5F7">44</div>
+        <div style="padding:11px 14px">42</div>
+        <div style="padding:11px 14px">600</div>
+        <div style="padding:11px 14px">500</div>
+        <div style="padding:11px 14px">1.10 / 1.20</div>
+        <div style="padding:11px 14px">-.025 / 0</div>
+        <div style="padding:11px 14px;font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0">营销 — 登录页左栏命题</div>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 78px 78px 96px 96px 104px 96px 1fr;background:#141416;border-bottom:1px solid rgba(255,255,255,.07);font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93;align-items:center">
+        <div style="padding:11px 14px;color:#F5F5F7">title</div>
+        <div style="padding:11px 14px;color:#F5F5F7">28</div>
+        <div style="padding:11px 14px">27</div>
+        <div style="padding:11px 14px">600</div>
+        <div style="padding:11px 14px">500</div>
+        <div style="padding:11px 14px">1.20 / 1.35</div>
+        <div style="padding:11px 14px">-.02 / 0</div>
+        <div style="padding:11px 14px;font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0">营销 — 段落标题；登录表单标题</div>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 78px 78px 96px 96px 104px 96px 1fr;background:#0A0A0B;border-bottom:1px solid rgba(255,255,255,.07);font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93;align-items:center">
+        <div style="padding:11px 14px;color:#F5F5F7">heading</div>
+        <div style="padding:11px 14px;color:#F5F5F7">24</div>
+        <div style="padding:11px 14px">23</div>
+        <div style="padding:11px 14px">600</div>
+        <div style="padding:11px 14px">500</div>
+        <div style="padding:11px 14px">1.25 / 1.40</div>
+        <div style="padding:11px 14px">-.015 / 0</div>
+        <div style="padding:11px 14px;font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0">应用上限 — 页面标题「机会台」；KPI 数值</div>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 78px 78px 96px 96px 104px 96px 1fr;background:#141416;border-bottom:1px solid rgba(255,255,255,.07);font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93;align-items:center">
+        <div style="padding:11px 14px;color:#F5F5F7">subhead</div>
+        <div style="padding:11px 14px;color:#F5F5F7">18</div>
+        <div style="padding:11px 14px">17</div>
+        <div style="padding:11px 14px">500</div>
+        <div style="padding:11px 14px">400</div>
+        <div style="padding:11px 14px">1.35 / 1.55</div>
+        <div style="padding:11px 14px">-.01 / 0</div>
+        <div style="padding:11px 14px;font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0">应用 — 面板标题 · 详情页章节 · 品牌锁定中文位</div>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 78px 78px 96px 96px 104px 96px 1fr;background:#0A0A0B;border-bottom:1px solid rgba(255,255,255,.07);font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93;align-items:center">
+        <div style="padding:11px 14px;color:#F5F5F7">body</div>
+        <div style="padding:11px 14px;color:#F5F5F7">15</div>
+        <div style="padding:11px 14px">14</div>
+        <div style="padding:11px 14px">400</div>
+        <div style="padding:11px 14px">400</div>
+        <div style="padding:11px 14px">1.45 / 1.80</div>
+        <div style="padding:11px 14px">-.005 / 0</div>
+        <div style="padding:11px 14px;font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0">共用 — 营销正文 · 输入框值 · 尽调长文（中文 1.8）</div>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 78px 78px 96px 96px 104px 96px 1fr;background:#141416;border-bottom:1px solid rgba(255,255,255,.07);font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93;align-items:center">
+        <div style="padding:11px 14px;color:#F5F5F7">ui</div>
+        <div style="padding:11px 14px;color:#F5F5F7">13</div>
+        <div style="padding:11px 14px">12</div>
+        <div style="padding:11px 14px">400 / 500</div>
+        <div style="padding:11px 14px">400</div>
+        <div style="padding:11px 14px">1.45 / 1.65</div>
+        <div style="padding:11px 14px">0 / 0</div>
+        <div style="padding:11px 14px;font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0">应用默认 — 表格单元 · 按钮 · tab · pill</div>
+      </div>
+      <div style="display:grid;grid-template-columns:150px 78px 78px 96px 96px 104px 96px 1fr;background:#0A0A0B;font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93;align-items:center">
+        <div style="padding:11px 14px;color:#F5F5F7">micro</div>
+        <div style="padding:11px 14px;color:#F5F5F7">11</div>
+        <div style="padding:11px 14px">11</div>
+        <div style="padding:11px 14px">600 caps / 500 mono</div>
+        <div style="padding:11px 14px">400</div>
+        <div style="padding:11px 14px">1.10 / 1.60</div>
+        <div style="padding:11px 14px">.08 / 0</div>
+        <div style="padding:11px 14px;font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0">共用底线 — 表头 caps · 编号 · 元数据。不得再小</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden;margin-bottom:40px">
+      <div style="background:#141416;padding:28px 24px">
+        <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:20px">样张 · 营销域</div>
+        <div style="font:600 72px/1.05 'Geist',sans-serif;letter-spacing:-.03em;color:#F5F5F7">Structured</div>
+        <div style="font:500 68px/1.15 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7;margin-bottom:18px">结构化盘面</div>
+        <div style="font:400 14px/1.8 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;max-width:440px">7,401 个展会品牌 · 9,740 家主办方 · 十年届次数据。为杜塞尔多夫展览的业务拓展提供事实基础。</div>
+      </div>
+      <div style="background:#141416;padding:28px 24px">
+        <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:20px">样张 · 应用域</div>
+        <div style="font:600 24px/1.25 'Geist',sans-serif;letter-spacing:-.015em;color:#F5F5F7">Pipeline</div>
+        <div style="font:500 23px/1.4 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7;margin-bottom:16px">机会台</div>
+        <div style="font:500 18px/1.35 'Geist',sans-serif;letter-spacing:-.01em;color:#F5F5F7">Electronica China</div>
+        <div style="font:400 17px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7;margin-bottom:16px">国际半导体先进制程博览会</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-bottom:6px">控股并购 · 华创展览科技（上海） · 上海</div>
+        <div style="font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;font-variant-numeric:tabular-nums;font-size:13px;font-weight:500;color:#F5F5F7;letter-spacing:0">85,000 ㎡ &nbsp; 3,420 位 &nbsp; 64,800 人</div>
+        <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-top:14px">OPP-2025-089 · UPDATED 18 MIN AGO</div>
+      </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1.15fr 1fr;gap:24px">
+      <sc-if value="{{ showThemeCode }}" hint-placeholder-val="{{ true }}">
+      <div style="background:#0E0E10;border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+        <div style="padding:12px 16px;border-bottom:1px solid rgba(255,255,255,.07);display:flex;justify-content:space-between;align-items:center">
+          <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">Tailwind v4 · app/globals.css</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A">@theme</span>
+        </div>
+        <pre style="margin:0;padding:18px 16px;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;font-size:12px;line-height:1.75;color:#8A8A93;overflow-x:auto">@theme {
+  --color-canvas:           #0A0A0B;
+  --color-sidebar:          #0E0E10;
+  --color-surface:          #141416;
+  --color-surface-elevated: #1A1A1E;
+  --color-surface-hover:    #1F1F24;
+  --color-hairline:         rgb(255 255 255 / 7%);
+  --color-hairline-active:  rgb(255 255 255 / 14%);
+  --color-fg:               #F5F5F7;
+  --color-fg-muted:         #8A8A93;
+  --color-fg-faint:         #52525A;
+  --color-accent:           #FE5C00;
+  --color-accent-hover:     #FF7324;
+
+  --font-sans: 'Geist', system-ui, sans-serif;
+  --font-cjk:  'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace,
+               SFMono-Regular, monospace;
+
+  --radius-badge: 2px;   --radius-control: 4px;
+  --radius-panel: 6px;   --radius-card:    8px;
+
+  --text-display: 4.5rem;  --text-hero:    2.75rem;
+  --text-title:   1.75rem; --text-heading: 1.5rem;
+  --text-subhead: 1.125rem;--text-body:    0.9375rem;
+  --text-ui:      0.8125rem;--text-micro:  0.6875rem;
+}</pre>
+      </div>
+      </sc-if>
+      <div style="display:flex;flex-direction:column;gap:24px">
+        <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:20px">
+          <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:18px">圆角 · 4 档</div>
+          <div style="display:flex;gap:20px;align-items:flex-end">
+            <div style="text-align:center"><div style="width:52px;height:36px;background:#1F1F24;border:1px solid rgba(255,255,255,.14);border-radius:2px;margin-bottom:8px"></div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93">2</div><div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A">徽标</div></div>
+            <div style="text-align:center"><div style="width:52px;height:36px;background:#1F1F24;border:1px solid rgba(255,255,255,.14);border-radius:4px;margin-bottom:8px"></div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93">4</div><div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A">控件</div></div>
+            <div style="text-align:center"><div style="width:52px;height:36px;background:#1F1F24;border:1px solid rgba(255,255,255,.14);border-radius:6px;margin-bottom:8px"></div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93">6</div><div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A">面板</div></div>
+            <div style="text-align:center"><div style="width:52px;height:36px;background:#1F1F24;border:1px solid rgba(255,255,255,.14);border-radius:8px;margin-bottom:8px"></div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93">8</div><div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A">营销卡</div></div>
+            <div style="text-align:center"><div style="width:36px;height:36px;background:#1F1F24;border:1px solid rgba(255,255,255,.14);border-radius:9999px;margin-bottom:8px"></div><div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93">full</div><div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A">仅状态点</div></div>
+          </div>
+        </div>
+        <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:20px;flex:1">
+          <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:18px">间距 · 4 基数</div>
+          <div style="display:flex;align-items:flex-end;gap:8px;margin-bottom:16px">
+            <div style="width:4px;height:12px;background:#52525A"></div>
+            <div style="width:8px;height:18px;background:#52525A"></div>
+            <div style="width:12px;height:24px;background:#52525A"></div>
+            <div style="width:16px;height:32px;background:#8A8A93"></div>
+            <div style="width:24px;height:44px;background:#8A8A93"></div>
+            <div style="width:32px;height:56px;background:#8A8A93"></div>
+            <div style="width:48px;height:68px;background:#F5F5F7"></div>
+            <div style="width:64px;height:80px;background:#F5F5F7"></div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.8;color:#8A8A93">4 · 8 · 12 · 16 · 24 · 32 · 48 · 64 · 96 · 120</div>
+          <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A;margin-top:10px">应用域内边距 12–16；表格行内 8–12。营销域段落间距 <span style="color:#F5F5F7">120</span>（原 160 已收），Hero 产品图底边与数字带上边框贴合，间隙 0。</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section style="margin-bottom:96px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:12px;margin-bottom:12px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:#52525A">03</span>
+      <h2 style="margin:0;font:600 24px/1.3 'Geist',sans-serif;letter-spacing:-.015em;color:#F5F5F7">中文排版规范</h2>
+      <span style="font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">7 条 · 落成数值 · 不可协商</span>
+    </div>
+    <p style="margin:0 0 32px;font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A;max-width:820px">前置条件（P0-2）：四个应用屏此前 0 处中文字体声明，中文全部走系统回退。所有屏的字体栈统一为 <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F5F5F7">'Geist','Noto Sans SC','PingFang SC',sans-serif</code>，中文段落显式声明 <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F5F5F7">--font-cjk</code>。</p>
+
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px">
+
+      <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:22px 24px">
+        <div style="display:flex;gap:12px;align-items:baseline;margin-bottom:16px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A;flex:none">R1</span>
+          <div>
+            <div style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">中文字重永远比拉丁低一档</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:#8A8A93;margin-top:4px">Geist 600 → Noto Sans SC 500 &nbsp;·&nbsp; 500 → 400 &nbsp;·&nbsp; 400 → 400（400 为地板）</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden">
+          <div style="background:#0A0A0B;padding:14px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:10px">✕ 前</div>
+            <div style="font-family:'Geist','Noto Sans SC',sans-serif;font-weight:600;font-size:24px;line-height:1.3;color:#8A8A93">机会台 Pipeline</div>
+          </div>
+          <div style="background:#0A0A0B;padding:14px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:10px">✓ 后</div>
+            <div style="line-height:1.3"><span style="font:500 23px 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">机会台</span><span style="display:inline-block;width:.25em"></span><span style="font:600 24px 'Geist',sans-serif;letter-spacing:-.015em;color:#F5F5F7">Pipeline</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:22px 24px">
+        <div style="display:flex;gap:12px;align-items:baseline;margin-bottom:16px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A;flex:none">R2</span>
+          <div>
+            <div style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">中文永不使用负字距</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:#8A8A93;margin-top:4px">letter-spacing: 0 &nbsp;— 全字阶、全字号、无例外</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden">
+          <div style="background:#0A0A0B;padding:14px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:10px">✕ -0.02em</div>
+            <div style="font:500 23px/1.4 'Noto Sans SC',sans-serif;letter-spacing:-.02em;color:#8A8A93">独家商业承办协议</div>
+          </div>
+          <div style="background:#0A0A0B;padding:14px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:10px">✓ 0</div>
+            <div style="font:500 23px/1.4 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">独家商业承办协议</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:22px 24px">
+        <div style="display:flex;gap:12px;align-items:baseline;margin-bottom:16px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A;flex:none">R3</span>
+          <div>
+            <div style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">中文行高高于拉丁</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:#8A8A93;margin-top:4px">UI 拉丁 1.45 ↔ 中文 1.65 &nbsp;·&nbsp; 长文中文 1.80 &nbsp;·&nbsp; 标题 拉丁 1.10–1.25 ↔ 中文 1.20–1.40</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden">
+          <div style="background:#0A0A0B;padding:14px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:10px">✕ 1.45</div>
+            <div style="font:400 14px/1.45 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">标的展会于华东半导体装备领域占据 38% 独占展位排期，历年客商复展率达 84.6%。</div>
+          </div>
+          <div style="background:#0A0A0B;padding:14px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:10px">✓ 1.80</div>
+            <div style="font:400 14px/1.8 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">标的展会于华东半导体装备领域占据 38% 独占展位排期，历年客商复展率达 84.6%。</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:22px 24px">
+        <div style="display:flex;gap:12px;align-items:baseline;margin-bottom:16px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A;flex:none">R4</span>
+          <div>
+            <div style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">中英混排时中文字号比拉丁小 1px</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:#8A8A93;margin-top:4px">72/68 · 44/42 · 28/27 · 24/23 · 18/17 · 15/14 · 13/12 · 11/11 — 补偿中文字面率</div>
+          </div>
+        </div>
+        <div style="background:#0A0A0B;border-radius:4px;padding:14px;display:flex;flex-direction:column;gap:10px">
+          <div style="display:flex;align-items:baseline;gap:0;padding-bottom:10px;border-bottom:1px solid rgba(255,255,255,.07)">
+            <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;width:44px;flex:none">✕</span>
+            <span style="font:400 15px 'Noto Sans SC',sans-serif;color:#8A8A93">对标 </span><span style="font:400 15px 'Geist',sans-serif;color:#8A8A93">Hannover Messe</span><span style="font:400 15px 'Noto Sans SC',sans-serif;color:#8A8A93"> 同类展期</span>
+          </div>
+          <div style="display:flex;align-items:baseline;gap:0">
+            <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;width:44px;flex:none">✓</span>
+            <span style="font:400 14px 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">对标</span><span style="display:inline-block;width:.25em"></span><span style="font:400 15px 'Geist',sans-serif;letter-spacing:-.005em;color:#F5F5F7">Hannover Messe</span><span style="display:inline-block;width:.25em"></span><span style="font:400 14px 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">同类展期</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:22px 24px">
+        <div style="display:flex;gap:12px;align-items:baseline;margin-bottom:16px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A;flex:none">R5</span>
+          <div>
+            <div style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">数字永远走拉丁等宽，绝不落入 CJK 字体</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:#8A8A93;margin-top:4px">P0-3 修复：Geist 必须从等宽栈里拿掉，否则 JetBrains Mono 永远不命中</div>
+          </div>
+        </div>
+        <div style="background:#0A0A0B;border-radius:4px;overflow:hidden">
+          <div style="padding:12px 14px;border-bottom:1px solid rgba(255,255,255,.07)">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:#52525A;margin-bottom:8px">✕ font-family: 'Geist', 'JetBrains Mono', monospace</div>
+            <div style="font-family:'Geist',sans-serif;font-variant-numeric:tabular-nums;font-size:13px;line-height:1.7;color:#8A8A93;text-align:right;width:110px">85,000<br>210,000<br>1,428,500</div>
+          </div>
+          <div style="padding:12px 14px">
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:#52525A;margin-bottom:8px">✓ font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace<br>&nbsp;&nbsp;font-variant-numeric: tabular-nums</div>
+            <div style="font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;font-variant-numeric:tabular-nums;font-size:13px;line-height:1.7;color:#F5F5F7;text-align:right;width:110px">85,000<br>210,000<br>1,428,500</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:22px 24px">
+        <div style="display:flex;gap:12px;align-items:baseline;margin-bottom:16px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A;flex:none">R6</span>
+          <div>
+            <div style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">中文标题不用 800 字重</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:#8A8A93;margin-top:4px">上限 500。系统回退字体在 ≥700 触发伪粗体，边缘发毛</div>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:1px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden">
+          <div style="background:#0A0A0B;padding:14px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:10px">✕ 800</div>
+            <div style="font-family:'Noto Sans SC',sans-serif;font-weight:800;font-size:42px;line-height:1.2;letter-spacing:0;color:#8A8A93">结构化盘面</div>
+          </div>
+          <div style="background:#0A0A0B;padding:14px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:10px">✓ 500</div>
+            <div style="font:500 42px/1.2 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">结构化盘面</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:22px 24px;grid-column:span 2">
+        <div style="display:flex;gap:12px;align-items:baseline;margin-bottom:16px">
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A;flex:none">R7</span>
+          <div>
+            <div style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">中英之间 0.25em 间隙，由样式控制，不靠手打空格</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.7;color:#8A8A93;margin-top:4px">实现：包裹 &lt;span class="lat"&gt; 并 margin-inline: .25em；或 text-spacing-trim / 服务端插入 &lt;wbr&gt; 前的 0.25em spacer。数据库字段里不得含补位空格。</div>
+          </div>
+        </div>
+        <div style="background:#0A0A0B;border-radius:4px;padding:16px 18px;display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;gap:16px;align-items:baseline">
+            <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;width:52px;flex:none">✕ 无隙</span>
+            <span style="font:400 14px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">标的<span style="font-family:'Geist',sans-serif;font-size:15px">Electronica China</span>于<span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:13px">2025-10-18</span>开幕，展览面积<span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:13px">85,000</span>㎡。</span>
+          </div>
+          <div style="display:flex;gap:16px;align-items:baseline">
+            <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;width:52px;flex:none">✓ .25em</span>
+            <span style="font:400 14px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">标的<span style="font-family:'Geist',sans-serif;font-size:15px;letter-spacing:-.005em;margin-inline:.25em">Electronica China</span>于<span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:13px;margin-inline:.25em">2025-10-18</span>开幕，展览面积<span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:13px;margin-inline:.25em">85,000</span>㎡。</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="background:#0E0E10;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:22px 24px;grid-column:span 2">
+        <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:18px">品牌锁定 · P0-1 · 四个应用屏语序已反正</div>
+        <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden">
+          <div style="background:#0A0A0B;padding:20px 18px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✕ 现状 · 4 屏</div>
+            <div style="display:flex;align-items:center;gap:10px">
+              <span style="font:500 20px/1 'Noto Sans SC',sans-serif;color:#8A8A93">万象</span>
+              <span style="width:1px;height:14px;background:rgba(255,255,255,.18)"></span>
+              <span style="font:400 15px/1 'Geist',sans-serif;color:#8A8A93">MWLAB</span>
+            </div>
+          </div>
+          <div style="background:#0A0A0B;padding:20px 18px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✓ 标准态 · 20/17</div>
+            <div style="display:flex;align-items:center;gap:12px">
+              <span style="font:600 20px/1 'Geist',sans-serif;letter-spacing:-.02em;color:#F5F5F7">MWLAB</span>
+              <span style="width:1px;height:15px;background:rgba(255,255,255,.18)"></span>
+              <span style="font:400 17px/1 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">万象</span>
+            </div>
+          </div>
+          <div style="background:#0A0A0B;padding:20px 18px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✓ 密集态 · 15/13</div>
+            <div style="display:flex;align-items:center;gap:9px">
+              <span style="font:600 15px/1 'Geist',sans-serif;letter-spacing:-.02em;color:#F5F5F7">MWLAB</span>
+              <span style="width:1px;height:11px;background:rgba(255,255,255,.18)"></span>
+              <span style="font:400 13px/1 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">万象</span>
+            </div>
+          </div>
+          <div style="background:#0A0A0B;padding:20px 18px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✓ 图标态 · 侧栏收起</div>
+            <div style="display:flex;align-items:center;gap:14px">
+              <span style="width:28px;height:28px;border:1px solid rgba(255,255,255,.14);border-radius:4px;display:flex;align-items:center;justify-content:center;font:400 15px/1 'Noto Sans SC',sans-serif;color:#F5F5F7">象</span>
+              <span style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A">兄弟项目同构<br>WHENJIN │ 问津 →「津」</span>
+            </div>
+          </div>
+        </div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A;margin-top:14px">规则：拉丁在前，字重 600、字距 -0.02em；发丝竖线 1px / rgba(255,255,255,.18) / 高度 = 拉丁字号 ×0.75；中文在后，字重低一档、视觉尺寸小一号、字距 0。三者间距 12px（密集态 9px）。</div>
+      </div>
+    </div>
+  </section>
+
+  <sc-if value="{{ showStateBoard }}" hint-placeholder-val="{{ true }}">
+  <section style="margin-bottom:96px">
+    <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:12px;margin-bottom:12px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:#52525A">04</span>
+      <h2 style="margin:0;font:600 24px/1.3 'Geist',sans-serif;letter-spacing:-.015em;color:#F5F5F7">组件状态对照板</h2>
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:#52525A">8 CLASSES · 39 STATES · ONE BOARD</span>
+    </div>
+    <p style="margin:0 0 36px;font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A;max-width:820px">全状态集中在这一张板上，不散进各屏。交互态用真实 hover / focus 实现，可直接点按验证；不可触发态（loading / skeleton / 空 / 失败）为静态帧。</p>
+
+    <div style="display:flex;flex-direction:column;gap:32px">
+
+      <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+        <div style="padding:14px 18px;background:#0E0E10;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:baseline;gap:12px">
+          <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">C1</span>
+          <span style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">表格行</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A">default / hover / selected / multi-select / keyboard-focus / current · 行高 32px 定高</span>
+        </div>
+        <div style="display:grid;grid-template-columns:150px 1fr">
+          <div style="border-right:1px solid rgba(255,255,255,.07);background:#0E0E10">
+            <div style="height:30px;display:flex;align-items:center;padding:0 16px;font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;border-bottom:1px solid rgba(255,255,255,.07)">表头</div>
+            <div style="height:32px;display:flex;align-items:center;padding:0 16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93;border-bottom:1px solid rgba(255,255,255,.07)">default</div>
+            <div style="height:32px;display:flex;align-items:center;padding:0 16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93;border-bottom:1px solid rgba(255,255,255,.07)">hover</div>
+            <div style="height:32px;display:flex;align-items:center;padding:0 16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93;border-bottom:1px solid rgba(255,255,255,.07)">selected</div>
+            <div style="height:32px;display:flex;align-items:center;padding:0 16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93;border-bottom:1px solid rgba(255,255,255,.07)">multi-select</div>
+            <div style="height:32px;display:flex;align-items:center;padding:0 16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93;border-bottom:1px solid rgba(255,255,255,.07)">kbd-focus</div>
+            <div style="height:32px;display:flex;align-items:center;padding:0 16px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#F5F5F7">current</div>
+          </div>
+          <div>
+            <div style="display:grid;grid-template-columns:28px minmax(0,1fr) 88px 132px 96px 72px;height:30px;align-items:center;background:#0E0E10;border-bottom:1px solid rgba(255,255,255,.07);font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">
+              <div style="padding:0 8px"></div><div style="padding:0 12px">机会名称</div><div style="padding:0 12px">类型</div><div style="padding:0 12px">阶段</div><div style="padding:0 12px;text-align:right">规模 ㎡</div><div style="padding:0 12px">优先级</div>
+            </div>
+            <div style="display:grid;grid-template-columns:28px minmax(0,1fr) 88px 132px 96px 72px;height:32px;align-items:center;background:#0A0A0B;border-bottom:1px solid rgba(255,255,255,.07);border-left:2px solid transparent">
+              <div style="padding:0 7px"><span style="display:block;width:13px;height:13px;border:1px solid rgba(255,255,255,.15);border-radius:2px"></span></div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">国际半导体先进制程博览会</div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;color:#8A8A93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">并购</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:8px"><span style="display:block;width:44px;height:2px;background:rgba(255,255,255,.10)"><span style="display:block;width:60%;height:2px;background:#8A8A93"></span></span><span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;color:#8A8A93">3/5</span><span style="font:400 11px/1 'Noto Sans SC',sans-serif;color:#8A8A93">意向</span></div>
+              <div style="padding:0 12px;text-align:right;font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#F5F5F7">85,000</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:7px"><span style="display:block;width:3px;height:12px;background:#F5F5F7"></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#F5F5F7">P1</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:28px minmax(0,1fr) 88px 132px 96px 72px;height:32px;align-items:center;background:#1F1F24;border-bottom:1px solid rgba(255,255,255,.07);border-left:2px solid transparent">
+              <div style="padding:0 7px"><span style="display:block;width:13px;height:13px;border:1px solid rgba(255,255,255,.28);border-radius:2px"></span></div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">亚太数字医疗器械巡展</div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;color:#F5F5F7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">参股</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:8px"><span style="display:block;width:44px;height:2px;background:rgba(255,255,255,.14)"><span style="display:block;width:40%;height:2px;background:#F5F5F7"></span></span><span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;color:#F5F5F7">2/5</span><span style="font:400 11px/1 'Noto Sans SC',sans-serif;color:#F5F5F7">尽调</span></div>
+              <div style="padding:0 12px;text-align:right;font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#F5F5F7">120,000</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:7px"><span style="display:block;width:3px;height:12px;background:rgba(245,245,247,.55)"></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93">P2</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:28px minmax(0,1fr) 88px 132px 96px 72px;height:32px;align-items:center;background:#1F1F24;border-bottom:1px solid rgba(255,255,255,.07);border-left:2px solid #FE5C00">
+              <div style="padding:0 7px"><span style="display:block;width:13px;height:13px;border:1px solid rgba(255,255,255,.28);border-radius:2px"></span></div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">华南工业智能制造技术展</div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;color:#F5F5F7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">承办</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:8px"><span style="display:block;width:44px;height:2px;background:rgba(255,255,255,.14)"><span style="display:block;width:80%;height:2px;background:#F5F5F7"></span></span><span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;color:#F5F5F7">4/5</span><span style="font:400 11px/1 'Noto Sans SC',sans-serif;color:#F5F5F7">审计</span></div>
+              <div style="padding:0 12px;text-align:right;font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#F5F5F7">62,500</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:7px"><span style="display:block;width:3px;height:12px;background:#F5F5F7"></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#F5F5F7">P1</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:28px minmax(0,1fr) 88px 132px 96px 72px;height:32px;align-items:center;background:#17171B;border-bottom:1px solid rgba(255,255,255,.07);border-left:2px solid transparent">
+              <div style="padding:0 7px"><span style="display:block;width:13px;height:13px;border:1px solid #F5F5F7;background:#F5F5F7;border-radius:2px;position:relative"><span style="position:absolute;left:3px;top:0px;width:5px;height:8px;border-right:2px solid #0A0A0B;border-bottom:2px solid #0A0A0B;transform:rotate(40deg)"></span></span></div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">新能源储能与电池应用展</div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;color:#8A8A93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">并购</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:8px"><span style="display:block;width:44px;height:2px;background:rgba(255,255,255,.10)"><span style="display:block;width:20%;height:2px;background:#8A8A93"></span></span><span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;color:#8A8A93">1/5</span><span style="font:400 11px/1 'Noto Sans SC',sans-serif;color:#8A8A93">接洽</span></div>
+              <div style="padding:0 12px;text-align:right;font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#F5F5F7">210,000</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:7px"><span style="display:block;width:3px;height:12px;background:rgba(245,245,247,.28)"></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93">P3</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:28px minmax(0,1fr) 88px 132px 96px 72px;height:32px;align-items:center;background:#0A0A0B;border-bottom:1px solid rgba(255,255,255,.07);border-left:2px solid transparent;box-shadow:inset 0 0 0 1px rgba(255,255,255,.28)">
+              <div style="padding:0 7px"><span style="display:block;width:13px;height:13px;border:1px solid rgba(255,255,255,.15);border-radius:2px"></span></div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">全球冷链物流与跨境枢纽展</div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;color:#8A8A93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">收购</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:8px"><span style="display:block;width:44px;height:2px;background:rgba(255,255,255,.10)"><span style="display:block;width:60%;height:2px;background:#8A8A93"></span></span><span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;color:#8A8A93">3/5</span><span style="font:400 11px/1 'Noto Sans SC',sans-serif;color:#8A8A93">意向</span></div>
+              <div style="padding:0 12px;text-align:right;font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#F5F5F7">45,000</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:7px"><span style="display:block;width:3px;height:12px;background:rgba(245,245,247,.55)"></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93">P2</span></div>
+            </div>
+            <div style="display:grid;grid-template-columns:28px minmax(0,1fr) 88px 132px 96px 72px;height:32px;align-items:center;background:#0A0A0B;border-left:2px solid rgba(255,255,255,.28)">
+              <div style="padding:0 7px"><span style="display:block;width:13px;height:13px;border:1px solid rgba(255,255,255,.15);border-radius:2px"></span></div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">全国商业航天与卫星通信展</div>
+              <div style="padding:0 12px;font:400 12px/1 'Noto Sans SC',sans-serif;color:#8A8A93;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">孵化</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:8px"><span style="display:block;width:44px;height:2px;background:rgba(255,255,255,.10)"><span style="display:block;width:20%;height:2px;background:#8A8A93"></span></span><span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;color:#8A8A93">1/5</span><span style="font:400 11px/1 'Noto Sans SC',sans-serif;color:#8A8A93">接洽</span></div>
+              <div style="padding:0 12px;text-align:right;font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#F5F5F7">38,000</div>
+              <div style="padding:0 12px;display:flex;align-items:center;gap:7px"><span style="display:block;width:3px;height:12px;background:rgba(245,245,247,.55)"></span><span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93">P2</span></div>
+            </div>
+          </div>
+        </div>
+        <div style="padding:14px 18px;border-top:1px solid rgba(255,255,255,.07);font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A">
+          P1-5 修：<span style="color:#8A8A93">阶段</span>列改为中性 2px 进度 + <code style="font-family:'JetBrains Mono',monospace;font-size:11px">3/5</code> + 文字，<span style="color:#8A8A93">优先级</span>列改为 3px 短条 + P 编号 —— 两列视觉语言彻底分开，全表零橙点。
+          P1-7 修：<span style="color:#8A8A93">类型</span>列固定 88px、单行截断、改用二字表述（并购 / 收购 / 参股 / 承办 / 孵化），行高恒定 32px。
+          橙色在本组件中只出现 1 次：selected 行的 2px 左边框。
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+        <div style="grid-column:span 5;background:#0E0E10;padding:14px 18px;display:flex;align-items:baseline;gap:12px;border-bottom:1px solid rgba(255,255,255,.07)">
+          <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">C2</span>
+          <span style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">表格整体</span>
+          <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A">skeleton / empty / error / sorting / no-result · 容器高度恒定，不跳版</span>
+        </div>
+        <div style="background:#141416;padding:16px">
+          <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:14px">加载 skeleton</div>
+          <div style="height:150px;display:flex;flex-direction:column;gap:9px">
+            <div style="height:9px;background:#1F1F24;border-radius:2px;width:100%;animation:sk 1.6s ease-in-out infinite"></div>
+            <div style="height:9px;background:#1F1F24;border-radius:2px;width:82%;animation:sk 1.6s ease-in-out .1s infinite"></div>
+            <div style="height:9px;background:#1F1F24;border-radius:2px;width:91%;animation:sk 1.6s ease-in-out .2s infinite"></div>
+            <div style="height:9px;background:#1F1F24;border-radius:2px;width:68%;animation:sk 1.6s ease-in-out .3s infinite"></div>
+            <div style="height:9px;background:#1F1F24;border-radius:2px;width:88%;animation:sk 1.6s ease-in-out .4s infinite"></div>
+            <div style="height:9px;background:#1F1F24;border-radius:2px;width:75%;animation:sk 1.6s ease-in-out .5s infinite"></div>
+          </div>
+          <div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:12px">行数 = 上次分页行数。不用转圈。</div>
+        </div>
+        <div style="background:#141416;padding:16px">
+          <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:14px">空状态</div>
+          <div style="height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1px dashed rgba(255,255,255,.07);border-radius:4px">
+            <div style="width:24px;height:1px;background:#52525A;margin-bottom:14px"></div>
+            <div style="font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">库内暂无机会</div>
+            <div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:4px">从「录入机会」开始建第一条</div>
+          </div>
+          <div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:12px">无插画、无图标。一句陈述 + 一条出路。</div>
+        </div>
+        <div style="background:#141416;padding:16px">
+          <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:14px">加载失败</div>
+          <div style="height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1px solid rgba(255,255,255,.14);border-radius:4px;padding:0 16px">
+            <div style="font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">数据读取失败</div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A;margin-top:5px">ERR_PIPELINE_504 · 11:24:07</div>
+            <button style="margin-top:14px;height:26px;padding:0 12px;background:#1F1F24;border:1px solid rgba(255,255,255,.14);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7;cursor:pointer" style-hover="background:#2A2A30">重试</button>
+          </div>
+          <div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:12px">错误码可复制，给得出排障线索。</div>
+        </div>
+        <div style="background:#141416;padding:16px">
+          <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:14px">排序进行中</div>
+          <div style="height:150px;border:1px solid rgba(255,255,255,.07);border-radius:4px;overflow:hidden">
+            <div style="height:30px;background:#0E0E10;display:flex;align-items:center;justify-content:space-between;padding:0 10px;border-bottom:1px solid rgba(255,255,255,.14)">
+              <span style="font:600 11px 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#F5F5F7">规模 ㎡</span>
+              <span style="display:flex;align-items:center;gap:6px"><span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#8A8A93">DESC</span><span style="display:block;width:11px;height:11px;border:1.5px solid rgba(255,255,255,.18);border-top-color:#F5F5F7;border-radius:9999px;animation:spin .7s linear infinite"></span></span>
+            </div>
+            <div style="opacity:.35;pointer-events:none">
+              <div style="height:28px;display:flex;align-items:center;justify-content:flex-end;padding:0 10px;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93;border-bottom:1px solid rgba(255,255,255,.07)">210,000</div>
+              <div style="height:28px;display:flex;align-items:center;justify-content:flex-end;padding:0 10px;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93;border-bottom:1px solid rgba(255,255,255,.07)">160,000</div>
+              <div style="height:28px;display:flex;align-items:center;justify-content:flex-end;padding:0 10px;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93;border-bottom:1px solid rgba(255,255,255,.07)">120,000</div>
+              <div style="height:28px;display:flex;align-items:center;justify-content:flex-end;padding:0 10px;font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:12px;color:#8A8A93">92,000</div>
+            </div>
+          </div>
+          <div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:12px">旧数据留在原位降到 35%，不闪白。</div>
+        </div>
+        <div style="background:#141416;padding:16px">
+          <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:14px">筛选无结果</div>
+          <div style="height:150px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;border:1px dashed rgba(255,255,255,.07);border-radius:4px;padding:0 14px">
+            <div style="font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">当前筛选下 0 条</div>
+            <div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:6px">规模 ≥200,000㎡ · 区域 华西 · 优先级 P1</div>
+            <button style="margin-top:14px;height:26px;padding:0 12px;background:transparent;border:1px solid rgba(255,255,255,.14);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93;cursor:pointer" style-hover="color:#F5F5F7;border-color:rgba(255,255,255,.28)">重置筛选</button>
+          </div>
+          <div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:12px">回显造成空集的具体条件。</div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+        <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+          <div style="padding:14px 18px;background:#0E0E10;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:baseline;gap:12px">
+            <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">C3</span>
+            <span style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">按钮</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A">28px · radius 4</span>
+          </div>
+          <div style="padding:20px 18px">
+            <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:8px">
+              <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">default</div>
+              <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">hover</div>
+              <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">active</div>
+              <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">disabled</div>
+              <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">loading</div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:8px">
+              <button style="height:28px;background:#FE5C00;border:none;border-radius:4px;font:500 12px 'Noto Sans SC',sans-serif;color:#0A0A0B;cursor:pointer;transition:background .12s" style-hover="background:#FF7324">录入机会</button>
+              <button style="height:28px;background:#FF7324;border:none;border-radius:4px;font:500 12px 'Noto Sans SC',sans-serif;color:#0A0A0B;cursor:pointer">录入机会</button>
+              <button style="height:28px;background:#FF7324;border:none;border-radius:4px;font:500 12px 'Noto Sans SC',sans-serif;color:#0A0A0B;opacity:.9;transform:translateY(1px);cursor:pointer">录入机会</button>
+              <button style="height:28px;background:#1F1F24;border:none;border-radius:4px;font:500 12px 'Noto Sans SC',sans-serif;color:#52525A;cursor:not-allowed">录入机会</button>
+              <button style="height:28px;background:#FE5C00;border:none;border-radius:4px;font:500 12px 'Noto Sans SC',sans-serif;color:#0A0A0B;display:flex;align-items:center;justify-content:center;gap:7px;cursor:wait"><span style="display:block;width:11px;height:11px;border:1.5px solid rgba(10,10,11,.35);border-top-color:#0A0A0B;border-radius:9999px;animation:spin .7s linear infinite"></span>提交中</button>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;color:#52525A;margin:14px 0 8px">PRIMARY — 每个面板上下文仅 1 个</div>
+            <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;margin-bottom:8px">
+              <button style="height:28px;background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7;cursor:pointer;transition:all .12s" style-hover="background:#1F1F24;border-color:rgba(255,255,255,.14)">导出 CSV</button>
+              <button style="height:28px;background:#1F1F24;border:1px solid rgba(255,255,255,.14);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7;cursor:pointer">导出 CSV</button>
+              <button style="height:28px;background:#1F1F24;border:1px solid rgba(255,255,255,.28);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7;transform:translateY(1px);cursor:pointer">导出 CSV</button>
+              <button style="height:28px;background:#141416;border:1px solid rgba(255,255,255,.04);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#3A3A41;cursor:not-allowed">导出 CSV</button>
+              <button style="height:28px;background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93;display:flex;align-items:center;justify-content:center;gap:7px;cursor:wait"><span style="display:block;width:11px;height:11px;border:1.5px solid rgba(255,255,255,.14);border-top-color:#F5F5F7;border-radius:9999px;animation:spin .7s linear infinite"></span>导出中</button>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;color:#52525A;margin:14px 0 8px">GHOST / SECONDARY</div>
+            <div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px">
+              <button style="width:24px;height:24px;background:transparent;border:none;border-radius:4px;color:#8A8A93;font-size:14px;cursor:pointer;transition:all .12s" style-hover="background:#141416;color:#F5F5F7">⋯</button>
+              <button style="width:24px;height:24px;background:#141416;border:none;border-radius:4px;color:#F5F5F7;font-size:14px;cursor:pointer">⋯</button>
+              <button style="width:24px;height:24px;background:#1F1F24;border:none;border-radius:4px;color:#F5F5F7;font-size:14px;cursor:pointer">⋯</button>
+              <button style="width:24px;height:24px;background:transparent;border:none;border-radius:4px;color:#3A3A41;font-size:14px;cursor:not-allowed">⋯</button>
+              <button style="width:24px;height:24px;background:transparent;border:none;border-radius:4px;color:#8A8A93;font-size:14px;cursor:wait;display:flex;align-items:center;justify-content:center"><span style="display:block;width:10px;height:10px;border:1.5px solid rgba(255,255,255,.14);border-top-color:#F5F5F7;border-radius:9999px;animation:spin .7s linear infinite"></span></button>
+            </div>
+            <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;color:#52525A;margin-top:8px">TOOL / ICON — 24×24</div>
+          </div>
+        </div>
+
+        <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+          <div style="padding:14px 18px;background:#0E0E10;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:baseline;gap:12px">
+            <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">C4</span>
+            <span style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">输入框</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A">应用 28px / 登录 44px · radius 4 / 8</span>
+          </div>
+          <div style="padding:20px 18px;display:flex;flex-direction:column;gap:16px">
+            <div>
+              <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:7px">default</div>
+              <input type="text" placeholder="搜索机会、公司、报告…" style="width:100%;box-sizing:border-box;height:28px;padding:0 10px;background:#0E0E10;border:1px solid rgba(255,255,255,.07);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7;outline:none" style-focus="border-color:rgba(255,255,255,.28)">
+            </div>
+            <div>
+              <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:7px">focus-visible &nbsp;·&nbsp; 无外发光，边框提亮至 .28</div>
+              <div style="height:28px;padding:0 10px;background:#0E0E10;border:1px solid rgba(255,255,255,.28);border-radius:4px;display:flex;align-items:center;justify-content:space-between">
+                <span style="display:flex;align-items:center"><span style="font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">半导体</span><span style="display:inline-block;width:1px;height:13px;background:#F5F5F7;margin-left:1px;animation:pulse 1.1s step-end infinite"></span></span>
+                <span style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#52525A;border:1px solid rgba(255,255,255,.07);border-radius:2px;padding:1px 4px">⌘K</span>
+              </div>
+            </div>
+            <div>
+              <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:7px">filled</div>
+              <div style="height:28px;padding:0 10px;background:#0E0E10;border:1px solid rgba(255,255,255,.07);border-radius:4px;display:flex;align-items:center;justify-content:space-between">
+                <span style="font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">华创展览科技（上海）</span>
+                <span style="color:#8A8A93;font-size:12px;cursor:pointer">✕</span>
+              </div>
+            </div>
+            <div>
+              <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:7px">error</div>
+              <div style="height:28px;padding:0 10px;background:#0E0E10;border:1px solid #E04A2B;border-radius:4px;display:flex;align-items:center">
+                <span style="font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">name@mds.c</span>
+              </div>
+              <div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#E04A2B;margin-top:5px">邮箱域名须为 mds.cn</div>
+            </div>
+            <div>
+              <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:7px">disabled</div>
+              <div style="height:28px;padding:0 10px;background:#0E0E10;border:1px solid rgba(255,255,255,.04);border-radius:4px;display:flex;align-items:center">
+                <span style="font:400 12px 'Noto Sans SC',sans-serif;color:#3A3A41">账号由管理员统一分配</span>
+              </div>
+            </div>
+            <div style="font:400 11px/1.65 'Noto Sans SC',sans-serif;color:#52525A;border-top:1px solid rgba(255,255,255,.07);padding-top:12px">error 边框 <code style="font-family:'JetBrains Mono',monospace">#E04A2B</code> 是 accent 的低饱和邻位，不算第二强调色：它只出现在校验失败处，且不带填充。</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1.35fr;gap:32px">
+        <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+          <div style="padding:14px 18px;background:#0E0E10;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:baseline;gap:12px">
+            <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">C5</span>
+            <span style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">侧栏项</span>
+            <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A">220px ↔ 64px</span>
+          </div>
+          <div style="padding:18px;display:flex;gap:18px">
+            <div style="width:220px;flex:none;background:#0E0E10;border:1px solid rgba(255,255,255,.07);border-radius:4px;overflow:hidden">
+              <div style="height:52px;display:flex;align-items:center;gap:10px;padding:0 14px;border-bottom:1px solid rgba(255,255,255,.07)">
+                <span style="font:600 15px/1 'Geist',sans-serif;letter-spacing:-.02em;color:#F5F5F7">MWLAB</span>
+                <span style="width:1px;height:11px;background:rgba(255,255,255,.18)"></span>
+                <span style="font:400 13px/1 'Noto Sans SC',sans-serif;color:#8A8A93">万象</span>
+              </div>
+              <div style="padding:8px 0">
+                <div style="height:32px;display:flex;align-items:center;padding:0 14px;border-left:2px solid transparent;font:400 13px 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;cursor:pointer;transition:all .12s" style-hover="background:#1F1F24;color:#F5F5F7">盘面</div>
+                <div style="height:32px;display:flex;align-items:center;padding:0 14px;border-left:2px solid #FE5C00;background:#1F1F24;font:400 13px 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">机会台</div>
+                <div style="height:32px;display:flex;align-items:center;padding:0 14px;border-left:2px solid transparent;background:#1F1F24;font:400 13px 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7;cursor:pointer">公司库</div>
+                <div style="height:32px;display:flex;align-items:center;padding:0 14px;border-left:2px solid transparent;font:400 13px 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;cursor:pointer;transition:all .12s" style-hover="background:#1F1F24;color:#F5F5F7">调研库</div>
+                <div style="height:32px;display:flex;align-items:center;padding:0 14px;border-left:2px solid transparent;font:400 13px 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;cursor:pointer;transition:all .12s" style-hover="background:#1F1F24;color:#F5F5F7">展会底图</div>
+              </div>
+              <div style="padding:6px 0;border-top:1px solid rgba(255,255,255,.07)">
+                <div style="height:32px;display:flex;align-items:center;padding:0 14px;border-left:2px solid transparent;font:400 13px 'Noto Sans SC',sans-serif;color:#52525A;cursor:pointer;transition:all .12s" style-hover="color:#8A8A93">设置</div>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;color:#52525A;padding:8px 14px 12px;border-top:1px solid rgba(255,255,255,.07)">EXPANDED 220 · default / hover / active</div>
+            </div>
+            <div style="width:64px;flex:none;background:#0E0E10;border:1px solid rgba(255,255,255,.07);border-radius:4px;overflow:hidden">
+              <div style="height:52px;display:flex;align-items:center;justify-content:center;border-bottom:1px solid rgba(255,255,255,.07)">
+                <span style="width:26px;height:26px;border:1px solid rgba(255,255,255,.14);border-radius:4px;display:flex;align-items:center;justify-content:center;font:400 14px/1 'Noto Sans SC',sans-serif;color:#F5F5F7">象</span>
+              </div>
+              <div style="padding:8px 0">
+                <div style="height:32px;display:flex;align-items:center;justify-content:center;border-left:2px solid transparent;font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93">盘</div>
+                <div style="height:32px;display:flex;align-items:center;justify-content:center;border-left:2px solid #FE5C00;background:#1F1F24;font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">机</div>
+                <div style="height:32px;display:flex;align-items:center;justify-content:center;border-left:2px solid transparent;font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93">司</div>
+                <div style="height:32px;display:flex;align-items:center;justify-content:center;border-left:2px solid transparent;font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93">研</div>
+                <div style="height:32px;display:flex;align-items:center;justify-content:center;border-left:2px solid transparent;font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93">图</div>
+              </div>
+              <div style="font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:.06em;color:#52525A;padding:8px 6px 12px;text-align:center;border-top:1px solid rgba(255,255,255,.07)">64</div>
+            </div>
+          </div>
+          <div style="padding:0 18px 18px;font:400 11px/1.65 'Noto Sans SC',sans-serif;color:#52525A">收起态取首字，hover 弹 tooltip 显示全称；active 仍靠 2px 左边框 + #1F1F24 底，不用色块填充。</div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:32px">
+          <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+            <div style="padding:14px 18px;background:#0E0E10;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:baseline;gap:12px">
+              <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">C6</span>
+              <span style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">数据面板</span>
+              <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A">有数据 / 加载中 / 无数据 / 失败 · 高度恒定 118px</span>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.07)">
+              <div style="background:#141416;padding:14px;min-height:118px;box-sizing:border-box">
+                <div style="font:600 10px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:10px">在跟进机会</div>
+                <div style="font-family:'JetBrains Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-size:24px;font-weight:500;line-height:1.25;color:#F5F5F7">142</div>
+                <div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#8A8A93;margin-top:2px;white-space:nowrap">标的席位</div>
+                <div style="display:flex;align-items:flex-end;gap:2px;height:22px;margin-top:8px">
+                  <span style="flex:1;height:30%;background:#2A2A30"></span><span style="flex:1;height:45%;background:#2A2A30"></span><span style="flex:1;height:38%;background:#2A2A30"></span><span style="flex:1;height:60%;background:#2A2A30"></span><span style="flex:1;height:52%;background:#2A2A30"></span><span style="flex:1;height:72%;background:#3A3A41"></span><span style="flex:1;height:88%;background:#52525A"></span><span style="flex:1;height:100%;background:#8A8A93"></span>
+                </div>
+              </div>
+              <div style="background:#141416;padding:14px;min-height:118px;box-sizing:border-box">
+                <div style="font:600 10px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:10px">并购标的</div>
+                <div style="width:54px;height:24px;background:#1F1F24;border-radius:2px;animation:sk 1.6s ease-in-out infinite"></div>
+                <div style="width:96px;height:9px;background:#1F1F24;border-radius:2px;margin-top:8px;animation:sk 1.6s ease-in-out .15s infinite"></div>
+                <div style="height:22px;margin-top:10px;background:#1F1F24;border-radius:2px;animation:sk 1.6s ease-in-out .3s infinite"></div>
+              </div>
+              <div style="background:#141416;padding:14px;min-height:118px;box-sizing:border-box;display:flex;flex-direction:column">
+                <div style="font:600 10px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:10px">白地品类</div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:24px;font-weight:400;line-height:1.25;color:#3A3A41">—</div>
+                  <div style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:2px">本期无满足阈值的赛道</div>
+                </div>
+              </div>
+              <div style="background:#141416;padding:14px;min-height:118px;box-sizing:border-box;display:flex;flex-direction:column">
+                <div style="font:600 10px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:10px">本周待办</div>
+                <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+                  <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">取数失败</div>
+                  <div style="font-family:'JetBrains Mono',monospace;font-size:10px;color:#52525A;margin-top:3px">ERR_AGG_TIMEOUT</div>
+                  <button style="margin-top:9px;align-self:flex-start;height:22px;padding:0 9px;background:#1F1F24;border:1px solid rgba(255,255,255,.14);border-radius:4px;font:400 11px 'Noto Sans SC',sans-serif;color:#F5F5F7;cursor:pointer" style-hover="border-color:rgba(255,255,255,.28)">重试</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:32px">
+            <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+              <div style="padding:14px 18px;background:#0E0E10;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:baseline;gap:12px">
+                <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">C7</span>
+                <span style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">Tab</span>
+              </div>
+              <div style="padding:18px">
+                <div style="display:flex;gap:0;border-bottom:1px solid rgba(255,255,255,.07)">
+                  <div style="height:34px;display:flex;align-items:center;gap:7px;padding:0 14px;border-bottom:2px solid #F5F5F7;margin-bottom:-1px;cursor:pointer">
+                    <span style="font:400 13px 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">并购标的</span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;color:#0A0A0B;background:#F5F5F7;border-radius:2px;padding:1px 5px">24</span>
+                  </div>
+                  <div style="height:34px;display:flex;align-items:center;gap:7px;padding:0 14px;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;transition:all .12s" style-hover="border-bottom-color:rgba(255,255,255,.28)">
+                    <span style="font:400 13px 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">全新品类</span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;color:#8A8A93;background:#1F1F24;border-radius:2px;padding:1px 5px">9</span>
+                  </div>
+                  <div style="height:34px;display:flex;align-items:center;gap:7px;padding:0 14px;border-bottom:2px solid transparent;margin-bottom:-1px;cursor:pointer;transition:all .12s" style-hover="border-bottom-color:rgba(255,255,255,.28)">
+                    <span style="font:400 13px 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">项目组支持</span>
+                    <span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;color:#8A8A93;background:#1F1F24;border-radius:2px;padding:1px 5px">15</span>
+                  </div>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;color:#52525A;margin-top:14px">ACTIVE = 2px 白底线 + 反白计数徽标。<br>DEFAULT / HOVER = 灰。TAB 上不用橙色。</div>
+              </div>
+            </div>
+
+            <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+              <div style="padding:14px 18px;background:#0E0E10;border-bottom:1px solid rgba(255,255,255,.07);display:flex;align-items:baseline;gap:12px">
+                <span style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">C8</span>
+                <span style="font:500 15px/1.55 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">筛选 pill</span>
+              </div>
+              <div style="padding:18px;display:flex;flex-direction:column;gap:12px">
+                <div style="display:flex;flex-wrap:wrap;gap:8px">
+                  <span style="height:26px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93;cursor:pointer;transition:all .12s" style-hover="background:#1F1F24;border-color:rgba(255,255,255,.14);color:#F5F5F7">阶段<span style="color:#52525A;font-size:9px">▾</span></span>
+                  <span style="height:26px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;background:#1F1F24;border:1px solid rgba(255,255,255,.14);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">规模<span style="color:#52525A">·</span><span style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px">≥20,000㎡</span></span>
+                  <span style="height:26px;display:inline-flex;align-items:center;gap:7px;padding:0 8px 0 10px;background:#1F1F24;border:1px solid rgba(255,255,255,.28);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">区域<span style="color:#52525A">·</span>华东/华南<span style="color:#8A8A93;font-size:11px;cursor:pointer;padding-left:1px" style-hover="color:#F5F5F7">✕</span></span>
+                  <span style="height:26px;display:inline-flex;align-items:center;gap:6px;padding:0 10px;background:#141416;border:1px solid rgba(255,255,255,.04);border-radius:4px;font:400 12px 'Noto Sans SC',sans-serif;color:#3A3A41;cursor:not-allowed">对标类型<span style="font-size:9px">▾</span></span>
+                </div>
+                <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:.06em;color:#52525A;line-height:1.7">DEFAULT / HOVER / SELECTED / CLEARABLE / DISABLED<br>已选中 = 值内联回显；可清除 = 边框 .28 + ✕。</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  </sc-if>
+
+  <section>
+    <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:12px;margin-bottom:28px">
+      <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:#52525A">05</span>
+      <h2 style="margin:0;font:600 24px/1.3 'Geist',sans-serif;letter-spacing:-.015em;color:#F5F5F7">纪律</h2>
+      <span style="font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">Accent 配额 · 列优先级 · 幻觉内容清除清单</span>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px">
+      <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+        <div style="padding:13px 16px;background:#0E0E10;border-bottom:1px solid rgba(255,255,255,.07);font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">Accent 配额 · 每屏 ≤ 3</div>
+        <div style="display:grid;grid-template-columns:150px 1fr 48px;font-family:'JetBrains Mono',monospace;font-size:11px;color:#8A8A93">
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);color:#F5F5F7">public_landing</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px/1.6 'Noto Sans SC',sans-serif;letter-spacing:0">Hero 第二行「结构化盘面」· 主 CTA「进入系统」· 语言段控激活项</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#F5F5F7">3</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);color:#F5F5F7">overview</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px/1.6 'Noto Sans SC',sans-serif;letter-spacing:0">侧栏 active 左边框 · 堵点阶段单格 · 逾期计数</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#F5F5F7">3</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);color:#F5F5F7">m_a_pipeline</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px/1.6 'Noto Sans SC',sans-serif;letter-spacing:0">侧栏 active 左边框 · 主 CTA「录入机会」· 选中行 2px 左边框</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#F5F5F7">3</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);color:#F5F5F7">opportunity_detail</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px/1.6 'Noto Sans SC',sans-serif;letter-spacing:0">侧栏 active 左边框 · 主 CTA「更新尽调结论」· 当前阶段节点</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#F5F5F7">3</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);color:#F5F5F7">exhibition_basemap</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px/1.6 'Noto Sans SC',sans-serif;letter-spacing:0">侧栏 active 左边框 · 主标的所在地标记 · 今日日程行</div>
+          <div style="padding:10px 16px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#F5F5F7">3</div>
+          <div style="padding:10px 16px;color:#F5F5F7">sign_in</div>
+          <div style="padding:10px 16px;font:400 12px/1.6 'Noto Sans SC',sans-serif;letter-spacing:0">Hero 第二行 · 登录按钮 · 语言段控激活项（error 态借用错误色，不计入）</div>
+          <div style="padding:10px 16px;text-align:right;color:#F5F5F7">3</div>
+        </div>
+        <div style="padding:13px 16px;border-top:1px solid rgba(255,255,255,.07);font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A">原机会台约 200+ 处橙色（阶段 ×24 行 + 优先级 ×24 行 + 状态点 + 按钮 + 侧栏）。配额收到 3 后，橙色重新具备「看这里」的语义。</div>
+      </div>
+
+      <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden">
+        <div style="padding:13px 16px;background:#0E0E10;border-bottom:1px solid rgba(255,255,255,.07);font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">列优先级 · 11 列 · 冻结首列 + 横向滚动</div>
+        <div style="display:grid;grid-template-columns:1fr 62px 62px 62px 72px;font-family:'JetBrains Mono',monospace;font-size:11px;font-variant-numeric:tabular-nums">
+          <div style="padding:9px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:600 10px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A">列</div>
+          <div style="padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;font:600 10px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A">1440</div>
+          <div style="padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;font:600 10px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A">1680</div>
+          <div style="padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;font:600 10px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A">1920</div>
+          <div style="padding:9px 8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;font:600 10px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A">宽度</div>
+
+          <div style="padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">机会名称 <span style="color:#52525A;font-family:'JetBrains Mono',monospace;font-size:10px">FROZEN</span></div>
+          <div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px 8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#8A8A93">flex</div>
+
+          <div style="padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">阶段</div>
+          <div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#8A8A93">132</div>
+
+          <div style="padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">下一步</div>
+          <div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#8A8A93">148</div>
+
+          <div style="padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">优先级</div>
+          <div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#8A8A93">72</div>
+
+          <div style="padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">规模 ㎡</div>
+          <div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#8A8A93">96</div>
+
+          <div style="padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px 'Noto Sans SC',sans-serif;color:#F5F5F7">负责人</div>
+          <div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#8A8A93">80</div>
+
+          <div style="padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93">类型</div>
+          <div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#8A8A93">88</div>
+
+          <div style="padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93">对标 MD 品牌</div>
+          <div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#3A3A41">○</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#8A8A93">124</div>
+
+          <div style="padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93">城市</div>
+          <div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#3A3A41">○</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#8A8A93">64</div>
+
+          <div style="padding:8px 16px;border-bottom:1px solid rgba(255,255,255,.07);font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93">关联公司</div>
+          <div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#3A3A41">○</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#3A3A41">○</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:center;color:#F5F5F7">●</div><div style="padding:8px;border-bottom:1px solid rgba(255,255,255,.07);text-align:right;color:#8A8A93">148</div>
+
+          <div style="padding:8px 16px;font:400 12px 'Noto Sans SC',sans-serif;color:#8A8A93">更新时间</div>
+          <div style="padding:8px;text-align:center;color:#3A3A41">○</div><div style="padding:8px;text-align:center;color:#3A3A41">○</div><div style="padding:8px;text-align:center;color:#F5F5F7">●</div><div style="padding:8px;text-align:right;color:#8A8A93">104</div>
+        </div>
+        <div style="padding:13px 16px;border-top:1px solid rgba(255,255,255,.07);font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A">
+          <span style="color:#F5F5F7">●</span> 默认显示 &nbsp; <span style="color:#3A3A41">○</span> 隐藏但可在「列过滤」开启（开启后进入横向滚动区，不再无声截断）。首列 <span style="color:#8A8A93">机会名称</span> 永久冻结、右侧带 1px 发丝线 + 4px 渐隐遮罩表明可滚。P1-8 修：1440 档默认 7 列，右边界永远落在列的边上。
+        </div>
+      </div>
+    </div>
+
+    <div style="background:#141416;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:20px 24px">
+      <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:16px">P2-9 · 幻觉内容清除清单 —— 以下元素在六屏中已全部移除，且从 DESIGN.md 的 Layout 段一并删除</div>
+      <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 32px;font-family:'JetBrains Mono',monospace;font-size:11px;line-height:1.9;color:#52525A">
+        <div style="text-decoration:line-through">基准汇率 USD/CNY 7.2405</div>
+        <div style="text-decoration:line-through">标的底稿加密级别 CONFIDENTIAL-L2</div>
+        <div style="text-decoration:line-through">更新引擎 MW-FEED v4.19</div>
+        <div style="text-decoration:line-through">数据哈希 7f89b4..d901</div>
+        <div style="text-decoration:line-through">延迟 18ms / &lt;30ms</div>
+        <div style="text-decoration:line-through">实时同步 99.8%</div>
+        <div style="text-decoration:line-through">ultrawide / dual-monitor financial setups</div>
+        <div style="text-decoration:line-through">Entity Master Tree 可调整分区 280–340px</div>
+        <div style="text-decoration:line-through">WGS84 PROJECTION SYSTEM 角标</div>
+      </div>
+      <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:16px;border-top:1px solid rgba(255,255,255,.07);padding-top:14px">替代物：页脚只保留业务事实 —— <span style="color:#F5F5F7">当前加载 24 / 24 标的</span> · <span style="color:#F5F5F7">数据更新 04-17 09:20</span> · 键盘提示。这不是彭博终端，是一家展会公司的内部 BD 工作台。</div>
+    </div>
+  </section>
+
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1440},&quot;showThemeCode&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;交付范围&quot;},&quot;showStateBoard&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;,&quot;section&quot;:&quot;交付范围&quot;}}">class Component extends DCLogic {
+  renderVals() {
+    return {
+      showThemeCode: this.props.showThemeCode ?? true,
+      showStateBoard: this.props.showStateBoard ?? true
+    };
+  }
+}</script>
+</body>
+</html>

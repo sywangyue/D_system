@@ -1,0 +1,250 @@
+/* ============================================================================
+   MWLAB 万象 · 交互动效层  motion.css
+   ----------------------------------------------------------------------------
+   全部数值抄自成熟方案，不自创：
+     · easing / duration  → Vercel Geist + Radix UI Primitives
+     · focus-visible 环    → WAI-ARIA APG 焦点可见性实践
+     · overlay 进出        → Radix Popover/Dialog 默认（200ms expo-out）
+     · 命令面板            → cmdk 库默认
+     · toast               → Sonner 默认
+     · reduced-motion      → WCAG 2.1 SC 2.3.3
+   依赖 design/MWLAB 设计系统板.dc.html 里的颜色 token，不新增任何颜色。
+   ========================================================================== */
+
+:root {
+  /* ── Easing（三条足够，别再加） ───────────────────────────── */
+  --ease-standard: cubic-bezier(0.4, 0, 0.2, 1);    /* 状态切换，默认用这条 */
+  --ease-out:      cubic-bezier(0.16, 1, 0.3, 1);   /* 元素进场，expo-out */
+  --ease-in:       cubic-bezier(0.4, 0, 1, 1);      /* 元素退场 */
+
+  /* ── Duration（Linear 的快，是靠 120ms 而不是靠花哨） ────── */
+  --dur-instant: 80ms;    /* 表格行 hover —— 必须跟手 */
+  --dur-fast:    120ms;   /* 颜色 / 边框 / 背景 */
+  --dur-base:    160ms;   /* 位移 / 缩放 */
+  --dur-slow:    200ms;   /* 浮层进出 */
+  --dur-panel:   240ms;   /* 侧栏收展 */
+}
+
+/* ── 全局减弱动效：国际化合规的硬性要求，不是可选项 ─────────── */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* ── 焦点环：用 :focus-visible，不用 :focus ────────────────────
+   鼠标点击不出环，键盘 Tab 才出环。这是现在的国际标准做法。 */
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-control);
+}
+
+/* ============================================================================
+   按钮
+   ========================================================================== */
+.btn {
+  transition:
+    background-color var(--dur-fast) var(--ease-standard),
+    border-color     var(--dur-fast) var(--ease-standard),
+    color            var(--dur-fast) var(--ease-standard),
+    transform        var(--dur-fast) var(--ease-standard);
+}
+.btn:active:not(:disabled) { transform: scale(0.97); }
+.btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* loading：宽度锁死，只换内容，避免按钮跳动 */
+.btn[data-loading="true"] { pointer-events: none; color: transparent; position: relative; }
+.btn[data-loading="true"]::after {
+  content: "";
+  position: absolute; inset: 0; margin: auto;
+  width: 14px; height: 14px;
+  border: 1.5px solid currentColor;
+  border-top-color: transparent;
+  border-radius: 50%;
+  color: var(--color-canvas);
+  animation: mw-spin 600ms linear infinite;
+}
+@keyframes mw-spin { to { transform: rotate(360deg); } }
+
+/* ============================================================================
+   表格行 —— 全页最高频的交互，宁可朴素也不能迟钝
+   ========================================================================== */
+.row {
+  transition: background-color var(--dur-instant) var(--ease-standard);
+  position: relative;
+}
+.row:hover { background-color: var(--color-surface-hover); }
+
+/* 选中：2px 左边框用 scaleY 长出来，不用 width 跳变 */
+.row[aria-selected="true"] { background-color: var(--color-surface-hover); }
+.row[aria-selected="true"]::before {
+  content: "";
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 2px; background: var(--color-accent);
+  transform: scaleY(0); transform-origin: center;
+  animation: mw-row-mark var(--dur-base) var(--ease-out) forwards;
+}
+@keyframes mw-row-mark { to { transform: scaleY(1); } }
+
+/* 键盘导航当前行（J/K） */
+.row[data-focused="true"] {
+  box-shadow: inset 0 0 0 1px var(--color-hairline-active);
+}
+
+/* 行内操作：默认不占视觉，hover 才出现 */
+.row .row-actions {
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease-standard);
+}
+.row:hover .row-actions,
+.row:focus-within .row-actions { opacity: 1; }
+
+/* ⚠️ 不做逐行入场动画。24 行依次淡入会拖慢读数，
+   而且会重演旧 dashboard.html 里硬编码 12 条 nth-child delay 的错误。 */
+
+/* ============================================================================
+   Tab —— 滑动指示条（抄 Radix Tabs 的共享指示器做法）
+   ========================================================================== */
+.tabs { position: relative; }
+.tabs .tab-indicator {
+  position: absolute; bottom: 0; height: 2px;
+  background: var(--color-accent);
+  transition:
+    transform var(--dur-base) var(--ease-standard),
+    width     var(--dur-base) var(--ease-standard);
+}
+.tab {
+  transition: color var(--dur-fast) var(--ease-standard);
+}
+
+/* ============================================================================
+   输入框
+   ========================================================================== */
+.input {
+  transition:
+    border-color var(--dur-fast) var(--ease-standard),
+    background-color var(--dur-fast) var(--ease-standard);
+}
+.input:focus-visible {
+  outline: none;                                  /* 输入框用边框表达焦点，不用外环 */
+  border-color: var(--color-fg-muted);
+}
+.input[aria-invalid="true"] {
+  border-color: var(--color-accent);
+  animation: mw-shake 200ms var(--ease-standard);
+}
+/* 抖动幅度刻意做小：2px。超过 4px 就变成游戏反馈了 */
+@keyframes mw-shake {
+  0%, 100% { transform: translateX(0); }
+  25%      { transform: translateX(-2px); }
+  75%      { transform: translateX(2px); }
+}
+
+/* ============================================================================
+   浮层：下拉 / 弹出 / 命令面板（Radix + cmdk 默认值）
+   ========================================================================== */
+.overlay {
+  animation: mw-overlay-in var(--dur-slow) var(--ease-out);
+  transform-origin: var(--mw-origin, top center);
+}
+.overlay[data-state="closed"] {
+  animation: mw-overlay-out var(--dur-fast) var(--ease-in) forwards;
+}
+@keyframes mw-overlay-in {
+  from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1)    translateY(0); }
+}
+@keyframes mw-overlay-out {
+  to { opacity: 0; transform: scale(0.98); }
+}
+
+/* 命令面板遮罩 */
+.scrim {
+  background: rgb(0 0 0 / 60%);
+  animation: mw-fade-in var(--dur-slow) var(--ease-out);
+}
+@keyframes mw-fade-in { from { opacity: 0; } to { opacity: 1; } }
+
+/* ============================================================================
+   骨架屏 —— 数据到达前的占位，取代"空白 + 转圈"
+   ========================================================================== */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--color-surface) 0%,
+    var(--color-surface-hover) 50%,
+    var(--color-surface) 100%
+  );
+  background-size: 200% 100%;
+  animation: mw-shimmer 1.4s var(--ease-standard) infinite;
+  border-radius: var(--radius-control);
+}
+@keyframes mw-shimmer {
+  from { background-position: 200% 0; }
+  to   { background-position: -200% 0; }
+}
+
+/* ============================================================================
+   面板进场 —— 只在首次挂载播一次，切筛选时不重播
+   ========================================================================== */
+.panel-enter {
+  animation: mw-panel-in var(--dur-slow) var(--ease-out) both;
+}
+@keyframes mw-panel-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================================
+   Toast（Sonner 默认：右下角，上浮进场）
+   ========================================================================== */
+.toast {
+  animation: mw-toast-in var(--dur-slow) var(--ease-out);
+}
+.toast[data-state="closed"] {
+  animation: mw-toast-out var(--dur-base) var(--ease-in) forwards;
+}
+@keyframes mw-toast-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to   { opacity: 1; transform: translateY(0)    scale(1); }
+}
+@keyframes mw-toast-out {
+  to { opacity: 0; transform: translateY(6px) scale(0.98); }
+}
+
+/* ============================================================================
+   侧栏收展
+   ========================================================================== */
+.sidebar {
+  transition: width var(--dur-panel) var(--ease-standard);
+}
+.sidebar .nav-label {
+  transition: opacity var(--dur-fast) var(--ease-standard);
+}
+.sidebar[data-collapsed="true"] .nav-label { opacity: 0; }
+
+/* ============================================================================
+   落地页：滚动进场（只对营销页，应用内不用）
+   ========================================================================== */
+.reveal {
+  opacity: 0; transform: translateY(16px);
+  transition:
+    opacity   400ms var(--ease-out),
+    transform 400ms var(--ease-out);
+}
+.reveal.is-visible { opacity: 1; transform: translateY(0); }
+
+/* ============================================================================
+   明确不做的事
+   ----------------------------------------------------------------------------
+   ✗ KPI 数字 count-up      —— 读数要即时，动画反而挡住信息
+   ✗ 表格逐行 stagger       —— 拖慢扫描，且难以维护
+   ✗ 视差滚动 / 3D 倾斜     —— 与机构调性冲突
+   ✗ 悬停辉光 / 霓虹        —— 上一版就是栽在这
+   ✗ 页面切换转场           —— Linear 和 Vercel 都没有，是即时的
+   ========================================================================== */
