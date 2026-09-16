@@ -23,6 +23,18 @@ def tables(conn):
     return {r[0] for r in conn.execute(
         "SELECT name FROM sqlite_master WHERE type='table' AND name NOT LIKE 'sqlite_%'")}
 
+print("\n【0】没有任何带数据的列被丢弃（014 就是栽在这里）")
+# 通用检查：备份里每一个非全空的列，迁移后都必须还能找到承载它的列
+for oc in cols(b, "customer_prospect"):
+    nonnull = b.execute(
+        f"SELECT COUNT(*) FROM customer_prospect WHERE {oc} IS NOT NULL AND {oc} != ''"
+    ).fetchone()[0]
+    if nonnull == 0:
+        continue   # 全空列被删无所谓
+    target = {"id": "company_id", "company_name": "name"}.get(oc, oc)
+    ck(f"{oc}（{nonnull} 行有值）在迁移后仍存在", target in cols(a, "company"),
+       "带数据的列被删除 = 数据丢失")
+
 print("\n【1】空表已删除")
 for t in ("person","exhibition_contact","contact_relation",
           "exhibition_relation","exhibition_timeline"):
@@ -33,13 +45,19 @@ n_b = b.execute("SELECT COUNT(*) FROM customer_prospect").fetchone()[0]
 n_a = a.execute("SELECT COUNT(*) FROM company").fetchone()[0]
 ck(f"行数 {n_b} → {n_a}", n_b == n_a, f"差 {n_b - n_a}")
 
-# 重命名映射；intel_report_id 是本次有意删除的列
+# 重命名映射。014 曾以「方向反了」为由删掉 intel_report_id，
+# 但那列 495 行里有 494 行有值（一份批量报告 → 494 家公司，是一对多关系），
+# 属于误删，已由 015 恢复并回填。这里不再排除任何列 —— 教训见下方【0】。
 RENAME = {"id": "company_id", "company_name": "name"}
-old_cols = [c for c in cols(b, "customer_prospect") if c != "intel_report_id"]
+old_cols = cols(b, "customer_prospect")
 new_cols = cols(a, "company")
 for oc in old_cols:
     ck(f"列 {oc} → {RENAME.get(oc, oc)} 存在", RENAME.get(oc, oc) in new_cols)
-ck("intel_report_id 已删", "intel_report_id" not in new_cols)
+# 014 删了它，015 恢复并回填。此处断言它必须存在且数据完整。
+ck("intel_report_id 已由 015 恢复", "intel_report_id" in new_cols)
+n_link_b = b.execute("SELECT COUNT(*) FROM customer_prospect WHERE intel_report_id IS NOT NULL").fetchone()[0]
+n_link_a = a.execute("SELECT COUNT(*) FROM company WHERE intel_report_id IS NOT NULL").fetchone()[0]
+ck(f"批量报告关联 {n_link_b} 条已回填", n_link_b == n_link_a, f"实际 {n_link_a}")
 for nc in ("name_en","type","city","country"):
     ck(f"新列 {nc}", nc in new_cols)
 
