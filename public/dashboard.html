@@ -1097,7 +1097,12 @@ function renderTable(){
   const brands = S.brands;
   const sorted = [...brands].sort((a, b) => {
     let va = a[S.sortK] ?? '', vb = b[S.sortK] ?? '';
-    if (typeof va === 'string') return S.sortD === 'asc' ? va.localeCompare(vb, 'zh') : vb.localeCompare(va, 'zh');
+    // 该列可能混有 null / number（如 exhibitors_count），先归一到字符串再比较，
+    // 否则 number 上没有 localeCompare，会抛错并中断 renderAll（表格 + 日历不渲染）
+    if (typeof va === 'string' || typeof vb === 'string') {
+      const sa = String(va), sb = String(vb);
+      return S.sortD === 'asc' ? sa.localeCompare(sb, 'zh') : sb.localeCompare(sa, 'zh');
+    }
     return S.sortD === 'asc' ? va - vb : vb - va;
   });
 
