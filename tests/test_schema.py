@@ -236,11 +236,15 @@ class TestMigrationsApplied(unittest.TestCase):
         cols_user = get_table_columns(self.conn, "user")
         self.assertIn('dashboard_prefs', cols_user)
 
-        # 版本 4-5: timeline/relation/people 表
+        # 版本 4-5 建的 timeline/relation/people 五表，014 已删除（建表至今零行）
         tables = get_all_tables(self.conn)
-        self.assertIn('exhibition_timeline', tables)
-        self.assertIn('exhibition_relation', tables)
-        self.assertIn('person', tables)
+        for dead in ('exhibition_timeline', 'exhibition_relation', 'person',
+                     'exhibition_contact', 'contact_relation'):
+            self.assertNotIn(dead, tables, f'{dead} 应已被 014 删除')
+
+        # 版本 14: 新建 opportunity / opportunity_event
+        self.assertIn('opportunity', tables)
+        self.assertIn('opportunity_event', tables)
 
         # 版本 6: intel_report / customer_prospect
         self.assertIn('intel_report', tables)

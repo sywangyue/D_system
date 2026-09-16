@@ -25,41 +25,8 @@ export async function GET(
     return NextResponse.json({ error: 'not found' }, { status: 404 })
   }
 
-  const timeline = db.prepare(`
-    SELECT id, brand_id, event_date, event_type, title, description,
-           counterpart, outcome, source_url, created_by, created_at
-    FROM exhibition_timeline
-    WHERE brand_id = ?
-    ORDER BY event_date DESC
-  `).all(id)
-
-  // Use subquery pattern instead of UNION ORDER BY to avoid old SQLite limitations
-  const relations = db.prepare(`
-    SELECT * FROM (
-      SELECT r.id, r.from_brand_id, r.to_brand_id, r.relation_type, r.notes,
-             r.created_at as created_at,
-             b.name_cn as to_name_cn, b.city as to_city, b.industry_l1 as to_industry
-      FROM exhibition_relation r
-      JOIN exhibition_brand b ON b.brand_id = r.to_brand_id
-      WHERE r.from_brand_id = ?
-      UNION ALL
-      SELECT r.id, r.from_brand_id, r.to_brand_id, r.relation_type, r.notes,
-             r.created_at as created_at,
-             b.name_cn as to_name_cn, b.city as to_city, b.industry_l1 as to_industry
-      FROM exhibition_relation r
-      JOIN exhibition_brand b ON b.brand_id = r.from_brand_id
-      WHERE r.to_brand_id = ?
-    ) ORDER BY created_at DESC
-  `).all(id, id)
-
-  const contacts = db.prepare(`
-    SELECT ec.id, ec.person_id, ec.role, ec.contact_date, ec.notes, ec.created_at,
-           p.name, p.title, p.company, p.linkedin, p.email
-    FROM exhibition_contact ec
-    JOIN person p ON p.person_id = ec.person_id
-    WHERE ec.brand_id = ?
-    ORDER BY contact_date DESC
-  `).all(id)
-
-  return NextResponse.json({ brand, timeline, relations, contacts })
+  // 014 迁移删除了 exhibition_timeline / exhibition_relation /
+  // exhibition_contact / person 四张零行空表，对应的时间线、展会关系、
+  // 相关人员三个区块已从前端移除。机会维度的时间线由 opportunity_event 承载。
+  return NextResponse.json({ brand })
 }

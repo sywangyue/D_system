@@ -23,7 +23,6 @@ DB_PATH = _REPO_ROOT / "data" / "mwlab.db"
 # ── 查询上限（防止输出过大撑满 LLM 上下文）
 MAX_EDITIONS = 10
 MAX_INDUSTRY_BRANDS = 50
-MAX_RELATIONS = 20
 
 
 def _connect() -> sqlite3.Connection:
@@ -68,38 +67,22 @@ def brand_research(identifier: str) -> str:
         (brand_id, MAX_EDITIONS)
     ).fetchall()
 
-    # 竞争关系查询（exhibition_relation 当前为空，实现 fallback）
-    relations = conn.execute(
-        "SELECT b.name_cn, b.brand_id, r.relation_type, r.notes "
-        "FROM exhibition_relation r "
-        "JOIN exhibition_brand b ON b.brand_id = r.to_brand_id "
-        "WHERE r.from_brand_id = ? LIMIT ?",
-        (brand_id, MAX_RELATIONS)
-    ).fetchall()
-
+    # 竞争关系：原先查 exhibition_relation 表并在空表时 fallback 到同行业聚合。
+    # 该表 014 迁移已删除（建表至今零行），fallback 是唯一跑过的分支，故只保留它。
     relation_section: list[str] = []
-    if relations:
-        relation_section.append("### 竞争关系网络（来自 exhibition_relation 表）")
-        for r in relations:
-            relation_section.append(
-                f"- [{r['relation_type']}] {r['name_cn']} ({r['brand_id']}): {r['notes'] or ''}"
-            )
-    else:
+    relation_section.append("### 同行业展会（按 industry_l1 聚合）")
+    peers = conn.execute(
+        "SELECT brand_id, name_cn, scale_score, ma_potential "
+        "FROM exhibition_brand "
+        "WHERE industry_l1 = ? AND brand_id != ? "
+        "ORDER BY scale_score DESC LIMIT 20",
+        (row["industry_l1"], brand_id)
+    ).fetchall()
+    for p in peers:
         relation_section.append(
-            "### 同行业展会（exhibition_relation 表当前无数据，fallback 到同行业聚合）"
+            f"- {p['name_cn']} ({p['brand_id']}) "
+            f"规模={p['scale_score'] or 'N/A'} MA潜力={p['ma_potential'] or 'N/A'}"
         )
-        peers = conn.execute(
-            "SELECT brand_id, name_cn, scale_score, ma_potential "
-            "FROM exhibition_brand "
-            "WHERE industry_l1 = ? AND brand_id != ? "
-            "ORDER BY scale_score DESC LIMIT 20",
-            (row["industry_l1"], brand_id)
-        ).fetchall()
-        for p in peers:
-            relation_section.append(
-                f"- {p['name_cn']} ({p['brand_id']}) "
-                f"规模={p['scale_score'] or 'N/A'} MA潜力={p['ma_potential'] or 'N/A'}"
-            )
 
     conn.close()
 
