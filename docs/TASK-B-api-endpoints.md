@@ -141,7 +141,12 @@ POST 必填    report_type, title
 一阶字段     b.brand_id, b.name_cn, b.name_en, b.city, b.industry_l1,
              e.year, e.area_sqm, e.exhibitors_count, e.visitors_count
 来源         exhibition_brand b LEFT JOIN exhibition_edition e
-             ON e.brand_id=b.brand_id AND e.year=(SELECT MAX(year) …)
+             ⚠️ 取「最新一届」必须锁到单行：有 8 个品牌在同一年有两届（春秋两季），
+             用 e.year = MAX(year) 会让 LEFT JOIN 扇出、total 多算、列表出现重复。
+             正确写法：
+               AND e.edition_id = (SELECT edition_id FROM exhibition_edition
+                                   WHERE brand_id = b.brand_id
+                                   ORDER BY year DESC, edition_id DESC LIMIT 1)
 过滤         b.display_ready = 1
 排序白名单   area_sqm(默认) / exhibitors_count / visitors_count / name_cn / year
 筛选白名单   industry_l1, industry_l2, city, country_cn
@@ -182,7 +187,8 @@ curl -s -b "session=$T" '/api/expo?size=3'           | jq .total
 curl -s -b "session=$T" '/api/company?sort=1;DROP+TABLE+company' | jq .total  # 不报错，回退默认
 
 # 现有数据基线：company 501 条、intel_report 2 条、resource 50 条、
-# exhibition_brand display_ready=1 的 5,332 条
+# exhibition_brand display_ready=1 的 7,378 条
+# （勘误：本文初稿写的 5,332 是 /api/dashboard 带年份过滤的口径，不是 display_ready）
 ```
 
 **特别检查**：`/api/research` 的一阶响应里**不能出现 `report_md` 或 `params_json`**。

@@ -55,7 +55,9 @@ export async function GET(
         FROM exhibition_brand b
         LEFT JOIN exhibition_edition e
           ON e.brand_id = b.brand_id
-         AND e.year = (SELECT MAX(year) FROM exhibition_edition WHERE brand_id = b.brand_id)
+         AND e.edition_id = (SELECT edition_id FROM exhibition_edition
+                             WHERE brand_id = b.brand_id
+                             ORDER BY year DESC, edition_id DESC LIMIT 1)
         WHERE b.brand_id = ?
       `).get(row.brand_id)
     : null
