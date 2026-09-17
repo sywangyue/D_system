@@ -12,15 +12,65 @@
 |------|-----|
 | 公网 IP | 47.79.17.71 |
 | 登录用户 | admin |
-| SSH Key | `MWlab.pem`（项目根目录） |
+| SSH Key | `~/.ssh/MWlab.pem`（已移出项目目录） |
 | 项目路径 | `/home/admin/dashboard/` |
 | RAM | 890MB 物理 + 2GB swap（/etc/fstab 持久化） |
 | 磁盘 | 29GB |
 
 ```bash
 # SSH 登录
-ssh -i "/Volumes/databoard/AI Project/D_dashboard/MWlab.pem" admin@47.79.17.71
+ssh -i ~/.ssh/MWlab.pem admin@47.79.17.71
 ```
+
+---
+
+## ⚠️ 2026-09-17 全新部署后的约定（先读这一节）
+
+旧版已整体下架，服务器目录重建。备份：服务器 `~/backups/dashboard-pre-redeploy-20260917-2026.tgz`，
+本地 `data/backups/server-20260917-2026/`（旧库 + 线上环境文件）。
+
+**服务器上绝对不要运行 `npm install` / `npm ci`。** 890MB 内存，npm 解析依赖清单就会耗尽内存、
+整机失去响应（SSH 握手超时），2026-09-17 连续两次只能在控制台重启。依赖一律在本地按 Linux 平台装好再上传：
+
+```bash
+S=$(mktemp -d); cp package.json package-lock.json $S/ && cd $S
+npm ci --omit=dev --ignore-scripts --os=linux --cpu=x64 --libc=glibc
+# SQLite 驱动：取 Linux + Node 20（ABI 115）的预编译二进制
+(cd node_modules/better-sqlite3 && ../.bin/prebuild-install --platform linux --arch x64 --libc glibc --runtime node --target 20.20.2)
+file node_modules/better-sqlite3/build/Release/better_sqlite3.node   # 必须是 ELF x86-64
+rm -rf node_modules/@next/swc-linux-x64-musl node_modules/@img/*musl*
+ssh admin@47.79.17.71 'rm -rf ~/dashboard/node_modules'
+COPYFILE_DISABLE=1 tar -czf - node_modules | ssh admin@47.79.17.71 'cd ~/dashboard && nice -n 19 tar -xzf -'
+```
+
+只有 `package.json` 依赖变了才需要重做这一步；平时只传 `.next/`。
+
+**上传清单**（服务器 `~/dashboard/` 下只有这些）：
+
+| 内容 | 说明 |
+|---|---|
+| `.next/` | 排除 `.next/dev`（本地开发缓存，500MB+）与 `.next/cache` |
+| `public/` `knowledge/` | 静态资源、知识库 |
+| `reports/` `exports/` `research/` | 资源下载接口读这三个目录，缺了下载全 404 |
+| `package.json` `package-lock.json` `next.config.ts` | |
+| `data/mwlab.db` | 见下 |
+| `.env.production.local` | 只有 `JWT_SECRET`，权限 600 |
+| `node_modules/` | 见上 |
+
+**数据库**：本地库是唯一数据源（采集管道跑在本机 crontab）。上传前用 `sqlite3 data/mwlab.db ".backup 副本"`
+取一致快照；**线上账号密码与本地不同**，上传前把副本里 `user.password_hash` 按 email 换成线上库的值，
+否则线上登录密码会变成本地的。服务器上**没有**定时任务（旧的 scheduler.py 定时任务已删）。
+
+**进程**（内存上限是防死机的关键，重建时照抄）：
+
+```bash
+pm2 start node_modules/next/dist/bin/next --name mwlab-dashboard --cwd /home/admin/dashboard \
+  --node-args="--max-old-space-size=320" --max-memory-restart 450M -- start -p 3000
+pm2 save
+```
+
+稳定运行约 180MB。`vm.swappiness` 已从 0 改为 10（`/etc/sysctl.conf`，原文件备份为 `.bak-20260917`）：
+设为 0 时内核几乎不用交换区，内存一紧就直接卡死。
 
 ---
 
