@@ -125,6 +125,11 @@ grep -rnE '>[^<>{}]*[一-鿿]+[^<>{}]*<' app/ components/ --include="*.tsx"
 grep -rnE '"[^"]*[一-鿿]+[^"]*"' app/ components/ --include="*.tsx" | grep -v "locales"
 #   两条都应为空。注释里的中文不算，只看会渲染的字符串。
 
+# 1b. 接口错误文案也是界面文案 —— 客户端会把 error 直接渲染出来
+grep -rnE "error: [\`'\"][^\`'\"]*[一-鿿]" app/api/
+#   应为空。第一轮质检就是漏了这条：上面两条只扫 .tsx，
+#   而错误串在 .ts 路由里，英文界面照样会显示中文报错。
+
 # 2. 两份字典键完全对齐
 python3 -c "
 import json

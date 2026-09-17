@@ -39,7 +39,7 @@ Max 已完成项目的档案：并购 / 收购 / 新品类开拓等。**一个�
 knowledge/<slug>/                    ← 不对外，服务端读
   index.md                             必需。frontmatter + 正文
   docs/
-    2024-协议签署版.pdf                 内部文件（合同、估值表），走鉴权下载
+    2024-协议签署版.pdf                 内部文件（合同、估值表），走 /api 下载
 
 public/knowledge/<slug>/             ← 公开静态目录，Next 直接发
   images/
@@ -124,7 +124,7 @@ cover: images/01-site.jpg
 | `app/knowledge/page.tsx` | 列表页（服务端组件，直接调 `lib/knowledge.ts`，不发 HTTP） |
 | `app/knowledge/[slug]/page.tsx` | 详情页（同上） |
 | `app/knowledge/[slug]/knowledge-body.tsx` | 客户端组件，只负责渲染 Markdown（`react-markdown` 是客户端库） |
-| `app/api/knowledge/[slug]/doc/[...path]/route.ts` | **只管 `docs/` 下的文件**下载，要鉴权 |
+| `app/api/knowledge/[slug]/doc/[...path]/route.ts` | **只管 `docs/` 下的文件**下载 |
 | `components/layout/Sidebar.tsx` | 加一个导航项 |
 | `locales/zh.json` + `locales/en.json` | 新增 `knowledge` 段与 `nav.knowledge` |
 | `docs/DEPLOY.md` | 补两条 rsync（见 §5.4） |
@@ -216,11 +216,18 @@ images/02-signing.png  →  /knowledge/<slug>/images/02-signing.png
 判断图片存不存在。`cover` 指向的图丢了就是浏览器出裂图，不值得为此多一次 IO；
 真要防，在卡片上给 `<img onError>` 兜一下即可。
 
-### 5.3 文档端点的路径校验不能省
+### 5.3 文档端点的路径拼接照现成的写法抄
 
-这一条跟登录无关，别当成「复杂的权限设置」：`[...path]` 是**从 URL 里来的字符串**，
-不校验就意味着 `..%2f..%2f.env.local` 能读走 `JWT_SECRET` 和企查查密钥。
-五行代码的事，但必须有。
+先说清楚**不需要**做什么：登录这关 `proxy.ts` 已经全局做完了，
+页面 307 跳登录、`/api/*` 直接 401，实测伪造 `x-user-role` 头也会被中间件剥离。
+所以这个端点里的 `requireUser` 只是跟其余 14 个路由保持一致的一行，
+**不是第二道登录门，别按「鉴权功能」去设计**。
+
+需要做的只有一件：`[...path]` 是**从 URL 里来的字符串**，
+你无论如何都得写一个函数把它变成磁盘路径 —— 这个函数必须存在，不写就没有下载功能。
+拒绝 `..` 只是这个函数里的一个 `if`，不是外面再加一层。
+少写它不会让代码变简单，只会让 `..%2f..%2f.env.local` 也能拼出去，
+而 `.env.local` 里是 `JWT_SECRET` 和企查查密钥。
 
 照 `app/api/resource/[id]/download/route.ts` 里 `resolveSafe()` 的思路写：
 
@@ -232,8 +239,7 @@ images/02-signing.png  →  /knowledge/<slug>/images/02-signing.png
 - **slug 本身也是路径的一段，同样要校验**，别只校验 `[...path]`；
 - 只允许落在 `knowledge/<slug>/docs/` 里，越到 `index.md` 也算越界。
 
-端点保留 `requireUser`（合同和估值表是内部文件），响应
-`Content-Disposition: attachment`，中文文件名照那个文件里的 RFC 5987 写法
+响应 `Content-Disposition: attachment`，中文文件名照那个文件里的 RFC 5987 写法
 （`filename*` + ASCII 回退），别再踩一遍。
 
 ### 5.4 两个新目录都要单独部署
