@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getDb } from '@/lib/db'
 import { requireUser } from '@/lib/api-guard'
+import { BRAND_LATEST_FROM } from '@/lib/queries/edition'
 
 /**
  * 展会盘面 —— 一阶列表端点（**只读**）
@@ -18,17 +19,8 @@ const LIST_COLUMNS = `
   e.year, e.area_sqm, e.exhibitors_count, e.visitors_count
 `
 
-/** 品牌 → 最新一届届次的连接条件。COUNT 与 SELECT 必须是同一个 FROM。 */
-const FROM = `
-  FROM exhibition_brand b
-  LEFT JOIN exhibition_edition e
-    ON e.brand_id = b.brand_id
-   -- 取「最新一届」必须锁定到单行：有 8 个品牌在同一年有两届（春秋两季那种），
-   -- 用 e.year = MAX(year) 会让 LEFT JOIN 扇出，列表里重复出现、total 也多算。
-   AND e.edition_id = (SELECT edition_id FROM exhibition_edition
-                       WHERE brand_id = b.brand_id
-                       ORDER BY year DESC, edition_id DESC LIMIT 1)
-`
+// 「最新一届」的连接条件只有一份：lib/queries/edition.ts
+const FROM = BRAND_LATEST_FROM
 
 /** 排序白名单：key 是外部可传的值，value 是真实列名。
  *  绝不能把 sort 参数直接拼进 SQL。 */

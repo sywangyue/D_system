@@ -596,6 +596,20 @@ describe("PATCH /api/opportunity/[id]", () => {
     expect(mockGetWritableDb).not.toHaveBeenCalled()
   })
 
+  // NOT NULL 列显式传 null / 空标题：原先会撞约束变成 500，或存出没有名字的机会（2026-09-17 代码质检）
+  it.each([
+    [{ title: null }, "titleRequired"],
+    [{ title: "   " }, "titleRequired"],
+    [{ stage: null }, "badStage"],
+    [{ detail_json: null }, "invalidValue"],
+  ])("PATCH %j → 400 %s，未写库", async (body, code) => {
+    const db = useDb(patchDb())
+    const res = await detailPATCH(authed("/1", { method: "PATCH", body }), ctx("1"))
+    expect(res.status).toBe(400)
+    expectDictError(await res.json(), code)
+    expect(db.log.run).toHaveLength(0)
+  })
+
   it("stage 非法 → 400 badStage，未执行 UPDATE", async () => {
     const db = useDb(patchDb())
     const res = await detailPATCH(authed("/1", { method: "PATCH", body: { stage: "bogus" } }), ctx("1"))

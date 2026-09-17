@@ -2,7 +2,7 @@
 
 import { Download } from "lucide-react"
 import { fill, fmtDate, type Dict, type Locale } from "@/lib/i18n-shared"
-import { RESOURCE_KIND, slugLabel } from "@/lib/enums"
+import { slugLabel } from "@/lib/enums"
 
 /**
  * 资源列表 —— 机会详情页与公司详情页共用。

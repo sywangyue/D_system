@@ -61,7 +61,7 @@ export default function Pipeline({
     } finally {
       setLoading(false)
     }
-  }, [tab, stage, mine, q, page, currentUser])
+  }, [tab, stage, mine, q, page, currentUser, t])
 
   useEffect(() => { load() }, [load])
   useEffect(() => { setPage(1) }, [tab, stage, mine, q])
@@ -225,7 +225,6 @@ export default function Pipeline({
         <NewDrawer
           defaultType={tab}
           currentUser={currentUser}
-          locale={locale}
           t={t}
           onClose={() => setDrawer(false)}
           onCreated={() => { setDrawer(false); load() }}

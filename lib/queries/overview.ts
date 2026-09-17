@@ -1,4 +1,6 @@
 import { getDb } from '@/lib/db'
+import { localDate } from '@/lib/time'
+import { STAGES } from '@/app/opportunity/types'
 
 /**
  * 盘面聚合查询。被 /api/overview 与 app/overview/page.tsx 共用 ——
@@ -11,10 +13,9 @@ function endOfWeek(): string {
   const d = new Date()
   const dow = d.getDay() === 0 ? 7 : d.getDay()   // 周一=1 … 周日=7
   d.setDate(d.getDate() + (7 - dow))
-  return d.toISOString().slice(0, 10)
+  return localDate(d)
 }
 
-const STAGES = ['contact', 'intent', 'dd', 'audit', 'closing'] as const
 
 export interface Task {
   opp_id: number; title: string; type: string; stage: string
@@ -81,7 +82,7 @@ export function getOverview(): OverviewData {
     FROM opportunity WHERE is_archived = 0 GROUP BY stage
   `).all() as { stage: string; n: number }[]
   const byStage = Object.fromEntries(counted.map(r => [r.stage, r.n]))
-  const funnel = STAGES.map(stage => ({
+  const funnel = STAGES.map(({ key: stage }) => ({
     stage,
     count: byStage[stage] ?? 0,
     // dwell_days / conversion 待 stage_change 事件积累后补，见文件头说明

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getDb, getWritableDb } from '@/lib/db'
 import { requireUser, requireWriter } from '@/lib/api-guard'
+import { localDateTime } from '@/lib/time'
+import { REPORT_TYPE, REPORT_STATUS } from '@/lib/enums'
 
 /**
  * 调研报告（intel_report）—— 一阶列表端点
@@ -47,15 +49,9 @@ const FILTERS: Record<string, string> = {
   opp_id: 'r.opp_id',
 }
 
-// 必须与 intel_report.report_type 的 CHECK 约束一致（见 006 建表 + 017 拓宽）。
-// company_research 是「公司尽调」，产品里最常用的一类，前端 overview 的中文映射
-// 与 docs/TASK-C §3.1 都以它为准；006 的枚举漏了它，017 补上，这里同步。
-const REPORT_TYPES = [
-  'industry_research', 'brand_research', 'batch_prospect', 'single_prospect',
-  'company_research',
-]
-
-const STATUSES = ['draft', 'published', 'archived']
+// 取值只有一处来源：lib/enums.ts（与 intel_report.report_type / status 的 CHECK 约束一致）
+const REPORT_TYPES = REPORT_TYPE.map(o => o.value)
+const STATUSES = REPORT_STATUS.map(o => o.value)
 
 /** 写字段白名单。不在表里的键静默忽略。 */
 const WRITABLE = [
@@ -149,7 +145,7 @@ export async function POST(request: Request) {
   // 都是 NOT NULL，未提供时让列默认值（'{}' / '' / '' / 'draft'）兜底，
   // 不补空字符串 —— status 补 '' 会当场撞 CHECK 约束。
   const cols = WRITABLE.filter(c => body[c] !== undefined)
-  const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
+  const now = localDateTime()
 
   const wdb = getWritableDb()
   try {

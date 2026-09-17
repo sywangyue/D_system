@@ -11,4 +11,3 @@
  * 不留中文字面量，「界面零硬编码中文」的扫描才不会被字标干扰。
  */
 export const BRAND_CN = "万象"
-export const BRAND_LATIN = "MWLAB"

@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getDb, getWritableDb } from '@/lib/db'
 import { requireUser, requireWriter } from '@/lib/api-guard'
+import { localDateTime } from '@/lib/time'
+import { REPORT_TYPE, REPORT_STATUS } from '@/lib/enums'
 
 /**
  * 调研报告详情 —— 二阶端点
@@ -11,13 +13,9 @@ import { requireUser, requireWriter } from '@/lib/api-guard'
  * ⚠️ 主键是裸 `id`；⚠️ 没有 is_archived，所以没有 DELETE 端点。
  */
 
-// 必须与 intel_report.report_type 的 CHECK 约束一致（见 006 建表 + 017 拓宽）。
-const REPORT_TYPES = [
-  'industry_research', 'brand_research', 'batch_prospect', 'single_prospect',
-  'company_research',
-]
-
-const STATUSES = ['draft', 'published', 'archived']
+// 取值只有一处来源：lib/enums.ts（与 intel_report.report_type / status 的 CHECK 约束一致）
+const REPORT_TYPES = REPORT_TYPE.map(o => o.value)
+const STATUSES = REPORT_STATUS.map(o => o.value)
 
 /** 与列表端点同一份白名单：不在表里的键静默忽略。 */
 const WRITABLE = [
@@ -91,7 +89,7 @@ export async function PATCH(
     return NextResponse.json({ error: "noFields" }, { status: 400 })
   }
 
-  const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
+  const now = localDateTime()
   const wdb = getWritableDb()
   try {
     const exists = wdb.prepare('SELECT id FROM intel_report WHERE id = ?').get(id)

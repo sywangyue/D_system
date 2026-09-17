@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import DataStatusCard, { type DataStatus } from "@/components/settings/DataStatusCard";
 import UsersTable, { UsersTableSkeleton, type UserEntry } from "@/components/settings/UsersTable";
 import SystemInfoBlock, { type SystemInfo } from "@/components/settings/SystemInfoBlock";
@@ -50,7 +49,6 @@ function ErrorCard({
 }
 
 export default function SettingContent({ t, locale }: { t: Dict; locale: Locale }) {
-  const router = useRouter();
 
   // Auth + RBAC state
   const [roleChecked, setRoleChecked] = useState(false);

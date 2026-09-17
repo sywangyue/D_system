@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server'
 import { getDb, getWritableDb } from '@/lib/db'
 import { requireUser, requireWriter } from '@/lib/api-guard'
+import { getBrandWithLatest } from '@/lib/queries/edition'
+import { localDateTime } from '@/lib/time'
+import { CONTACT_STATUS } from '@/lib/enums'
 
 /**
  * 客户详情 —— 二阶端点
@@ -14,7 +17,6 @@ import { requireUser, requireWriter } from '@/lib/api-guard'
  * ⚠️ company 表没有 is_archived，所以既不过滤软删除，也没有 DELETE 端点。
  */
 
-const CONTACT_STATUS = ['未接触', '已接触', '谈判中', '合作中', '放弃', '']
 
 /** 与列表端点同一份白名单：不在表里的键静默忽略。source_type 不可改。 */
 const WRITABLE = [
@@ -38,18 +40,7 @@ export async function GET(
   if (!companyRow) return NextResponse.json({ error: 'notFound' }, { status: 404 })
 
   const brand = companyRow.brand_id
-    ? db.prepare(`
-        SELECT b.brand_id, b.name_cn, b.name_en, b.city, b.organizer,
-               b.industry_l1, b.industry_l2, b.is_ufi_certified,
-               e.year, e.area_sqm, e.exhibitors_count, e.visitors_count
-        FROM exhibition_brand b
-        LEFT JOIN exhibition_edition e
-          ON e.brand_id = b.brand_id
-         AND e.edition_id = (SELECT edition_id FROM exhibition_edition
-                             WHERE brand_id = b.brand_id
-                             ORDER BY year DESC, edition_id DESC LIMIT 1)
-        WHERE b.brand_id = ?
-      `).get(companyRow.brand_id)
+    ? getBrandWithLatest(companyRow.brand_id as string)
     : null
 
   // 名下资源：直接挂在公司上的。collected_at 倒序，最新版本排最前。
@@ -115,7 +106,7 @@ export async function PATCH(
     return NextResponse.json({ error: "noFields" }, { status: 400 })
   }
 
-  const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
+  const now = localDateTime()
   const wdb = getWritableDb()
   try {
     const exists = wdb.prepare('SELECT company_id FROM company WHERE company_id = ?').get(id)

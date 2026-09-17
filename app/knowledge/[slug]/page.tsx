@@ -5,7 +5,7 @@ import { getSessionUser } from "@/lib/session"
 import { getDict, getLocale } from "@/lib/i18n"
 import { getKnowledge, listDocs } from "@/lib/knowledge"
 import { bizLineLabel } from "@/lib/enums"
-import { pickContent, type Dict, type Locale } from "@/lib/i18n-shared"
+import { pickContent } from "@/lib/i18n-shared"
 import KnowledgeBody from "./knowledge-body"
 
 /**

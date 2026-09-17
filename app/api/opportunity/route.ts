@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getDb, getWritableDb } from '@/lib/db'
 import { requireUser, requireWriter } from '@/lib/api-guard'
+import { localDateTime } from '@/lib/time'
+import { BIZ_LINES, STAGES as STAGE_DEFS, DEAL_TYPES } from '@/app/opportunity/types'
 
 /**
  * 机会台 —— 一阶列表端点（参考实现，其余资源照此套）
@@ -34,9 +36,9 @@ const FILTERS: Record<string, string> = {
   company_id: 'o.company_id',
 }
 
-const TYPES = ['ma', 'greenfield', 'project_support']
-const STAGES = ['contact', 'intent', 'dd', 'audit', 'closing']
-const DEAL_TYPES = ['收购', '并购', '参股', '承办', '孵化']
+// 取值只有一处来源：app/opportunity/types.ts（前端的 tab、步进器、下拉都用它）
+const TYPES: string[] = BIZ_LINES.map(l => l.key)
+const STAGES: string[] = STAGE_DEFS.map(s => s.key)
 
 /** POST 接受的字段白名单。不在表里的键静默忽略。 */
 const WRITABLE = [
@@ -111,10 +113,11 @@ export async function POST(request: Request) {
   if (!TYPES.includes(body.type as string)) {
     return NextResponse.json({ error: "badBizLine", values: TYPES.join(" / ") }, { status: 400 })
   }
-  if (body.stage != null && !STAGES.includes(body.stage as string)) {
+  // stage 与 detail_json 是 NOT NULL 列：显式传 null 也要拦下，否则撞约束变成 500
+  if (body.stage !== undefined && !STAGES.includes(body.stage as string)) {
     return NextResponse.json({ error: "badStage", values: STAGES.join(" / ") }, { status: 400 })
   }
-  if (body.deal_type != null && !DEAL_TYPES.includes(body.deal_type as string)) {
+  if (body.deal_type != null && !(DEAL_TYPES as string[]).includes(body.deal_type as string)) {
     return NextResponse.json({ error: "badDealType", values: DEAL_TYPES.join(" / ") }, { status: 400 })
   }
   if (body.priority != null) {
@@ -124,13 +127,16 @@ export async function POST(request: Request) {
     }
   }
 
+  if (body.detail_json === null) {
+    return NextResponse.json({ error: "invalidValue" }, { status: 400 })
+  }
   // detail_json 允许传对象或字符串，统一存成字符串
   if (body.detail_json != null && typeof body.detail_json === 'object') {
     body.detail_json = JSON.stringify(body.detail_json)
   }
 
   const cols = WRITABLE.filter(c => body[c] !== undefined)
-  const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
+  const now = localDateTime()
 
   const wdb = getWritableDb()
   try {

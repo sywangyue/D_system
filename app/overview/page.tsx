@@ -5,6 +5,7 @@ import { getOverview } from "@/lib/queries/overview"
 import { getLocale, getDict } from "@/lib/i18n"
 import { fmtDate, fmtMonthDay, type Dict } from "@/lib/i18n-shared"
 import { slugLabel, stageLabel } from "@/lib/enums"
+import { STAGES } from "@/app/opportunity/types"
 import { ArrowRight, FileText, Inbox } from "lucide-react"
 
 /**
@@ -177,11 +178,10 @@ function SectionTitle({ children, action }: { children: React.ReactNode; action?
 }
 
 function StagePip({ stage, t }: { stage: string; t: Dict }) {
-  const order = ["contact", "intent", "dd", "audit", "closing"]
-  const i = order.indexOf(stage)
+  const i = STAGES.findIndex(s => s.key === stage)
   return (
     <span className="flex gap-0.5 shrink-0" title={stageLabel(t, stage)}>
-      {order.map((_, k) => (
+      {STAGES.map((_, k) => (
         <span key={k} className="w-2.5 h-1 rounded-[1px]"
               style={{ background: k <= i ? "var(--color-fg-subtle)" : "var(--color-hairline-active)" }} />
       ))}

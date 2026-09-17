@@ -1,5 +1,6 @@
 import { unstable_cache } from 'next/cache'
 import { getDb } from '@/lib/db'
+import { BRAND_LATEST_FROM } from '@/lib/queries/edition'
 import { getExpoStats, type ExpoStats } from '@/lib/queries/expo'
 
 /**
@@ -10,19 +11,8 @@ import { getExpoStats, type ExpoStats } from '@/lib/queries/expo'
  * 页面本身必然是动态的；而十几条聚合查询的数据每月才更新两次，每次请求全跑一遍没意义（§5）。
  */
 
-/**
- * 品牌 → 最新一届届次的连接条件。
- * 与 `app/api/expo/route.ts` 的 FROM **逐字一致** —— 两处口径不同的话，
- * 落地页的数字和系统内的数字会对不上，而落地页是给外部看的，对不上最难看。
- */
-const FROM = `
-  FROM exhibition_brand b
-  LEFT JOIN exhibition_edition e
-    ON e.brand_id = b.brand_id
-   AND e.edition_id = (SELECT edition_id FROM exhibition_edition
-                       WHERE brand_id = b.brand_id
-                       ORDER BY year DESC, edition_id DESC LIMIT 1)
-`
+// 「最新一届」的连接条件只有一份：lib/queries/edition.ts
+const FROM = BRAND_LATEST_FROM
 
 /** 强调哪一条集团：杜塞尔多夫展览自己的那一行（§4.4 第 2 块 / §6.4）。 */
 const HIGHLIGHT_ORG = '杜塞尔多夫展览'

@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { X, Search, Loader2 } from "lucide-react"
 import { BIZ_LINES, STAGES, DEAL_TYPES, type BizLine, type DealType, type Stage } from "./types"
 import { COMPANY_STATUS, bizLineLabel, dealTypeLabel, enumLabel, stageLabel } from "@/lib/enums"
-import type { Dict, Locale } from "@/lib/i18n-shared"
+import type { Dict } from "@/lib/i18n-shared"
 import { errorText } from "@/lib/i18n-shared"
 
 /**
@@ -18,13 +18,10 @@ import { errorText } from "@/lib/i18n-shared"
 interface CompanyHit { company_id: number; name: string; company_status: string | null }
 
 export default function NewDrawer({
-  defaultType, currentUser, locale, t, onClose, onCreated,
+  defaultType, currentUser, t, onClose, onCreated,
 }: {
   defaultType: BizLine
   currentUser: string
-  /** 与 pipeline / opportunity-detail 同一组签名。抽屉里眼下没有随语言变化的渲染
-   *  （日期、单位、枚举标签全走字典），但调用处不该因将来加一个日期格式而改签名。 */
-  locale: Locale
   t: Dict
   onClose: () => void
   onCreated: () => void

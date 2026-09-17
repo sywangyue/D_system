@@ -1,4 +1,6 @@
 import { getDb } from '@/lib/db'
+import { localDate } from '@/lib/time'
+import { BRAND_LATEST_FROM } from '@/lib/queries/edition'
 import { resolvePoint, type GeoPoint } from '@/lib/geo'
 
 /**
@@ -6,19 +8,11 @@ import { resolvePoint, type GeoPoint } from '@/lib/geo'
  * 服务端壳直接调它拿首屏（§6.2），客户端只在筛选变化/翻月时打接口。
  *
  * 口径与 /api/expo 完全一致（§3）：只统计 display_ready=1，每个品牌只取**最新一届**，
- * 且「最新一届」必须锁定到单行（有 8 个品牌同一年办两届，用 year = MAX(year) 会扇出重复计数）。
- * 下面的 FROM 与 app/api/expo/route.ts 的 FROM 是同一段逻辑，改一处要改两处。
+ * 「最新一届」的连接条件取自 lib/queries/edition.ts，与 /api/expo 共用同一份。
  */
 
-/** 品牌 → 最新一届。COUNT 与 SELECT 必须是同一个 FROM。 */
-const FROM = `
-  FROM exhibition_brand b
-  LEFT JOIN exhibition_edition e
-    ON e.brand_id = b.brand_id
-   AND e.edition_id = (SELECT edition_id FROM exhibition_edition
-                       WHERE brand_id = b.brand_id
-                       ORDER BY year DESC, edition_id DESC LIMIT 1)
-`
+// 「最新一届」的连接条件只有一份：lib/queries/edition.ts
+const FROM = BRAND_LATEST_FROM
 
 /** 规模四档。既是筛选的取值，也是小图的档位顺序。
  *  客户端只能传 key（lt1w / 1w-5w / 5w-10w / gte10w），区间由服务端映射 ——
@@ -30,7 +24,6 @@ export const SCALE_BUCKETS = [
   { key: 'gte10w', min: 100_000, max: Number.MAX_SAFE_INTEGER },
 ] as const
 
-export type ScaleKey = (typeof SCALE_BUCKETS)[number]['key']
 
 /** SQL 里的分档表达式。面积为空的行**不进任何一档**（它既不是小展也不是大展），
  *  所以小图各档之和 ≤ 品牌数；大数字下方那行「N 个品牌」给的是品牌数，两处口径不同但都真实。 */
@@ -155,8 +148,7 @@ export function getExpoStats(f: ExpoFilters = {}): ExpoStats {
  * 库里存的就是本地时间无时区；客户端自己算会在跨日时与服务端不一致，报 hydration 警告。
  */
 export function localToday(now: Date = new Date()): string {
-  const p = (n: number) => String(n).padStart(2, '0')
-  return `${now.getFullYear()}-${p(now.getMonth() + 1)}-${p(now.getDate())}`
+  return localDate(now)
 }
 
 /** 当月，'YYYY-MM'。 */

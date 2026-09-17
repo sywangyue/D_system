@@ -345,9 +345,10 @@ describe("POST /api/research — 建档", () => {
     const body = await res.json()
     expect(body.error).toBe("badReportType")
     expectKnownErrorCode(body.error)
-    expect(body.values).toBe(
-      "industry_research / brand_research / batch_prospect / single_prospect / company_research",
-    )
+    // 取值来自 lib/enums.ts 的 REPORT_TYPE，断言集合而不是顺序
+    expect(new Set(body.values.split(" / "))).toEqual(new Set([
+      "industry_research", "brand_research", "batch_prospect", "single_prospect", "company_research",
+    ]))
     expect(mockGetWritableDb).not.toHaveBeenCalled()
   })
 

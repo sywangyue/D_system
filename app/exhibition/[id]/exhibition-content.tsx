@@ -1,7 +1,6 @@
 "use client"
 
-import { useCallback, useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
 import type { Dict, Locale } from "@/lib/i18n-shared"
@@ -32,7 +31,6 @@ function Tag({ label }: { label: string }) {
 export default function ExhibitionContent({ id, t, locale }: {
   id: string; t: Dict; locale: Locale
 }) {
-  const router = useRouter()
   const [data, setData] = useState<ExhibitionData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)

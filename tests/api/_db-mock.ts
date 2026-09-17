@@ -12,6 +12,7 @@ interface FakeStatement {
 export interface FakeDb {
   prepare: Mock<(sql: string) => FakeStatement>
   pragma: Mock
+  transaction: Mock
   close: Mock
 }
 
@@ -52,6 +53,8 @@ export function buildMockDb(
       return fakeStatement([])
     }),
     pragma: vi.fn(() => []),
+    // better-sqlite3 的 transaction(fn) 返回包装函数；这里直接执行 fn，不模拟回滚
+    transaction: vi.fn((fn: (...a: unknown[]) => unknown) => (...a: unknown[]) => fn(...a)),
     close: vi.fn(),
   }
 }
@@ -161,7 +164,7 @@ export function buildRecordingMockDb(
   })
 
   return {
-    db: { prepare, pragma: vi.fn(() => []), close: vi.fn() } as unknown as FakeDb,
+    db: { prepare, pragma: vi.fn(() => []), transaction: vi.fn((fn: (...a: unknown[]) => unknown) => (...a: unknown[]) => fn(...a)), close: vi.fn() } as unknown as FakeDb,
     log,
     sqlContaining: (snippet) => log.prepared.filter((s) => s.includes(snippet)),
     runsMatching: (snippet) => log.run.filter((c) => c.sql.includes(snippet)),

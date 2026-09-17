@@ -2,6 +2,7 @@ import { notFound, redirect } from "next/navigation"
 import { getSessionUser } from "@/lib/session"
 import { getDict, getLocale } from "@/lib/i18n"
 import { getOpportunityDetail } from "@/lib/queries/opportunity"
+import { localDate } from "@/lib/time"
 import OpportunityDetail from "./opportunity-detail"
 
 /**
@@ -30,12 +31,7 @@ export default async function OpportunityDetailPage({
   // 逾期判定放服务端算：客户端算会在服务端渲染与 hydration 之间
   // 因时区/跨日产生不一致，React 会报 hydration 警告。
   // 口径与 lib/queries/overview.ts 的 date('now','localtime') 对齐，用本地日期。
-  const now = new Date()
-  const today = [
-    now.getFullYear(),
-    String(now.getMonth() + 1).padStart(2, "0"),
-    String(now.getDate()).padStart(2, "0"),
-  ].join("-")
+  const today = localDate()
 
   return (
     <OpportunityDetail

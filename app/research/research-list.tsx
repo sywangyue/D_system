@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { AlertCircle, FileText, Search } from "lucide-react"
-import { slugLabel } from "@/lib/enums"
+import { REPORT_TYPE, REPORT_STATUS, slugLabel } from "@/lib/enums"
 import { errorText, fmtDate, type Locale, type Dict } from "@/lib/i18n-shared"
 
 /**
@@ -37,8 +37,10 @@ const PAGE_SIZE = 50
  * 所以标签直接用 slugLabel(t.enum.reportType / t.enum.reportStatus) 查字典，
  * 页面里不再留任何中文映射（见 lib/enums.ts）。
  */
+// 筛选条只露出库里实际有数据的三类（brand_research / single_prospect 目前 0 条）
 const REPORT_TYPES = ["batch_prospect", "industry_research", "company_research"]
-const STATUSES = ["draft", "published", "archived"]
+  .filter(v => REPORT_TYPE.some(o => o.value === v))
+const STATUSES = REPORT_STATUS.map(o => o.value)
 
 export default function ResearchList({ locale, t }: { locale: Locale; t: Dict }) {
   const router = useRouter()

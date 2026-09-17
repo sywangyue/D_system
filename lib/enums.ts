@@ -68,6 +68,9 @@ export const SOURCE_TYPE: EnumOption[] = [
 ]
 
 /** 与 intel_report.report_type 的 CHECK 约束一致（006 建表 + 017 拓宽） */
+/** company.contact_status 的合法取值（空串 = 未填）。界面暂不展示，只供接口校验。 */
+export const CONTACT_STATUS = ["未接触", "已接触", "谈判中", "合作中", "放弃", ""]
+
 export const REPORT_TYPE: EnumOption[] = [
   { value: "batch_prospect", slug: "batch_prospect" },
   { value: "industry_research", slug: "industry_research" },
@@ -88,14 +91,6 @@ export const RESOURCE_KIND: EnumOption[] = [
   { value: "export", slug: "export" },
   { value: "roster", slug: "roster" },
   { value: "note", slug: "note" },
-]
-
-export const EVENT_TYPE: EnumOption[] = [
-  { value: "note", slug: "note" },
-  { value: "meeting", slug: "meeting" },
-  { value: "file", slug: "file" },
-  { value: "task_done", slug: "task_done" },
-  { value: "stage_change", slug: "stage_change" },
 ]
 
 export const USER_ROLE: EnumOption[] = [

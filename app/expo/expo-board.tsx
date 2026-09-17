@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { CITY_GEO } from "@/lib/geo"
 import { INDUSTRY_L1, enumLabel } from "@/lib/enums"
-import { errorText, fill, fmtNum, type Dict, type Locale } from "@/lib/i18n-shared"
+import { errorText, fill, fmtNum, LOCALE_TAG, type Dict, type Locale } from "@/lib/i18n-shared"
 import type { ExpoStats, CalendarDay } from "@/lib/queries/expo"
 // 地图与行业堆叠条抽成了共用组件：落地页复用同一份实现（TASK-J §4.4）
 import MapSvg from "@/components/basemap/MapSvg"
@@ -261,7 +261,11 @@ function CalendarPanel({
                   className="p-1 text-fg-subtle hover:text-fg">
             <ChevronLeft size={14} />
           </button>
-          <span className="num text-[12px] text-fg w-[52px] text-center">{month}</span>
+          {/* 月份走 Intl（TASK-E §4.3）：中文「2026年9月」，英文「Sep 2026」 */}
+          <span className="num text-[12px] text-fg min-w-[64px] text-center">
+            {new Intl.DateTimeFormat(LOCALE_TAG[locale], { year: "numeric", month: "short" })
+              .format(new Date(y, m - 1, 1))}
+          </span>
           <button onClick={() => onShift(1)} aria-label={t.basemap.nextMonth}
                   className="p-1 text-fg-subtle hover:text-fg">
             <ChevronRight size={14} />

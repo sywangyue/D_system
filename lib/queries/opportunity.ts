@@ -1,4 +1,5 @@
 import { getDb } from '@/lib/db'
+import { getBrandWithLatest } from '@/lib/queries/edition'
 
 /**
  * 机会详情六块聚合查询。
@@ -121,18 +122,7 @@ export function getOpportunityDetail(id: string | number): OppDetail | null {
     : null
 
   const brand = row.brand_id
-    ? db.prepare(`
-        SELECT b.brand_id, b.name_cn, b.name_en, b.city, b.organizer,
-               b.industry_l1, b.industry_l2, b.is_ufi_certified,
-               e.year, e.area_sqm, e.exhibitors_count, e.visitors_count
-        FROM exhibition_brand b
-        LEFT JOIN exhibition_edition e
-          ON e.brand_id = b.brand_id
-         AND e.edition_id = (SELECT edition_id FROM exhibition_edition
-                             WHERE brand_id = b.brand_id
-                             ORDER BY year DESC, edition_id DESC LIMIT 1)
-        WHERE b.brand_id = ?
-      `).get(row.brand_id)
+    ? getBrandWithLatest(row.brand_id as string)
     : null
 
   // 资源：直接挂在本机会上的，加上挂在其关联公司上的

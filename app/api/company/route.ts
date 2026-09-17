@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server'
 import { getDb, getWritableDb } from '@/lib/db'
 import { requireUser, requireWriter } from '@/lib/api-guard'
+import { localDateTime } from '@/lib/time'
+import { SOURCE_TYPE, CONTACT_STATUS } from '@/lib/enums'
 
 /**
  * 客户库 —— 一阶列表端点
@@ -38,8 +40,8 @@ const FILTERS: Record<string, string> = {
   intel_report_id: 'c.intel_report_id',
 }
 
-const SOURCE_TYPES = ['qcc_search', 'manual', 'db_match']
-const CONTACT_STATUS = ['未接触', '已接触', '谈判中', '合作中', '放弃', '']
+// 取值只有一处来源：lib/enums.ts
+const SOURCE_TYPES = SOURCE_TYPE.map(o => o.value)
 
 /**
  * 写字段白名单。不在表里的键静默忽略。
@@ -140,7 +142,7 @@ export async function POST(request: Request) {
   const cols = WRITABLE.filter(c => body[c] !== undefined)
   const insertCols = ['source_type', ...cols]
   const insertVals: unknown[] = [body.source_type, ...cols.map(c => body[c])]
-  const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
+  const now = localDateTime()
 
   const wdb = getWritableDb()
   try {
