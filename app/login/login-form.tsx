@@ -3,9 +3,10 @@
 import { useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import { AlertCircle } from "lucide-react"
-import { LOCALE_LABELS, LOCALE_COOKIE, fill, fmtNum, type Locale, type Dict } from "@/lib/i18n-shared"
+import { fill, fmtNum, type Locale, type Dict } from "@/lib/i18n-shared"
 import { errorText } from "@/lib/i18n-shared"
 import BrandLockup from "@/components/brand/BrandLockup"
+import LocaleSwitch from "@/components/layout/LocaleSwitch"
 
 /**
  * 登录表单。四个状态（default / focused / error / loading）全部实现。
@@ -33,11 +34,6 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
   const [error, setError] = useState("")
   const [loading, setLoading] = useState(false)
   const isEn = locale === "en"
-
-  function switchLocale(next: Locale) {
-    document.cookie = `${LOCALE_COOKIE}=${next}; path=/; max-age=31536000`
-    router.refresh()
-  }
 
   async function onSubmit(e: FormEvent) {
     e.preventDefault()
@@ -123,17 +119,9 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
           输入框走 bg-canvas 的白底，两者才分得开。原来这里写死 #0E0E10，
           是本次反置里唯一一处硬编码色 —— 已收进令牌层。 */}
       <div className="flex-1 flex flex-col bg-sidebar">
-        <div className="flex justify-end p-8 gap-1">
-          {(Object.keys(LOCALE_LABELS) as Locale[]).map(l => (
-            <button
-              key={l}
-              onClick={() => switchLocale(l)}
-              className={`btn h-7 px-3 text-[12px] rounded-[4px] border-0 cursor-pointer
-                ${l === locale ? "bg-surface-elevated text-fg font-medium" : "bg-transparent text-fg-subtle hover:text-fg"}`}
-            >
-              {LOCALE_LABELS[l]}
-            </button>
-          ))}
+        <div className="flex justify-end p-8">
+          {/* 语言切换与落地页共用同一组件（TASK-J §4.1） */}
+          <LocaleSwitch locale={locale} />
         </div>
 
         <div className="flex-1 flex items-center justify-center px-8">

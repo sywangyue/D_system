@@ -104,6 +104,43 @@ rsync -avz \
 
 ---
 
+## 同步知识库内容
+
+知识库是**文件即数据源**（见 `docs/TASK-K-knowledge-base.md`）：正文与文档在 `knowledge/`，
+图片在 `public/knowledge/`。**两个目录都要单独同步** —— 少一个的话，
+线上这一页是空的（读不到 index.md）、图是裂的（静态文件不在）。
+
+```bash
+rsync -avz \
+  -e "ssh -i '/Volumes/databoard/AI Project/D_dashboard/MWlab.pem' -o StrictHostKeyChecking=no" \
+  "/Volumes/databoard/AI Project/D_dashboard/knowledge/" \
+  admin@47.79.17.71:/home/admin/dashboard/knowledge/
+
+rsync -avz \
+  -e "ssh -i '/Volumes/databoard/AI Project/D_dashboard/MWlab.pem' -o StrictHostKeyChecking=no" \
+  "/Volumes/databoard/AI Project/D_dashboard/public/knowledge/" \
+  admin@47.79.17.71:/home/admin/dashboard/public/knowledge/
+```
+
+> 加项目 / 换图之后都要重跑这两条。只改 `.next/`（第 2 步）不会带上内容文件 ——
+> 它们是运行时读的原始文件，不在构建产物里。
+
+## 同步落地页产品图
+
+官网落地页 `/` 首屏的截图是 `public/landing/product.webp`，同样不在构建产物里：
+
+```bash
+rsync -avz \
+  -e "ssh -i '/Volumes/databoard/AI Project/D_dashboard/MWlab.pem' -o StrictHostKeyChecking=no" \
+  "/Volumes/databoard/AI Project/D_dashboard/public/landing/" \
+  admin@47.79.17.71:/home/admin/dashboard/public/landing/
+```
+
+> 这张图是公开的（落地页不需要登录）。重截时只能截 `/expo`，
+> 且要先清空筛选、把日历翻到没有事项的月份、裁掉侧栏 —— 侧栏有账号邮箱，日历里是机会名称。
+
+---
+
 ## 爬虫调度
 
 > **注意**：`scheduler.py` 不存在于仓库。本节此前描述的 `--cron` / `--run-now` / `--status`

@@ -138,17 +138,10 @@ build_time: process.env.NEXT_PUBLIC_BUILD_TIME || new Date().toISOString(),
 
 **列名 `dashboard_prefs` 不要改**。它是库里的列，改名要迁移，收益为零。
 
-### 5.2 `requireUser` 那句注释是错的
+### 5.2 ~~`requireUser` 那句注释是错的~~（本条作废，2026-09-17 质检更正）
 
-`app/api/users/route.ts` 与 `app/api/setting/status/route.ts` 里都写着
-「requireUser 同时校验 is_active，使被禁用账号的存量 token 立即失效」。
-
-**这不是事实**：`requireUser` 只读中间件注入的请求头，中间件只验 JWT 签名，
-都不查 `is_active`。被禁用的账号在 token 过期（24h）前仍能调接口。
-（页面侧的 `getSessionUser` 倒是查了 `is_active`。）
-
-**本任务只把这两句注释改成如实描述**，不实现 API 侧的 `is_active` 校验 ——
-没有禁用账号的界面，也就没有被禁用的账号，做了也没有场景。在注释里写明这个缺口即可。
+初稿说「`requireUser` 不查 `is_active`」，**这是规格写错了**：`lib/api-guard.ts` 第 19–21 行
+查了库，被禁用账号会被拒。原注释「requireUser 同时校验 is_active」是对的，已改回。
 
 ### 5.3 设置页只有 admin 能看
 

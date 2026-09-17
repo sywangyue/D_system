@@ -7,6 +7,7 @@
     "pipeline": "Pipeline",
     "entities": "Entities",
     "reports": "Reports",
+    "knowledge": "Knowledge",
     "basemap": "Basemap",
     "settings": "Settings",
     "logout": "Sign out"
@@ -155,6 +156,9 @@
   },
   "error": {
     "generic": "Something went wrong",
+    "unauthorized": "Not signed in, or your session expired",
+    "forbidden": "Your account does not have permission for this",
+    "notFound": "Not found, or already deleted",
     "badJson": "Malformed request body",
     "badRequest": "Malformed request",
     "noFields": "No fields to update",
@@ -455,6 +459,10 @@
     "colState": "Status",
     "colLastLogin": "Last login",
     "dataStatus": "Data status",
+    "totalCompanies": "Companies",
+    "totalOpportunities": "Open opportunities",
+    "totalReports": "Research reports",
+    "totalResources": "Resource files",
     "brandTotal": "Brands",
     "editionTotal": "Editions",
     "lastCrawlStatus": "Last crawl",
@@ -463,30 +471,23 @@
     "minutes": "{n} min",
     "systemInfo": "System",
     "nodeVersion": "Node.js:",
-    "nextVersion": "Next.js:",
     "buildTime": "Build time:"
   },
   "profile": {
-    "back": "Back to dashboard",
+    "back": "Back to Overview",
     "user": "User",
-    "industryFilter": "Customize dashboard industry filter",
-    "industryFilterHint": "Once checked, your next dashboard visit applies this industry filter. Leave unchecked to see everything.",
+    "industryFilter": "Default industry filter on the basemap",
+    "industryFilterHint": "Once checked, the basemap applies this industry filter when you open it. Leave unchecked to see everything.",
     "selected": "{n} sectors selected",
     "loading": "Loading…",
-    "saving": "Saved, redirecting…",
-    "savePrefs": "Save preferences"
+    "saving": "Saved",
+    "savePrefs": "Save preferences",
+    "saveFailed": "Could not save",
+    "viewBasemap": "View on basemap"
   },
   "placeholder": {
     "notImplemented": "not built yet",
     "planned": "Planned"
-  },
-  "expo": {
-    "title": "Basemap",
-    "phase": "Phase 5.7",
-    "item1": "Geographic distribution of 7,378 exhibition brands",
-    "item2": "My action calendar (not an exhibition schedule)",
-    "item3": "Trend quadrants + industry split, scoped to current filters rather than the whole database",
-    "item4": "API /api/expo is ready"
   },
   "exhibition": {
     "notFound": "Exhibition not found",
@@ -503,26 +504,45 @@
     "visitors": "Visitors",
     "website": "Website"
   },
+  "knowledge": {
+    "title": "Knowledge",
+    "archivedToggle": "Show archived",
+    "archived": "Archived",
+    "empty": "No projects yet",
+    "back": "← Knowledge",
+    "docs": "Documents",
+    "download": "Download"
+  },
   "basemap": {
     "title": "Basemap",
     "search": "Search cities, venues, expo brands…",
     "hubs": "Global hubs",
     "filterIndustry": "Industry",
-    "filterRelation": "Relation",
+    "filterCity": "City",
+    "filterScale": "Scale",
+    "scale": {
+      "lt1w": "< 10k m²",
+      "1w-5w": "10k–50k m²",
+      "5w-10w": "50k–100k m²",
+      "gte10w": "≥ 100k m²"
+    },
+    "scaleCaption": "{brands} brands · latest edition each",
+    "unlocated": "{count} brands not located",
+    "prevMonth": "Prev month",
+    "nextMonth": "Next month",
     "projection": "Azimuthal",
     "resetView": "Reset view",
     "level": "Level",
     "legendVisiting": "Visiting / exhibiting",
     "legendTargets": "Target locations",
     "calendar": "Schedule",
-    "backToWeek": "This week",
+    "backToMonth": "This month",
     "weekDetail": "Key actions this week",
     "scheduled": "{count} scheduled",
     "trendVisitors": "Trade visitors",
     "trendArea": "Exhibition area",
     "trendExhibitors": "Exhibitor pool",
     "trendSectors": "Sectors",
-    "trendTtm": "TTM change",
     "weekday": {
       "mon": "M",
       "tue": "T",
@@ -531,6 +551,83 @@
       "fri": "F",
       "sat": "S",
       "sun": "S"
+    }
+  },
+  "landing": {
+    "nav": {
+      "data": "Data",
+      "capability": "Facets",
+      "business": "Business",
+      "enter": "Sign in"
+    },
+    "hero": {
+      "headlineLead": "China's exhibition market,",
+      "headlineFocus": "in structured form",
+      "subline": "{brands} exhibition brands · {groups} organizer groups · {editions} edition records. A factual basis for Messe Düsseldorf's business development.",
+      "enter": "Sign in",
+      "viewCoverage": "View data coverage →",
+      "shotAlt": "MWLAB exhibition basemap interface",
+      "shotPending": "Product screenshot of /expo pending"
+    },
+    "coverage": {
+      "brands": "Exhibition brands",
+      "groups": "Organizer groups",
+      "editions": "Edition records",
+      "geoTags": "Geo tags",
+      "companies": "Company profiles",
+      "verified": "Manual checks",
+      "note": "Every figure traceable to source · Incremental update twice a month"
+    },
+    "facets": {
+      "overline": "Facets",
+      "headline": "One dataset, six readings",
+      "mapTitle": "Geographic spread",
+      "mapDesc": "Exhibition brands aggregated by city; circle size equals brand count",
+      "mapUnlocated": "{count} brands not located",
+      "orgTitle": "Organizer groups",
+      "orgDesc": "Exhibition brands grouped by organizer group",
+      "industryTitle": "Sector structure",
+      "industryDesc": "Scale composition across the top-level sectors",
+      "scaleTitle": "Scale ranking",
+      "scaleDesc": "By city: top 6 by brand count, area summed over each brand’s latest edition",
+      "colCity": "City",
+      "colArea": "Total area m²",
+      "scheduleTitle": "Calendar density",
+      "scheduleDesc": "2026 editions counted by start month",
+      "schedulePeak": "Busiest month: {n} editions",
+      "no2026Title": "Brands with no 2026 edition",
+      "no2026Desc": "Biennial series and editions not yet collected also fall into this group",
+      "no2026With": "{n} with a 2026 edition",
+      "no2026Without": "{n} with no 2026 edition",
+      "colBrands": "Brands"
+    },
+    "biz": {
+      "overline": "Application",
+      "headline": "Three business lines",
+      "maDesc": "Acquisition and partnership targets for extending existing Messe Düsseldorf brands into China",
+      "maItems": [
+        "Organizer ownership mapping",
+        "Scale and valuation anchoring",
+        "Due diligence reports"
+      ],
+      "greenfieldDesc": "Categories absent from the global Messe Düsseldorf portfolio that China should have",
+      "greenfieldItems": [
+        "Edition gap detection",
+        "Incumbent mapping",
+        "Feasibility assessment"
+      ],
+      "projectDesc": "Data tooling and partner introductions for the project teams",
+      "projectItems": [
+        "Exhibitor lead mining",
+        "Partner matchmaking",
+        "Custom data tools"
+      ]
+    },
+    "footer": {
+      "org": "Messe Düsseldorf Shanghai · Business Development",
+      "copyright": "© 2026 Messe Düsseldorf (Shanghai) Co., Ltd. · Internal system",
+      "enter": "Sign in →",
+      "accessNote": "Internal account required"
     }
   }
 }

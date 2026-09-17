@@ -12,22 +12,27 @@
   "dependencies": {
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^11.9.1",
+    "d3-geo": "^3.1.1",
+    "gray-matter": "^4.0.3",
     "jose": "^6.2.3",
     "lucide-react": "^0.532.0",
     "next": "^16.2.4",
     "react": "^19.2.5",
     "react-dom": "^19.2.5",
     "react-markdown": "^10.1.0",
-    "remark-gfm": "^4.0.1"
+    "remark-gfm": "^4.0.1",
+    "topojson-client": "^3.1.0"
   },
   "devDependencies": {
     "@opennextjs/cloudflare": "^1.19.6",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/bcryptjs": "^2.4.6",
     "@types/better-sqlite3": "^7.6.13",
+    "@types/d3-geo": "^3.1.1",
     "@types/node": "^22.15.0",
     "@types/react": "^19.2.14",
     "@types/react-dom": "^19.1.0",
+    "@types/topojson-client": "^3.1.5",
     "@vitejs/plugin-react": "^5.0.2",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.2.4",

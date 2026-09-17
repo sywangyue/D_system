@@ -65,7 +65,7 @@ export default function UsersTable({
 }) {
   if (users.length === 0) {
     return (
-      <div className="bg-surface border border-hairline rounded-xl p-6 text-center text-sm text-text-secondary">
+      <div className="bg-surface border border-hairline rounded-xl p-6 text-center text-sm text-fg-muted">
         {t.settings.usersEmpty}
       </div>
     );
@@ -73,23 +73,23 @@ export default function UsersTable({
 
   return (
     <div className="bg-surface border border-hairline rounded-xl overflow-hidden">
-      <h2 className="text-base font-semibold text-text-primary px-6 pt-5 pb-3">
+      <h2 className="text-base font-semibold text-fg px-6 pt-5 pb-3">
         {fill(t.settings.usersTitle, { count: users.length })}
       </h2>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-hairline">
-              <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase">
+              <th className="text-left px-6 py-3 text-xs font-medium text-fg-muted uppercase">
                 {t.settings.colEmail}
               </th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase">
+              <th className="text-left px-6 py-3 text-xs font-medium text-fg-muted uppercase">
                 {t.settings.colRole}
               </th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase">
+              <th className="text-left px-6 py-3 text-xs font-medium text-fg-muted uppercase">
                 {t.settings.colState}
               </th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase">
+              <th className="text-left px-6 py-3 text-xs font-medium text-fg-muted uppercase">
                 {t.settings.colLastLogin}
               </th>
             </tr>
@@ -103,7 +103,7 @@ export default function UsersTable({
                   key={user.user_id}
                   className="border-b border-hairline last:border-0 hover:bg-surface-elevated transition-colors"
                 >
-                  <td className="px-6 py-3 font-mono text-xs text-text-primary">
+                  <td className="px-6 py-3 font-mono text-xs text-fg">
                     {user.email}
                   </td>
                   <td className="px-6 py-3">
@@ -120,7 +120,7 @@ export default function UsersTable({
                       {status.label}
                     </span>
                   </td>
-                  <td className="px-6 py-3 text-text-secondary">
+                  <td className="px-6 py-3 text-fg-muted">
                     {fmtDateTime(locale, user.last_login, "--")}
                   </td>
                 </tr>

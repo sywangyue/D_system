@@ -98,6 +98,60 @@ describe("middleware", () => {
     expect(res.headers.get("location")).toContain("/login")
   })
 
+  // 落地页（TASK-J §3）：/ 公开，未登录也放行
+  it("should let unauthenticated users reach the landing page at /", async () => {
+    const res = await middleware(makeRequest("/"))
+    expect(res.status).not.toBe(307)
+    expect(res.headers.get("location")).toBeNull()
+  })
+
+  // 但放行必须**只放 /**：写成 startsWith('/') 就等于放行全站
+  it("should still protect other pages (the '/' exemption is exact, not a prefix)", async () => {
+    for (const p of ["/overview", "/company", "/expo", "/knowledge"]) {
+      const res = await middleware(makeRequest(p))
+      expect(res.status).toBe(307)
+      expect(res.headers.get("location")).toContain("/login")
+    }
+  })
+
+  // 以静态资源扩展名结尾的 /api 路径不能走「静态放行」分支：
+  // 那条分支不剥离 x-user-* 头，伪造头就能不登录直达接口（2026-09-17 质检实测）
+  it("should reject forged identity headers on /api paths that end in a static extension", async () => {
+    for (const p of [
+      "/api/knowledge/demo/doc/plan.png",
+      "/api/knowledge/demo/doc/style.css",
+      "/api/company/1.jpg",
+    ]) {
+      const req = makeRequest(p, {
+        headers: { "x-user-email": "admin@mwlab.internal", "x-user-role": "admin" },
+      })
+      const res = await middleware(req)
+      expect(res.status).toBe(401)
+    }
+  })
+
+  it("should inject verified identity on /api paths that end in a static extension", async () => {
+    vi.mocked(jwtVerify).mockResolvedValueOnce({
+      payload: { email: "manager@mwlab.com", role: "manager" } as any,
+      protectedHeader: { alg: "HS256" },
+      key: {} as any,
+    })
+    const req = makeRequest("/api/knowledge/demo/doc/plan.png", {
+      token: "valid-jwt",
+      headers: { "x-user-email": "admin@mwlab.internal", "x-user-role": "admin" },
+    })
+    const res = await middleware(req)
+    expect(res.status).toBe(200)
+    // 伪造的 admin 被剥离，换成验签得到的 manager
+    expect(res.headers.get("x-middleware-request-x-user-role")).toBe("manager")
+  })
+
+  // 地图的陆地轮廓是公开的：不放行的话匿名访客的地图只剩点位（TASK-J §4.4）
+  it("should serve the countries GeoJSON without a token", async () => {
+    const res = await middleware(makeRequest("/countries-110m.json"))
+    expect(res.status).not.toBe(307)
+  })
+
   // token 存在但验签失败 → 回 /login 重新登录
   it("should redirect page routes to /login when token is invalid", async () => {
     vi.mocked(jwtVerify).mockRejectedValueOnce(new Error("jwt expired"))

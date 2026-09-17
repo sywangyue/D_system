@@ -4,7 +4,7 @@ import { requireUser } from '@/lib/api-guard'
 
 export async function GET(request: Request) {
   const user = requireUser(request)
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   const email = user.email
 
   const db = getDb()
@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   ).get(email) as { dashboard_prefs: string | null } | undefined
 
   if (!row) {
-    return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    return NextResponse.json({ error: 'notFound' }, { status: 404 })
   }
 
   let l1s: string[] = []
@@ -30,7 +30,7 @@ export async function GET(request: Request) {
 export async function PATCH(request: Request) {
   // 仅 requireUser：看板筛选偏好属于用户自身 UI 状态，readonly 角色也应可保存
   const user = requireUser(request)
-  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
   const email = user.email
 
   let body: { l1s?: unknown }

@@ -5,14 +5,11 @@ import { requireUser } from '@/lib/api-guard'
 /**
  * 展会盘面 —— 一阶列表端点（**只读**）
  *
- * 取代将来要退役的 /api/dashboard：那个端点一次吐回全部品牌由前端过滤，
+ * 取代旧看板那个「一次吐回全部品牌、由前端过滤」的端点（已随本任务删除，见 TASK-I §4）。
  * 这里把分页、筛选、排序全部压进 SQL，只给 9 个字段。
  *
  * 每个品牌只取**最新一届**的届次数据（MAX(year)），下面 areas/展商/观众三个数字
  * 都是那一届的。
- *
- * ⚠️ /api/dashboard 仍在给线上的 public/dashboard.html 和 app/profile/page.tsx 供数，
- * 本端点是新文件，不动它。
  */
 
 /** 一阶字段。展会品牌 + 最新一届的数字。 */

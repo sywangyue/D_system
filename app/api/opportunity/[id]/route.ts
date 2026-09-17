@@ -33,7 +33,7 @@ export async function GET(
 
   const { id } = await params
   const detail = getOpportunityDetail(id)
-  if (!detail) return NextResponse.json({ error: 'not found' }, { status: 404 })
+  if (!detail) return NextResponse.json({ error: 'notFound' }, { status: 404 })
 
   return NextResponse.json(detail)
 }
@@ -81,7 +81,7 @@ export async function PATCH(
   try {
     const before = wdb.prepare('SELECT stage FROM opportunity WHERE opp_id = ?').get(id) as
       { stage: string } | undefined
-    if (!before) return NextResponse.json({ error: 'not found' }, { status: 404 })
+    if (!before) return NextResponse.json({ error: 'notFound' }, { status: 404 })
 
     wdb.prepare(`
       UPDATE opportunity
@@ -131,7 +131,7 @@ export async function DELETE(
       'UPDATE opportunity SET is_archived = 1, updated_at = ? WHERE opp_id = ? AND is_archived = 0'
     ).run(now, id)
     if (info.changes === 0) {
-      return NextResponse.json({ error: 'not found' }, { status: 404 })
+      return NextResponse.json({ error: 'notFound' }, { status: 404 })
     }
     return NextResponse.json({ ok: true, archived: Number(id) })
   } finally {

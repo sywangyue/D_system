@@ -3,7 +3,7 @@
 import { usePathname, useRouter } from "next/navigation"
 import Link from "next/link"
 import {
-  LayoutDashboard, Target, Building2, FileText, Map, Settings, LogOut,
+  LayoutDashboard, Target, Building2, FileText, BookOpen, Map, Settings, LogOut,
 } from "lucide-react"
 import type { SessionUser } from "@/lib/session"
 import type { Dict, Locale } from "@/lib/i18n-shared"
@@ -20,7 +20,8 @@ const NAV: { href: string; key: keyof Dict["nav"]; lat: string; icon: typeof Tar
   { href: "/overview",    key: "overview", lat: "Overview", icon: LayoutDashboard },
   { href: "/opportunity", key: "pipeline", lat: "Pipeline", icon: Target },
   { href: "/company",     key: "entities", lat: "Entities", icon: Building2 },
-  { href: "/research",    key: "reports",  lat: "Reports",  icon: FileText },
+  { href: "/research",     key: "reports",  lat: "Reports",  icon: FileText },
+  { href: "/knowledge",    key: "knowledge", lat: "Knowledge", icon: BookOpen },
   { href: "/expo",        key: "basemap",  lat: "Basemap",  icon: Map },
   { href: "/setting",     key: "settings", lat: "Settings", icon: Settings, adminOnly: true },
 ]

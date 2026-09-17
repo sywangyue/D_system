@@ -1,179 +1,152 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import Link from "next/link";
 import type { SessionUser } from "@/lib/session";
-import type { Dict } from "@/lib/i18n-shared";
-import { fill } from "@/lib/i18n-shared";
+import { errorText, fill, type Dict } from "@/lib/i18n-shared";
 import { INDUSTRY_L1, enumLabel } from "@/lib/enums";
-import { ArrowLeft, Check, Loader2 } from "lucide-react";
+import { ArrowLeft, Check } from "lucide-react";
 
+/**
+ * 个人资料。
+ *
+ * 首屏**零个接口请求**：偏好在服务端壳里读好传进来（TASK-I §2.2）。
+ * 之前这里为了拿 8 个行业名去请求旧看板那个端点 —— 它一次吐回全部 7,401 个品牌，
+ * 只为在前端 Set 去重出 8 个值；那个端点已随本任务删除。
+ */
 export default function ProfileContent({
-  userInfo, t,
+  userInfo,
+  t,
+  initialL1s,
 }: {
-  userInfo: SessionUser
-  t: Dict
+  userInfo: SessionUser;
+  t: Dict;
+  initialL1s: string[];
 }) {
-  const router = useRouter();
-
-  const [allL1s, setAllL1s] = useState<string[]>([]);
-  const [selectedL1s, setSelectedL1s] = useState<Set<string>>(new Set());
-  const [loading, setLoading] = useState(true);
+  const [selected, setSelected] = useState<Set<string>>(new Set(initialL1s));
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    Promise.all([
-      fetch("/api/dashboard").then((r) => r.json()),
-      fetch("/api/user/preferences").then((r) => r.json()),
-    ]).then(([dashData, prefs]) => {
-      const l1s: string[] = Array.from(
-        new Set<string>(
-          (dashData.brands ?? [])
-            .map((b: { industry_l1?: string }) => b.industry_l1)
-            .filter(Boolean) as string[]
-        )
-      ).sort();
-      setAllL1s(l1s);
-      if (Array.isArray(prefs.l1s) && prefs.l1s.length > 0) {
-        setSelectedL1s(new Set(prefs.l1s));
-      }
-      setLoading(false);
-    }).catch(() => setLoading(false));
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  const industryMap = t.enum.industryL1 as Record<string, string>;
 
-  function toggleL1(l1: string) {
-    setSelectedL1s((prev) => {
+  function toggle(value: string) {
+    setSaved(false);
+    setError(null);
+    setSelected((prev) => {
       const next = new Set(prev);
-      if (next.has(l1)) next.delete(l1);
-      else next.add(l1);
+      if (next.has(value)) next.delete(value);
+      else next.add(value);
       return next;
     });
   }
 
-  async function handleSave() {
+  async function save() {
     setSaving(true);
+    setSaved(false);
+    setError(null);
     try {
-      await fetch("/api/user/preferences", {
+      const res = await fetch("/api/user/preferences", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ l1s: Array.from(selectedL1s) }),
+        // 提交的是**中文原值**（INDUSTRY_L1 的 value），不是 slug（TASK-I §5.1）
+        body: JSON.stringify({ l1s: [...selected] }),
       });
+      // 之前这里不检查 res.ok，接口 400 / 401 也照样显示「已保存」（TASK-I §2.3）
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(errorText(t, body.error, body.values, t.profile.saveFailed));
+      }
+      // 保存成功**不跳转**：原地显示「已保存」。
+      // 自动跳走是给旧看板设计的（保存完回去看效果），现在偏好作用在展会底图，
+      // 由用户自己决定去不去看 —— 页面上给个链接（TASK-I §2.1）。
       setSaved(true);
-      setTimeout(() => router.push("/dashboard.html"), 1500);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : t.profile.saveFailed);
     } finally {
       setSaving(false);
     }
   }
 
-  // industry_l1 是闭集（全库 8 个取值），按 locale 出标签；勾选态与提交值仍用库里的中文原值。
-  // 按**显示标签**排序：中文下标签 == 库值，所以顺序与改动前逐字相同；
-  // 英文下自然成为字母序（原先按中文码位排，英文字母序才是该有的样子）。
-  const industryMap = t.enum.industryL1 as Record<string, string>;
-  const industryOptions = allL1s
-    .map((value) => ({ value, label: enumLabel(INDUSTRY_L1, industryMap, value) }))
-    .sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0));
-
-  const initials = userInfo
-    ? (userInfo.display_name || userInfo.email || "").slice(0, 2).toUpperCase()
-    : "?";
+  const initials = (userInfo.display_name || userInfo.email)
+    .slice(0, 1)
+    .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-surface">
-      <div className="max-w-lg mx-auto px-4 py-8">
-        {/* Back */}
-        <button
-          onClick={() => router.push("/dashboard.html")}
-          className="flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg mb-6"
-        >
-          <ArrowLeft size={16} />
-          {t.profile.back}
-        </button>
+    <div className="max-w-lg mx-auto py-12 px-6">
+      {/* 返回盘面。原来指向旧看板的静态页 —— 那个文件阶段 5 就删了，
+          点一下（以及保存后 1.5 秒）会跳到 404（TASK-I §2.1） */}
+      <Link
+        href="/overview"
+        className="flex items-center gap-2 text-[13px] text-fg-subtle hover:text-fg mb-7"
+      >
+        <ArrowLeft size={14} />
+        {t.profile.back}
+      </Link>
 
-        {/* User card */}
-        <div className="bg-surface rounded-xl border border-hairline p-6 mb-6 shadow-sm">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-[var(--color-accent-fg)] font-bold text-lg">
-              {initials}
-            </div>
-            <div>
-              <div className="font-semibold text-fg">
-                {userInfo?.display_name || t.profile.user}
-              </div>
-              {/* 邮箱与角色是数据，原样显示 */}
-              <div className="text-sm text-fg-muted">{userInfo?.email}</div>
-              <div className="text-xs text-fg-subtle mt-0.5 capitalize">
-                {userInfo?.role}
-              </div>
-            </div>
+      <div className="border border-hairline rounded-lg p-6 bg-surface">
+        <div className="flex items-center gap-4 mb-7">
+          <div className="w-12 h-12 rounded-full bg-accent flex items-center justify-center text-[var(--color-accent-fg)] font-medium">
+            {initials}
+          </div>
+          <div>
+            <div className="text-[15px] text-fg">{userInfo.display_name || t.profile.user}</div>
+            <div className="text-[12px] text-fg-subtle">{userInfo.email}</div>
           </div>
         </div>
 
-        {/* Industry preference */}
-        <div className="bg-surface rounded-xl border border-hairline p-6 shadow-sm">
-          <h2 className="text-base font-semibold text-fg mb-1">
-            {t.profile.industryFilter}
-          </h2>
-          <p className="text-sm text-fg-muted mb-4">
+        <div className="mb-2">
+          <h2 className="text-[14px] text-fg">{t.profile.industryFilter}</h2>
+          <p className="text-[12px] text-fg-subtle mt-1 mb-4 leading-relaxed">
             {t.profile.industryFilterHint}
           </p>
+        </div>
 
-          {loading ? (
-            <div className="flex items-center gap-2 text-sm text-fg-subtle py-4">
-              <Loader2 size={16} className="animate-spin" />
-              {t.profile.loading}
-            </div>
-          ) : (
-            <div className="space-y-2">
-              {industryOptions.map(({ value, label }) => (
-                <label
-                  key={value}
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface-elevated cursor-pointer select-none"
-                >
-                  <div
-                    className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                      selectedL1s.has(value)
-                        ? "bg-accent border-accent"
-                        : "border-hairline-active bg-surface"
-                    }`}
-                    onClick={() => toggleL1(value)}
-                  >
-                    {selectedL1s.has(value) && (
-                      <Check size={12} className="text-[var(--color-accent-fg)]" strokeWidth={3} />
-                    )}
-                  </div>
-                  <span
-                    className="text-sm text-fg"
-                    onClick={() => toggleL1(value)}
-                  >
-                    {label}
-                  </span>
-                </label>
-              ))}
-            </div>
-          )}
-
-          <div className="mt-6 flex items-center gap-3">
-            <button
-              onClick={handleSave}
-              disabled={saving || saved}
-              className="flex items-center gap-2 h-10 px-6 rounded-lg bg-accent text-[var(--color-accent-fg)] text-sm font-semibold hover:opacity-90 disabled:opacity-50 transition-opacity"
+        <div className="grid grid-cols-2 gap-2 mb-6">
+          {/* 顺序就用 INDUSTRY_L1 的数组顺序（按品牌数从多到少），不排序 ——
+              对中文原值 .sort() 在两种语言下都没有意义（TASK-I §2.2） */}
+          {INDUSTRY_L1.map(({ value }) => (
+            <label
+              key={value}
+              className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface-elevated cursor-pointer select-none"
             >
-              {saving ? (
-                <Loader2 size={14} className="animate-spin" />
-              ) : saved ? (
-                <><Check size={14} /> {t.profile.saving}</>
-              ) : (
-                t.profile.savePrefs
-              )}
-            </button>
-            {selectedL1s.size > 0 && (
-              <span className="text-sm text-fg-subtle">
-                {fill(t.profile.selected, { n: selectedL1s.size })}
+              <div
+                className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
+                  selected.has(value)
+                    ? "bg-accent border-accent"
+                    : "border-hairline-active bg-surface"
+                }`}
+                onClick={() => toggle(value)}
+              >
+                {selected.has(value) && (
+                  <Check size={12} className="text-[var(--color-accent-fg)]" strokeWidth={3} />
+                )}
+              </div>
+              <span className="text-sm text-fg" onClick={() => toggle(value)}>
+                {enumLabel(INDUSTRY_L1, industryMap, value)}
               </span>
+            </label>
+          ))}
+        </div>
+
+        <div className="flex items-center justify-between">
+          <div className="text-[12px] text-fg-subtle">
+            {fill(t.profile.selected, { n: selected.size })}
+            {saved && <span className="ml-3 text-fg">{t.profile.saving}</span>}
+            {saved && (
+              <Link href="/expo" className="ml-3 underline underline-offset-2 hover:text-fg">
+                {t.profile.viewBasemap}
+              </Link>
             )}
+            {error && <span className="ml-3 text-[var(--color-error-text)]">{error}</span>}
           </div>
+          <button
+            onClick={save}
+            disabled={saving}
+            className="px-4 py-2 rounded-[6px] bg-accent text-[var(--color-accent-fg)] text-[13px] hover:bg-accent-hover disabled:opacity-40"
+          >
+            {t.profile.savePrefs}
+          </button>
         </div>
       </div>
     </div>

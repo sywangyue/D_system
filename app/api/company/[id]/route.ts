@@ -35,7 +35,7 @@ export async function GET(
 
   const companyRow = db.prepare('SELECT * FROM company WHERE company_id = ?').get(id) as
     Record<string, unknown> | undefined
-  if (!companyRow) return NextResponse.json({ error: 'not found' }, { status: 404 })
+  if (!companyRow) return NextResponse.json({ error: 'notFound' }, { status: 404 })
 
   const brand = companyRow.brand_id
     ? db.prepare(`
@@ -119,7 +119,7 @@ export async function PATCH(
   const wdb = getWritableDb()
   try {
     const exists = wdb.prepare('SELECT company_id FROM company WHERE company_id = ?').get(id)
-    if (!exists) return NextResponse.json({ error: 'not found' }, { status: 404 })
+    if (!exists) return NextResponse.json({ error: 'notFound' }, { status: 404 })
 
     wdb.prepare(`
       UPDATE company

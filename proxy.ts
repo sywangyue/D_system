@@ -11,9 +11,23 @@ export default async function middleware(request: NextRequest) {
   // 完全公开路径——始终放行，不注入头部
   if (
     pathname === '/login' ||
+    // 官网落地页（TASK-J）：未登录也能看。
+    // ⚠️ 必须写成精确相等 —— 写成 startsWith('/') 等于放行全站。
+    // 已登录用户访问 / 的分流由 app/page.tsx 里的 getSessionUser() 完成，不在这里做。
+    pathname === '/' ||
+    // 地图的陆地轮廓 GeoJSON（public/countries-110m.json）。
+    // 纯静态世界地图数据、不含任何业务信息，但扩展名不在下面 matcher 的负向预查里
+    // （那里只排除了图片），所以必须显式放行 —— 否则匿名访客的地图只有点位、
+    // 没有陆地轮廓（TASK-J §4.4 第 1 块）。
+    pathname === '/countries-110m.json' ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/auth/') ||
-    pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2|woff|ttf)$/)
+    // 静态资源按扩展名放行 —— 但**绝不能作用于 /api/**。
+    // 这个分支直接 next()、不剥离 x-user-* 头；若对 /api 生效，
+    // 以 .png/.css 等结尾的接口路径（如知识库文档 /api/knowledge/<slug>/doc/平面图.png）
+    // 就能带着伪造的 x-user-email / x-user-role 不登录直达接口（2026-09-17 质检实测为 200）。
+    (!pathname.startsWith('/api/') &&
+      pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2|woff|ttf)$/))
   ) {
     return NextResponse.next()
   }
@@ -64,6 +78,10 @@ export default async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
+    // /api 单列一条、不带任何扩展名排除：下一条的负向预查会把 .png/.jpg 结尾的路径
+    // 整个排除在中间件之外，而接口路径也可能以这些扩展名结尾（见上方静态资源分支的注释）。
+    // 两条任一命中即运行中间件。
+    '/api/:path*',
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
 }

@@ -117,7 +117,7 @@ export default function SettingContent({ t, locale }: { t: Dict; locale: Locale 
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-xl font-semibold text-text-primary">{t.settings.title}</h1>
+        <h1 className="text-xl font-semibold text-fg">{t.settings.title}</h1>
         <DataStatusCard isLoading t={t} locale={locale} />
         <UsersTableSkeleton />
         <SystemInfoBlock isLoading t={t} locale={locale} />
@@ -153,7 +153,7 @@ export default function SettingContent({ t, locale }: { t: Dict; locale: Locale 
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-text-primary">{t.settings.title}</h1>
+      <h1 className="text-xl font-semibold text-fg">{t.settings.title}</h1>
 
       {statusError && !dataStatus ? (
         <ErrorCard message={statusError} retryLabel={t.settings.clickRetry} onRetry={retry} />

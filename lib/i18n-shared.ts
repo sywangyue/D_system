@@ -74,6 +74,18 @@ export function fill(tpl: string, vars: Record<string, string | number>): string
 }
 
 /**
+ * 内容字段的中英双份取一。
+ *
+ * 知识库的 title/summary 有 `_en` 变体，是 Max 自己写了两份，不是翻译层的事
+ * （TASK-K §5.5）。英文界面优先取英文，**缺了回退中文** —— 显示中文标题好过显示空白。
+ * 中文界面一律取中文那一份（不会去拿英文的来充数）。
+ */
+export function pickContent(locale: Locale, zh: string | null, en: string | null): string {
+  if (locale === "en") return (en && en.trim()) || (zh ?? "")
+  return zh ?? ""
+}
+
+/**
  * 接口错误码 → 可显示的句子。
  *
  * 接口只回 slug，不回中文句子（返工单 E-2）：句子写死在路由里，英文界面会把中文

@@ -7,6 +7,7 @@
     "pipeline": "机会台",
     "entities": "公司库",
     "reports": "调研库",
+    "knowledge": "知识库",
     "basemap": "展会底图",
     "settings": "设置",
     "logout": "退出"
@@ -155,6 +156,9 @@
   },
   "error": {
     "generic": "操作失败",
+    "unauthorized": "未登录或登录已过期，请重新登录",
+    "forbidden": "当前账号没有这个权限",
+    "notFound": "内容不存在或已被删除",
     "badJson": "请求体不是合法 JSON",
     "badRequest": "请求格式错误",
     "noFields": "没有可更新的字段",
@@ -455,6 +459,10 @@
     "colState": "状态",
     "colLastLogin": "最后登录",
     "dataStatus": "数据状态",
+    "totalCompanies": "公司",
+    "totalOpportunities": "在跟进机会",
+    "totalReports": "调研报告",
+    "totalResources": "资源文件",
     "brandTotal": "品牌总数",
     "editionTotal": "展会届次",
     "lastCrawlStatus": "最近采集状态",
@@ -463,30 +471,23 @@
     "minutes": "{n} 分钟",
     "systemInfo": "系统信息",
     "nodeVersion": "Node.js：",
-    "nextVersion": "Next.js：",
     "buildTime": "构建时间："
   },
   "profile": {
-    "back": "返回 Dashboard",
+    "back": "返回盘面",
     "user": "用户",
-    "industryFilter": "定制 Dashboard 行业筛选",
-    "industryFilterHint": "勾选后，下次登录 Dashboard 将自动应用所选行业筛选。不勾选则显示全部。",
+    "industryFilter": "展会底图的默认行业筛选",
+    "industryFilterHint": "勾选后，打开展会底图时会自动应用所选行业筛选。不勾选则显示全部。",
     "selected": "已选 {n} 个行业",
     "loading": "加载中…",
-    "saving": "已保存，正在跳转…",
-    "savePrefs": "保存偏好"
+    "saving": "已保存",
+    "savePrefs": "保存偏好",
+    "saveFailed": "保存失败",
+    "viewBasemap": "去展会底图查看"
   },
   "placeholder": {
     "notImplemented": "待实现",
     "planned": "计划内容"
-  },
-  "expo": {
-    "title": "展会底图",
-    "phase": "阶段 5.7",
-    "item1": "7,378 个展会品牌的地理分布图",
-    "item2": "我的行动日历（不是展会档期表）",
-    "item3": "趋势四宫格 + 行业分布，口径需跟随当前筛选而非全库聚合",
-    "item4": "接口 /api/expo 已就绪"
   },
   "exhibition": {
     "notFound": "展会不存在",
@@ -503,26 +504,130 @@
     "visitors": "观众",
     "website": "网站"
   },
+  "knowledge": {
+    "title": "知识库",
+    "archivedToggle": "显示已归档",
+    "archived": "已归档",
+    "empty": "还没有项目",
+    "back": "← 返回知识库",
+    "docs": "文档",
+    "download": "下载"
+  },
   "basemap": {
     "title": "展会底图",
     "search": "搜索城市、展馆、展会品牌…",
     "hubs": "全球核心枢纽",
     "filterIndustry": "行业",
-    "filterRelation": "关系",
+    "filterCity": "城市",
+    "filterScale": "规模",
+    "scale": {
+      "lt1w": "＜1 万㎡",
+      "1w-5w": "1–5 万㎡",
+      "5w-10w": "5–10 万㎡",
+      "gte10w": "≥10 万㎡"
+    },
+    "scaleCaption": "{brands} 个品牌 · 各取最新一届",
+    "unlocated": "另有 {count} 个品牌未能定位",
+    "prevMonth": "上个月",
+    "nextMonth": "下个月",
     "projection": "等角方位",
     "resetView": "重置视角",
     "level": "层级",
     "legendVisiting": "重点拜访 / 参展中",
     "legendTargets": "储备并购标的所在地",
     "calendar": "行动日程",
-    "backToWeek": "返回本周",
+    "backToMonth": "回到本月",
     "weekDetail": "本周核心行动明细",
     "scheduled": "{count} 项已排定",
     "trendVisitors": "专业观众",
     "trendArea": "展览面积",
     "trendExhibitors": "有效展商池",
     "trendSectors": "行业分布",
-    "trendTtm": "TTM 环比",
-    "weekday": { "mon": "一", "tue": "二", "wed": "三", "thu": "四", "fri": "五", "sat": "六", "sun": "日" }
+    "weekday": {
+      "mon": "一",
+      "tue": "二",
+      "wed": "三",
+      "thu": "四",
+      "fri": "五",
+      "sat": "六",
+      "sun": "日"
+    }
+  },
+  "landing": {
+    "nav": {
+      "data": "数据",
+      "capability": "能力",
+      "business": "业务",
+      "enter": "进入系统"
+    },
+    "hero": {
+      "headlineLead": "中国展会市场的",
+      "headlineFocus": "结构化盘面",
+      "subline": "{brands} 个展会品牌 · {groups} 个主办方集团 · {editions} 条届次记录。为杜塞尔多夫展览的业务拓展提供事实基础。",
+      "enter": "进入系统",
+      "viewCoverage": "查看数据覆盖 →",
+      "shotAlt": "MWLAB 万象 展会底图界面",
+      "shotPending": "待补 /expo 截图"
+    },
+    "coverage": {
+      "brands": "展会品牌",
+      "groups": "主办方集团",
+      "editions": "届次记录",
+      "geoTags": "地理标签",
+      "companies": "企业档案",
+      "verified": "人工核验",
+      "note": "数据来源全程可溯 · 每月两次增量更新"
+    },
+    "facets": {
+      "overline": "数据切面",
+      "headline": "同一份数据，六种读法",
+      "mapTitle": "地理分布",
+      "mapDesc": "展会品牌按城市聚合，圆点大小即品牌数",
+      "mapUnlocated": "另有 {count} 个品牌未能定位",
+      "orgTitle": "主办方集团",
+      "orgDesc": "按主办方集团归并的展会品牌数",
+      "industryTitle": "行业结构",
+      "industryDesc": "一级品类的规模构成",
+      "scaleTitle": "规模排名",
+      "scaleDesc": "按城市汇总，取品牌数前 6，面积为各品牌最新一届之和",
+      "colCity": "城市",
+      "colArea": "合计面积 ㎡",
+      "scheduleTitle": "档期分布",
+      "scheduleDesc": "2026 年届次按开幕月份计数",
+      "schedulePeak": "最密集的月份 {n} 条",
+      "no2026Title": "无 2026 年届次的品牌",
+      "no2026Desc": "两年一届与采集尚未覆盖的届次都会落进这一组",
+      "no2026With": "有 2026 年届次 {n}",
+      "no2026Without": "无 2026 年届次 {n}",
+      "colBrands": "品牌数"
+    },
+    "biz": {
+      "overline": "应用",
+      "headline": "三条业务线",
+      "maDesc": "为杜塞已有品牌寻找中国延展的收购与合作标的",
+      "maItems": [
+        "主办方企业穿透",
+        "规模与估值锚定",
+        "深度尽调报告"
+      ],
+      "greenfieldDesc": "杜塞全球没有、中国市场应该有的空白赛道",
+      "greenfieldItems": [
+        "届次断档识别",
+        "现有玩家盘点",
+        "可行性评估"
+      ],
+      "projectDesc": "为各项目组提供数据工具与合作方对接",
+      "projectItems": [
+        "展商线索挖掘",
+        "合作方撮合",
+        "定制数据工具"
+      ]
+    },
+    "footer": {
+      "org": "Messe Düsseldorf Shanghai · Business Development",
+      "copyright": "© 2026 杜塞尔多夫展览（上海）有限公司 · 内部系统",
+      "enter": "进入系统 →",
+      "accessNote": "访问需内部账号"
+    }
   }
 }

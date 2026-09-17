@@ -1,0 +1,11 @@
+目录用途与分界线见 docs/TASK-K-knowledge-base.md §2。
+
+public/ 不经 proxy.ts 中间件：拿到 URL 不登录就能取。
+所以只有「能被陌生人看到也无所谓的」才放这里 —— 目前只有展会现场照片。
+index.md（项目背景/流程/结果）与 docs/（合同、估值表）一律留在 knowledge/ 下。
+
+每个项目的图片放 public/knowledge/<slug>/images/，
+文档放 knowledge/<slug>/docs/（走 /api/knowledge/<slug>/doc/... 下载）。
+
+本文件只是让这个目录存在于仓库里 —— 空的目录 git 不跟踪，
+而 DEPLOY.md 的 rsync 会因为源目录不存在而报错。

@@ -58,7 +58,7 @@ export async function GET(
     'SELECT title, file_path, mime, size_bytes FROM resource WHERE resource_id = ?'
   ).get(id) as { title: string; file_path: string; mime: string | null; size_bytes: number } | undefined
 
-  if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 })
+  if (!row) return NextResponse.json({ error: 'notFound' }, { status: 404 })
 
   const abs = resolveSafe(row.file_path)
   if (!abs) {

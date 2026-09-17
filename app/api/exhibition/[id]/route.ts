@@ -22,7 +22,7 @@ export async function GET(
   `).get(id)
 
   if (!brand) {
-    return NextResponse.json({ error: 'not found' }, { status: 404 })
+    return NextResponse.json({ error: 'notFound' }, { status: 404 })
   }
 
   // 014 迁移删除了 exhibition_timeline / exhibition_relation /

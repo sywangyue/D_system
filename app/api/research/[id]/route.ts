@@ -38,7 +38,7 @@ export async function GET(
 
   const report = db.prepare('SELECT * FROM intel_report WHERE id = ?').get(id) as
     Record<string, unknown> | undefined
-  if (!report) return NextResponse.json({ error: 'not found' }, { status: 404 })
+  if (!report) return NextResponse.json({ error: 'notFound' }, { status: 404 })
 
   const company = report.company_id
     ? db.prepare('SELECT * FROM company WHERE company_id = ?').get(report.company_id)
@@ -95,7 +95,7 @@ export async function PATCH(
   const wdb = getWritableDb()
   try {
     const exists = wdb.prepare('SELECT id FROM intel_report WHERE id = ?').get(id)
-    if (!exists) return NextResponse.json({ error: 'not found' }, { status: 404 })
+    if (!exists) return NextResponse.json({ error: 'notFound' }, { status: 404 })
 
     wdb.prepare(`
       UPDATE intel_report
