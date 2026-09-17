@@ -10,17 +10,29 @@
 
 | # | 任务 | 规格 | 谁做 | 依赖 |
 |---|---|---|---|---|
-| 1 | 历史 docx 回填 `intel_report` | `TASK-D-backfill-reports.md` | DS | — |
-| 2 | 机会详情页 `/opportunity/[id]` | `TASK-G-opportunity-detail.md` | DS | 1 |
-| 3 | 公司库 + 调研库 | `TASK-C-list-detail-pages.md` | DS | 1 |
-| 4 | 全站 i18n 接线 | `TASK-E-i18n-wiring.md` | DS | 2, 3 |
-| 5 | 8 个端点补测试 | `TASK-F-api-tests.md` | DS | 2, 3 |
-| 5.5 | **知识库 `/knowledge`** | `TASK-K-knowledge-base.md` | DS | 4 |
-| 6 | 展会底图 `/expo` | 待写 TASK-H | DS | — |
-| 7 | 设置 / 个人资料收尾 | 待写 TASK-I | DS | 4 |
-| 8 | 官网落地页 `/` | 待写 TASK-J | DS | 4 |
-| 9 | **配色与 logo 整体重做** | Stitch / Claude Design | **Max 主导** | 8 |
-| 10 | 部署上线 | — | Claude + Max | 9 |
+| 1 | 历史 docx 回填 `intel_report` ✅ | `TASK-D-backfill-reports.md` | DS | — |
+| 2 | 机会详情页 `/opportunity/[id]` ✅ | `TASK-G-opportunity-detail.md` | DS | 1 |
+| 3 | 公司库 + 调研库 ✅ | `TASK-C-list-detail-pages.md` | DS | 1 |
+| 4 | 全站 i18n 接线 ✅ | `TASK-E-i18n-wiring.md` | DS | 2, 3 |
+| 5 | **知识库 `/knowledge`** | `TASK-K-knowledge-base.md` | DS | 4 |
+| 6 | 端点补测试 | `TASK-F-api-tests.md` | DS | 5 |
+| 7 | 展会底图 `/expo` | `TASK-H-expo-basemap.md` | DS | 4 |
+| 8 | 设置 / 个人资料收尾 | `TASK-I-settings-profile.md` | DS | 7 |
+| 9 | 官网落地页 `/` | `TASK-J-landing-page.md` | DS | 7 |
+| 10 | **配色与 logo 整体重做** | Stitch / Claude Design | **Max 主导** | 9 |
+| 11 | 部署上线 | — | Claude + Max | 10 |
+
+### 5–9 这一批：DS 按 K → F → H → I → J 连续做完，Claude 统一质检（Max 2026-09-17 定）
+
+批内顺序不能乱，有三处硬依赖：
+
+- **F 在 K 之后**：F §6 要给知识库文档端点补穿越测试；
+- **I 在 H 之后**：个人资料页的行业偏好改为作用于 `/expo`，H 没做 I 验不了；
+  I 还要删 `/api/dashboard` 与 `tests/api/dashboard.test.ts`，F 不要去测这个端点；
+- **J 在 H 之后**：落地页复用 H 的地图与行业堆叠条，首屏截图截的也是 `/expo`。
+
+统一质检时按同一顺序逐个过验收，每个任务单独出返工单。
+一批做完意味着返工也可能成批，**安全与数据丢失类缺陷仍按 §2.3 由 Claude 立即修**。
 
 ### 知识库（K）为什么插在这里
 
