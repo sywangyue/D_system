@@ -243,12 +243,102 @@
     letter-spacing: -0.01em;
   }
 
-  /** R3：长文中文行高 1.80（详情页的调研报告正文用） */
+  /** R3：长文中文行高 1.80（详情页的调研报告正文用）
+   *
+   *  这里同时负责把 Markdown 渲染出来的元素接回令牌层。
+   *  仓库没有装 @tailwindcss/typography —— 那会再引一套自成体系的颜色与间距，
+   *  和「颜色只在这一个文件里」的现有规矩冲突。所以只补 Markdown 会产出、
+   *  而全局样式（h1–h4、a、body）没覆盖到的元素：表格、列表、引用、代码、分隔线。
+   *  任务 D 回填的 11 份 docx 里表格极多（FPackAsia 一份 27 张），
+   *  不补这几条，整片会塌成没有边框的纯文本。
+   *  只引用下面已有的 --color-* / --text-* / --radius-*，不新增任何颜色。 */
   .prose-cjk {
     font-size: var(--text-body-cjk);
     line-height: 1.8;
     font-weight: 400;
   }
+
+  /* 块间距只由「相邻兄弟」给，不写在各元素上 —— 免得首元素多出一段上边距 */
+  .prose-cjk > * + * { margin-top: 0.9em; }
+
+  .prose-cjk h1 { font-size: var(--text-heading-cjk); margin-top: 1.7em; }
+  .prose-cjk h2 { font-size: var(--text-subhead-cjk); margin-top: 1.6em; }
+  .prose-cjk h3 { font-size: var(--text-body-cjk);   margin-top: 1.5em; }
+  .prose-cjk h4,
+  .prose-cjk h5,
+  .prose-cjk h6 { font-size: var(--text-body-cjk);   margin-top: 1.4em; }
+  .prose-cjk h1:first-child,
+  .prose-cjk h2:first-child,
+  .prose-cjk h3:first-child { margin-top: 0; }
+
+  .prose-cjk h2,
+  .prose-cjk h3 { padding-bottom: 0.3em; border-bottom: 1px solid var(--color-hairline); }
+
+  .prose-cjk ul,
+  .prose-cjk ol { padding-left: 1.5em; }
+  .prose-cjk ul { list-style: disc; }
+  .prose-cjk ol { list-style: decimal; }
+  .prose-cjk li + li { margin-top: 0.25em; }
+  .prose-cjk li > ul,
+  .prose-cjk li > ol { margin-top: 0.25em; }
+
+  /* 正文里的链接：报告大量引用外部来源，要给得看得见 */
+  .prose-cjk a {
+    color: var(--color-fg);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .prose-cjk strong { font-weight: 600; }
+
+  .prose-cjk hr { border: 0; border-top: 1px solid var(--color-hairline); }
+
+  .prose-cjk blockquote {
+    border-left: 2px solid var(--color-hairline-active);
+    padding-left: 0.9em;
+    color: var(--color-fg-subtle);
+  }
+
+  .prose-cjk code {
+    font-family: var(--font-mono);
+    font-size: 0.9em;
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: 3px;
+    padding: 0.1em 0.35em;
+  }
+  .prose-cjk pre {
+    background: var(--color-surface);
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-control);
+    padding: 0.8em 1em;
+    overflow-x: auto;
+  }
+  .prose-cjk pre code { background: none; border: 0; padding: 0; }
+
+  /* 表格：本质检报告正文里表格是主要内容形态，必须给边框。
+     单元格加 tabular-nums 让数字列对齐 —— 这里不能上 .num（正文数字混在
+     中文句子里，整块换等宽字体反而更难读），只对齐数字宽度。 */
+  .prose-cjk table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: var(--text-ui-cjk);
+    font-variant-numeric: tabular-nums;
+  }
+  .prose-cjk th,
+  .prose-cjk td {
+    border: 1px solid var(--color-hairline);
+    padding: 0.45em 0.65em;
+    text-align: left;
+    vertical-align: top;
+    line-height: 1.6;
+  }
+  .prose-cjk th {
+    background: var(--color-sidebar);
+    font-weight: 500;
+    color: var(--color-fg-muted);
+  }
+  .prose-cjk td { color: var(--color-fg-muted); }
 
   /** 发丝线分隔，取代 border 与投影混用 */
   .hairline   { border-color: var(--color-hairline); }

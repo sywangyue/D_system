@@ -1,9 +1,10 @@
-import Placeholder from "@/components/layout/Placeholder"
-export default function Page() {
-  return <Placeholder title="公司库" lat="Entities" phase="阶段 5.6"
-    items={[
-      "501 家公司的一阶列表：公司名 / 类型 / 经营状态 / 城市 / 更新时间",
-      "详情页带出该公司名下的全部资源与关联机会",
-      "接口 /api/company 与 /api/company/[id] 已就绪",
-    ]} />
+import { redirect } from "next/navigation"
+import { getSessionUser } from "@/lib/session"
+import CompanyList from "./company-list"
+
+/** 公司库。服务端只负责取登录态，列表数据由客户端按需分页拉取。 */
+export default async function CompanyPage() {
+  const user = await getSessionUser()
+  if (!user) redirect("/login")
+  return <CompanyList />
 }

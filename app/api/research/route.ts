@@ -13,10 +13,20 @@ import { requireUser, requireWriter } from '@/lib/api-guard'
  * ⚠️ 这张表没有 is_archived，所以没有软删除过滤，也没有 DELETE 端点。
  */
 
-/** 一阶字段。excerpt 是 SUBSTR 出来的片段，不是整列。 */
+/**
+ * 一阶字段。excerpt 是 SUBSTR 出来的片段，不是整列。
+ *
+ * company_name 是解析后的公司名（TASK-C §3.1 的列表要「关联公司」这一列）。
+ * 为什么不是 target_company：014 把 intel_report 扶正为公司尽调的落库主体时
+ * 定了方向 ——「target_company 是自由文本，保留可回溯性，但**新数据一律写
+ * company_id**」（见 schema/migrations/014_rebuild.sql §3）。实测库里
+ * target_company 只有 1 条非空、company_id 有 9 条，所以列要展示的是公司名。
+ * 仍 COALESCE 回 target_company 兜住重构前的老行。
+ */
 const LIST_COLUMNS = `
   r.id, r.title, r.report_type, r.status, r.company_id, r.updated_at,
-  SUBSTR(r.report_md, 1, 160) AS excerpt
+  SUBSTR(r.report_md, 1, 160) AS excerpt,
+  COALESCE(c.name, r.target_company) AS company_name
 `
 
 /** 排序白名单：key 是外部可传的值，value 是真实列名。
@@ -96,6 +106,7 @@ export async function GET(request: Request) {
   const items = db.prepare(`
     SELECT ${LIST_COLUMNS}
     FROM intel_report r
+    LEFT JOIN company c ON c.company_id = r.company_id
     ${whereSql}
     ORDER BY ${sortCol} ${order}
     LIMIT ? OFFSET ?

@@ -1,10 +1,10 @@
-import Placeholder from "@/components/layout/Placeholder"
-export default function Page() {
-  return <Placeholder title="调研库" lat="Reports" phase="阶段 5.6"
-    items={[
-      "intel_report 列表，一阶只给标题 / 类型 / 状态 / 摘要，不吐报告全文",
-      "详情页渲染 report_md，并列出可下载的原始文件",
-      "reports/ 下 11 份 docx 历史报告待回填入库",
-      "接口 /api/research 与 /api/research/[id] 已就绪",
-    ]} />
+import { redirect } from "next/navigation"
+import { getSessionUser } from "@/lib/session"
+import ResearchList from "./research-list"
+
+/** 调研库。服务端只负责取登录态，列表数据由客户端按需分页拉取。 */
+export default async function ResearchPage() {
+  const user = await getSessionUser()
+  if (!user) redirect("/login")
+  return <ResearchList />
 }

@@ -1,6 +1,8 @@
 # 任务 C · 公司库 + 调研库（列表与详情页）
 
-**前置**：E（i18n 接线）先做完 —— 新页面直接按 E 的模式写，否则 E 还得回头返工
+**前置**：D（历史 docx 回填）—— 否则调研库打开是空的。
+> 规格初稿写的是「前置：E 先做完」，与 `DEV-ORDER-AND-QC.md` §1 定的 G→C→E→F 顺序相反。
+> 以顺序表为准：**C 的界面文案先写死中文**，i18n 由任务 E 一次扫全站接线。
 **参照实现**：`app/opportunity/pipeline.tsx`（一阶列表）、`app/overview/page.tsx`（服务端聚合页）
 **接口**：`/api/company`、`/api/company/[id]`、`/api/research`、`/api/research/[id]` **均已就绪**
 **验收**：见 §6
@@ -29,13 +31,18 @@
 
 ```
 一阶列（只要这 5 列，不要加）
-  公司名称 · 类型 · 经营状态 · 城市 · 更新时间
+  公司名称 · 类型 · 经营状态 · 法定代表人 · 更新时间
 
 筛选   type / company_status / source_type
 搜索   q（打到 name 与 credit_code）
 排序   updated_at(默认) / name / prospect_score
 分页   size 50
 ```
+
+> 第五列原本是「城市」，但 `company.city` 全表 501 行皆空
+> （`prospect_score` / `name_en` / `country` / `contact_status` 同样全空，别拿它们做列）。
+> 2026-09-17 改用 `oper_name`（468/501 有值）。city 列仍留在表里，采集到了再议。
+> `排序` 里的 `prospect_score` 是空列，排了等于没排，留着是因为接口白名单已有，不碍事。
 
 基线：**501 条**。其中 494 条来自 CIBS2026 展商批量线索，
 6 条是做过深度尽调的标的（励泰两家 / 华尔科技 / 杭州川方至 / 仁然 / 奥利弗）。
@@ -84,9 +91,12 @@
 ```
 一阶列   标题 · 类型 · 状态 · 关联公司 · 更新时间
          外加 excerpt 作为列表项下的一行摘要（接口已返回）
-筛选     report_type / status / company_id
+筛选     report_type / status
 搜索     q（打到 title 与 target_company）
 ```
+
+> `company_id` 筛选已从规格删除（2026-09-17）：501 家公司做不成 pill，
+> 而公司详情页的「关联报告」区块已经能到达同样的结果。接口仍支持该参数，只是界面不给入口。
 
 `report_type` 的中文映射：
 
@@ -184,4 +194,4 @@ curl -s -D - -o /tmp/t.docx -b "session=$T" localhost:3000/api/resource/$RID/dow
 人工检查：
 - 列表页字段数与 §2.1 / §3.1 完全一致，**没有多塞列**
 - 调研库详情的 Markdown 正文容器带 `prose-cjk`
-- 切到 EN 后页面无中文（依赖任务 E 已完成）
+- ~~切到 EN 后页面无中文~~ —— **本任务不验**，i18n 归任务 E，E 做完回来补这一条

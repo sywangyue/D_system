@@ -15,7 +15,9 @@ import { requireUser, requireWriter } from '@/lib/api-guard'
 
 /** 一阶字段。改这里就等于改列表页的列头。 */
 const LIST_COLUMNS = `
-  c.company_id, c.name, c.type, c.company_status, c.city, c.updated_at
+  -- city 全表 501 行皆空（prospect_score / name_en / country 同样），列表第五列改用
+  -- 法定代表人 oper_name（468/501 有值）。city 仍留在表里，采集到了再说。
+  c.company_id, c.name, c.type, c.company_status, c.oper_name, c.updated_at
 `
 
 /** 排序白名单：key 是外部可传的值，value 是真实列名。
