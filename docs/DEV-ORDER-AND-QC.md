@@ -14,11 +14,11 @@
 | 2 | 机会详情页 `/opportunity/[id]` ✅ | `TASK-G-opportunity-detail.md` | DS | 1 |
 | 3 | 公司库 + 调研库 ✅ | `TASK-C-list-detail-pages.md` | DS | 1 |
 | 4 | 全站 i18n 接线 ✅ | `TASK-E-i18n-wiring.md` | DS | 2, 3 |
-| 5 | **知识库 `/knowledge`** | `TASK-K-knowledge-base.md` | DS | 4 |
-| 6 | 端点补测试 | `TASK-F-api-tests.md` | DS | 5 |
-| 7 | 展会底图 `/expo` | `TASK-H-expo-basemap.md` | DS | 4 |
-| 8 | 设置 / 个人资料收尾 | `TASK-I-settings-profile.md` | DS | 7 |
-| 9 | 官网落地页 `/` | `TASK-J-landing-page.md` | DS | 7 |
+| 5 | 知识库 `/knowledge` ✅ | `TASK-K-knowledge-base.md` | DS | 4 |
+| 6 | 端点补测试 ✅ | `TASK-F-api-tests.md` | DS | 5 |
+| 7 | 展会底图 `/expo` ✅ | `TASK-H-expo-basemap.md` | DS | 4 |
+| 8 | 设置 / 个人资料收尾 ✅ | `TASK-I-settings-profile.md` | DS | 7 |
+| 9 | 官网落地页 `/` ✅ | `TASK-J-landing-page.md` | DS | 7 |
 | 10 | **配色与 logo 整体重做** | Stitch / Claude Design | **Max 主导** | 9 |
 | 11 | 部署上线 | — | Claude + Max | 10 |
 
