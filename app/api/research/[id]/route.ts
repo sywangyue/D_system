@@ -11,7 +11,12 @@ import { requireUser, requireWriter } from '@/lib/api-guard'
  * ⚠️ 主键是裸 `id`；⚠️ 没有 is_archived，所以没有 DELETE 端点。
  */
 
-const REPORT_TYPES = ['industry_research', 'brand_research', 'batch_prospect', 'single_prospect']
+// 必须与 intel_report.report_type 的 CHECK 约束一致（见 006 建表 + 017 拓宽）。
+const REPORT_TYPES = [
+  'industry_research', 'brand_research', 'batch_prospect', 'single_prospect',
+  'company_research',
+]
+
 const STATUSES = ['draft', 'published', 'archived']
 
 /** 与列表端点同一份白名单：不在表里的键静默忽略。 */

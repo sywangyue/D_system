@@ -37,7 +37,14 @@ const FILTERS: Record<string, string> = {
   opp_id: 'r.opp_id',
 }
 
-const REPORT_TYPES = ['industry_research', 'brand_research', 'batch_prospect', 'single_prospect']
+// 必须与 intel_report.report_type 的 CHECK 约束一致（见 006 建表 + 017 拓宽）。
+// company_research 是「公司尽调」，产品里最常用的一类，前端 overview 的中文映射
+// 与 docs/TASK-C §3.1 都以它为准；006 的枚举漏了它，017 补上，这里同步。
+const REPORT_TYPES = [
+  'industry_research', 'brand_research', 'batch_prospect', 'single_prospect',
+  'company_research',
+]
+
 const STATUSES = ['draft', 'published', 'archived']
 
 /** 写字段白名单。不在表里的键静默忽略。 */
