@@ -82,7 +82,7 @@ class TestIntelProspects(unittest.TestCase):
         )
         conn = sqlite3.connect(self.db.name)
         row = conn.execute(
-            "SELECT intel_report_id FROM customer_prospect WHERE company_name='报告关联公司'"
+            "SELECT intel_report_id FROM company WHERE name='报告关联公司'"
         ).fetchone()
         self.assertIsNotNone(row)
         self.assertEqual(row[0], report_id)
@@ -221,7 +221,7 @@ class TestIntelExport(unittest.TestCase):
 # ─── intel 表 CHECK 约束回归 ──────────────────────────────────────────
 
 class TestIntelConstraints(unittest.TestCase):
-    """intel_report / customer_prospect 的 CHECK 约束。"""
+    """intel_report / company 的 CHECK 约束。"""
 
     def setUp(self):
         from schema.db import init_db
@@ -256,11 +256,11 @@ class TestIntelConstraints(unittest.TestCase):
             INSERT INTO exhibition_brand (brand_id, name_cn) VALUES ('EXPO-CSTR', '约束测试')
         """)
         self.conn.execute(
-            "INSERT INTO customer_prospect (company_name, source_type, brand_id) VALUES (?, ?, ?)",
+            "INSERT INTO company (name, source_type, brand_id) VALUES (?, ?, ?)",
             ('测试公司', 'qcc_search', 'EXPO-CSTR'),
         )
         self.conn.commit()
-        cnt = self.conn.execute("SELECT COUNT(*) FROM customer_prospect").fetchone()[0]
+        cnt = self.conn.execute("SELECT COUNT(*) FROM company").fetchone()[0]
         self.assertEqual(cnt, 1)
 
     def test_prospect_score_boundary(self):
@@ -270,11 +270,11 @@ class TestIntelConstraints(unittest.TestCase):
         """)
         for score in (1, 3, 5):
             self.conn.execute(
-                "INSERT INTO customer_prospect (company_name, source_type, prospect_score, brand_id) VALUES (?, ?, ?, ?)",
+                "INSERT INTO company (name, source_type, prospect_score, brand_id) VALUES (?, ?, ?, ?)",
                 (f'公司{score}', 'manual', score, 'EXPO-CSTR2'),
             )
         self.conn.commit()
-        cnt = self.conn.execute("SELECT COUNT(*) FROM customer_prospect").fetchone()[0]
+        cnt = self.conn.execute("SELECT COUNT(*) FROM company").fetchone()[0]
         self.assertEqual(cnt, 3)
 
     def test_prospect_score_out_of_range(self):
@@ -285,7 +285,7 @@ class TestIntelConstraints(unittest.TestCase):
         """)
         with self.assertRaises(sqlite3.IntegrityError):
             self.conn.execute(
-                "INSERT INTO customer_prospect (company_name, source_type, prospect_score, brand_id) VALUES (?, ?, ?, ?)",
+                "INSERT INTO company (name, source_type, prospect_score, brand_id) VALUES (?, ?, ?, ?)",
                 ('坏评分', 'manual', 6, 'EXPO-CSTR3'),
             )
             self.conn.commit()

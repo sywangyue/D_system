@@ -246,9 +246,9 @@ class TestMigrationsApplied(unittest.TestCase):
         self.assertIn('opportunity', tables)
         self.assertIn('opportunity_event', tables)
 
-        # 版本 6: intel_report / customer_prospect
+        # 版本 6: intel_report / company（014 把 006 建的旧公司表改名为 company）
         self.assertIn('intel_report', tables)
-        self.assertIn('customer_prospect', tables)
+        self.assertIn('company', tables)
 
         # 版本 7: provenance 唯一索引
         indexes = {r[0] for r in self.conn.execute(
@@ -256,8 +256,8 @@ class TestMigrationsApplied(unittest.TestCase):
         ).fetchall()}
         self.assertIn('idx_provenance_brand_url', indexes)
 
-        # 版本 8: prospect 唯一索引
-        self.assertIn('idx_prospect_brand_qcc', indexes)
+        # 版本 8: prospect 唯一索引（014 已随表改名重建为 idx_company_brand_qcc）
+        self.assertIn('idx_company_brand_qcc', indexes)
 
     def test_schema_version_all_registered(self):
         """schema_version 表中应包含版本 1-8。"""

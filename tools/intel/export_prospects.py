@@ -2,7 +2,7 @@
 """
 tools/intel/export_prospects.py — 客户线索导出工具
 
-将 customer_prospect 表数据导出为 Excel（.xlsx）或 CSV。
+将 company 表数据导出为 Excel（.xlsx）或 CSV。
 
 用法:
   # 导出指定 brand_id 的全部线索
@@ -30,20 +30,20 @@ _REPO_ROOT = Path(__file__).resolve().parent.parent.parent
 DB_PATH = _REPO_ROOT / "data" / "mwlab.db"
 
 _COLUMNS = [
-    "id", "intel_report_id", "brand_id", "source_type",
-    "qcc_key_no", "company_name", "credit_code", "oper_name",
+    "company_id", "intel_report_id", "brand_id", "source_type",
+    "qcc_key_no", "name", "credit_code", "oper_name",
     "start_date", "company_status", "reg_no", "address",
     "prospect_score", "contact_status", "notes",
     "created_at", "updated_at",
 ]
 
 _COL_LABELS = {
-    "id": "ID",
+    "company_id": "ID",
     "intel_report_id": "报告ID",
     "brand_id": "展会品牌",
     "source_type": "来源",
     "qcc_key_no": "企查查KeyNo",
-    "company_name": "公司名称",
+    "name": "公司名称",
     "credit_code": "统一社会信用代码",
     "oper_name": "法定代表人",
     "start_date": "成立日期",
@@ -70,17 +70,17 @@ def _query_prospects(
 
     if brand_id:
         rows = conn.execute(
-            f"SELECT {', '.join(_COLUMNS)} FROM customer_prospect WHERE brand_id = ? ORDER BY id",
+            f"SELECT {', '.join(_COLUMNS)} FROM company WHERE brand_id = ? ORDER BY company_id",
             (brand_id,),
         ).fetchall()
     elif report_id is not None:
         rows = conn.execute(
-            f"SELECT {', '.join(_COLUMNS)} FROM customer_prospect WHERE intel_report_id = ? ORDER BY id",
+            f"SELECT {', '.join(_COLUMNS)} FROM company WHERE intel_report_id = ? ORDER BY company_id",
             (report_id,),
         ).fetchall()
     elif all_records:
         rows = conn.execute(
-            f"SELECT {', '.join(_COLUMNS)} FROM customer_prospect ORDER BY id",
+            f"SELECT {', '.join(_COLUMNS)} FROM company ORDER BY company_id",
         ).fetchall()
     else:
         conn.close()
@@ -128,7 +128,7 @@ def export_xlsx(rows: list[dict], out_path: Path) -> None:
 
     # 列宽自适应（粗略估算）
     col_widths = {
-        "company_name": 30, "address": 40, "notes": 35,
+        "name": 30, "address": 40, "notes": 35,
         "credit_code": 22, "qcc_key_no": 20,
     }
     for col_idx, col in enumerate(_COLUMNS, 1):

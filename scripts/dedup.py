@@ -515,7 +515,7 @@ def run_execute(conn, db_path: Path):
             #   业务数据表      迁移到 canonical（这些表 ON DELETE 是 SET NULL/NO ACTION，
             #                  不处理会静默丢失归属或直接报错）
             conn.execute("DELETE FROM brand_geo_tag WHERE brand_id = ?", (bid,))
-            for tbl, col in (("customer_prospect", "brand_id"),
+            for tbl, col in (("company", "brand_id"),
                              ("intel_report", "brand_id"),
                              ("exhibition_contact", "brand_id"),
                              ("exhibition_timeline", "brand_id"),

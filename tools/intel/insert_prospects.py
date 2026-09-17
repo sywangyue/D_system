@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-tools/intel/insert_prospects.py — 批量写入客户线索到 customer_prospect 表
+tools/intel/insert_prospects.py — 批量写入客户线索到 company 表
 
 由 /batch-prospect skill 调用。从 --json 文件读取 prospects 列表，
 INSERT OR IGNORE 实现幂等写入。
@@ -24,7 +24,7 @@ _FIELD_MAP = {
     "brand_id": "brand_id",
     "intel_report_id": "intel_report_id",
     "source_type": "source_type",
-    "company_name": "company_name",
+    "company_name": "name",
     "qcc_key_no": "qcc_key_no",
     "credit_code": "credit_code",
     "oper_name": "oper_name",
@@ -36,7 +36,7 @@ _FIELD_MAP = {
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="批量写入客户线索到 customer_prospect 表")
+    parser = argparse.ArgumentParser(description="批量写入客户线索到 company 表")
     parser.add_argument("--json", required=True, help="prospects JSON 文件路径")
     parser.add_argument("--report-id", type=int, help="覆盖/填充所有记录的 intel_report_id")
     parser.add_argument("--db", default=str(DEFAULT_DB), help="数据库路径（默认 mwlab.db）")
@@ -69,8 +69,8 @@ def main() -> None:
             qcc_key_no = p.get("qcc_key_no")
             if qcc_key_no is None:
                 dup = conn.execute(
-                    "SELECT 1 FROM customer_prospect "
-                    "WHERE brand_id IS ? AND company_name = ? LIMIT 1",
+                    "SELECT 1 FROM company "
+                    "WHERE brand_id IS ? AND name = ? LIMIT 1",
                     (p.get("brand_id"), company_name),
                 ).fetchone()
                 if dup:
@@ -81,8 +81,8 @@ def main() -> None:
             report_id = args.report_id if args.report_id is not None else p.get("intel_report_id")
 
             conn.execute(
-                "INSERT OR IGNORE INTO customer_prospect "
-                "(intel_report_id, brand_id, source_type, company_name, qcc_key_no, "
+                "INSERT OR IGNORE INTO company "
+                "(intel_report_id, brand_id, source_type, name, qcc_key_no, "
                 " credit_code, oper_name, start_date, company_status, reg_no, address) "
                 "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
                 (

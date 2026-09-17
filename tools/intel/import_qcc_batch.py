@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-tools/intel/import_qcc_batch.py — 企查查批量导出 Excel → customer_prospect 表
+tools/intel/import_qcc_batch.py — 企查查批量导出 Excel → company 表
 
 用法:
   python3 tools/intel/import_qcc_batch.py /path/to/qcc_export.xlsx
@@ -164,13 +164,13 @@ def import_data(db_path: str, records: list[dict], dry_run: bool = False) -> dic
             if credit_code:
                 # 查重
                 existing = conn.execute(
-                    "SELECT id, source_type, qcc_key_no FROM customer_prospect WHERE credit_code = ? LIMIT 1",
+                    "SELECT company_id, source_type, qcc_key_no FROM company WHERE credit_code = ? LIMIT 1",
                     (credit_code,),
                 ).fetchone()
             else:
                 # 无信用代码，按公司名查重
                 existing = conn.execute(
-                    "SELECT id, source_type, qcc_key_no FROM customer_prospect WHERE company_name = ? AND credit_code IS NULL LIMIT 1",
+                    "SELECT company_id, source_type, qcc_key_no FROM company WHERE name = ? AND credit_code IS NULL LIMIT 1",
                     (r["company_name"],),
                 ).fetchone()
 
@@ -185,12 +185,12 @@ def import_data(db_path: str, records: list[dict], dry_run: bool = False) -> dic
                 # UPDATE — 保留 qcc_key_no 如果原来有（API 数据）
                 eid, old_source, old_qcc = existing
                 conn.execute(
-                    """UPDATE customer_prospect SET
-                        company_name = ?, credit_code = ?, oper_name = ?,
+                    """UPDATE company SET
+                        name = ?, credit_code = ?, oper_name = ?,
                         start_date = ?, company_status = ?, reg_no = ?,
                         address = ?, email = ?, notes = ?,
                         updated_at = datetime('now', 'localtime')
-                    WHERE id = ?""",
+                    WHERE company_id = ?""",
                     (
                         r["company_name"], credit_code, r["oper_name"],
                         r["start_date"], r["company_status"], r["reg_no"],
@@ -206,8 +206,8 @@ def import_data(db_path: str, records: list[dict], dry_run: bool = False) -> dic
                     continue
 
                 conn.execute(
-                    """INSERT INTO customer_prospect
-                        (source_type, company_name, credit_code, oper_name,
+                    """INSERT INTO company
+                        (source_type, name, credit_code, oper_name,
                          start_date, company_status, reg_no, address, email, notes)
                     VALUES ('qcc_search', ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
                     (
@@ -228,7 +228,7 @@ def import_data(db_path: str, records: list[dict], dry_run: bool = False) -> dic
 
 
 def main():
-    parser = argparse.ArgumentParser(description="企查查批量导出 Excel → customer_prospect")
+    parser = argparse.ArgumentParser(description="企查查批量导出 Excel → company")
     parser.add_argument("xlsx", help="企查查批量导出 .xlsx 路径")
     parser.add_argument("--db", default=str(DB_PATH), help="数据库路径")
     parser.add_argument("--dry-run", action="store_true", help="仅预览，不写入")
@@ -256,12 +256,12 @@ def main():
     # 验证
     if not args.dry_run:
         conn = sqlite3.connect(args.db)
-        total = conn.execute("SELECT COUNT(*) FROM customer_prospect").fetchone()[0]
+        total = conn.execute("SELECT COUNT(*) FROM company").fetchone()[0]
         batch = conn.execute(
-            "SELECT COUNT(*) FROM customer_prospect WHERE notes != ''"
+            "SELECT COUNT(*) FROM company WHERE notes != ''"
         ).fetchone()[0]
         conn.close()
-        print(f"📊 DB 当前状态: customer_prospect 共 {total} 条 (其中含 notes 数据: {batch} 条)")
+        print(f"📊 DB 当前状态: company 共 {total} 条 (其中含 notes 数据: {batch} 条)")
 
 
 if __name__ == "__main__":

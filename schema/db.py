@@ -106,14 +106,15 @@ def _reconcile_production(conn: sqlite3.Connection) -> list[tuple[int, str]]:
             )
             backfilled.append((12, '012_change_source'))
 
-    # 版本 6: intel_report / customer_prospect 表
+    # 版本 6: intel_report / customer_prospect（014 已把 customer_prospect 改名 company，
+    # 两种表名都要认，否则尚未应用 014 的旧生产库对账会失败）
     if 6 not in registered:
         tables = {
             r[0] for r in conn.execute(
                 "SELECT name FROM sqlite_master WHERE type='table'"
             ).fetchall()
         }
-        if 'intel_report' in tables and 'customer_prospect' in tables:
+        if 'intel_report' in tables and ('customer_prospect' in tables or 'company' in tables):
             conn.execute(
                 "INSERT INTO schema_version(version, description, applied_at) VALUES (6, '006_intel_tables', ?)",
                 (datetime.now().isoformat(),)
