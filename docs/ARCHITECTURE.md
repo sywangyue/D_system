@@ -1,120 +1,53 @@
-# MWLAB-2026 · Architecture & Technical Reference
+# 架构 · MWLAB 万象（V2）
 
-**最后更新**：2026-05-28（Railway → 阿里云迁移完成后重写）
+Next.js 16 单进程（App Router）+ SQLite（better-sqlite3），部署在阿里云轻量服务器，见 `DEPLOY.md`。
+数据采集与治理是 Python 管道，跑在 Max 本机 crontab，产出 `data/mwlab.db` 后随部署上传。
 
----
+## 1. 数据模型
 
-## 当前系统架构
-
-```
-浏览器
-  │  HTTPS (Cloudflare Flexible SSL)
-  ▼
-Cloudflare CDN (orange cloud)
-  │  HTTP
-  ▼
-Nginx (80) ── 反向代理 ──► Next.js 16 (3000) ── better-sqlite3 ──► data/mwlab.db
-                                │
-                           JWT middleware
-                           (edge runtime)
-
-采集（独立进程，目前手动触发）
-  crawlers/jufair_crawler.py ──► data/jufair_2026.db (raw_jufair)
-  crawlers/cnexpo_crawler.py ──► data/cnexpo_2026.db (raw_cnexpo)
-       两者的 crawl_log 均写入 data/mwlab.db（看板从主库读）
-                    │
-  tools/merge_engine.py ──► data/mwlab.db (exhibition_brand / edition / provenance)
-```
-
-> **无调度器**：`scheduler.py` 曾在本文档与 PRD 中被标注「已完成」，但该文件不存在于仓库。
-> 采集只能手动触发，`--cron` / `--run-now` / `--status` 等描述均无对应实现。
-
----
-
-## 技术栈（实际生产状态）
-
-| 层级 | 选择 | 说明 |
-|------|------|------|
-| 框架 | Next.js 16.2.4 (App Router) | 前后端一体，API Routes 替代原 FastAPI |
-| 运行时 | Node.js 20 (via nvm) | PM2 守护，开机自启 |
-| 数据库驱动 | better-sqlite3 11.9.1 | 同步 API，WAL 模式，64MB 缓存 |
-| 认证 | jose 6.2.3 (JWT HS256) | 24h token，httpOnly cookie |
-| 样式 | Tailwind CSS 4.2.4 | PostCSS 8 |
-| 图标 | lucide-react 0.532.0 | |
-| 密码哈希 | bcryptjs 3.0.3 | |
-| 爬虫 | Python 3.10 + requests + beautifulsoup4 | 独立 venv (.venv) |
-| 进程管理 | PM2 7.0.1 | `mwlab-dashboard` 进程 |
-| 反向代理 | Nginx 1.18.0 | HTTP → localhost:3000 |
-| SSL | Cloudflare Universal SSL (Flexible) | 无需服务器证书 |
-
----
-
-## 关键文件索引
-
-| 文件 | 职责 |
-|------|------|
-| `proxy.ts` | JWT 验证 + 路由保护 + 角色守卫（Next.js 16 起由 middleware.ts 更名而来） |
-| `lib/db.ts` | better-sqlite3 单例，`getDb()` 只读 / `getWritableDb()` 写 |
-| `lib/auth.ts` | 客户端 localStorage auth state 管理 |
-| `lib/api-guard.ts` | 服务端鉴权：`requireUser()` 查库校验 is_active、`requireWriter()` 拦 readonly |
-| `app/api/dashboard/route.ts` | 核心 KPI 聚合 API，多维筛选 + gzip 压缩 |
-| `app/api/auth/login/route.ts` | 登录，bcrypt 验证，JWT 签发 |
-| `schema/init_db.sql` | 完整 Schema 定义 |
-| `schema/migrations/` | 增量迁移 001–010，由 `schema/db.py:init_db()` 打开库时自动应用 |
-| `crawlers/jufair_crawler.py` | Jufair 爬取（写 raw_jufair，timeout=30s） |
-| `crawlers/cnexpo_crawler.py` | Cnexpo 爬取（写 raw_cnexpo，timeout=30s） |
-| `requirements.txt` | Python 依赖：requests + beautifulsoup4 |
-
----
-
-## 数据库 Schema（6 张核心表）
+中心实体是**公司**；展会数据降级为被引用的字典（底图）。
 
 ```
-exhibition_brand      ← 品牌主表（变化慢）
-  └── exhibition_edition    ← 届次时序数据（每年一条）
-  └── data_provenance       ← 原始来源溯源
-  └── manual_tag_history    ← 人工打标审计日志
-
-crawl_log             ← 爬虫执行日志
-user                  ← 用户账号 + RBAC + dashboard_prefs
-schema_version        ← 迁移版本追踪
+company ─┬─ opportunity ── opportunity_event（时间线；stage_change 是驻留天数的唯一数据源）
+         ├─ intel_report（调研报告，主键是裸 id）
+         ├─ resource（文件索引：reports/ exports/ research/ 下的原文件）
+         └─ exhibition_brand ── exhibition_edition / brand_organizer / brand_geo_tag
+user（3 个账号）· schema_version（当前 17）
 ```
 
-**已执行迁移**：
-- `001_initial.sql` — schema_version 表
-- `002_display_ready.sql` — exhibition_brand.display_ready 字段
-- `003_user_prefs.sql` — user.dashboard_prefs JSON 字段
+- 时间一律**本地时间、无时区**，写库用 `lib/time.ts`，不要用 `toISOString()`。
+- 「品牌 → 最新一届」只有一份写法：`lib/queries/edition.ts`。
+- 只展示 `exhibition_brand.display_ready = 1`（7,378 条）。
+- 闭集取值只有一份：业务线 / 阶段 / 交易形式在 `app/opportunity/types.ts`，其余在 `lib/enums.ts`。
+- 知识库不在库里：`knowledge/<slug>/index.md`（服务端读）+ `public/knowledge/<slug>/images/`（公开静态）。
 
----
+## 2. 目录
 
-## 已实现能力
+| 路径 | 作用 |
+|---|---|
+| `app/<页面>/` | 服务端壳 `page.tsx` + 客户端组件；首屏数据由服务端直接调 `lib/queries/*` |
+| `app/api/` | 一阶列表 / 二阶详情端点；错误只回错误码，前端 `errorText()` 查字典 |
+| `lib/queries/` | 聚合查询，页面与接口共用，避免口径漂移 |
+| `lib/i18n.ts` / `lib/i18n-shared.ts` | 语言只认 cookie `mwlab_locale`；前者服务端专用 |
+| `locales/zh.json` `en.json` | 两份键必须完全对齐，en 不得含中文 |
+| `components/` | 共用组件（资源列表、地图、落地页、外壳） |
+| `proxy.ts` | 中间件（鉴权） |
+| `tests/` | vitest（接口，模拟库）+ pytest（Python 工具） |
+| `crawlers/` `scripts/` `tools/` `schema/` | Python 采集、治理、迁移 |
 
-| 能力 | 入口 |
-|------|------|
-| JWT 登录 / 登出 | `/api/auth/login` · `/api/auth/logout` |
-| 多维筛选 Dashboard | `/api/dashboard?industry_l1[]=...` |
-| 用户偏好持久化 | `/api/user/preferences` |
-| 系统状态 / 爬取日志 | `/api/setting/status` |
-| 用户管理（admin） | `/api/users` |
-| 采集 | 手动执行 `crawlers/*.py`，再跑 `tools/merge_engine.py --batch ALL` |
-| 展示池标记 | cron → `scripts/check_display_ready.py`，每周一 02:00 |
+## 3. 鉴权
 
----
+- `proxy.ts` 验 JWT，剥离客户端传入的 `x-user-*` 再注入可信值；`/api/*` 无效令牌 401，页面 307 到 `/login`。
+- **`/api/*` 不走静态资源放行**：以 `.png` 等结尾的接口路径曾可伪造身份（V2-14 修复），matcher 单列 `/api/:path*`。
+- `requireUser()` 读注入的身份并查库校验 `is_active`；`requireWriter()` 拒绝 readonly。
+- 公开路径：`/`（落地页，打 `x-mwlab-bare` 标记不渲染侧栏）、`/login`、静态资源、`/countries-110m.json`。
+- `public/` 不经中间件：**只有能被陌生人看到也无所谓的文件才放 `public/`**。
 
-## 规划中的扩展方向
+## 4. 写接口约定
 
-| 方向 | 技术方案 | 迁移成本 |
-|------|---------|---------|
-| 时间线 + 关系图谱 | Schema 迁移 004/005（新增表） | 低 |
-| 人员关系网络 | 新增 person / exhibition_contact / contact_relation 表 | 低 |
-| 前端筛选重构 | 现有 App Router 框架内改 | 中 |
-| EIR 一次性检索 | Flask sidecar（PM2 独立进程，:5001）← 从 Geckos 迁移 | 中 |
+- 白名单字段、只更新传入的列；NOT NULL 列显式传 null 要回 400，不能撞约束变 500。
+- 改阶段与写 `stage_change` 在同一事务。
+- 写连接 `getWritableDb()` 必须 `finally` 关闭；读用单例 `getDb()`（只读）。
+- 文件读取端点的路径校验在字符串层完成，根目录写字面量（Turbopack 文件追踪要求）。
 
----
-
-## 反模式（维持不变）
-
-- ❌ 在服务器上执行 `npm run build`（内存不足 OOM）
-- ❌ 把 `@opennextjs/cloudflare` 放进 `dependencies`（非 Cloudflare 环境会 crash）
-- ❌ 爬虫 sqlite3.connect 不设 timeout（遇 WAL 写锁立即报错）
-- ❌ 关闭 Cloudflare 代理（灰云）再测 HTTPS（直连服务器只有 HTTP）
+历次设计取舍的原始讨论见 `archive/`。

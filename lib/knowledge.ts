@@ -12,7 +12,7 @@ import { rewriteAsset } from "@/lib/knowledge-url"
  *
  * ⚠️ 服务端专用（用了 `fs`）。客户端组件不要引这个文件。
  * ⚠️ 只扫 `knowledge/`，**不去读 `public/knowledge/`** 判断图存不存在 ——
- *    为此多一次 IO 不值得，图丢了就是浏览器出裂图（TASK-K §5.2）。
+ *    为此多一次 IO 不值得，图丢了就是浏览器出裂图（V2-10 §5.2）。
  * ⚠️ 每个 `path.join` 的根目录都写字面量 `"knowledge"`：Turbopack 的文件追踪
  *    靠这个静态收敛，写成变量会把整个仓库打进部署产物。
  */

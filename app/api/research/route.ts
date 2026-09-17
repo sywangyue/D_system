@@ -18,7 +18,7 @@ import { REPORT_TYPE, REPORT_STATUS } from '@/lib/enums'
 /**
  * 一阶字段。excerpt 是 SUBSTR 出来的片段，不是整列。
  *
- * company_name 是解析后的公司名（TASK-C §3.1 的列表要「关联公司」这一列）。
+ * company_name 是解析后的公司名（V2-08 §3.1 的列表要「关联公司」这一列）。
  * 为什么不是 target_company：014 把 intel_report 扶正为公司尽调的落库主体时
  * 定了方向 ——「target_company 是自由文本，保留可回溯性，但**新数据一律写
  * company_id**」（见 schema/migrations/014_rebuild.sql §3）。实测库里

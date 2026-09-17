@@ -617,7 +617,7 @@ def extract_jufair_category(industry_raw: str) -> str:
 # 的分类值都被它先吃掉 —— 217 条里 63 条命中的是为别的用途写的关键词
 # （制药原料、机械→机械和设备；消费电子→生活方式；游乐设备/博彩→机械和设备），
 # 另有 4 条（车/设计装饰/书/泳池，共 147 个展会）完全没有映射。
-# 详见 docs/REMEDIATION-DRAFT-2026-07-29.md Part 1。
+# 详见 docs/archive/V1-prd-audits.md Part 1。
 #
 # 口径：分类名里同时出现产业词和形态词时取产业词（制药原料、机械 → 医疗和健康），
 # 无明确下游的通用装备归机械和设备。
@@ -877,7 +877,7 @@ def backup_table(conn: sqlite3.Connection) -> None:
     """把 exhibition_brand 备份到外部归档库（每天一张，已存在则跳过）。
 
     此前备份表建在主库里，攒到 5 张 34,397 行，占了主库 10MB
-    （REMEDIATION-DRAFT-2026-07-29 P2-1）。改为写 data/backups/。
+    （docs/archive/V1-prd-audits.md P2-1）。改为写 data/backups/。
     """
     import datetime
     today = datetime.date.today().strftime("%Y%m%d")

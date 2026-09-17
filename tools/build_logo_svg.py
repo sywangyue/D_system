@@ -31,7 +31,7 @@ FONT_SANS = ROOT / "public/fonts/geist-latin.woff2"
 FONT_CN = ROOT / "public/fonts/noto-serif-sc-logo.woff2"
 OUT = ROOT / "public/brand/logo"
 
-# ── 品牌色（出处：docs/CLAUDE-DESIGN-BRIEF.md P0-4 / whenjin 的 --color-rule）──
+# ── 品牌色（出处：docs/DESIGN.md P0-4 / whenjin 的 --color-rule）──
 BRAND = "#FE5C00"
 BRAND_FG = "#FFFFFF"
 INK_DARK = "#08090A"    # 反白单色版里的字

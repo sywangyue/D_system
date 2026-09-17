@@ -120,7 +120,7 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
           是本次反置里唯一一处硬编码色 —— 已收进令牌层。 */}
       <div className="flex-1 flex flex-col bg-sidebar">
         <div className="flex justify-end p-8">
-          {/* 语言切换与落地页共用同一组件（TASK-J §4.1） */}
+          {/* 语言切换与落地页共用同一组件（V2-14 §4.1） */}
           <LocaleSwitch locale={locale} />
         </div>
 

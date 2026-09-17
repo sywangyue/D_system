@@ -156,7 +156,7 @@ rsync -avz \
 
 ## 同步知识库内容
 
-知识库是**文件即数据源**（见 `docs/TASK-K-knowledge-base.md`）：正文与文档在 `knowledge/`，
+知识库是**文件即数据源**（见 `docs/archive/V2-task-specs.md`（V2-10））：正文与文档在 `knowledge/`，
 图片在 `public/knowledge/`。**两个目录都要单独同步** —— 少一个的话，
 线上这一页是空的（读不到 index.md）、图是裂的（静态文件不在）。
 

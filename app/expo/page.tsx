@@ -12,7 +12,7 @@ import ExpoBoard from "./expo-board"
  * 客户端只在筛选变化 / 翻月时才请求接口，与 /overview 同一做法。
  *
  * 行业筛选的初始值 = 当前用户在 /profile 保存的偏好。这是那份偏好在
- * 新架构里唯一的消费方（TASK-H §4.4）。
+ * 新架构里唯一的消费方（V2-12 §4.4）。
  */
 
 export default async function ExpoPage() {

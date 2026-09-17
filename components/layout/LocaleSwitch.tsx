@@ -6,10 +6,10 @@ import { LOCALE_COOKIE, LOCALE_LABELS, type Locale } from "@/lib/i18n-shared"
 /**
  * 语言切换（ZH | EN）。
  *
- * 从登录页抽出来，落地页与登录页共用一份（TASK-J §4.1）。复制第二份的代价是：
+ * 从登录页抽出来，落地页与登录页共用一份（V2-14 §4.1）。复制第二份的代价是：
  * 「写 cookie 之后必须 refresh」这类细节，早晚只在一处修。
  *
- * 没有 DE：`locales/` 只有 zh 与 en，德文待人工翻译（DEV-ORDER-AND-QC §4）。
+ * 没有 DE：`locales/` 只有 zh 与 en，德文待人工翻译（docs/QC.md §4）。
  * 放一个点了没反应的按钮比不放更糟。
  */
 export default function LocaleSwitch({

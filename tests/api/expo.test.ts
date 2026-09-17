@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 import Database from "better-sqlite3"
 
 /**
- * GET /api/expo —— 连接扇出回归测试（TASK-F §2.5）
+ * GET /api/expo —— 连接扇出回归测试（V2-11 §2.5）
  *
  * 这里 mock 的是 `@/lib/db`（不是路由本身），返回的是一份**内存 sqlite**
  * （`:memory:`，绝不碰 data/mwlab.db），并把真实 schema 里本端点用到的列建出来。

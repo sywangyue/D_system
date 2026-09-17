@@ -17,7 +17,7 @@ import { pickContent, type Dict, type Locale } from "@/lib/i18n-shared"
  * 顺带让开关状态可收藏、可后退。缺点是不是即时切换 —— 20 条记录上不明显。
  *
  * ⚠️ title / summary 是**内容**（有 `_en` 变体是 Max 自己写了两份），走 pickContent，
- *    不进字典；界面文案才走 t.knowledge.*（TASK-K §5.5）。
+ *    不进字典；界面文案才走 t.knowledge.*（V2-10 §5.5）。
  */
 export default async function KnowledgePage({
   searchParams,

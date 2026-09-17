@@ -10,7 +10,7 @@ import { rewriteAsset } from "@/lib/knowledge-url"
  * 单独拆成客户端组件的原因只有一个：`react-markdown` 是客户端库。
  * 页面其余部分（标题、徽标、文档列表）都在服务端渲染好，这一块只吃两个字符串。
  *
- * ⚠️ `urlTransform` 是本任务最容易漏的地方（TASK-K §5.1）：
+ * ⚠️ `urlTransform` 是本任务最容易漏的地方（V2-10 §5.1）：
  *    不加它，正文里 `![签约现场](images/02-signing.png)` 会被浏览器按当前地址
  *    `/knowledge/<slug>` 解析成 `/knowledge/images/02-signing.png` —— 图全裂。
  *    真实位置是 `public/knowledge/<slug>/images/02-signing.png`，

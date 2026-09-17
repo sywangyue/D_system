@@ -8,19 +8,11 @@
 
 ---
 
-## 项目状态（2026-07-28）
+## 项目状态（2026-09-17）
 
-| Phase | 内容 | 状态 |
-|-------|------|------|
-| Phase 1 | 数据采集器（Jufair + cnexpo 爬虫） | ✅ 已完成 |
-| Phase 2 | Schema + 合并引擎 + 打标工具 | ✅ 已完成 |
-| Phase 3 | Dashboard 查询 API + JWT 认证 | ✅ 已完成 |
-| Phase 3b | 打标批量工具（Excel 导出/导入） | ✅ 已完成 |
-| Phase 4 | 前端 UI（看板、日历、地图、设置） | ✅ 已完成 |
-| Phase 5 | Intel 后端（调研报告、DB 查询、企查查接入） | ✅ 已完成 |
-| Phase 6 | 代码审计与合规清理 | ✅ 已完成 |
-| 质检整改 | 脚本质检 + 数据治理（见 `docs/AUDIT-2026-07-27.md`） | ✅ 已完成 |
-| **Phase 1b** | **全集采集（Jufair 全量 + cnexpo 全量）** | **⏳ 当前任务** |
+V1 展会看板时代（原 Phase 1–7）已结束；V2 万象 BD 工作台重构全部完成并部署。
+完整时间线与统一编码见 `docs/HISTORY.md`，待办见 `docs/ROADMAP.md`，
+Web 应用架构见 `docs/ARCHITECTURE.md`。本文件侧重数据层与采集管道。
 
 **定时调度（2026-07-30 落地）**：`scripts/run_pipeline.sh` + crontab，每月 7/27 号 03:00 跑
 采集 → 合并 → 分类 → 届次状态 → 展示池 → 导出去重复核表。详见下文「定时任务」。
@@ -95,8 +87,8 @@ crawl_log (爬取日志)           users (用户表)
 
 | 文件 | 说明 |
 |------|------|
-| docs/MWLAB-2026-PRD-v1.1-merged.md | **整合 PRD（当前唯一权威文档）** |
-| docs/AUDIT-2026-07-27.md | 脚本质检审计报告 + 整改记录 |
+| docs/archive/V1-prd-audits.md | **整合 PRD（当前唯一权威文档）** |
+| docs/archive/V1-prd-audits.md | 脚本质检审计报告 + 整改记录 |
 | crawlers/jufair_crawler.py | Jufair 爬虫（Python，curl 抓取，支持 `--proxy` / `--refresh`） |
 | scripts/run_pipeline.sh | **月度 pipeline**（cron 每月 7/27 号 03:00 调用） |
 | tools/export_dedup_review.py | 去重人工复核表导出（CSV，只读） |
@@ -136,7 +128,7 @@ crawl_log (爬取日志)           users (用户表)
 | `data/jufair_2026.db` | raw_jufair | 6,945 |
 | `data/cnexpo_2026.db` | raw_cnexpo | 2,286 |
 
-> 2026-07-29 整改（`docs/REMEDIATION-DRAFT-2026-07-29.md`）：
+> 2026-07-29 整改（`docs/archive/V1-prd-audits.md`）：
 > jufair 分类改用 217 条显式映射表（改判 1,291 品牌）；合并 29 组重复届次；
 > 清 38 条溯源孤儿并给裸连接补外键；迁移 011/012（data_source CHECK、
 > manual_tag_history.change_source、删两个全空列）；备份表移出主库（28→18 MB）。

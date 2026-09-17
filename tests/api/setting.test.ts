@@ -10,7 +10,7 @@ vi.mock("@/lib/db", () => ({
 
 import { GET } from "@/app/api/setting/status/route"
 
-/** 四项新计数 + 原有品牌/届次 + 采集日志。TASK-I §3 要求四项排在前。 */
+/** 四项新计数 + 原有品牌/届次 + 采集日志。V2-13 §3 要求四项排在前。 */
 const BASE_MATCHERS = [
   ["SELECT is_active FROM user WHERE email", "get", { is_active: 1 }],
   ["SELECT COUNT(*) as count FROM company", "get", { count: 501 }],

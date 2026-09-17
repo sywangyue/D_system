@@ -2,7 +2,7 @@
 """
 fix_edition_ids.py — 一次性清理：合并完全重复的届次 + 重建错位的 edition_id
 
-背景（REMEDIATION-DRAFT-2026-07-29 P0-3 / P0-5）：
+背景（docs/archive/V1-prd-audits.md P0-3 / P0-5）：
     dedup 在 2026-07-28 补上级联重建之前（scripts/dedup.py:455），合并品牌时
     改了 brand_id 却没重写 edition_id，留下 86 条 `edition_id` 前缀 ≠ `brand_id`，
     以及 38 组「同 brand_id + 同 year」的重复届次。

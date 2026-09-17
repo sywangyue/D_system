@@ -60,7 +60,7 @@ export function fmtDateTime(locale: Locale, s: string | null | undefined, dash =
   }).format(d)
 }
 
-/** 千分位。数字不手拼（I18N-SPEC §4）。 */
+/** 千分位。数字不手拼（docs/DESIGN.md §4）。 */
 export function fmtNum(locale: Locale, n: number | null | undefined, dash = '—'): string {
   if (n === null || n === undefined || !Number.isFinite(n)) return dash
   return new Intl.NumberFormat(LOCALE_TAG[locale]).format(n)
@@ -77,7 +77,7 @@ export function fill(tpl: string, vars: Record<string, string | number>): string
  * 内容字段的中英双份取一。
  *
  * 知识库的 title/summary 有 `_en` 变体，是 Max 自己写了两份，不是翻译层的事
- * （TASK-K §5.5）。英文界面优先取英文，**缺了回退中文** —— 显示中文标题好过显示空白。
+ * （V2-10 §5.5）。英文界面优先取英文，**缺了回退中文** —— 显示中文标题好过显示空白。
  * 中文界面一律取中文那一份（不会去拿英文的来充数）。
  */
 export function pickContent(locale: Locale, zh: string | null, en: string | null): string {

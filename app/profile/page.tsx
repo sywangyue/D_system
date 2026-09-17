@@ -6,7 +6,7 @@ import ProfileContent from "./profile-content"
 
 /**
  * 服务端壳。
- * 偏好在服务端读好再传下来（TASK-I §2.2）：省掉首屏那次 `/api/user/preferences`，
+ * 偏好在服务端读好再传下来（V2-13 §2.2）：省掉首屏那次 `/api/user/preferences`，
  * 也没有「先渲染未勾选、再闪一下变成已勾选」的过程。
  */
 export default async function ProfilePage() {

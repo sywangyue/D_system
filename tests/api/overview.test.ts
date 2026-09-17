@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest"
 import Database from "better-sqlite3"
 
 /**
- * GET /api/overview —— 聚合端点 + lib/queries/overview.ts 的回归测试（TASK-F §2.6）
+ * GET /api/overview —— 聚合端点 + lib/queries/overview.ts 的回归测试（V2-11 §2.6）
  *
  * 只 mock `@/lib/db`（返回一份 `:memory:` sqlite，绝不碰 data/mwlab.db）。
  * 查询主体 `lib/queries/overview.ts` 是**没被 mock 的真实模块** ——

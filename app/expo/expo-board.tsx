@@ -7,7 +7,7 @@ import { CITY_GEO } from "@/lib/geo"
 import { INDUSTRY_L1, enumLabel } from "@/lib/enums"
 import { errorText, fill, fmtNum, LOCALE_TAG, type Dict, type Locale } from "@/lib/i18n-shared"
 import type { ExpoStats, CalendarDay } from "@/lib/queries/expo"
-// 地图与行业堆叠条抽成了共用组件：落地页复用同一份实现（TASK-J §4.4）
+// 地图与行业堆叠条抽成了共用组件：落地页复用同一份实现（V2-14 §4.4）
 import MapSvg from "@/components/basemap/MapSvg"
 import IndustryBar from "@/components/basemap/IndustryBar"
 
@@ -211,7 +211,7 @@ function MapPanel({
 }) {
   return (
     <section className="relative rounded-[6px] border border-hairline overflow-hidden bg-surface">
-      {/* 地图本体在 components/basemap/MapSvg.tsx —— 落地页复用同一个组件（TASK-J §4.4），
+      {/* 地图本体在 components/basemap/MapSvg.tsx —— 落地页复用同一个组件（V2-14 §4.4），
           这里只负责外框、可点选、以及「定位不到」那句报数 */}
       <MapSvg points={points} locale={locale} active={active?.name ?? null}
               onPick={(name) => onPick(name ? { kind: CITY_GEO[name] ? "city" : "country_cn", name } : null)} />
@@ -261,7 +261,7 @@ function CalendarPanel({
                   className="p-1 text-fg-subtle hover:text-fg">
             <ChevronLeft size={14} />
           </button>
-          {/* 月份走 Intl（TASK-E §4.3）：中文「2026年9月」，英文「Sep 2026」 */}
+          {/* 月份走 Intl（V2-09 §4.3）：中文「2026年9月」，英文「Sep 2026」 */}
           <span className="num text-[12px] text-fg min-w-[64px] text-center">
             {new Intl.DateTimeFormat(LOCALE_TAG[locale], { year: "numeric", month: "short" })
               .format(new Date(y, m - 1, 1))}

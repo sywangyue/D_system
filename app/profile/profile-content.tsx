@@ -10,7 +10,7 @@ import { ArrowLeft, Check } from "lucide-react";
 /**
  * 个人资料。
  *
- * 首屏**零个接口请求**：偏好在服务端壳里读好传进来（TASK-I §2.2）。
+ * 首屏**零个接口请求**：偏好在服务端壳里读好传进来（V2-13 §2.2）。
  * 之前这里为了拿 8 个行业名去请求旧看板那个端点 —— 它一次吐回全部 7,401 个品牌，
  * 只为在前端 Set 去重出 8 个值；那个端点已随本任务删除。
  */
@@ -49,17 +49,17 @@ export default function ProfileContent({
       const res = await fetch("/api/user/preferences", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        // 提交的是**中文原值**（INDUSTRY_L1 的 value），不是 slug（TASK-I §5.1）
+        // 提交的是**中文原值**（INDUSTRY_L1 的 value），不是 slug（V2-13 §5.1）
         body: JSON.stringify({ l1s: [...selected] }),
       });
-      // 之前这里不检查 res.ok，接口 400 / 401 也照样显示「已保存」（TASK-I §2.3）
+      // 之前这里不检查 res.ok，接口 400 / 401 也照样显示「已保存」（V2-13 §2.3）
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(errorText(t, body.error, body.values, t.profile.saveFailed));
       }
       // 保存成功**不跳转**：原地显示「已保存」。
       // 自动跳走是给旧看板设计的（保存完回去看效果），现在偏好作用在展会底图，
-      // 由用户自己决定去不去看 —— 页面上给个链接（TASK-I §2.1）。
+      // 由用户自己决定去不去看 —— 页面上给个链接（V2-13 §2.1）。
       setSaved(true);
     } catch (e) {
       setError(e instanceof Error ? e.message : t.profile.saveFailed);
@@ -75,7 +75,7 @@ export default function ProfileContent({
   return (
     <div className="max-w-lg mx-auto py-12 px-6">
       {/* 返回盘面。原来指向旧看板的静态页 —— 那个文件阶段 5 就删了，
-          点一下（以及保存后 1.5 秒）会跳到 404（TASK-I §2.1） */}
+          点一下（以及保存后 1.5 秒）会跳到 404（V2-13 §2.1） */}
       <Link
         href="/overview"
         className="flex items-center gap-2 text-[13px] text-fg-subtle hover:text-fg mb-7"
@@ -104,7 +104,7 @@ export default function ProfileContent({
 
         <div className="grid grid-cols-2 gap-2 mb-6">
           {/* 顺序就用 INDUSTRY_L1 的数组顺序（按品牌数从多到少），不排序 ——
-              对中文原值 .sort() 在两种语言下都没有意义（TASK-I §2.2） */}
+              对中文原值 .sort() 在两种语言下都没有意义（V2-13 §2.2） */}
           {INDUSTRY_L1.map(({ value }) => (
             <label
               key={value}

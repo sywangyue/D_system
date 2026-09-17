@@ -98,7 +98,7 @@ describe("middleware", () => {
     expect(res.headers.get("location")).toContain("/login")
   })
 
-  // 落地页（TASK-J §3）：/ 公开，未登录也放行
+  // 落地页（V2-14 §3）：/ 公开，未登录也放行
   it("should let unauthenticated users reach the landing page at /", async () => {
     const res = await middleware(makeRequest("/"))
     expect(res.status).not.toBe(307)
@@ -169,7 +169,7 @@ describe("middleware", () => {
     expect(res.headers.get("x-middleware-request-x-user-role")).toBe("manager")
   })
 
-  // 地图的陆地轮廓是公开的：不放行的话匿名访客的地图只剩点位（TASK-J §4.4）
+  // 地图的陆地轮廓是公开的：不放行的话匿名访客的地图只剩点位（V2-14 §4.4）
   it("should serve the countries GeoJSON without a token", async () => {
     const res = await middleware(makeRequest("/countries-110m.json"))
     expect(res.status).not.toBe(307)

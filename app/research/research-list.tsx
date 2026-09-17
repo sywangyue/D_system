@@ -16,7 +16,7 @@ import { errorText, fmtDate, type Locale, type Dict } from "@/lib/i18n-shared"
  * ⚠️ 没有 is_archived，所以没有归档过滤，也没有删除入口。
  *
  * 文案一律走字典（t / locale 由服务端壳下传）；报告标题、公司名是**数据**，
- * 原样显示不查字典（TASK-E §4.1）。
+ * 原样显示不查字典（V2-09 §4.1）。
  */
 
 interface ReportRow {

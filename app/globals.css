@@ -64,13 +64,13 @@
   --color-error-border: hsl(0 90% 92%);
   --color-error-text:   hsl(358 66% 48%);
 
-  /* ── 品牌色（2026-09-17 品牌重塑，规范见 docs/BRAND-LOGO.md）──────
+  /* ── 品牌色（2026-09-17 品牌重塑，规范见 docs/DESIGN.md）──────
      兄弟品牌「问津 Whenjin」与本项目共用一条规矩：色块 + 白色标记。
        问津 ＝ 红 #c2261c 方块 + 白色几何 W  + 衬线拉丁（报）
        万象 ＝ 橙 #FE5C00 色板 + 白色 MWLAB  + 无衬线拉丁（工具）
      两个都在浅场上（2026-09-17 看板整体反置后，原先「一暗一浅」的区分不再成立），
      品牌区分改由色相、标记形态、拉丁字体三件事承担。中文仍是同一款衬线。
-     橙的出处：docs/CLAUDE-DESIGN-BRIEF.md P0-4 的 accent / accent-hover，
+     橙的出处：docs/DESIGN.md P0-4 的 accent / accent-hover，
      不是现配的。问津的红只属于问津，不进本项目。
 
      橙色不进 CTA —— 主 CTA 走 Geist 的黑白高对比（简报 P1-5：每屏最多 3 处橙）。 */
@@ -137,7 +137,7 @@
    实测标准态那几条侥幸留下，带 -dense 后缀的与 --logo-icon-size 全部消失，
    结果组件里的 var() 全部落空、版面塌成一行字。走普通 :root 才不会被碰。
 
-   数值出处与三态定义见 docs/BRAND-LOGO.md §2；资产由
+   数值出处与三态定义见 docs/DESIGN.md §2；资产由
    tools/build_logo_svg.py 按同一套数值烘出，改这里必须重跑它。
    ========================================================================== */
 :root {
@@ -185,7 +185,7 @@
     letter-spacing: 0;
   }
 
-  /** 英文版摘掉整条 CJK 字体栈（I18N-SPEC §1 第一层）。
+  /** 英文版摘掉整条 CJK 字体栈（docs/DESIGN.md §1 第一层）。
    *  lang 由 app/layout.tsx 按 cookie 种在 <html> 上，这里只认它 ——
    *  组件里不要再各自写 inline 的 fontFamily 覆盖，机制只留这一处。
    *  第二层（不下载 CJK webfont）在 layout.tsx：locale=en 时不挂 logo 的中文字体变量，

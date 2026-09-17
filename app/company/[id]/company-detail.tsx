@@ -12,7 +12,7 @@ import {
 } from "@/lib/enums"
 
 /**
- * 公司详情 —— 五块全都要落到页面上（TASK-C §2.2）：
+ * 公司详情 —— 五块全都要落到页面上（V2-08 §2.2）：
  * 公司全字段 + 关联展会品牌 + 名下资源 + 引用它的机会 + 关联报告。
  *
  * 资源区是重点，用 components/resource/ResourceList（任务 G 提出来放进 components/ 的那份），

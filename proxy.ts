@@ -8,7 +8,7 @@ export default async function middleware(request: NextRequest) {
   const token = request.cookies.get('session')?.value
   const { pathname } = request.nextUrl
 
-  // 官网落地页（TASK-J）：公开，登录与否都显示落地页（2026-09-17 Max 定）。
+  // 官网落地页（V2-14）：公开，登录与否都显示落地页（2026-09-17 Max 定）。
   // ⚠️ 必须写成精确相等 —— 写成 startsWith('/') 等于放行全站。
   // 打上 x-mwlab-bare 标记：根布局据此不渲染后台侧栏，已登录用户看到的也是完整落地页。
   if (pathname === '/') {
@@ -23,7 +23,7 @@ export default async function middleware(request: NextRequest) {
     // 地图的陆地轮廓 GeoJSON（public/countries-110m.json）。
     // 纯静态世界地图数据、不含任何业务信息，但扩展名不在下面 matcher 的负向预查里
     // （那里只排除了图片），所以必须显式放行 —— 否则匿名访客的地图只有点位、
-    // 没有陆地轮廓（TASK-J §4.4 第 1 块）。
+    // 没有陆地轮廓（V2-14 §4.4 第 1 块）。
     pathname === '/countries-110m.json' ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/auth/') ||

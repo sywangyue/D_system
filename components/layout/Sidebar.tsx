@@ -12,7 +12,7 @@ import BrandLockup from "@/components/brand/BrandLockup"
 /**
  * 侧栏。user 与字典都由服务端组件经 AppShell 传入 ——
  * 客户端不再自己读登录态，也不自己读语言。
- * 品牌锁定走 BrandLockup（橙板 + 衬线中文），规范见 docs/BRAND-LOGO.md。
+ * 品牌锁定走 BrandLockup（橙板 + 衬线中文），规范见 docs/DESIGN.md。
  */
 
 /** key 对应字典的 nav.*；lat 是中文版右侧的拉丁小字。 */
@@ -48,7 +48,7 @@ export default function Sidebar({
 
   return (
     <aside className="w-[200px] shrink-0 h-full flex flex-col bg-sidebar hairline-r">
-      {/* 品牌锁定 —— 橙板内拉丁在前、发丝线、衬线中文在后。规范见 docs/BRAND-LOGO.md
+      {/* 品牌锁定 —— 橙板内拉丁在前、发丝线、衬线中文在后。规范见 docs/DESIGN.md
           用标准态：这块 56px 高、200px 宽的栏能容下的最大一档（板 92×33，两侧余 8px）。
           再大就得动侧栏宽度与表头高度，那是另一个决定。
           英文版摘掉「万象」二字 —— 那两个字必然要 CJK 字体。 */}

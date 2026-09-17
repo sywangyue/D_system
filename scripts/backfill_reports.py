@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """把 reports/ 下的 docx 调研报告正文抽出来回填进 intel_report，并回写 resource.report_id。
 
-背景（docs/TASK-D-backfill-reports.md）：
+背景（`docs/archive/V2-task-specs.md`（V2-06））：
   reports/ 下 11 份 docx 已经由 scripts/index_resources.py 登记进 resource 表
   （kind='report'，含 company_id 关联），但正文一份都没进 intel_report ——
   报告不可搜索，调研库页面打开是空的。本脚本把正文抽成 Markdown 入库。

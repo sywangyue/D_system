@@ -9,7 +9,7 @@ import type { Dict } from "@/lib/i18n-shared"
  * 与 app/api/company/route.ts 里的 CONTACT_STATUS 同一路子。
  *
  * 为什么翻它们：界面上这些是**闭集**（六七种取值），不是用户录入的自由文本。
- * 自由文本（公司名 / 报告标题 / 机会名称）一律原样显示，不查字典 —— 见 TASK-E §4.1。
+ * 自由文本（公司名 / 报告标题 / 机会名称）一律原样显示，不查字典 —— 见 V2-09 §4.1。
  */
 
 export interface EnumOption {

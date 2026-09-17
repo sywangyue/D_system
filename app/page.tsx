@@ -4,7 +4,7 @@ import { getLandingData } from '@/lib/queries/landing'
 import LandingPage from '@/components/landing/LandingPage'
 
 /**
- * 根路由 = 官网落地页，登录与否都显示（2026-09-17 Max 定，原 TASK-J §1 为「已登录跳 /overview」）。
+ * 根路由 = 官网落地页，登录与否都显示（2026-09-17 Max 定，原 V2-14 §1 为「已登录跳 /overview」）。
  * 登录态只决定「进入系统」指向哪里：已登录直接进盘面，未登录去登录页。
  *
  * 中间件对 `/` 是**精确放行**并打上 x-mwlab-bare，根布局据此不渲染后台侧栏。

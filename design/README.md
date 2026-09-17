@@ -19,4 +19,4 @@ design/stitch/
 > ⚠️ Stitch 输出是 Tailwind **v3** 语法（CDN + `tailwind.config`），本项目是 Tailwind **v4**（`@theme`）。
 > 不可直接复制进 `app/`。转写在阶段 5.2 由 DeepSeek 做。
 
-**下一步**：`docs/CLAUDE-DESIGN-BRIEF.md` —— 待修问题清单与深度设计要求。
+**下一步**：`docs/DESIGN.md` —— 待修问题清单与深度设计要求。

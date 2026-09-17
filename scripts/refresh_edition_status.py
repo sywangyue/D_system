@@ -2,7 +2,7 @@
 """
 refresh_edition_status.py — 按日期回填 exhibition_edition.status
 
-背景（REMEDIATION-DRAFT-2026-07-29 P0-2）：
+背景（docs/archive/V1-prd-audits.md P0-2）：
     status 有 CHECK 约束、前端 app/api/exhibition/[id] 也在读，
     但全库 7,505 条里只有 2 条有值 —— 4,412 条已过期届次仍不是「已举办」，
     任何按「即将举办」筛选的逻辑都在空转。

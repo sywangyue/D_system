@@ -1,4 +1,23 @@
-# MWLAB 重构总方案 · 2026-09-16
+# V2 万象重构 · 方案与信息架构原文
+
+> **归档文件**：以下为已执行完毕的原始文档合并，内容保持原样、不再维护。
+> 文中「阶段 X / 任务 X / Phase X」与统一编码的对应关系见 `docs/HISTORY.md`。
+> 文中对其他 docs 文件的引用，文件已并入 `docs/` 下的新文件或本目录。
+
+## 目录
+
+1. V2-00 · 重构总方案 2026-09-16
+2. V2-00 · 信息架构定稿
+3. V2-04 · 后端 API 规格
+
+
+---
+
+## V2-00 · 重构总方案 2026-09-16
+
+<!-- 原文件：docs/REBUILD-2026-09-PLAN.md -->
+
+### MWLAB 重构总方案 · 2026-09-16
 
 **性质**：推翻重做（Max 已授权「对整改没有限制」）
 **主线变更**：产品主体从「展会目录」改为「BD 工作台」，展会数据降级为底图
@@ -6,9 +25,9 @@
 
 ---
 
-## §0 结论先行：三个必须先说的判断
+#### §0 结论先行：三个必须先说的判断
 
-### 判断 1 —— 「舍去展会信息」应该精确为「展会目录这个产品形态下架，数据留下」
+##### 判断 1 —— 「舍去展会信息」应该精确为「展会目录这个产品形态下架，数据留下」
 
 展会数据不是包袱，是新主线的**燃料**：
 
@@ -26,7 +45,7 @@
 > 真正要下架的是：日历+地图+趋势+全量表格这套「给所有人看展会」的外壳，
 > 以及 `public/dashboard.html` 这个 1,801 行的静态页。
 
-### 判断 2 —— 新架构的中心实体是「公司」，不是「展会」
+##### 判断 2 —— 新架构的中心实体是「公司」，不是「展会」
 
 三条业务线的共同宾语：
 
@@ -38,7 +57,7 @@
 现状是：`exhibition_brand` 7,401 行是一等公民，而公司侧只有 `customer_prospect` 495 行。
 **重心迁移 = 把公司扶正，展会挂到公司下面。**
 
-### 判断 3 —— 不用新建表，现有两张表扶正即可
+##### 判断 3 —— 不用新建表，现有两张表扶正即可
 
 | 现有表 | 现状 | 新角色 |
 |---|--:|---|
@@ -47,7 +66,7 @@
 
 真正要新建的只有 **1 张表：`opportunity`（机会台）**。
 
-### 判断 4 —— 五张空表 + 一个空页面是死代码，本次删除
+##### 判断 4 —— 五张空表 + 一个空页面是死代码，本次删除
 
 | 对象 | 现状 |
 |---|---|
@@ -59,9 +78,9 @@
 
 ---
 
-## §1 新信息架构
+#### §1 新信息架构
 
-### 1.1 实体模型
+##### 1.1 实体模型
 
 ```
 company（公司）  ← 中心实体，由 customer_prospect 扶正
@@ -89,7 +108,7 @@ company（公司）  ← 中心实体，由 customer_prospect 扶正
 **代价**：`detail_json` 里的字段无法 SQL 聚合。
 若 M&A 的估值需要跨标的排序/统计，就要把该字段提升为正式列。→ 见 §6 决策 3。
 
-### 1.2 页面清单（9 个路由，取代现有 5 个）
+##### 1.2 页面清单（9 个路由，取代现有 5 个）
 
 | 路由 | 名称 | 内容 | 优先级 |
 |---|---|---|---|
@@ -121,7 +140,7 @@ company（公司）  ← 中心实体，由 customer_prospect 扶正
 
 ---
 
-## §2 视觉方向：与问津的兄弟关系
+#### §2 视觉方向：与问津的兄弟关系
 
 > 代码与数据层面，两个项目**继续彻底切开**（沿用既有约定，不复用任何代码和数据）。
 > 兄弟关系只存在于**品牌视觉语言**层，且是**对位关系**而非相似关系。
@@ -148,7 +167,7 @@ company（公司）  ← 中心实体，由 customer_prospect 扶正
    图标态（favicon / 侧栏收起）各取末字：**象** ‖ **津**。
 3. 同一套字阶比例（数值不同，比例相同）
 
-### 参考锚点（Max 已确认）
+##### 参考锚点（Max 已确认）
 
 | 参考 | 偷什么 | 落到哪 |
 |---|---|---|
@@ -158,13 +177,13 @@ company（公司）  ← 中心实体，由 customer_prospect 扶正
 
 ---
 
-## §3 执行顺序（含手动/自动/模型分工）
+#### §3 执行顺序（含手动/自动/模型分工）
 
 **核心顺序判断：信息架构必须领先视觉半步。**
 Stitch 画的是屏幕，屏幕的内容取决于 `opportunity` 有哪些字段。
 先画后定模型 = Claude Design 深稿做完才发现字段对不上 = 全部返工。
 
-### 阶段 0 · 冻结与清场（0.5 天）
+##### 阶段 0 · 冻结与清场（0.5 天）
 
 | # | 动作 | 谁做 | 模型 |
 |---|---|---|---|
@@ -175,7 +194,7 @@ Stitch 画的是屏幕，屏幕的内容取决于 `opportunity` 有哪些字段�
 
 **验证**：`git tag -l` 有 tag；备份文件行数与主库一致；`npm run build` 通过。
 
-### 阶段 1 · 信息架构定稿（1 天，纯文档，不写代码）
+##### 阶段 1 · 信息架构定稿（1 天，纯文档，不写代码）
 
 | # | 动作 | 谁做 | 模型 |
 |---|---|---|---|
@@ -186,7 +205,7 @@ Stitch 画的是屏幕，屏幕的内容取决于 `opportunity` 有哪些字段�
 **验证**：每个页面都能回答「这一屏要做什么决策」，答不上来的页面删掉。
 **不开 subagent** —— 这一步需要全部上下文，冷启动 agent 会重新读一遍文档，更贵。
 
-### 阶段 2 · 视觉设计（Max 主导，Claude 供料）
+##### 阶段 2 · 视觉设计（Max 主导，Claude 供料）
 
 | # | 动作 | 谁做 | 模型 |
 |---|---|---|---|
@@ -203,7 +222,7 @@ Stitch 画的是屏幕，屏幕的内容取决于 `opportunity` 有哪些字段�
 **验证**：token 文档里每个值都能在深稿里找到出处；`app/globals.css` 成为唯一真源，
 `public/dashboard.html` 的那套 `--bg-page/--text-1` 全部删除。
 
-### 阶段 3 · 数据层重建（2 天）
+##### 阶段 3 · 数据层重建（2 天）
 
 | # | 动作 | 谁做 | 模型 |
 |---|---|---|---|
@@ -217,7 +236,7 @@ Stitch 画的是屏幕，屏幕的内容取决于 `opportunity` 有哪些字段�
 
 > ⚠️ 沿用既有教训：**行数对得上 ≠ 没丢数据**，3.6 必须逐字段与备份比对，不可省。
 
-### 阶段 4 · 后端 API（1.5 天）
+##### 阶段 4 · 后端 API（1.5 天）
 
 | # | 动作 | 谁做 | 模型 |
 |---|---|---|---|
@@ -226,7 +245,7 @@ Stitch 画的是屏幕，屏幕的内容取决于 `opportunity` 有哪些字段�
 | 4.3 | 展会底图查询（在 `/api/dashboard` 上瘦身） | 自动 | **DeepSeek** |
 | 4.4 | 权限：机会台是否按 owner 隔离 | 取决于 §6 决策 5 | Claude |
 
-### 阶段 5 · 前端落地（3–4 天，最大的一块）
+##### 阶段 5 · 前端落地（3–4 天，最大的一块）
 
 | # | 动作 | 谁做 | 模型 |
 |---|---|---|---|
@@ -238,7 +257,7 @@ Stitch 画的是屏幕，屏幕的内容取决于 `opportunity` 有哪些字段�
 | 5.6 | 登录页重做（删 Matrix 数字雨） | 自动 | **DeepSeek** |
 | 5.7 | 静态资源治理（8.4MB → WebP，含 4 张 2MB+ 图） | 自动 | **DeepSeek** |
 
-### 阶段 6 · 内容填充与上线（Max 主导）
+##### 阶段 6 · 内容填充与上线（Max 主导）
 
 | # | 动作 | 谁做 |
 |---|---|---|
@@ -248,9 +267,9 @@ Stitch 画的是屏幕，屏幕的内容取决于 `opportunity` 有哪些字段�
 
 ---
 
-## §4 Token 经济：模型分工原则
+#### §4 Token 经济：模型分工原则
 
-### 交给 Hermes + DeepSeek 的（机械、格式固定、有明确验收标准）
+##### 交给 Hermes + DeepSeek 的（机械、格式固定、有明确验收标准）
 
 - SQL DDL 与数据搬运脚本
 - CRUD API 路由样板（同一个模板套 8 遍）
@@ -259,7 +278,7 @@ Stitch 画的是屏幕，屏幕的内容取决于 `opportunity` 有哪些字段�
 - 图片压缩、资源治理、死代码删除
 - docx / xlsx 导出模板
 
-### 必须 Claude 做的（需要判断力或全局上下文）
+##### 必须 Claude 做的（需要判断力或全局上下文）
 
 - 数据模型的取舍与边界（阶段 1、3.1）
 - **迁移校验规则的设计**（阶段 3.6 —— 这是最容易出事的一步）
@@ -268,7 +287,7 @@ Stitch 画的是屏幕，屏幕的内容取决于 `opportunity` 有哪些字段�
 - Stitch / Claude Design 的 prompt 工程
 - 所有 DeepSeek 产物的验收
 
-### 关于 subagent：建议只开 1 处
+##### 关于 subagent：建议只开 1 处
 
 | 场景 | 建议 |
 |---|---|
@@ -282,11 +301,11 @@ Stitch 画的是屏幕，屏幕的内容取决于 `opportunity` 有哪些字段�
 
 ---
 
-## §5 Stitch Prompt（可直接粘贴）
+#### §5 Stitch Prompt（可直接粘贴）
 
 > 用法：一屏一条，分别跑。中文名已定稿为「万象」，prompt 内已写死，可直接粘贴。
 
-### Prompt A —— 机会台（主界面，最关键）
+##### Prompt A —— 机会台（主界面，最关键）
 
 ```
 Design a dark-mode internal B2B intelligence workstation for an exhibition
@@ -335,7 +354,7 @@ Flat — no drop shadows, no glass blur, no gradients. Depth comes from
 one-step-lighter surfaces only.
 ```
 
-### Prompt B —— 盘面首页
+##### Prompt B —— 盘面首页
 
 ```
 Same dark design system as before (MWLAB 万象, #0E0E10 sidebar, #FE5C00
@@ -362,7 +381,7 @@ No illustrations. No icons larger than 16px. Whitespace comes from a strict
 8px baseline grid, not from padding inflation.
 ```
 
-### Prompt C —— 机会详情
+##### Prompt C —— 机会详情
 
 ```
 Same dark design system (MWLAB 万象). Design the OPPORTUNITY DETAIL screen.
@@ -381,7 +400,7 @@ The long-form reading area must feel calm and generous, in deliberate
 contrast to the dense table screen. Same palette, different rhythm.
 ```
 
-### Prompt D —— 展会底图 `/expo`
+##### Prompt D —— 展会底图 `/expo`
 
 ```
 Same dark design system (MWLAB 万象, #0A0A0B background, #FE5C00 single
@@ -415,7 +434,7 @@ Every number in a tabular-figures face. Chinese labels at a lower weight
 than latin numerals so the two align optically.
 ```
 
-### Prompt E —— 官网主界面 `/`（v2 · 2026-09-16 重写）
+##### Prompt E —— 官网主界面 `/`（v2 · 2026-09-16 重写）
 
 > **v1 作废的原因**（Max 反馈）：内容与架构太狭隘、不符合杜塞尔多夫展览的调性、
 > 参考了旧 `pitch.html`。v2 的三条铁律：
@@ -562,7 +581,7 @@ Nothing else. No developer credit, no social icons, no newsletter, no sitemap.
 - Every number uses tabular figures.
 ```
 
-### Prompt F —— 登录界面 `/login`
+##### Prompt F —— 登录界面 `/login`
 
 > **背景**：现有登录页是 Matrix 数字雨 + "The Matrix has you" 打字机 + 日文半角假名，
 > 本次全部删除。三语切换与「← 回到官网」是已有功能，必须保留。
@@ -642,7 +661,7 @@ Bottom-right, 32px inset: a 13px #8A8A8F text link "← 回到官网".
 
 ---
 
-## §6 决策记录（2026-09-16 已定）
+#### §6 决策记录（2026-09-16 已定）
 
 | # | 问题 | 结论 |
 |---|---|---|
@@ -653,7 +672,7 @@ Bottom-right, 32px inset: a 13px #8A8A8F text link "← 回到官网".
 | 5 | `MW` 的实指 | ⏳ 未答，不阻塞（「万象」按意译处理，不做音译对应） |
 | 6 | 历史调研报告是否入库 | ⏳ 待定，建议入库 |
 
-### 决策 1 落地：「万象」
+##### 决策 1 落地：「万象」
 
 - **语义**：森罗万象 / 包罗万象 / 万象更新 / 气象万千。
 - **与新主线的张力（必须正视）**：「万象」字面是「包罗万物」，更贴旧的展会目录；
@@ -667,7 +686,7 @@ Bottom-right, 32px inset: a 13px #8A8A8F text link "← 回到官网".
   2. 竖排「万 / 象」与 MWLAB 横向锁定
   3. **完整字标用「MWLAB 万象」（英文在前），favicon / 收起态图标只用「象」**（已写进全部 Stitch prompt）
 
-### 决策 4 落地：2 人协作的工程含义
+##### 决策 4 落地：2 人协作的工程含义
 
 - ✅ 保留 `opportunity.owner` 字段与「按负责人筛选」
 - ❌ **不做行级权限隔离**，沿用现有 `user.role` 的 admin/user 二元角色
@@ -677,7 +696,7 @@ Bottom-right, 32px inset: a 13px #8A8A8F text link "← 回到官网".
 
 ---
 
-## §7 工期与风险
+#### §7 工期与风险
 
 | 阶段 | 工期 | 风险 |
 |---|---|---|
@@ -694,3 +713,423 @@ Bottom-right, 32px inset: a 13px #8A8A8F text link "← 回到官网".
 1. **阶段 1 定不准** → 唯一解法是阶段 1.3 让 Max 逐页过字段，别跳过
 2. **阶段 3 丢数据** → 必须逐字段比对，行数相等不作数
 3. **Stitch/Claude Design 往返失控** → 限定 2 轮，第 2 轮后无论如何抽 token 进入阶段 3
+
+---
+
+## V2-00 · 信息架构定稿
+
+<!-- 原文件：docs/IA-2026-09.md -->
+
+### 信息架构定稿 · MWLAB 万象
+
+**日期**：2026-09-16 · **阶段 1**（重构方案 §3）
+**上游**：`docs/REBUILD-2026-09-PLAN.md` · `docs/CONTENT-CONTRACT.md` · `docs/I18N-SPEC.md`
+**用法**：**Max 逐页过 §4，砍掉不需要的字段。** 砍完才进阶段 3 数据层。
+
+---
+
+#### §0 摘要
+
+| 动作 | 对象 |
+|---|---|
+| **新建 2 张表** | `opportunity` · `opportunity_event` |
+| **扶正 2 张表** | `customer_prospect` → `company`；`intel_report` 补字段 |
+| **降级 1 组表** | `exhibition_*` 保留不动，改为被引用的字典 |
+| **删除 5 张空表** | `person` · `exhibition_contact` · `contact_relation` · `exhibition_relation` · `exhibition_timeline` |
+| 迁移编号 | `schema/migrations/014_rebuild.sql`（当前 `schema_version = 13`） |
+
+---
+
+#### §1 新建表
+
+##### 1.1 `opportunity` —— 机会台主表
+
+**100% 人工录入**。三条业务线共用一张表，靠 `type` 区分。
+
+```sql
+CREATE TABLE opportunity (
+  opp_id          INTEGER PRIMARY KEY,
+  type            TEXT NOT NULL,          -- ma | greenfield | project_support
+  title           TEXT NOT NULL,
+  title_en        TEXT,                   -- 见 §5 决策 1
+  stage           TEXT NOT NULL,          -- contact|intent|dd|audit|closing
+  deal_type       TEXT,                   -- 见下「两个 type 不是一回事」
+  company_id      INTEGER REFERENCES company(company_id),
+  brand_id        TEXT    REFERENCES exhibition_brand(brand_id),
+  md_brand        TEXT,                   -- 对标的 MD 品牌，如 interpack / drupa
+  priority        INTEGER,                -- 1–5
+  owner           TEXT,                   -- user.email
+  next_action     TEXT,
+  next_action_due TEXT,                   -- ISO date
+  detail_json     TEXT NOT NULL DEFAULT '{}',
+  is_archived     INTEGER NOT NULL DEFAULT 0,
+  created_by      TEXT NOT NULL,
+  created_at      TEXT NOT NULL,
+  updated_at      TEXT NOT NULL
+);
+CREATE INDEX idx_opp_type_stage ON opportunity(type, stage);
+CREATE INDEX idx_opp_owner      ON opportunity(owner);
+CREATE INDEX idx_opp_due        ON opportunity(next_action_due);
+```
+
+###### ⚠️ 两个 type 不是一回事（我从精修稿里读出来的）
+
+设计稿的 tab 是「并购标的 / 全新品类 / 项目组支持」，
+而表格里的**类型列**却是「收购 / 并购 / 参股 / 承办 / 孵化」。这是两个维度：
+
+| 字段 | 含义 | 取值 | 谁用 |
+|---|---|---|---|
+| `type` | **业务线** | `ma` / `greenfield` / `project_support` | 顶部 tab |
+| `deal_type` | **交易形式** | 收购 / 并购 / 参股 / 承办 / 孵化 | 表格「类型」列，**只对 `type=ma` 有意义** |
+
+如果合成一个字段，白地和项目组就没法用「参股/承办」这些词。**建议保留两个。**
+
+###### `detail_json` 按 type 存什么
+
+| type | 键 |
+|---|---|
+| `ma` | `valuation_range` 对价区间 · `equity_pct` 股权比例 · `baseline_date` 评估基准日 · `ebitda` · `audit_confidence` |
+| `greenfield` | `market_size` 市场规模判断 · `existing_players` 现有玩家 · `dead_brand_ids` 停办信号来源 · `feasibility` |
+| `project_support` | `requester` 需求方项目组 · `deliverable` 交付物类型 · `partner_company_ids` |
+
+> **`detail_json` 里的字段无法 SQL 排序聚合。**
+> 若「对价区间」要跨标的排序，就把它提升为正式列 —— 见 §5 决策 2。
+
+##### 1.2 `opportunity_event` —— 时间线 + 附件（合二为一）
+
+```sql
+CREATE TABLE opportunity_event (
+  event_id    INTEGER PRIMARY KEY,
+  opp_id      INTEGER NOT NULL REFERENCES opportunity(opp_id),
+  event_type  TEXT NOT NULL,   -- note|stage_change|file|meeting|task_done
+  content     TEXT,
+  file_path   TEXT,            -- event_type='file' 时用
+  created_by  TEXT NOT NULL,
+  created_at  TEXT NOT NULL
+);
+CREATE INDEX idx_oppev ON opportunity_event(opp_id, created_at DESC);
+```
+
+**为什么不能省**：机会详情的「时间线」tab 展示的是你写的纪要
+（团队访谈纪要 / 西部展馆排期确认），不是字段变更，`manual_tag_history` 装不下。
+
+**为什么附件不单独建表**：上传文件本身就是时间线上的一个事件
+（「顾言风 上传了尽调底稿」）。合并后少一张表，且时间线天然完整。
+
+---
+
+#### §2 扶正表
+
+##### 2.1 `customer_prospect` → `company`
+
+495 行全部保留。`source_type` 现在全是 `qcc_search`，`contact_status` 全空。
+
+| 现有列 | 处置 |
+|---|---|
+| `id` → `company_id` | 改名 |
+| `company_name` → `name` | 改名 |
+| `qcc_key_no` `credit_code` `oper_name` `start_date` `company_status` `reg_no` `address` `email` | 保留（企查查字段） |
+| `brand_id` | 保留，指向展会品牌 |
+| `prospect_score` `contact_status` `notes` | 保留（BD 字段） |
+| `exhibitor_name` `name_confidence` | 保留（展商匹配链路产物） |
+| `source_type` | 保留，扩充取值：`qcc_search` / `organizer` / `manual` |
+| **`intel_report_id`** | **保留**（见下方勘误） |
+
+> **勘误 2026-09-16**：本文初稿判断 `intel_report_id`「方向反了」应删除，**这是错的**。
+> 实测 495 行里 494 行有值，指向 `report_type='batch_prospect'` 的报告 3
+> （博华游艇展 CIBS2026）—— 一份批量线索报告挖出 494 家公司，是**一对多**关系，
+> `intel_report.company_id` 存不下。014 已误删，**015 恢复并从备份逐格回填**。
+>
+> 两个方向是两种关系，都要留：
+> `company.intel_report_id` = 这家公司从哪份批量报告挖出来的（多对一）
+> `intel_report.company_id` = 这份深度尽调报告写的是哪家公司（一对一）
+
+**新增列**：
+
+```sql
+name_en    TEXT,   -- 见 §5 决策 1
+type       TEXT,   -- organizer|exhibitor|service|target|partner
+city       TEXT,
+country    TEXT
+```
+
+> 2 条 `company_name` 重复，迁移时按 `credit_code` 去重，无信用代码的保留并标记。
+
+##### 2.2 `intel_report` 补字段
+
+现有 `report_type` / `brand_id` / `industry_l1` / `industry_l2` / `target_company` /
+`params_json` / `report_md` / `report_file` / `status` / `created_by` 全部保留。
+
+```sql
+ALTER TABLE intel_report ADD COLUMN opp_id     INTEGER REFERENCES opportunity(opp_id);
+ALTER TABLE intel_report ADD COLUMN company_id INTEGER REFERENCES company(company_id);
+ALTER TABLE intel_report ADD COLUMN title      TEXT;   -- 现在没有标题列，调研库列表无法展示
+```
+
+`target_company` 是自由文本，保留但**新数据一律写 `company_id`**。
+`reports/*.docx` 的历史报告按 §5 决策 3 决定是否回填。
+
+##### 2.3 展会表降级
+
+`exhibition_brand` / `exhibition_edition` / `brand_organizer` / `brand_geo_tag`
+**结构不动、数据不动**，只改角色：从「产品主体」变成「被 `opportunity` 和 `company` 引用的字典」。
+
+唯一新增：
+
+```sql
+ALTER TABLE exhibition_brand ADD COLUMN company_id INTEGER REFERENCES company(company_id);
+-- 主办方指向公司，由 brand_organizer 归并结果回填
+```
+
+---
+
+#### §3 删除清单（需你逐项确认）
+
+| 对象 | 行数 | 确认 |
+|---|--:|---|
+| 表 `person` | 0 | ☐ |
+| 表 `exhibition_contact` | 0 | ☐ |
+| 表 `contact_relation` | 0 | ☐ |
+| 表 `exhibition_relation` | 0 | ☐ |
+| 表 `exhibition_timeline` | 0 | ☐ |
+| 页面 `app/people/*`（355 行） | 读空表 | ☐ |
+| 路由 `app/api/people/**`（4 个） | 读空表 | ☐ |
+| 路由 `app/api/exhibition/[id]/timeline/**`（2 个） | 读空表 | ☐ |
+| 静态页 `public/dashboard.html`（1,801 行） | 被 `/expo` 取代 | ☐ |
+| 静态页 `public/pitch.html`（1,141 行） | 被 `/` 取代 | ☐ |
+
+---
+
+#### §4 逐页字段清单 —— **请在这一节动刀**
+
+> 判据：**这一屏要帮你做什么决策？** 答不上来的字段划掉。
+
+##### 4.1 `/overview` 盘面
+
+| 区块 | 字段 | 来源 | 砍 |
+|---|---|---|---|
+| KPI ×4 | 在跟进机会 / 并购标的 / 白地品类 / 本周待办 | `opportunity` 计数 | ☐ |
+| 本周待办 | `next_action` · `next_action_due` · `owner` · `title` · `stage` | opportunity | ☐ |
+| 最近调研 | `title` · `report_type` · `updated_at` · 摘要 3 行 | intel_report | ☐ |
+| 阶段漏斗 | 5 阶段计数 + 均值驻留天数 + 转化率 | opportunity 聚合 | ☐ |
+
+> ⚠️ **均值驻留天数和转化率算不出来** —— 需要 `opportunity_event` 里有 `stage_change`
+> 事件才能计算停留时长。新系统上线后要跑一段时间才有数。**第一版建议只显示计数。**
+
+##### 4.2 `/opportunity` 机会台
+
+| 列 | 字段 | 砍 |
+|---|---|---|
+| 机会名称 | `title` | ☐ |
+| 类型 | `deal_type` | ☐ |
+| 阶段 | `stage` | ☐ |
+| 对标 MD 品牌 | `md_brand` | ☐ |
+| 关联公司 | `company.name` | ☐ |
+| 城市 | `company.city` 或 `exhibition_brand.city` | ☐ |
+| 规模 ㎡ | `exhibition_edition.area_sqm` 最新届 | ☐ |
+| 优先级 | `priority` | ☐ |
+| 负责人 | `owner` | ☐ |
+| 下一步 | `next_action` | ☐ |
+| 更新时间 | `updated_at` | ☐ |
+
+**必须补的界面**（精修稿里完全没有）：
+录入抽屉 ☐ · 行内编辑「阶段/优先级/下一步」☐ · 空状态 ☐ · 骨架屏 ☐ · 筛选无结果 ☐
+
+##### 4.3 `/opportunity/[id]` 机会详情
+
+| tab | 字段 | 砍 |
+|---|---|---|
+| 概览 | 标题 / 类型 / 阶段 / 负责人 / 对价区间 / 评估基准日 / 下一步 | ☐ |
+| 深度调研 | `intel_report.report_md` 渲染 + 上传 docx | ☐ |
+| 时间线 | `opportunity_event` 倒序 | ☐ |
+| 关联展会 | 品牌名 / 面积 / 展位 / 观众 / UFI / 区域排位 | ☐ |
+| 右栏·公司 | 法定代表人 / 成立时间 / 注册资本 / 实缴 / 状态 | ☐ |
+| 右栏·股权穿透 | 穿透层级 / 持股结构 | ☐ **企查查只买了 5 个接口，股权穿透类一律 214 —— 这块拿不到数据** |
+
+##### 4.4 `/company` 公司库 与 `/company/[id]`
+
+| 列 | 字段 | 砍 |
+|---|---|---|
+| 公司名 / 信用代码 / 法定代表人 / 成立时间 / 状态 / 城市 | company | ☐ |
+| 类型 | `type` | ☐ |
+| 关联机会数 | 聚合 | ☐ |
+| 评分 | `prospect_score` | ☐ |
+
+##### 4.5 `/expo` 展会底图
+
+| 区块 | 砍 |
+|---|---|
+| 地图（`brand_geo_tag`） | ☐ |
+| 我的行动日历（新数据，**需要一张日程表还是挂在 `opportunity_event` 上？见 §5 决策 4**） | ☐ |
+| 趋势四宫格（观众/面积/展商/行业） | ☐ |
+| 筛选器（行业/城市/规模/关系） | ☐ |
+
+> ⚠️ 趋势四宫格必须**跟随当前筛选范围**，全库聚合没有决策价值（重构方案 §1.2 已记）。
+
+---
+
+#### §5 需你拍板的 4 个决策
+
+| # | 问题 | 建议 |
+|---|---|---|
+| 1 | `opportunity.title_en` / `company.name_en` 加不加？ | **加**。英文版读者是德方总部，中文标题他们读不懂；`exhibition_brand.name_en` 已有 97.6% 覆盖可参照 |
+| 2 | `detail_json` 里哪个字段要提升为正式列？ | 若「对价区间」需要跨标的排序 → 提升 `valuation_low` / `valuation_high` 两列；否则一个都不提 |
+| 3 | `reports/*.docx` 历史报告回填进 `intel_report`？ | **回填**。否则调研库是空的，M&A 最重的资产搜不到 |
+| 4 | 「我的行动日历」怎么存？ | **挂 `opportunity_event`**（`event_type='meeting'` + 日期），不单独建表。代价：与机会无关的行程存不了 |
+
+---
+
+#### §6 阶段 3 数据层的前置条件
+
+1. §3 删除清单逐项确认
+2. §4 每页砍完字段
+3. §5 四个决策拍板
+4. `git tag pre-rebuild-2026-09-16` + 全库备份
+
+四条齐了才写 `014_rebuild.sql`。**迁移校验必须逐字段比对，行数相等不作数。**
+
+---
+
+## V2-04 · 后端 API 规格
+
+<!-- 原文件：docs/API-SPEC-PHASE4.md -->
+
+### 阶段 4 · 后端 API 规格
+
+**日期**：2026-09-17
+**参考实现**：`app/api/opportunity/route.ts` + `app/api/opportunity/[id]/route.ts`
+**用法**：其余端点照参考实现套。**先读完参考实现的代码再动手。**
+
+---
+
+#### §0 一条核心原则：二阶式
+
+> 本系统的核心是**存储报告与采集来的资源**，不是展示后台数据。
+> 列表页只给最少的列，点详情才看全部。
+
+| 阶 | 端点 | 返回 | 典型体积 |
+|---|---|---|---|
+| **一阶** | `GET /api/{res}` | 精简字段 + 分页 + 服务端筛选排序 | 每页 ≤ 50 条 × 5 字段 |
+| **二阶** | `GET /api/{res}/{id}` | 全字段 + 关联对象 + 关联资源 | 单条 |
+
+**反面教材**：现有 `/api/dashboard` 一次返回全部 5,332 条品牌，前端做纯客户端过滤。
+新端点一律不许这样。分页与筛选必须在 SQL 里做。
+
+---
+
+#### §1 列表端点契约
+
+##### 请求
+
+```
+GET /api/opportunity?type=ma&stage=dd&owner=x@y.cn&q=半导体&page=1&size=50&sort=updated_at&order=desc
+```
+
+| 参数 | 说明 |
+|---|---|
+| `page` | 从 1 起，默认 1 |
+| `size` | 默认 50，**上限 200**（超过按 200 截断，不报错） |
+| `sort` | **必须走列白名单**，不在白名单一律回退默认列 |
+| `order` | `asc` / `desc`，非法值回退 `desc` |
+| `q` | 模糊搜索，`LIKE '%q%'`，只查 1–2 个主字段 |
+| 其余 | 每个资源自定义的筛选白名单 |
+
+> ⚠️ `sort` 与 `order` **绝不能拼进 SQL 字符串**，必须先在白名单里查到映射再用。
+> 其余参数一律走 `?` 占位符。
+
+##### 响应
+
+```json
+{
+  "items": [ { …精简字段… } ],
+  "page": 1,
+  "size": 50,
+  "total": 137
+}
+```
+
+`total` 是筛选后的总数（同一套 WHERE 再跑一次 `COUNT(*)`），不是全表数。
+
+---
+
+#### §2 详情端点契约
+
+```json
+{
+  "opportunity": { …全字段，detail_json 已解析成对象… },
+  "company":     { …关联公司，可为 null… },
+  "brand":       { …关联展会品牌，可为 null… },
+  "resources":   [ { resource_id, kind, title, file_path, size_bytes, collected_at } ],
+  "events":      [ { event_id, event_type, content, occurred_at, created_by, created_at } ],
+  "reports":     [ { id, title, report_type, status, updated_at } ]
+}
+```
+
+**详情端点必须带 `resources`** —— 这是本系统的核心功能，所有详情页都要能看到并下载该对象的资源。
+`company` / `research` 的详情端点同理。
+
+---
+
+#### §3 写操作
+
+| 方法 | 端点 | 权限 |
+|---|---|---|
+| `POST` | `/api/{res}` | `requireWriter` |
+| `PATCH` | `/api/{res}/{id}` | `requireWriter` |
+| `DELETE` | `/api/{res}/{id}` | `requireWriter`，**软删除**（`is_archived=1`），不物理删 |
+
+规则：
+
+1. 写操作用 `getWritableDb()`，**必须 `try/finally` 里 `close()`**，
+   否则 WAL 连接泄漏。读操作用 `getDb()`（单例只读，不要 close）。
+2. `updated_at` 由服务端写，**不接受客户端传入**。
+3. `PATCH` 只更新请求体里出现的字段，缺省字段不动（不要整行覆盖）。
+4. 字段白名单：请求体里不在白名单的键**静默忽略**，不报错。
+5. 枚举值在写库前校验一遍（DB 有 CHECK 约束兜底，但要给出可读的 400 而不是 500）。
+
+---
+
+#### §4 错误码
+
+| 码 | 场景 | 响应体 |
+|---|---|---|
+| 400 | 参数/枚举非法 | `{ "error": "可读中文说明" }` |
+| 401 | 未认证或账号被禁用 | `{ "error": "unauthorized" }` |
+| 403 | readonly 角色写操作 | `{ "error": "forbidden" }` |
+| 404 | 资源不存在 | `{ "error": "not found" }` |
+| 409 | 唯一约束冲突 | `{ "error": "可读中文说明" }` |
+
+---
+
+#### §5 待实现端点
+
+| 端点 | 一阶字段 | 筛选白名单 | 谁做 |
+|---|---|---|---|
+| `/api/opportunity` ✅ | title, type, stage, owner, updated_at | type, stage, owner, priority, q | **参考实现（已完成）** |
+| `/api/company` | name, type, company_status, city, updated_at | type, company_status, source_type, q | DeepSeek |
+| `/api/research` | title, report_type, status, target_company, updated_at | report_type, status, q | DeepSeek |
+| `/api/resource` | kind, title, size_bytes, collected_at | kind, company_id, opp_id, source, q | DeepSeek |
+| `/api/resource/[id]/download` | — 返回文件流 | — | **我做**（路径穿越防护） |
+| `/api/overview` | 聚合，无列表 | — | **我做** |
+| `/api/dashboard` 瘦身 | 改为分页 | — | DeepSeek |
+
+---
+
+#### §6 验收
+
+```bash
+# 分页与总数
+curl -b "session=$T" '/api/opportunity?size=2' | jq '{n:(.items|length), total, page, size}'
+
+# 筛选生效（total 应随之变化）
+curl -b "session=$T" '/api/opportunity?type=ma' | jq .total
+
+# sort 注入防护：非法列名不应报错，应回退默认排序
+curl -b "session=$T" '/api/opportunity?sort=1;DROP+TABLE+opportunity' | jq .total
+
+# 详情带 resources
+curl -b "session=$T" '/api/opportunity/1' | jq 'keys'
+
+# readonly 写操作应 403
+curl -b "session=$T_READONLY" -X POST '/api/opportunity' -d '{}' | jq .
+```

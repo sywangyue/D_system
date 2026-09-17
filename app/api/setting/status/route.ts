@@ -18,7 +18,7 @@ export async function GET(request: Request) {
 
   const db = getDb()
 
-  // 中心实体已经是公司（REBUILD-2026-09-PLAN.md §0 判断 2），所以这四个计数排在前，
+  // 中心实体已经是公司（docs/archive/V2-plan.md §0 判断 2），所以这四个计数排在前，
   // 原有品牌/届次/采集三项退到后面：这张卡的读者是判断「系统里有什么」的人。
   const companies = db.prepare('SELECT COUNT(*) as count FROM company').get() as { count: number }
   const opportunities = db.prepare(
@@ -54,7 +54,7 @@ export async function GET(request: Request) {
       node_version: process.version,
       db_type: 'SQLite',
       // 由 next.config.ts 在构建时写死。取不到就是 '—'，**不回退成当前时间** ——
-      // 原来 `|| new Date().toISOString()` 会让「构建时间」每次请求都变，等于在说谎（TASK-I §3.1）。
+      // 原来 `|| new Date().toISOString()` 会让「构建时间」每次请求都变，等于在说谎（V2-13 §3.1）。
       // Next.js 版本那一行已删：`process.env.__NEXT_VERSION__` 不是 Next 提供的变量，永远走回退值。
       build_time: process.env.NEXT_PUBLIC_BUILD_TIME || '—',
     },

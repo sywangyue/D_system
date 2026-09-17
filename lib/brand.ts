@@ -4,7 +4,7 @@
  * 「万象」两个字是**字标**（lockup 的一部分），不是界面文案：
  * 它不翻译 —— 英文版直接不渲染它（BrandLockup 的 showCn），
  * 因为渲染这两个字必然要加载 CJK 字体，而英文版要求一个 CJK 字体都不出现
- * （I18N-SPEC §1/§4.2）。
+ * （docs/DESIGN.md §1/§4.2）。
  *
  * 放这里而不是写在组件里：与 tools/build_logo_svg.py 烘进
  * public/brand/logo/*.svg 的是同两个字，两处必须一致；同时组件里

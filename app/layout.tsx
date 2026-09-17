@@ -33,7 +33,7 @@ const jetbrains = localFont({
  * 正文不加载任何 CJK webfont，仍走系统栈（见 globals.css 的 --font-cjk）。
  *
  * ⚠️ 英文版（locale=en）**不挂这个变量类**：那就等于整站没有引用任何 CJK 字体，
- * 浏览器一个中文字体都不会下载（I18N-SPEC §1 第二层）。字体栈的摘除在
+ * 浏览器一个中文字体都不会下载（docs/DESIGN.md §1 第二层）。字体栈的摘除在
  * globals.css 的 html[lang="en"] 规则里（第一层），两层都要。
  */
 const notoSerifScLogo = localFont({

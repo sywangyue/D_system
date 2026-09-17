@@ -14,7 +14,7 @@
 
 > **本文档写给接手这个项目的开发者。**
 > 目标是让你在 10 分钟内跑起来，并搞清楚数据是怎么从爬虫流到看板的。
-> 产品层面的权威定义在 `docs/MWLAB-2026-PRD-v1.1-merged.md`，不在这里重复。
+> 产品层面的权威定义在 `docs/archive/V1-prd-audits.md`，不在这里重复。
 
 ---
 
@@ -407,7 +407,7 @@ jufair 有地理封锁。非大陆环境用 `--proxy`（走本地 Tor 9050）。
 | 4 | 前端 UI（筛选看板、日历、地图、设置） | ✅ |
 | 5 | Intel 后端（调研报告、DB 查询、企查查接入） | ✅ |
 | 6 | 代码审计与合规清理 | ✅ |
-| 质检整改 | 脚本质检 + 数据治理，见 `docs/AUDIT-2026-07-27.md` | ✅ |
+| 质检整改 | 脚本质检 + 数据治理，见 `docs/archive/V1-prd-audits.md` | ✅ |
 | **1b** | **全集采集（Jufair 全量 + cnexpo 全量）** | **⏳ 当前任务** |
 
 **已知缺口**
@@ -427,10 +427,10 @@ jufair 有地理封锁。非大陆环境用 `--proxy`（走本地 Tor 9050）。
 
 | 资源 | 路径 |
 |------|------|
-| 产品权威定义（PRD） | `docs/MWLAB-2026-PRD-v1.1-merged.md` |
+| 产品权威定义（PRD） | `docs/archive/V1-prd-audits.md` |
 | 架构说明 | `docs/ARCHITECTURE.md` |
 | 部署手册 | `docs/DEPLOY.md` |
-| 质检审计报告 | `docs/AUDIT-2026-07-27.md` |
+| 质检审计报告 | `docs/archive/V1-prd-audits.md` |
 | Claude Code 行为约束 | `CLAUDE.md` |
 | 项目上下文与文件索引 | `AGENTS.md` |
 | 历史规划文档 | `_archive/planning/` |
