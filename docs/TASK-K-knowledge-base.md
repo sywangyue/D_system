@@ -1,0 +1,306 @@
+# 任务 K · 知识库 `/knowledge`
+
+**前置**：E（i18n 接线）—— **这一页从第一行就按字典写，不留中文硬编码**。
+E 之前的页面是先写死中文再回头接线，K 晚于 E，没有这个借口。
+**参照实现**：`app/research/page.tsx` + `app/research/[id]/research-detail.tsx`
+（服务端壳取 locale/dict → 客户端渲染 Markdown），`app/api/resource/[id]/download/route.ts`（路径安全）
+**验收**：见 §7
+
+---
+
+## 1. 这一页是什么
+
+Max 已完成项目的档案：并购 / 收购 / 新品类开拓等。**一个项目一条**，
+内容是 **项目背景 + 流程 + 结果**，配图片和文档。
+
+规模是这个任务所有设计决定的依据：**现在 3 条，上限 20 条，超过 20 条 Max 自己存档。**
+
+所以——
+
+| 不要做 | 为什么 |
+|---|---|
+| 不建数据库表 | 20 条记录不值得一张表 + 一次迁移 + 一套 CRUD 接口 |
+| 不写录入表单 / 富文本编辑器 | Max 直接写 Markdown 文件，仓库里已经全是这个习惯 |
+| 不写索引脚本 | 页面直接读目录，省掉「改完内容忘了重跑脚本」这类故障 |
+| 不做分页 | 20 条一屏放得下 |
+| 不做筛选条 | 同上。列表只有一个「显示已归档」的开关 |
+| 不跟公司库 / 机会台关联 | Max 已定：独立一页。这三个项目本来就不在 `opportunity` 表里 |
+
+**这是本仓库唯一一个「文件即数据源」的页面。** 别照着公司库/调研库那套
+「接口分页 + 客户端取数」写，那是为 501 条和 13 条设计的，这里用不上。
+
+---
+
+## 2. 目录约定
+
+```
+knowledge/
+  2024-litai-acquisition/          ← 目录名就是 URL slug
+    index.md                       ← 必需。frontmatter + 正文
+    images/
+      01-site.jpg
+      02-signing.png
+    docs/
+      协议签署版.pdf
+  2025-fpackasia-greenfield/
+    index.md
+    images/...
+```
+
+- **目录名即 slug**，URL 是 `/knowledge/2024-litai-acquisition`。
+  只允许 `[a-z0-9-]`，扫描时不符合的目录直接跳过（别报错，别渲染）。
+- 没有 `index.md` 的目录跳过。
+- `images/` 与 `docs/` 都是可选的。
+
+### index.md 的 frontmatter
+
+```markdown
+---
+title: 励泰展览并购
+title_en: Litai Exhibition Acquisition
+type: ma
+year: 2024
+status: active
+summary: 从初次接洽到交割用了 11 个月，核心是把六个同名展会的主体关系问清楚。
+summary_en: Eleven months from first contact to closing; the crux was untangling six same-named shows.
+cover: images/01-site.jpg
+---
+
+## 项目背景
+……
+
+## 流程
+……
+
+## 结果
+……
+```
+
+| 字段 | 必需 | 说明 |
+|---|---|---|
+| `title` | ✅ | 中文标题 |
+| `title_en` | — | 缺了就回退 `title`（英文界面下显示中文标题，好过显示空） |
+| `type` | ✅ | **复用已有业务线枚举**：`ma` / `greenfield` / `project_support`。标签走 `bizLineLabel(t, type)`，别自己写映射 |
+| `year` | ✅ | 四位数字，列表按它倒序 |
+| `status` | — | `active`（默认）/ `archived`。缺省按 `active` |
+| `summary` / `summary_en` | — | 列表卡片上的一行说明 |
+| `cover` | — | 相对项目目录的图片路径。缺了列表卡片就不出图 |
+
+**正文的三个小标题（项目背景 / 流程 / 结果）由 Max 自己在 Markdown 里写 `##`，
+不要在代码里硬编码这三段结构。** 他说了「包括且不限于」，结构不稳定，
+写死成三个字段等于逼他以后每加一种内容就来改代码。
+
+### frontmatter 怎么解析
+
+装 `gray-matter`，别手写 YAML 解析。
+
+手写的话要处理引号、冒号、中文、多行、注释，写出来五十行还漏边界；
+`gray-matter` 是这件事的标准件。**在 commit 里写明新增了依赖**（同任务 C 的 `react-markdown`）。
+
+> 考虑过用 `meta.json` 避免这个依赖，否决了：Max 手写 JSON 要对付尾逗号和引号转义，
+> 比 YAML frontmatter 难用，而且元数据和正文分两个文件，改一个项目要开两次。
+
+---
+
+## 3. 要写的文件
+
+| 文件 | 作用 |
+|---|---|
+| `lib/knowledge.ts` | 扫目录、解析 frontmatter、返回列表 / 单条。**服务端专用**，用 `fs` |
+| `app/knowledge/page.tsx` | 列表页（服务端组件，直接调 `lib/knowledge.ts`，不发 HTTP） |
+| `app/knowledge/[slug]/page.tsx` | 详情页（同上） |
+| `app/knowledge/[slug]/knowledge-body.tsx` | 客户端组件，只负责渲染 Markdown（`react-markdown` 是客户端库） |
+| `app/api/knowledge/[slug]/asset/[...path]/route.ts` | 图片与文档的读取端点，**必须鉴权** |
+| `components/layout/Sidebar.tsx` | 加一个导航项 |
+| `locales/zh.json` + `locales/en.json` | 新增 `knowledge` 段与 `nav.knowledge` |
+
+服务端页面直接调 `lib/knowledge.ts`，**不要为它建 `/api/knowledge` 列表接口** ——
+页面和数据在同一个进程里，套一层 HTTP 只是给自己发请求（`lib/queries/overview.ts`
+的注释里写过这件事）。资源端点是例外，因为 `<img src>` 只能走 URL。
+
+---
+
+## 4. 页面
+
+### 4.1 列表 `/knowledge`
+
+一屏卡片网格，按 `year` 倒序、同年按 `title` 排。每张卡片：
+
+```
+┌──────────────────────────┐
+│  cover 图（有就出，16:9） │
+│  2024   并购标的          │   ← year + type 徽标
+│  励泰展览并购             │   ← title
+│  从初次接洽到交割用了…     │   ← summary，两行截断
+└──────────────────────────┘
+```
+
+- 默认只显示 `status: active`。顶栏右侧一个「显示已归档」开关，打开才带出 `archived`。
+- 空态一个就够：`knowledge/` 下没有合法项目时显示「还没有项目」。
+  **不需要**「筛选无结果」态 —— 没有筛选条。
+
+### 4.2 详情 `/knowledge/[slug]`
+
+```
+← 返回知识库
+标题 · year 徽标 · type 徽标 ·（archived 时多一个「已归档」徽标）
+─────────────────────────────────────────┬──────────────
+正文（prose-cjk + react-markdown + GFM）   │  文档下载列表
+                                          │  （docs/ 下的文件）
+```
+
+- 正文容器用 `prose-cjk`，与调研库详情同一套（`globals.css` 里任务 C 已经把
+  表格/列表/引用/代码都接到令牌层了，不用再补样式）。
+- 右栏列 `docs/` 下的文件：文件名 + 大小 + 下载按钮。
+  **不要复用 `components/resource/ResourceList`** —— 那个组件吃的是 `resource`
+  表的行（有 `resource_id` / `kind` / `collected_at`），知识库的文档是文件系统里的
+  裸文件，没有这些字段。硬套要么造假数据要么改坏共用组件。这里写一个简单的列表即可。
+- `docs/` 为空时整块不渲染。
+- slug 不存在 → `notFound()`（真 404，与 `/opportunity/[id]` 一致）。
+
+---
+
+## 5. ⚠️ 六个陷阱
+
+### 5.1 Markdown 里的图片路径必须重写
+
+Max 在 `index.md` 里会这么写：
+
+```markdown
+![签约现场](images/02-signing.png)
+```
+
+`react-markdown` 直接输出 `<img src="images/02-signing.png">`，浏览器按当前 URL
+`/knowledge/<slug>` 解析成 `/knowledge/images/02-signing.png` —— **404，图全裂**。
+
+必须把相对路径改写到资源端点。`react-markdown` v10 用 `urlTransform`：
+
+```
+images/02-signing.png  →  /api/knowledge/<slug>/asset/images/02-signing.png
+```
+
+只改写相对路径。`http://` `https://` `data:` 开头的原样放行。
+
+`cover` 字段在列表页也要过同一次改写。
+
+### 5.2 图片绝对不能放 `public/`
+
+`public/` 下的文件不经中间件、不需要登录，任何人拿到 URL 就能看。
+**这些是并购项目的内部资料。** 所有图片和文档一律走
+`/api/knowledge/[slug]/asset/[...path]`，端点第一行就是 `requireUser`。
+
+### 5.3 资源端点的路径穿越防护，照抄现成的写法
+
+`app/api/resource/[id]/download/route.ts` 里的 `resolveSafe()` 是本仓库审计过的
+写法，**照它的思路写，别自己发明**：
+
+- 在**字符串层**就拒绝：绝对路径、任一段是 `..` 或 `.`，直接 return null；
+- 不要「先 join 再回头比前缀」；
+- `path.join` 的根目录必须是**字面量**（`path.join(process.cwd(), 'knowledge', ...)`），
+  否则 Turbopack 的文件追踪收敛不了，会把整个仓库打进部署产物
+  （构建报 `Encountered unexpected file in NFT list`，那条注释里写了原委）。
+
+slug 本身也是路径的一段，**同样要校验**，别只校验 `[...path]`。
+
+### 5.4 图片要 inline，文档要 attachment
+
+现成的 `/api/resource/[id]/download` 写死了 `Content-Disposition: attachment`，
+`<img>` 指过去浏览器当下载处理，不渲染 —— 这就是为什么要新写一个端点，
+而不是扩展那个。
+
+新端点按 MIME 分：`image/*` 给 `inline`，其余给 `attachment`（中文文件名照
+那个文件里的 RFC 5987 写法，`filename*` + ASCII 回退，别再踩一遍）。
+
+**MIME 按扩展名白名单给**，不要信任文件内容也不要回落到 `application/octet-stream`
+就放行任意扩展名：`.jpg .jpeg .png .webp .gif .svg` 给图片，`.pdf .docx .xlsx .pptx .md .txt`
+给文档，**其余一律 404**。
+
+> `.svg` 会被浏览器当文档执行内嵌脚本。如果嫌麻烦，把 `.svg` 从白名单去掉 ——
+> Max 放的是项目现场照片，不会有 SVG。去掉更省事，在 commit 里说明即可。
+
+### 5.5 `title` / `summary` / 正文是数据，不进字典
+
+与 `TASK-E §4.1` 同一条规矩：公司名、报告标题、机会名称原样显示。
+知识库的 `title` / `summary` / 正文同理 —— 它们有 `_en` 变体是因为 Max 自己写了两份，
+不是翻译层的事。**界面文案**（「返回知识库」「显示已归档」「还没有项目」「文档」）
+才进 `locales/*.json`。
+
+`type` 是闭集，走 `bizLineLabel(t, type)`，字典里已经有 `enum.bizLine`，别新增一份。
+
+### 5.6 `knowledge/` 要单独部署
+
+`docs/DEPLOY.md` 的 rsync 只同步 `.next/` 与几个指定目录。
+`knowledge/` 是新目录，**不加进去的话线上这一页永远是空的**。
+本任务要在 `DEPLOY.md` 里补一条 rsync 命令，照 `reports/` 那条写。
+
+---
+
+## 6. 建目录时顺手做的事
+
+仓库里 `knowledge/` 还不存在。建一个 `knowledge/_example/`（下划线开头，
+按 §2 的 slug 规则会被自动跳过，不会出现在页面上），里面放一份写满所有
+frontmatter 字段的 `index.md`，当作 Max 新建项目时的模板。
+
+真实项目内容由 Max 自己写，**不要编造三个项目的内容填进去**。
+
+---
+
+## 7. 验收
+
+```bash
+npx tsc --noEmit && npm run build    # 零错误零告警
+
+# 造两个测试项目（验收后删掉）
+mkdir -p knowledge/test-alpha/images knowledge/test-beta
+# test-alpha: status 缺省、带 cover 和一张正文插图、带一个 docs 文件
+# test-beta:  status: archived
+
+curl -s -o /dev/null -w "%{http_code}\n" -b "session=$T" localhost:3000/knowledge            # 200
+curl -s -o /dev/null -w "%{http_code}\n" -b "session=$T" localhost:3000/knowledge/test-alpha # 200
+curl -s -o /dev/null -w "%{http_code}\n" -b "session=$T" localhost:3000/knowledge/不存在的   # 404
+
+# 图片：登录能看、inline、不是下载
+curl -s -D - -o /dev/null -b "session=$T" \
+  'localhost:3000/api/knowledge/test-alpha/asset/images/01.jpg' | grep -i 'content-type\|content-disposition'
+#   应为 image/jpeg + inline
+
+# 不登录必须拿不到
+curl -s -o /dev/null -w "%{http_code}\n" \
+  'localhost:3000/api/knowledge/test-alpha/asset/images/01.jpg'   # 401
+
+# 路径穿越必须挡住（四条都要试，全部非 200）
+for p in '../../.env.local' '..%2f..%2f.env.local' 'images/../../../.env.local' '/etc/passwd'; do
+  curl -s -o /dev/null -w "$p -> %{http_code}\n" -b "session=$T" \
+    "localhost:3000/api/knowledge/test-alpha/asset/$p"
+done
+# slug 也要试：localhost:3000/api/knowledge/..%2f..%2f/asset/x.jpg
+
+# 白名单外的扩展名要 404
+curl -s -o /dev/null -w "%{http_code}\n" -b "session=$T" \
+  'localhost:3000/api/knowledge/test-alpha/asset/docs/x.sh'       # 404
+```
+
+人工检查：
+
+- 列表默认看不到 `test-beta`，打开「显示已归档」才出现
+- 详情页正文里的插图**显示出来了**，不是裂图、不是触发下载（§5.1）
+- 右栏文档点了下载到的是文件
+- 切 EN：界面文案全英文，项目标题按 `title_en`（没写就回退中文标题），正文原样中文
+- `knowledge/_example/` 不出现在列表里
+
+```bash
+# 清理
+rm -rf knowledge/test-alpha knowledge/test-beta
+```
+
+**最关键的两条**：图片在正文里能正常显示（§5.1），以及不登录拿不到任何资源（§5.2 / §5.3）。
+任一条不过，整个任务视为未完成。
+
+---
+
+## 8. 与顺序表的关系
+
+本任务在 `DEV-ORDER-AND-QC.md` §1 里是**新增项**，插在 E 之后。
+与 F（8 个端点补测试）无依赖，可以并行；但 F 的测试范围要把
+`/api/knowledge/[slug]/asset` 的鉴权与路径穿越两条加进去 —— 那是本仓库
+第二个直接读文件系统的端点，值得有回归测试。
