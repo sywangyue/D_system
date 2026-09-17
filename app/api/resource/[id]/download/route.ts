@@ -63,17 +63,17 @@ export async function GET(
   const abs = resolveSafe(row.file_path)
   if (!abs) {
     // 路径越界：不告诉调用方越到了哪里，也不回显路径
-    return NextResponse.json({ error: '资源路径非法' }, { status: 400 })
+    return NextResponse.json({ error: "badResourcePath" }, { status: 400 })
   }
 
   let size: number
   try {
     const st = statSync(abs)
-    if (!st.isFile()) return NextResponse.json({ error: '资源不是普通文件' }, { status: 400 })
+    if (!st.isFile()) return NextResponse.json({ error: "notRegularFile" }, { status: 400 })
     size = st.size
   } catch {
     // 库里有记录但磁盘上文件没了 —— 这在文件留磁盘的方案里是会发生的
-    return NextResponse.json({ error: '文件已不在磁盘上，请重新索引' }, { status: 404 })
+    return NextResponse.json({ error: "fileMissing" }, { status: 404 })
   }
 
   const filename = path.basename(abs)

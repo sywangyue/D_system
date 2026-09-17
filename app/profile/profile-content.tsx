@@ -3,9 +3,17 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import type { SessionUser } from "@/lib/session";
+import type { Dict } from "@/lib/i18n-shared";
+import { fill } from "@/lib/i18n-shared";
+import { INDUSTRY_L1, enumLabel } from "@/lib/enums";
 import { ArrowLeft, Check, Loader2 } from "lucide-react";
 
-export default function ProfileContent({ userInfo }: { userInfo: SessionUser }) {
+export default function ProfileContent({
+  userInfo, t,
+}: {
+  userInfo: SessionUser
+  t: Dict
+}) {
   const router = useRouter();
 
   const [allL1s, setAllL1s] = useState<string[]>([]);
@@ -59,6 +67,14 @@ export default function ProfileContent({ userInfo }: { userInfo: SessionUser }) 
     }
   }
 
+  // industry_l1 是闭集（全库 8 个取值），按 locale 出标签；勾选态与提交值仍用库里的中文原值。
+  // 按**显示标签**排序：中文下标签 == 库值，所以顺序与改动前逐字相同；
+  // 英文下自然成为字母序（原先按中文码位排，英文字母序才是该有的样子）。
+  const industryMap = t.enum.industryL1 as Record<string, string>;
+  const industryOptions = allL1s
+    .map((value) => ({ value, label: enumLabel(INDUSTRY_L1, industryMap, value) }))
+    .sort((a, b) => (a.label < b.label ? -1 : a.label > b.label ? 1 : 0));
+
   const initials = userInfo
     ? (userInfo.display_name || userInfo.email || "").slice(0, 2).toUpperCase()
     : "?";
@@ -72,7 +88,7 @@ export default function ProfileContent({ userInfo }: { userInfo: SessionUser }) 
           className="flex items-center gap-1.5 text-sm text-fg-muted hover:text-fg mb-6"
         >
           <ArrowLeft size={16} />
-          返回 Dashboard
+          {t.profile.back}
         </button>
 
         {/* User card */}
@@ -83,8 +99,9 @@ export default function ProfileContent({ userInfo }: { userInfo: SessionUser }) 
             </div>
             <div>
               <div className="font-semibold text-fg">
-                {userInfo?.display_name || "用户"}
+                {userInfo?.display_name || t.profile.user}
               </div>
+              {/* 邮箱与角色是数据，原样显示 */}
               <div className="text-sm text-fg-muted">{userInfo?.email}</div>
               <div className="text-xs text-fg-subtle mt-0.5 capitalize">
                 {userInfo?.role}
@@ -96,41 +113,41 @@ export default function ProfileContent({ userInfo }: { userInfo: SessionUser }) 
         {/* Industry preference */}
         <div className="bg-surface rounded-xl border border-hairline p-6 shadow-sm">
           <h2 className="text-base font-semibold text-fg mb-1">
-            定制 Dashboard 行业筛选
+            {t.profile.industryFilter}
           </h2>
           <p className="text-sm text-fg-muted mb-4">
-            勾选后，下次登录 Dashboard 将自动应用所选行业筛选。不勾选则显示全部。
+            {t.profile.industryFilterHint}
           </p>
 
           {loading ? (
             <div className="flex items-center gap-2 text-sm text-fg-subtle py-4">
               <Loader2 size={16} className="animate-spin" />
-              加载中…
+              {t.profile.loading}
             </div>
           ) : (
             <div className="space-y-2">
-              {allL1s.map((l1) => (
+              {industryOptions.map(({ value, label }) => (
                 <label
-                  key={l1}
+                  key={value}
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-surface-elevated cursor-pointer select-none"
                 >
                   <div
                     className={`w-5 h-5 rounded border-2 flex items-center justify-center flex-shrink-0 transition-colors ${
-                      selectedL1s.has(l1)
+                      selectedL1s.has(value)
                         ? "bg-accent border-accent"
                         : "border-hairline-active bg-surface"
                     }`}
-                    onClick={() => toggleL1(l1)}
+                    onClick={() => toggleL1(value)}
                   >
-                    {selectedL1s.has(l1) && (
+                    {selectedL1s.has(value) && (
                       <Check size={12} className="text-[var(--color-accent-fg)]" strokeWidth={3} />
                     )}
                   </div>
                   <span
                     className="text-sm text-fg"
-                    onClick={() => toggleL1(l1)}
+                    onClick={() => toggleL1(value)}
                   >
-                    {l1}
+                    {label}
                   </span>
                 </label>
               ))}
@@ -146,14 +163,14 @@ export default function ProfileContent({ userInfo }: { userInfo: SessionUser }) 
               {saving ? (
                 <Loader2 size={14} className="animate-spin" />
               ) : saved ? (
-                <><Check size={14} /> 已保存，正在跳转…</>
+                <><Check size={14} /> {t.profile.saving}</>
               ) : (
-                "保存偏好"
+                t.profile.savePrefs
               )}
             </button>
             {selectedL1s.size > 0 && (
               <span className="text-sm text-fg-subtle">
-                已选 {selectedL1s.size} 个行业
+                {fill(t.profile.selected, { n: selectedL1s.size })}
               </span>
             )}
           </div>

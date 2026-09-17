@@ -1,11 +1,15 @@
 {
+  "meta": {
+    "title": "MWLAB · Competitive Dashboard"
+  },
   "nav": {
     "overview": "Overview",
     "pipeline": "Pipeline",
     "entities": "Entities",
     "reports": "Reports",
     "basemap": "Basemap",
-    "settings": "Settings"
+    "settings": "Settings",
+    "logout": "Sign out"
   },
   "common": {
     "search": "Search opportunities, companies, reports…",
@@ -15,6 +19,7 @@
     "columns": "Columns",
     "columnsCount": "Columns · {shown} / {total}",
     "resetFilters": "Reset",
+    "clearFilters": "Clear filters",
     "clear": "Clear",
     "save": "Save",
     "cancel": "Cancel",
@@ -28,17 +33,154 @@
     "due": "Due",
     "today": "Today",
     "thisWeek": "This week",
-    "overdue": "Overdue"
+    "overdue": "Overdue",
+    "retry": "Retry",
+    "prev": "Prev",
+    "next": "Next",
+    "source": "Source",
+    "updated": "Updated",
+    "yes": "Yes",
+    "no": "No",
+    "notAssigned": "Unassigned",
+    "notFilled": "Not set",
+    "searchHint": "Try widening your filters",
+    "listSep": ", ",
+    "unitArea": "m²",
+    "unitYear": "{n}"
   },
   "empty": {
     "noOpportunities": "No opportunities yet",
     "noOpportunitiesHint": "Add your first one from the top right",
+    "noOpportunitiesHintReadonly": "Ask an administrator to add one",
     "noResults": "No matching opportunities",
     "noResultsHint": "Try widening your filters",
     "noReports": "No research reports yet",
     "noTasks": "Nothing due this week",
     "loadFailed": "Failed to load",
     "retry": "Retry"
+  },
+  "enum": {
+    "stage": {
+      "contact": "Contact",
+      "intent": "Intent",
+      "dd": "DD",
+      "audit": "Audit",
+      "closing": "Close"
+    },
+    "bizLine": {
+      "ma": "M&A",
+      "greenfield": "Greenfield",
+      "project_support": "Project support"
+    },
+    "dealType": {
+      "acquisition": "Acquire",
+      "control": "Control",
+      "minority": "Minority",
+      "hosting": "Host",
+      "incubation": "Incubate"
+    },
+    "reportType": {
+      "batch_prospect": "Batch leads",
+      "industry_research": "Industry",
+      "company_research": "Company DD",
+      "brand_research": "Brand",
+      "single_prospect": "Single lead"
+    },
+    "reportStatus": {
+      "draft": "Draft",
+      "published": "Published",
+      "archived": "Archived"
+    },
+    "resourceKind": {
+      "report": "Report",
+      "raw": "Raw",
+      "export": "Export",
+      "roster": "Roster",
+      "note": "Note"
+    },
+    "companyStatus": {
+      "inForce": "In force",
+      "operating": "Operating",
+      "inForceFull": "In force (full)",
+      "registered": "Registered",
+      "normal": "Normal",
+      "deregistered": "Deregistered"
+    },
+    "companyType": {
+      "organizer": "Organizer",
+      "exhibitor": "Exhibitor",
+      "service": "Service",
+      "target": "Target",
+      "partner": "Partner"
+    },
+    "sourceType": {
+      "qcc_search": "QCC search",
+      "manual": "Manual",
+      "db_match": "DB match"
+    },
+    "eventType": {
+      "note": "Note",
+      "meeting": "Meeting",
+      "file": "Upload",
+      "task_done": "Done",
+      "stage_change": "Stage change"
+    },
+    "role": {
+      "admin": "Admin",
+      "manager": "Manager",
+      "readonly": "Read-only"
+    },
+    "userState": {
+      "active": "Active",
+      "inactive": "Idle",
+      "disabled": "Disabled"
+    },
+    "crawlStatus": {
+      "success": "OK",
+      "running": "Running",
+      "failed": "Failed",
+      "partial": "Partial",
+      "none": "None"
+    },
+    "industryL1": {
+      "machinery": "Machinery & Equipment",
+      "lifestyle": "Lifestyle",
+      "leisure": "Leisure",
+      "chemicalsEnergy": "Chemicals & Energy",
+      "techPlus": "Technology+",
+      "healthcare": "Healthcare",
+      "retailServices": "Retail, Trade & Services",
+      "agriculture": "Agriculture & Livestock"
+    }
+  },
+  "error": {
+    "generic": "Something went wrong",
+    "badJson": "Malformed request body",
+    "badRequest": "Malformed request",
+    "noFields": "No fields to update",
+    "invalidValue": "Value violates a constraint",
+    "requiredField": "A required field cannot be empty",
+    "titleRequired": "Opportunity name is required",
+    "companyNameRequired": "Company name is required",
+    "reportTitleRequired": "Report title is required",
+    "badBizLine": "Business line must be one of {values}",
+    "badStage": "Stage must be one of {values}",
+    "badDealType": "Invalid deal type",
+    "badReportType": "Report type must be one of {values}",
+    "badReportStatus": "Report status must be one of {values}",
+    "badContactStatus": "Invalid contact status",
+    "badSourceType": "Source type must be one of {values}",
+    "badPriority": "Priority must be an integer from 1 to 5",
+    "badScore": "Prospect score must be an integer from 1 to 5",
+    "badCompanyOrBrand": "Linked company or expo brand not found",
+    "badBrand": "Linked expo brand not found",
+    "badCompanyBrandOrOpp": "Linked company, expo brand or opportunity not found",
+    "duplicate": "A record with the same name and source already exists",
+    "credentialsRequired": "Email and password are required",
+    "badCredentials": "Wrong email or password",
+    "badResourcePath": "Illegal resource path",
+    "notRegularFile": "Resource is not a regular file",
+    "fileMissing": "File is no longer on disk, please re-index"
   },
   "login": {
     "title": "Welcome back",
@@ -57,10 +199,18 @@
     "errFormat": "Invalid email format",
     "errPassword": "Please enter your password",
     "errCredentials": "Incorrect email or password",
-    "errNetwork": "Network error, please try again"
+    "errNetwork": "Network error, please try again",
+    "panelBrands": "Exhibition brands",
+    "panelOrganizers": "Organizer index",
+    "panelEditions": "Past editions",
+    "panelGreenfield": "Greenfield signals",
+    "headlineLead": "China's exhibition market,",
+    "headlineFocus": "structured",
+    "stats": "{brands} exhibition brands · {organizers} organizers"
   },
   "overview": {
     "title": "Overview",
+    "weekEnding": "· week to date",
     "kpiActive": "Active",
     "kpiMa": "M&A targets",
     "kpiGreenfield": "Greenfield",
@@ -69,10 +219,13 @@
     "tasksTask": "Task",
     "reportsTitle": "Recent diligence & research",
     "reportsMore": "Reports →",
+    "reportsUnit": "reports ·",
+    "reportsScope": "reports & resources",
     "funnelTitle": "Stage distribution",
     "funnelBottleneck": "Bottleneck",
     "funnelDwell": "Avg. {days}d dwell",
     "funnelConversion": "{rate} conv.",
+    "funnelEmpty": "Dwell time and conversion rate need accumulated stage changes",
     "filterAll": "All",
     "filterDueSoon": "Due soon",
     "filterPriority": "P1"
@@ -83,9 +236,23 @@
     "create": "New",
     "totalArea": "Total area",
     "avgCycle": "Avg. cycle",
+    "search": "Search name, MD brand…",
+    "allStages": "All stages",
+    "onlyMine": "Only mine",
     "tabMa": "M&A",
     "tabGreenfield": "Greenfield",
     "tabSupport": "Project support",
+    "drawer": {
+      "dealType": "Deal type",
+      "nameRequired": "Opportunity name is required",
+      "saveFailed": "Failed to save",
+      "hintComma": "comma-separated",
+      "phName": "e.g. East China semiconductor packaging expo · majority stake",
+      "phPrice": "e.g. 80–120 M CNY",
+      "phMarket": "e.g. ~4 B CNY a year, no dominant show",
+      "phDeliverables": "Data tools / partner intros / lead list",
+      "phNextAction": "e.g. verify booth sell-through"
+    },
     "col": {
       "name": "Opportunity",
       "type": "Type",
@@ -105,24 +272,11 @@
       "region": "Region",
       "priority": "Priority",
       "targetType": "Target type"
-    },
-    "type": {
-      "acquisition": "Acquire",
-      "control": "Control",
-      "minority": "Minority",
-      "hosting": "Host",
-      "incubation": "Incubate"
-    },
-    "stage": {
-      "contact": "Contact",
-      "intent": "Intent",
-      "dd": "DD",
-      "audit": "Audit",
-      "closing": "Close"
     }
   },
   "opportunity": {
     "back": "← Pipeline",
+    "notFound": "Opportunity not found",
     "tabOverview": "Overview",
     "tabResearch": "Diligence",
     "tabTimeline": "Timeline",
@@ -138,6 +292,39 @@
     "analyst": "Analyst",
     "baselineDate": "Valuation date",
     "priceRange": "Price range",
+    "archived": "Archived",
+    "priority": "Pri.",
+    "nextAction": "Next action",
+    "overdueSuffix": " · overdue",
+    "advanceFailed": "Failed to advance stage",
+    "stageCurrent": "Current stage: ",
+    "stageAdvanceTo": "Move to \"{stage}\"",
+    "stageHint": "Click any stage to advance",
+    "stageHintReadonly": "Read-only account cannot advance stages",
+    "mdBrand": "MD brand",
+    "mdBrandNone": "No MD brand set",
+    "ma": {
+      "priceRange": "Price range",
+      "equity": "Equity %",
+      "baselineDate": "Valuation date",
+      "auditConfidence": "Audit conf.",
+      "marketSize": "Market size",
+      "players": "Incumbents",
+      "entryBrands": "Entry brands",
+      "feasibility": "Feasibility",
+      "demandSide": "Demand side",
+      "deliverables": "Deliverables",
+      "partner": "Partner co."
+    },
+    "detail": {
+      "emptyTitle": "No details yet",
+      "emptyHint": "This opportunity's inputs have not been written to detail_json"
+    },
+    "reportsEmpty": "No linked reports yet",
+    "reportsEmptyHint": "Link a company to pull in its reports",
+    "timelineEmpty": "No entries yet",
+    "notIndexed": "· not in the resource library",
+    "resourcesEmpty": "No resources for this opportunity or its company yet",
     "company": {
       "title": "Linked company",
       "legalRep": "Legal rep.",
@@ -146,7 +333,11 @@
       "paidCapital": "Paid-in capital",
       "status": "Status",
       "equity": "Ownership structure",
-      "layers": "{n} layers deep"
+      "layers": "{n} layers deep",
+      "creditCode": "Credit code",
+      "empty": "No company linked",
+      "emptyHint": "Link one to pull in its reports and raw data",
+      "view": "View company"
     },
     "expo": {
       "benchmark": "MD benchmark brand",
@@ -155,8 +346,162 @@
       "ufi": "UFI approved",
       "area": "Exhibition area",
       "booths": "Standard booths",
-      "visitors": "Trade visitors"
+      "visitors": "Trade visitors",
+      "brandId": "Brand ID",
+      "nameCn": "Name (CN)",
+      "nameEn": "Name (EN)",
+      "city": "City",
+      "organizer": "Organizer",
+      "industry": "Industry",
+      "ufiYes": "Yes",
+      "ufiNo": "No",
+      "latestEdition": "Latest ed.",
+      "latestScale": "Latest scale",
+      "exhibitors": "Exhibitors",
+      "exhibitorsUnit": "exhibitors",
+      "visitorsCount": "Visitors",
+      "visitorsUnit": "visitors",
+      "editionStats": "{year} · {area} m² · {exhibitors} exhibitors · {visitors} visitors"
     }
+  },
+  "company": {
+    "title": "Entities",
+    "search": "Search company name or credit code…",
+    "allStatus": "All statuses",
+    "allType": "All types",
+    "allSource": "All sources",
+    "sort": "Sort",
+    "sortUpdatedAt": "Updated",
+    "sortName": "Name",
+    "sortScore": "Prospect score",
+    "notFound": "Company not found",
+    "source": "Source",
+    "col": {
+      "name": "Company",
+      "type": "Type",
+      "status": "Status",
+      "legalRep": "Legal rep.",
+      "updatedAt": "Updated"
+    },
+    "registration": "Registration",
+    "registrationEmpty": "No registration data for this company",
+    "creditCode": "Credit code",
+    "legalRep": "Legal rep.",
+    "founded": "Founded",
+    "regNo": "Reg. no.",
+    "address": "Address",
+    "email": "Email",
+    "brand": "Linked expo brand",
+    "brandName": "Brand",
+    "brandNameEn": "Name (EN)",
+    "city": "City",
+    "organizer": "Organizer",
+    "industry": "Industry",
+    "latestEdition": "Latest ed.",
+    "editionStats": "{year} · {area} m² · {exhibitors} exhibitors · {visitors} visitors",
+    "opportunities": "Opportunities · {count}",
+    "opportunitiesEmpty": "No opportunities reference this company yet",
+    "reports": "Reports · {count}",
+    "reportsEmpty": "No reports for this company yet",
+    "resources": "Resources · {count}",
+    "resourcesEmpty": "No resources for this company yet",
+    "emptyTitle": "No companies yet",
+    "noResults": "No matching companies"
+  },
+  "research": {
+    "title": "Reports",
+    "search": "Search report title or target company…",
+    "allType": "All types",
+    "allStatus": "All statuses",
+    "notFound": "Report not found",
+    "col": {
+      "title": "Title",
+      "type": "Type",
+      "status": "Status",
+      "company": "Company",
+      "updatedAt": "Updated"
+    },
+    "bodyEmpty": "This report has no body text",
+    "bodyEmptyHint": "Empty body means nothing was extracted at import time, or the report is still a draft",
+    "company": "Linked company",
+    "legalRep": "Legal rep.",
+    "status": "Status",
+    "creditCode": "Credit code",
+    "noCompany": "No company linked",
+    "noCompanyHint": "Link a company and this report will also appear under its Linked reports",
+    "noCompanyHintSector": "Industry research links to a sector, not a specific company",
+    "resources": "Resources · {count}",
+    "resourcesEmpty": "No files linked to this report",
+    "emptyTitle": "No research reports yet",
+    "noResults": "No matching reports"
+  },
+  "resource": {
+    "empty": "No resources yet",
+    "download": "Download {name}"
+  },
+  "settings": {
+    "title": "Settings",
+    "tabUsers": "Users",
+    "tabSystem": "System",
+    "loadUsersFailed": "Failed to load users",
+    "loadSystemFailed": "Failed to load system status",
+    "networkError": "Network error",
+    "retryFailed": "Retry failed",
+    "clickRetry": "Click to retry",
+    "usersTitle": "Users ({count})",
+    "usersEmpty": "No user data",
+    "colEmail": "Email",
+    "colRole": "Role",
+    "colState": "Status",
+    "colLastLogin": "Last login",
+    "dataStatus": "Data status",
+    "brandTotal": "Brands",
+    "editionTotal": "Editions",
+    "lastCrawlStatus": "Last crawl",
+    "lastCrawlDuration": "Duration",
+    "underMinute": "< 1 min",
+    "minutes": "{n} min",
+    "systemInfo": "System",
+    "nodeVersion": "Node.js:",
+    "nextVersion": "Next.js:",
+    "buildTime": "Build time:"
+  },
+  "profile": {
+    "back": "Back to dashboard",
+    "user": "User",
+    "industryFilter": "Customize dashboard industry filter",
+    "industryFilterHint": "Once checked, your next dashboard visit applies this industry filter. Leave unchecked to see everything.",
+    "selected": "{n} sectors selected",
+    "loading": "Loading…",
+    "saving": "Saved, redirecting…",
+    "savePrefs": "Save preferences"
+  },
+  "placeholder": {
+    "notImplemented": "not built yet",
+    "planned": "Planned"
+  },
+  "expo": {
+    "title": "Basemap",
+    "phase": "Phase 5.7",
+    "item1": "Geographic distribution of 7,378 exhibition brands",
+    "item2": "My action calendar (not an exhibition schedule)",
+    "item3": "Trend quadrants + industry split, scoped to current filters rather than the whole database",
+    "item4": "API /api/expo is ready"
+  },
+  "exhibition": {
+    "notFound": "Exhibition not found",
+    "back": "Back to dashboard",
+    "competition": "Competitor",
+    "maPotential": "M&A potential",
+    "strategicRelevance": "Strategic fit",
+    "organizer": "Organizer",
+    "city": "City",
+    "editionYear": "Edition year",
+    "venue": "Venue",
+    "area": "Area (m²)",
+    "exhibitors": "Exhibitors",
+    "visitors": "Visitors",
+    "website": "Website"
   },
   "basemap": {
     "title": "Basemap",
@@ -178,6 +523,14 @@
     "trendExhibitors": "Exhibitor pool",
     "trendSectors": "Sectors",
     "trendTtm": "TTM change",
-    "weekday": { "mon": "M", "tue": "T", "wed": "W", "thu": "T", "fri": "F", "sat": "S", "sun": "S" }
+    "weekday": {
+      "mon": "M",
+      "tue": "T",
+      "wed": "W",
+      "thu": "T",
+      "fri": "F",
+      "sat": "S",
+      "sun": "S"
+    }
   }
 }

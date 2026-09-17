@@ -3,6 +3,8 @@
 import { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { AlertCircle, FileText, Search } from "lucide-react"
+import { slugLabel } from "@/lib/enums"
+import { errorText, fmtDate, type Locale, type Dict } from "@/lib/i18n-shared"
 
 /**
  * 调研库 —— 一阶列表。
@@ -12,6 +14,9 @@ import { AlertCircle, FileText, Search } from "lucide-react"
  *
  * ⚠️ 这张表的主键是裸 `id`，不是 opp_id / company_id / resource_id。
  * ⚠️ 没有 is_archived，所以没有归档过滤，也没有删除入口。
+ *
+ * 文案一律走字典（t / locale 由服务端壳下传）；报告标题、公司名是**数据**，
+ * 原样显示不查字典（TASK-E §4.1）。
  */
 
 interface ReportRow {
@@ -27,28 +32,15 @@ interface ReportRow {
 
 const PAGE_SIZE = 50
 
-/** report_type 的中文映射取自 TASK-C §3.1（规格给了，不自己编）。 */
-const REPORT_TYPES = [
-  { value: "batch_prospect",    label: "批量线索" },
-  { value: "industry_research", label: "行业调研" },
-  { value: "company_research",  label: "公司尽调" },
-]
-
 /**
- * 状态的中文映射规格里没给。草稿（draft）是仓库里已有的说法
- * （app/overview/page.tsx 就用「草稿」），published / archived 按同一直觉补全，
- * 待规格确认。见交付说明。
+ * 筛选条的取值。report_type / status 都是**闭集 slug**，slug 本身既是键又是值，
+ * 所以标签直接用 slugLabel(t.enum.reportType / t.enum.reportStatus) 查字典，
+ * 页面里不再留任何中文映射（见 lib/enums.ts）。
  */
-const STATUSES = [
-  { value: "draft",     label: "草稿" },
-  { value: "published", label: "已发布" },
-  { value: "archived",  label: "已归档" },
-]
+const REPORT_TYPES = ["batch_prospect", "industry_research", "company_research"]
+const STATUSES = ["draft", "published", "archived"]
 
-const typeLabel = (t: string) => REPORT_TYPES.find(x => x.value === t)?.label || t
-const statusLabel = (s: string) => STATUSES.find(x => x.value === s)?.label || s
-
-export default function ResearchList() {
+export default function ResearchList({ locale, t }: { locale: Locale; t: Dict }) {
   const router = useRouter()
   const [q, setQ] = useState("")
   const [type, setType] = useState("")
@@ -68,7 +60,10 @@ export default function ResearchList() {
     if (status) p.set("status", status)
     try {
       const res = await fetch(`/api/research?${p}`)
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "加载失败")
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(errorText(t, err.error, err.values, t.empty.loadFailed))
+      }
       const d = await res.json()
       setRows(d.items); setTotal(d.total)
     } catch (e) {
@@ -76,7 +71,7 @@ export default function ResearchList() {
     } finally {
       setLoading(false)
     }
-  }, [q, type, status, page])
+  }, [q, type, status, page, t])
 
   useEffect(() => { load() }, [load])
   useEffect(() => { setPage(1) }, [q, type, status])
@@ -89,27 +84,31 @@ export default function ResearchList() {
       {/* ── 顶栏 ─────────────────────────────────────────── */}
       <div className="flex items-center justify-between px-8 h-14 hairline-b shrink-0">
         <div className="flex items-baseline gap-3">
-          <h1 className="text-[17px] font-medium">调研库</h1>
-          <span className="lat text-[11px] uppercase tracking-wider text-fg-subtle">Reports</span>
+          <h1 className="text-[17px] font-medium">{t.research.title}</h1>
+          {/* 拉丁字标是中文标题的对照，中文版才需要；英文版标题本身就是 Reports，
+              再来一个等于同一个词渲染两遍。 */}
+          {locale === "zh" && (
+            <span className="lat text-[11px] uppercase tracking-wider text-fg-subtle">Reports</span>
+          )}
           <span className="num text-[12px] text-fg-muted">{total}</span>
         </div>
       </div>
 
       {/* ── 筛选条 ───────────────────────────────────────── */}
       <div className="flex items-center gap-1.5 px-8 py-2.5 hairline-b shrink-0 flex-wrap">
-        <Pill active={!type} onClick={() => setType("")}>全部类型</Pill>
-        {REPORT_TYPES.map(t => (
-          <Pill key={t.value} active={type === t.value} onClick={() => setType(t.value)}>
-            {t.label}
+        <Pill active={!type} onClick={() => setType("")}>{t.research.allType}</Pill>
+        {REPORT_TYPES.map(v => (
+          <Pill key={v} active={type === v} onClick={() => setType(v)}>
+            {slugLabel(t.enum.reportType, v)}
           </Pill>
         ))}
 
         <span className="w-px h-4 bg-hairline mx-1.5" />
 
-        <Pill active={!status} onClick={() => setStatus("")}>全部状态</Pill>
-        {STATUSES.map(s => (
-          <Pill key={s.value} active={status === s.value} onClick={() => setStatus(s.value)}>
-            {s.label}
+        <Pill active={!status} onClick={() => setStatus("")}>{t.research.allStatus}</Pill>
+        {STATUSES.map(v => (
+          <Pill key={v} active={status === v} onClick={() => setStatus(v)}>
+            {slugLabel(t.enum.reportStatus, v)}
           </Pill>
         ))}
 
@@ -118,7 +117,7 @@ export default function ResearchList() {
           <input
             value={q}
             onChange={e => setQ(e.target.value)}
-            placeholder="搜索报告标题、目标公司…"
+            placeholder={t.research.search}
             className="input h-7 w-64 pl-8 pr-2.5 rounded-[4px] bg-sidebar text-[12px]
                        border border-hairline placeholder:text-fg-faint"
           />
@@ -146,11 +145,11 @@ export default function ResearchList() {
           <table className="w-full table-fixed border-collapse">
             <thead className="sticky top-0 z-10">
               <tr className="bg-sidebar">
-                <Th className="w-[46%]">标题</Th>
-                <Th className="w-[11%]">类型</Th>
-                <Th className="w-[11%]">状态</Th>
-                <Th className="w-[20%]">关联公司</Th>
-                <Th className="w-[12%] text-right">更新时间</Th>
+                <Th className="w-[46%]">{t.research.col.title}</Th>
+                <Th className="w-[11%]">{t.research.col.type}</Th>
+                <Th className="w-[11%]">{t.research.col.status}</Th>
+                <Th className="w-[20%]">{t.research.col.company}</Th>
+                <Th className="w-[12%] text-right">{t.research.col.updatedAt}</Th>
               </tr>
             </thead>
             <tbody>
@@ -161,18 +160,24 @@ export default function ResearchList() {
                   {/* 摘要在标题单元格里另起一行（规格 §3.1：列表项下的一行摘要）。
                       用单元格内的第二行而不是独立的列表布局，列头才立得住。 */}
                   <td className="px-8 py-2.5 align-top">
-                    <div className="text-[13px] text-fg">{r.title || typeLabel(r.report_type)}</div>
+                    <div className="text-[13px] text-fg">
+                      {r.title || slugLabel(t.enum.reportType, r.report_type)}
+                    </div>
                     {r.excerpt && (
                       <div className="text-[12px] text-fg-subtle truncate mt-0.5">{r.excerpt}</div>
                     )}
                   </td>
-                  <td className="px-3 py-2.5 align-top"><Tag>{typeLabel(r.report_type)}</Tag></td>
-                  <td className="px-3 py-2.5 align-top"><Tag>{statusLabel(r.status)}</Tag></td>
+                  <td className="px-3 py-2.5 align-top">
+                    <Tag>{slugLabel(t.enum.reportType, r.report_type)}</Tag>
+                  </td>
+                  <td className="px-3 py-2.5 align-top">
+                    <Tag>{slugLabel(t.enum.reportStatus, r.status)}</Tag>
+                  </td>
                   <td className="px-3 py-2.5 align-top text-[12px] text-fg-muted">
                     {r.company_name || "—"}
                   </td>
                   <td className="num px-8 py-2.5 align-top text-[11px] text-fg-subtle text-right">
-                    {(r.updated_at || "").slice(0, 10) || "—"}
+                    {fmtDate(locale, r.updated_at)}
                   </td>
                 </tr>
               ))}
@@ -182,16 +187,16 @@ export default function ResearchList() {
 
         {!loading && error && (
           <Empty icon={<AlertCircle size={22} />} title={error}
-                 action={<button onClick={load} className="btn text-fg bg-transparent border-0 cursor-pointer text-[13px] underline underline-offset-4">重试</button>} />
+                 action={<button onClick={load} className="btn text-fg bg-transparent border-0 cursor-pointer text-[13px] underline underline-offset-4">{t.common.retry}</button>} />
         )}
 
         {!loading && !error && rows.length === 0 && (
           hasFilter
-            ? <Empty icon={<Search size={22} />} title="没有符合条件的报告"
-                     hint="试着放宽筛选条件"
+            ? <Empty icon={<Search size={22} />} title={t.research.noResults}
+                     hint={t.common.searchHint}
                      action={<button onClick={() => { setQ(""); setType(""); setStatus("") }}
-                                     className="btn text-fg bg-transparent border-0 cursor-pointer text-[13px] underline underline-offset-4">清除筛选</button>} />
-            : <Empty icon={<FileText size={22} />} title="还没有调研报告" />
+                                     className="btn text-fg bg-transparent border-0 cursor-pointer text-[13px] underline underline-offset-4">{t.common.clearFilters}</button>} />
+            : <Empty icon={<FileText size={22} />} title={t.research.emptyTitle} />
         )}
       </div>
 
@@ -200,11 +205,11 @@ export default function ResearchList() {
         <div className="flex items-center justify-center gap-3 h-11 hairline-t shrink-0 text-[12px]">
           <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}
                   className="btn h-6 px-2.5 rounded-[4px] bg-transparent border border-hairline
-                             text-fg-muted cursor-pointer disabled:opacity-35">上一页</button>
+                             text-fg-muted cursor-pointer disabled:opacity-35">{t.common.prev}</button>
           <span className="num text-fg-subtle">{page} / {pages}</span>
           <button disabled={page >= pages} onClick={() => setPage(p => p + 1)}
                   className="btn h-6 px-2.5 rounded-[4px] bg-transparent border border-hairline
-                             text-fg-muted cursor-pointer disabled:opacity-35">下一页</button>
+                             text-fg-muted cursor-pointer disabled:opacity-35">{t.common.next}</button>
         </div>
       )}
     </div>

@@ -1,3 +1,7 @@
+import type { Dict, Locale } from "@/lib/i18n-shared"
+import { fill, fmtDateTime } from "@/lib/i18n-shared"
+import { enumLabel, USER_ROLE, USER_STATE } from "@/lib/enums"
+
 export interface UserEntry {
   user_id: string;
   email: string;
@@ -6,36 +10,31 @@ export interface UserEntry {
   last_login: string | null;
 }
 
-function getUserStatus(user: UserEntry): { label: string; color: string } {
-  if (!user.is_active) return { label: "已禁用", color: "bg-amber-100 text-amber-800" };
+/** 角色与状态都是闭集枚举，标签走字典（原先 switch 里写死中文） */
+function getUserStatus(user: UserEntry, t: Dict): { label: string; color: string } {
+  if (!user.is_active) {
+    return { label: enumLabel(USER_STATE, t.enum.userState, "disabled"),
+             color: "bg-amber-100 text-amber-800" };
+  }
   if (user.last_login) {
     const lastLogin = new Date(user.last_login).getTime();
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
-    if (lastLogin > thirtyDaysAgo) return { label: "活跃", color: "bg-green-100 text-green-800" };
+    if (lastLogin > thirtyDaysAgo) {
+      return { label: enumLabel(USER_STATE, t.enum.userState, "active"),
+               color: "bg-green-100 text-green-800" };
+    }
   }
-  return { label: "未活跃", color: "bg-surface-elevated text-fg-muted" };
+  return { label: enumLabel(USER_STATE, t.enum.userState, "inactive"),
+           color: "bg-surface-elevated text-fg-muted" };
 }
 
-function getRoleBadge(role: string): { label: string; color: string } {
+function getRoleBadge(role: string, t: Dict): { label: string; color: string } {
+  // role 值本身就是 admin / manager / readonly，与字典 slug 一致
+  const label = enumLabel(USER_ROLE, t.enum.role, role, role);
   switch (role) {
-    case "admin":   return { label: "管理员", color: "bg-red-100 text-red-700" };
-    case "manager": return { label: "经理",   color: "bg-blue-100 text-blue-700" };
-    default:        return { label: "只读",   color: "bg-surface-elevated text-fg-muted" };
-  }
-}
-
-function formatDateTime(iso: string | null): string {
-  if (!iso) return "--";
-  try {
-    return new Date(iso).toLocaleString("zh-CN", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return "--";
+    case "admin":   return { label, color: "bg-red-100 text-red-700" };
+    case "manager": return { label, color: "bg-blue-100 text-blue-700" };
+    default:        return { label, color: "bg-surface-elevated text-fg-muted" };
   }
 }
 
@@ -57,11 +56,17 @@ export function UsersTableSkeleton() {
   );
 }
 
-export default function UsersTable({ users }: { users: UserEntry[] }) {
+export default function UsersTable({
+  users, t, locale,
+}: {
+  users: UserEntry[]
+  t: Dict
+  locale: Locale
+}) {
   if (users.length === 0) {
     return (
       <div className="bg-surface border border-hairline rounded-xl p-6 text-center text-sm text-text-secondary">
-        暂无用户数据
+        {t.settings.usersEmpty}
       </div>
     );
   }
@@ -69,30 +74,30 @@ export default function UsersTable({ users }: { users: UserEntry[] }) {
   return (
     <div className="bg-surface border border-hairline rounded-xl overflow-hidden">
       <h2 className="text-base font-semibold text-text-primary px-6 pt-5 pb-3">
-        用户管理 ({users.length})
+        {fill(t.settings.usersTitle, { count: users.length })}
       </h2>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-hairline">
               <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase">
-                邮箱
+                {t.settings.colEmail}
               </th>
               <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase">
-                角色
+                {t.settings.colRole}
               </th>
               <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase">
-                状态
+                {t.settings.colState}
               </th>
               <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase">
-                最后登录
+                {t.settings.colLastLogin}
               </th>
             </tr>
           </thead>
           <tbody>
             {users.map((user) => {
-              const roleBadge = getRoleBadge(user.role);
-              const status = getUserStatus(user);
+              const roleBadge = getRoleBadge(user.role, t);
+              const status = getUserStatus(user, t);
               return (
                 <tr
                   key={user.user_id}
@@ -116,7 +121,7 @@ export default function UsersTable({ users }: { users: UserEntry[] }) {
                     </span>
                   </td>
                   <td className="px-6 py-3 text-text-secondary">
-                    {formatDateTime(user.last_login)}
+                    {fmtDateTime(locale, user.last_login, "--")}
                   </td>
                 </tr>
               );

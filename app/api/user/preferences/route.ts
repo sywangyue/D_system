@@ -37,7 +37,7 @@ export async function PATCH(request: Request) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '请求格式错误' }, { status: 400 })
+    return NextResponse.json({ error: "badRequest" }, { status: 400 })
   }
 
   const l1s = Array.isArray(body.l1s) ? (body.l1s as string[]).filter(v => typeof v === 'string') : []

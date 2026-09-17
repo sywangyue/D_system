@@ -11,14 +11,14 @@ export async function POST(request: Request) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '请求格式错误' }, { status: 400 })
+    return NextResponse.json({ error: "badRequest" }, { status: 400 })
   }
 
   const email = body.email?.trim().toLowerCase()
   const password = body.password
 
   if (!email || !password) {
-    return NextResponse.json({ error: '邮箱和密码不能为空' }, { status: 400 })
+    return NextResponse.json({ error: "credentialsRequired" }, { status: 400 })
   }
 
   const db = getWritableDb()
@@ -35,7 +35,7 @@ export async function POST(request: Request) {
 
     // 统一 401，不泄露用户名是否存在
     if (!user || !bcrypt.compareSync(password, user.password_hash)) {
-      return NextResponse.json({ error: '邮箱或密码错误' }, { status: 401 })
+      return NextResponse.json({ error: "badCredentials" }, { status: 401 })
     }
 
     db.prepare(

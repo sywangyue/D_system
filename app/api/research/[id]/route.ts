@@ -69,17 +69,17 @@ export async function PATCH(
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '请求体不是合法 JSON' }, { status: 400 })
+    return NextResponse.json({ error: "badJson" }, { status: 400 })
   }
 
   if (body.report_type != null && !REPORT_TYPES.includes(body.report_type as string)) {
     return NextResponse.json(
-      { error: `报告类型只能是 ${REPORT_TYPES.join(' / ')}` },
+      { error: "badReportType", values: REPORT_TYPES.join(" / ") },
       { status: 400 }
     )
   }
   if (body.status != null && !STATUSES.includes(body.status as string)) {
-    return NextResponse.json({ error: `报告状态只能是 ${STATUSES.join(' / ')}` }, { status: 400 })
+    return NextResponse.json({ error: "badReportStatus", values: STATUSES.join(" / ") }, { status: 400 })
   }
   if (body.params_json != null && typeof body.params_json === 'object') {
     body.params_json = JSON.stringify(body.params_json)
@@ -88,7 +88,7 @@ export async function PATCH(
   // 只更新请求体里出现的字段，缺省的不动 —— 不做整行覆盖
   const cols = WRITABLE.filter(c => body[c] !== undefined)
   if (cols.length === 0) {
-    return NextResponse.json({ error: '没有可更新的字段' }, { status: 400 })
+    return NextResponse.json({ error: "noFields" }, { status: 400 })
   }
 
   const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
@@ -108,13 +108,13 @@ export async function PATCH(
   } catch (e) {
     const msg = (e as Error).message
     if (msg.includes('FOREIGN KEY')) {
-      return NextResponse.json({ error: '关联的公司、展会品牌或机会不存在' }, { status: 400 })
+      return NextResponse.json({ error: "badCompanyBrandOrOpp" }, { status: 400 })
     }
     if (msg.includes('CHECK')) {
-      return NextResponse.json({ error: '字段取值不符合约束' }, { status: 400 })
+      return NextResponse.json({ error: "invalidValue" }, { status: 400 })
     }
     if (msg.includes('NOT NULL')) {
-      return NextResponse.json({ error: '必填字段不能为空' }, { status: 400 })
+      return NextResponse.json({ error: "requiredField" }, { status: 400 })
     }
     throw e
   } finally {

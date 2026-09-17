@@ -1,11 +1,15 @@
 {
+  "meta": {
+    "title": "MWLAB 万象 · 竞争盘面看板"
+  },
   "nav": {
     "overview": "盘面",
     "pipeline": "机会台",
     "entities": "公司库",
     "reports": "调研库",
     "basemap": "展会底图",
-    "settings": "设置"
+    "settings": "设置",
+    "logout": "退出"
   },
   "common": {
     "search": "搜索机会、公司、报告…",
@@ -15,6 +19,7 @@
     "columns": "列过滤",
     "columnsCount": "列过滤 · {shown} / {total}",
     "resetFilters": "重置筛选",
+    "clearFilters": "清除筛选",
     "clear": "清除",
     "save": "保存",
     "cancel": "取消",
@@ -28,17 +33,154 @@
     "due": "排期",
     "today": "今日",
     "thisWeek": "本周",
-    "overdue": "逾期"
+    "overdue": "逾期",
+    "retry": "重试",
+    "prev": "上一页",
+    "next": "下一页",
+    "source": "来源",
+    "updated": "更新",
+    "yes": "是",
+    "no": "否",
+    "notAssigned": "未指派",
+    "notFilled": "未填写",
+    "searchHint": "试着放宽筛选条件",
+    "listSep": "、",
+    "unitArea": "㎡",
+    "unitYear": "{n} 年"
   },
   "empty": {
     "noOpportunities": "还没有机会",
     "noOpportunitiesHint": "点右上角录入第一条",
+    "noOpportunitiesHintReadonly": "等待管理员录入",
     "noResults": "没有符合条件的机会",
     "noResultsHint": "试着放宽筛选条件",
     "noReports": "还没有调研报告",
     "noTasks": "本周没有到期事项",
     "loadFailed": "加载失败",
     "retry": "重试"
+  },
+  "enum": {
+    "stage": {
+      "contact": "接洽",
+      "intent": "意向",
+      "dd": "尽调",
+      "audit": "审计",
+      "closing": "交割"
+    },
+    "bizLine": {
+      "ma": "并购标的",
+      "greenfield": "全新品类",
+      "project_support": "项目组支持"
+    },
+    "dealType": {
+      "acquisition": "收购",
+      "control": "并购",
+      "minority": "参股",
+      "hosting": "承办",
+      "incubation": "孵化"
+    },
+    "reportType": {
+      "batch_prospect": "批量线索",
+      "industry_research": "行业调研",
+      "company_research": "公司尽调",
+      "brand_research": "品牌调研",
+      "single_prospect": "单点线索"
+    },
+    "reportStatus": {
+      "draft": "草稿",
+      "published": "已发布",
+      "archived": "已归档"
+    },
+    "resourceKind": {
+      "report": "调研报告",
+      "raw": "采集原始",
+      "export": "导出",
+      "roster": "名录",
+      "note": "笔记"
+    },
+    "companyStatus": {
+      "inForce": "存续",
+      "operating": "在业",
+      "inForceFull": "存续（在营、开业、在册）",
+      "registered": "仍注册",
+      "normal": "正常",
+      "deregistered": "注销"
+    },
+    "companyType": {
+      "organizer": "主办方",
+      "exhibitor": "展商",
+      "service": "服务商",
+      "target": "标的",
+      "partner": "伙伴"
+    },
+    "sourceType": {
+      "qcc_search": "企查查检索",
+      "manual": "手工建档",
+      "db_match": "库内匹配"
+    },
+    "eventType": {
+      "note": "记录",
+      "meeting": "会议",
+      "file": "上传附件",
+      "task_done": "已完成",
+      "stage_change": "阶段变更"
+    },
+    "role": {
+      "admin": "管理员",
+      "manager": "经理",
+      "readonly": "只读"
+    },
+    "userState": {
+      "active": "活跃",
+      "inactive": "未活跃",
+      "disabled": "已禁用"
+    },
+    "crawlStatus": {
+      "success": "成功",
+      "running": "运行中",
+      "failed": "失败",
+      "partial": "部分成功",
+      "none": "无记录"
+    },
+    "industryL1": {
+      "machinery": "机械和设备",
+      "lifestyle": "生活方式",
+      "leisure": "休闲",
+      "chemicalsEnergy": "化工与能源",
+      "techPlus": "科技+",
+      "healthcare": "医疗和健康",
+      "retailServices": "零售贸易和服务",
+      "agriculture": "农业与畜牧"
+    }
+  },
+  "error": {
+    "generic": "操作失败",
+    "badJson": "请求体不是合法 JSON",
+    "badRequest": "请求格式错误",
+    "noFields": "没有可更新的字段",
+    "invalidValue": "字段取值不符合约束",
+    "requiredField": "必填字段不能为空",
+    "titleRequired": "机会名称必填",
+    "companyNameRequired": "企业名称必填",
+    "reportTitleRequired": "报告标题必填",
+    "badBizLine": "业务线只能是 {values}",
+    "badStage": "阶段只能是 {values}",
+    "badDealType": "交易形式只能是 {values}",
+    "badReportType": "报告类型只能是 {values}",
+    "badReportStatus": "报告状态只能是 {values}",
+    "badContactStatus": "接触状态只能是 {values}",
+    "badSourceType": "来源类型只能是 {values}",
+    "badPriority": "优先级需为 1–5 的整数",
+    "badScore": "意向评分需为 1–5 的整数",
+    "badCompanyOrBrand": "关联的公司或展会品牌不存在",
+    "badBrand": "关联的展会品牌不存在",
+    "badCompanyBrandOrOpp": "关联的公司、展会品牌或机会不存在",
+    "duplicate": "已存在同名同源的记录",
+    "credentialsRequired": "邮箱和密码不能为空",
+    "badCredentials": "邮箱或密码错误",
+    "badResourcePath": "资源路径非法",
+    "notRegularFile": "资源不是普通文件",
+    "fileMissing": "文件已不在磁盘上，请重新索引"
   },
   "login": {
     "title": "欢迎回来",
@@ -57,10 +199,18 @@
     "errFormat": "邮箱格式不正确",
     "errPassword": "请输入密码",
     "errCredentials": "邮箱或密码错误，请重试",
-    "errNetwork": "网络异常，请稍后重试"
+    "errNetwork": "网络异常，请稍后重试",
+    "panelBrands": "展会品牌",
+    "panelOrganizers": "主办方索引",
+    "panelEditions": "历史届次",
+    "panelGreenfield": "白地信号",
+    "headlineLead": "中国展会市场的",
+    "headlineFocus": "结构化盘面",
+    "stats": "{brands} 个展会品牌 · {organizers} 家主办方"
   },
   "overview": {
     "title": "盘面",
+    "weekEnding": "· 本周截至",
     "kpiActive": "在跟进机会",
     "kpiMa": "并购标的",
     "kpiGreenfield": "白地品类",
@@ -69,10 +219,13 @@
     "tasksTask": "节点任务",
     "reportsTitle": "最近尽调与研报",
     "reportsMore": "调研库 →",
-    "funnelTitle": "机会阶段流转分布",
+    "reportsUnit": "份 ·",
+    "reportsScope": "报告与采集资源",
+    "funnelTitle": "机会阶段分布",
     "funnelBottleneck": "堵点阶段",
     "funnelDwell": "均值驻留 {days} 天",
     "funnelConversion": "转化 {rate}",
+    "funnelEmpty": "驻留天数与转化率需阶段变更记录积累后才能计算",
     "filterAll": "全部",
     "filterDueSoon": "临期",
     "filterPriority": "重点 P1"
@@ -83,9 +236,23 @@
     "create": "录入机会",
     "totalArea": "总估算规模",
     "avgCycle": "平均推进周期",
+    "search": "搜索机会名称、对标品牌…",
+    "allStages": "全部阶段",
+    "onlyMine": "只看我的",
     "tabMa": "并购标的",
     "tabGreenfield": "全新品类",
     "tabSupport": "项目组支持",
+    "drawer": {
+      "dealType": "交易形式",
+      "nameRequired": "机会名称必填",
+      "saveFailed": "保存失败",
+      "hintComma": "逗号分隔",
+      "phName": "如：华东半导体封装展 · 控股收购",
+      "phPrice": "如：8000–12000 万",
+      "phMarket": "如：国内年规模约 40 亿，无主力展会",
+      "phDeliverables": "数据工具 / 合作方对接 / 线索清单",
+      "phNextAction": "如：核实展位销售率"
+    },
     "col": {
       "name": "机会名称",
       "type": "类型",
@@ -97,7 +264,7 @@
       "priority": "优先级",
       "owner": "负责人",
       "nextAction": "下一步",
-      "updatedAt": "更新时间"
+      "updatedAt": "更新"
     },
     "filter": {
       "stage": "阶段",
@@ -105,25 +272,12 @@
       "region": "区域",
       "priority": "优先级",
       "targetType": "对标类型"
-    },
-    "type": {
-      "acquisition": "收购",
-      "control": "并购",
-      "minority": "参股",
-      "hosting": "承办",
-      "incubation": "孵化"
-    },
-    "stage": {
-      "contact": "接洽",
-      "intent": "意向",
-      "dd": "尽调",
-      "audit": "审计",
-      "closing": "交割"
     }
   },
   "opportunity": {
     "back": "← 机会台",
-    "tabOverview": "概览总览",
+    "notFound": "机会不存在",
+    "tabOverview": "概览",
     "tabResearch": "深度调研",
     "tabTimeline": "时间线",
     "tabExpo": "关联展会",
@@ -138,6 +292,39 @@
     "analyst": "执笔分析师",
     "baselineDate": "评估基准日",
     "priceRange": "对价区间",
+    "archived": "已归档",
+    "priority": "优先级",
+    "nextAction": "下一步",
+    "overdueSuffix": " · 已逾期",
+    "advanceFailed": "推进阶段失败",
+    "stageCurrent": "当前阶段：",
+    "stageAdvanceTo": "推进到「{stage}」",
+    "stageHint": "点任一阶段可直接推进",
+    "stageHintReadonly": "只读账号不可推进阶段",
+    "mdBrand": "对标 MD 品牌",
+    "mdBrandNone": "未标注对标品牌",
+    "ma": {
+      "priceRange": "对价区间",
+      "equity": "股权比例",
+      "baselineDate": "评估基准日",
+      "auditConfidence": "审计置信度",
+      "marketSize": "市场规模",
+      "players": "现有玩家",
+      "entryBrands": "可切入品牌",
+      "feasibility": "可行性",
+      "demandSide": "需求方",
+      "deliverables": "交付物",
+      "partner": "合作公司"
+    },
+    "detail": {
+      "emptyTitle": "尚未填写详细信息",
+      "emptyHint": "这条机会的入参还没有落到 detail_json"
+    },
+    "reportsEmpty": "还没有关联的调研报告",
+    "reportsEmptyHint": "挂上公司后会自动带出该公司名下的报告",
+    "timelineEmpty": "还没有记录",
+    "notIndexed": "· 未登记进资源库",
+    "resourcesEmpty": "这一机会及其关联公司名下还没有资源",
     "company": {
       "title": "关联公司",
       "legalRep": "法定代表人",
@@ -146,7 +333,11 @@
       "paidCapital": "实缴资本",
       "status": "经营状态",
       "equity": "股权穿透结构",
-      "layers": "穿透层级 {n} 层"
+      "layers": "穿透层级 {n} 层",
+      "creditCode": "统一社会信用代码",
+      "empty": "未关联公司",
+      "emptyHint": "关联后可自动带出其调研报告与原始数据",
+      "view": "查看公司详情"
     },
     "expo": {
       "benchmark": "国际直接对标品牌",
@@ -155,8 +346,162 @@
       "ufi": "UFI 国际认证",
       "area": "展览面积",
       "booths": "标准展位",
-      "visitors": "专业观众"
+      "visitors": "专业观众",
+      "brandId": "品牌 ID",
+      "nameCn": "中文名",
+      "nameEn": "英文名",
+      "city": "城市",
+      "organizer": "主办方",
+      "industry": "行业",
+      "ufiYes": "是",
+      "ufiNo": "否",
+      "latestEdition": "最新一届",
+      "latestScale": "最新一届规模",
+      "exhibitors": "展商数",
+      "exhibitorsUnit": "家",
+      "visitorsCount": "观众数",
+      "visitorsUnit": "人次",
+      "editionStats": "{year} 年 · 面积 {area} ㎡ · 展商 {exhibitors} · 观众 {visitors}"
     }
+  },
+  "company": {
+    "title": "公司库",
+    "search": "搜索公司名称、统一社会信用代码…",
+    "allStatus": "全部状态",
+    "allType": "全部类型",
+    "allSource": "全部来源",
+    "sort": "排序",
+    "sortUpdatedAt": "更新时间",
+    "sortName": "名称",
+    "sortScore": "意向评分",
+    "notFound": "公司不存在",
+    "source": "来源",
+    "col": {
+      "name": "公司名称",
+      "type": "类型",
+      "status": "经营状态",
+      "legalRep": "法定代表人",
+      "updatedAt": "更新时间"
+    },
+    "registration": "工商信息",
+    "registrationEmpty": "这家公司还没有工商信息",
+    "creditCode": "统一社会信用代码",
+    "legalRep": "法定代表人",
+    "founded": "成立日期",
+    "regNo": "注册号",
+    "address": "注册地址",
+    "email": "邮箱",
+    "brand": "关联展会品牌",
+    "brandName": "品牌名",
+    "brandNameEn": "英文名",
+    "city": "城市",
+    "organizer": "主办方",
+    "industry": "行业",
+    "latestEdition": "最新一届",
+    "editionStats": "{year} 年 · 面积 {area} ㎡ · 展商 {exhibitors} · 观众 {visitors}",
+    "opportunities": "关联机会 · {count}",
+    "opportunitiesEmpty": "还没有引用这家公司的机会",
+    "reports": "关联报告 · {count}",
+    "reportsEmpty": "这家公司名下还没有调研报告",
+    "resources": "资源 · {count}",
+    "resourcesEmpty": "这家公司名下还没有资源",
+    "emptyTitle": "还没有公司记录",
+    "noResults": "没有符合条件的公司"
+  },
+  "research": {
+    "title": "调研库",
+    "search": "搜索报告标题、目标公司…",
+    "allType": "全部类型",
+    "allStatus": "全部状态",
+    "notFound": "报告不存在",
+    "col": {
+      "title": "标题",
+      "type": "类型",
+      "status": "状态",
+      "company": "关联公司",
+      "updatedAt": "更新时间"
+    },
+    "bodyEmpty": "这份报告还没有正文",
+    "bodyEmptyHint": "正文为空说明入库时没抽到内容，或报告仍是草稿",
+    "company": "关联公司",
+    "legalRep": "法定代表人",
+    "status": "经营状态",
+    "creditCode": "信用代码",
+    "noCompany": "未关联公司",
+    "noCompanyHint": "这份报告还没有挂公司。挂上之后，它会一并出现在该公司详情页的「关联报告」里",
+    "noCompanyHintSector": "行业调研报告只挂行业，不挂具体公司",
+    "resources": "资源 · {count}",
+    "resourcesEmpty": "这份报告还没有关联的文件",
+    "emptyTitle": "还没有调研报告",
+    "noResults": "没有符合条件的报告"
+  },
+  "resource": {
+    "empty": "还没有资源",
+    "download": "下载 {name}"
+  },
+  "settings": {
+    "title": "设置",
+    "tabUsers": "用户",
+    "tabSystem": "系统",
+    "loadUsersFailed": "无法加载用户数据",
+    "loadSystemFailed": "无法加载系统状态",
+    "networkError": "网络异常",
+    "retryFailed": "重试失败",
+    "clickRetry": "点击重试",
+    "usersTitle": "用户管理 ({count})",
+    "usersEmpty": "暂无用户数据",
+    "colEmail": "邮箱",
+    "colRole": "角色",
+    "colState": "状态",
+    "colLastLogin": "最后登录",
+    "dataStatus": "数据状态",
+    "brandTotal": "品牌总数",
+    "editionTotal": "展会届次",
+    "lastCrawlStatus": "最近采集状态",
+    "lastCrawlDuration": "最近采集耗时",
+    "underMinute": "< 1 分钟",
+    "minutes": "{n} 分钟",
+    "systemInfo": "系统信息",
+    "nodeVersion": "Node.js：",
+    "nextVersion": "Next.js：",
+    "buildTime": "构建时间："
+  },
+  "profile": {
+    "back": "返回 Dashboard",
+    "user": "用户",
+    "industryFilter": "定制 Dashboard 行业筛选",
+    "industryFilterHint": "勾选后，下次登录 Dashboard 将自动应用所选行业筛选。不勾选则显示全部。",
+    "selected": "已选 {n} 个行业",
+    "loading": "加载中…",
+    "saving": "已保存，正在跳转…",
+    "savePrefs": "保存偏好"
+  },
+  "placeholder": {
+    "notImplemented": "待实现",
+    "planned": "计划内容"
+  },
+  "expo": {
+    "title": "展会底图",
+    "phase": "阶段 5.7",
+    "item1": "7,378 个展会品牌的地理分布图",
+    "item2": "我的行动日历（不是展会档期表）",
+    "item3": "趋势四宫格 + 行业分布，口径需跟随当前筛选而非全库聚合",
+    "item4": "接口 /api/expo 已就绪"
+  },
+  "exhibition": {
+    "notFound": "展会不存在",
+    "back": "返回看板",
+    "competition": "竞争展会",
+    "maPotential": "并购潜力",
+    "strategicRelevance": "战略相关",
+    "organizer": "主办方",
+    "city": "城市",
+    "editionYear": "届次年份",
+    "venue": "场馆",
+    "area": "面积(㎡)",
+    "exhibitors": "参展商",
+    "visitors": "观众",
+    "website": "网站"
   },
   "basemap": {
     "title": "展会底图",

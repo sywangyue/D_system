@@ -1,10 +1,12 @@
 import Placeholder from "@/components/layout/Placeholder"
-export default function Page() {
-  return <Placeholder title="展会底图" lat="Basemap" phase="阶段 5.7"
-    items={[
-      "7,378 个展会品牌的地理分布图",
-      "我的行动日历（不是展会档期表）",
-      "趋势四宫格 + 行业分布，口径需跟随当前筛选而非全库聚合",
-      "接口 /api/expo 已就绪",
-    ]} />
+import { getDict } from "@/lib/i18n"
+
+/** 展会底图。服务端组件，直接取字典。 */
+export default async function ExpoPage() {
+  const t = await getDict()
+  return <Placeholder t={t}
+    title={t.expo.title}
+    lat="Basemap"
+    phase={t.expo.phase}
+    items={[t.expo.item1, t.expo.item2, t.expo.item3, t.expo.item4]} />
 }

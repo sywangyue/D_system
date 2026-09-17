@@ -1,10 +1,13 @@
 import { Suspense } from "react";
 import SettingContent from "./setting-content";
+import { getDict, getLocale } from "@/lib/i18n";
 
-export default function SettingPage() {
+/** 服务端壳：字典与语言在这里读一次，往下传（角色校验由 proxy.ts 负责）。 */
+export default async function SettingPage() {
+  const [locale, t] = await Promise.all([getLocale(), getDict()]);
   return (
     <Suspense fallback={<SettingFallback />}>
-      <SettingContent />
+      <SettingContent t={t} locale={locale} />
     </Suspense>
   );
 }

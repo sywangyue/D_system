@@ -102,25 +102,25 @@ export async function POST(request: Request) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '请求体不是合法 JSON' }, { status: 400 })
+    return NextResponse.json({ error: "badJson" }, { status: 400 })
   }
 
   if (!body.title || typeof body.title !== 'string' || !body.title.trim()) {
-    return NextResponse.json({ error: '机会名称必填' }, { status: 400 })
+    return NextResponse.json({ error: "titleRequired" }, { status: 400 })
   }
   if (!TYPES.includes(body.type as string)) {
-    return NextResponse.json({ error: `业务线只能是 ${TYPES.join(' / ')}` }, { status: 400 })
+    return NextResponse.json({ error: "badBizLine", values: TYPES.join(" / ") }, { status: 400 })
   }
   if (body.stage != null && !STAGES.includes(body.stage as string)) {
-    return NextResponse.json({ error: `阶段只能是 ${STAGES.join(' / ')}` }, { status: 400 })
+    return NextResponse.json({ error: "badStage", values: STAGES.join(" / ") }, { status: 400 })
   }
   if (body.deal_type != null && !DEAL_TYPES.includes(body.deal_type as string)) {
-    return NextResponse.json({ error: `交易形式只能是 ${DEAL_TYPES.join(' / ')}` }, { status: 400 })
+    return NextResponse.json({ error: "badDealType", values: DEAL_TYPES.join(" / ") }, { status: 400 })
   }
   if (body.priority != null) {
     const p = Number(body.priority)
     if (!Number.isInteger(p) || p < 1 || p > 5) {
-      return NextResponse.json({ error: '优先级需为 1–5 的整数' }, { status: 400 })
+      return NextResponse.json({ error: "badPriority" }, { status: 400 })
     }
   }
 
@@ -147,10 +147,10 @@ export async function POST(request: Request) {
   } catch (e) {
     const msg = (e as Error).message
     if (msg.includes('FOREIGN KEY')) {
-      return NextResponse.json({ error: '关联的公司或展会品牌不存在' }, { status: 400 })
+      return NextResponse.json({ error: "badCompanyOrBrand" }, { status: 400 })
     }
     if (msg.includes('CHECK')) {
-      return NextResponse.json({ error: '字段取值不符合约束' }, { status: 400 })
+      return NextResponse.json({ error: "invalidValue" }, { status: 400 })
     }
     throw e
   } finally {

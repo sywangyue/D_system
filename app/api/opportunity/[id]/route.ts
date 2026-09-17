@@ -51,19 +51,19 @@ export async function PATCH(
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '请求体不是合法 JSON' }, { status: 400 })
+    return NextResponse.json({ error: "badJson" }, { status: 400 })
   }
 
   if (body.stage != null && !STAGES.includes(body.stage as string)) {
-    return NextResponse.json({ error: `阶段只能是 ${STAGES.join(' / ')}` }, { status: 400 })
+    return NextResponse.json({ error: "badStage", values: STAGES.join(" / ") }, { status: 400 })
   }
   if (body.deal_type != null && !DEAL_TYPES.includes(body.deal_type as string)) {
-    return NextResponse.json({ error: `交易形式只能是 ${DEAL_TYPES.join(' / ')}` }, { status: 400 })
+    return NextResponse.json({ error: "badDealType", values: DEAL_TYPES.join(" / ") }, { status: 400 })
   }
   if (body.priority != null) {
     const p = Number(body.priority)
     if (!Number.isInteger(p) || p < 1 || p > 5) {
-      return NextResponse.json({ error: '优先级需为 1–5 的整数' }, { status: 400 })
+      return NextResponse.json({ error: "badPriority" }, { status: 400 })
     }
   }
   if (body.detail_json != null && typeof body.detail_json === 'object') {
@@ -73,7 +73,7 @@ export async function PATCH(
   // 只更新请求体里出现的字段，缺省的不动 —— 不做整行覆盖
   const cols = WRITABLE.filter(c => body[c] !== undefined)
   if (cols.length === 0) {
-    return NextResponse.json({ error: '没有可更新的字段' }, { status: 400 })
+    return NextResponse.json({ error: "noFields" }, { status: 400 })
   }
 
   const now = new Date().toISOString().slice(0, 19).replace('T', ' ')
@@ -102,10 +102,10 @@ export async function PATCH(
   } catch (e) {
     const msg = (e as Error).message
     if (msg.includes('FOREIGN KEY')) {
-      return NextResponse.json({ error: '关联的公司或展会品牌不存在' }, { status: 400 })
+      return NextResponse.json({ error: "badCompanyOrBrand" }, { status: 400 })
     }
     if (msg.includes('CHECK')) {
-      return NextResponse.json({ error: '字段取值不符合约束' }, { status: 400 })
+      return NextResponse.json({ error: "invalidValue" }, { status: 400 })
     }
     throw e
   } finally {

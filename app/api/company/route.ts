@@ -112,27 +112,27 @@ export async function POST(request: Request) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '请求体不是合法 JSON' }, { status: 400 })
+    return NextResponse.json({ error: "badJson" }, { status: 400 })
   }
 
   if (!body.name || typeof body.name !== 'string' || !body.name.trim()) {
-    return NextResponse.json({ error: '企业名称必填' }, { status: 400 })
+    return NextResponse.json({ error: "companyNameRequired" }, { status: 400 })
   }
   if (!SOURCE_TYPES.includes(body.source_type as string)) {
     return NextResponse.json(
-      { error: `来源类型只能是 ${SOURCE_TYPES.join(' / ')}` },
+      { error: "badSourceType", values: SOURCE_TYPES.join(" / ") },
       { status: 400 }
     )
   }
   if (body.prospect_score != null) {
     const p = Number(body.prospect_score)
     if (!Number.isInteger(p) || p < 1 || p > 5) {
-      return NextResponse.json({ error: '意向评分需为 1–5 的整数' }, { status: 400 })
+      return NextResponse.json({ error: "badScore" }, { status: 400 })
     }
   }
   if (body.contact_status != null && !CONTACT_STATUS.includes(body.contact_status as string)) {
     return NextResponse.json(
-      { error: `接触状态只能是 ${CONTACT_STATUS.filter(Boolean).join(' / ')}` },
+      { error: "badContactStatus", values: CONTACT_STATUS.filter(Boolean).join(" / ") },
       { status: 400 }
     )
   }
@@ -157,16 +157,16 @@ export async function POST(request: Request) {
   } catch (e) {
     const msg = (e as Error).message
     if (msg.includes('FOREIGN KEY')) {
-      return NextResponse.json({ error: '关联的展会品牌不存在' }, { status: 400 })
+      return NextResponse.json({ error: "badBrand" }, { status: 400 })
     }
     if (msg.includes('CHECK')) {
-      return NextResponse.json({ error: '字段取值不符合约束' }, { status: 400 })
+      return NextResponse.json({ error: "invalidValue" }, { status: 400 })
     }
     if (msg.includes('NOT NULL')) {
-      return NextResponse.json({ error: '必填字段不能为空' }, { status: 400 })
+      return NextResponse.json({ error: "requiredField" }, { status: 400 })
     }
     if (msg.includes('UNIQUE')) {
-      return NextResponse.json({ error: '已存在同名同源的记录' }, { status: 409 })
+      return NextResponse.json({ error: "duplicate" }, { status: 409 })
     }
     throw e
   } finally {

@@ -1,3 +1,7 @@
+import type { Dict, Locale } from "@/lib/i18n-shared"
+import { fill, fmtDateTime, fmtNum } from "@/lib/i18n-shared"
+import { CRAWL_STATUS, enumLabel } from "@/lib/enums"
+
 export interface DataStatus {
   total_brands: number;
   total_editions: number;
@@ -6,37 +10,16 @@ export interface DataStatus {
   last_crawl_status: string | null;
 }
 
-function formatDateTime(iso: string | null): string {
-  if (!iso) return "--";
-  try {
-    return new Date(iso).toLocaleString("zh-CN", {
-      year: "numeric",
-      month: "2-digit",
-      day: "2-digit",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  } catch {
-    return "--";
-  }
-}
-
-function crawlStatusLabel(status: string | null): string {
-  switch (status) {
-    case "success":  return "成功";
-    case "running":  return "运行中";
-    case "failed":   return "失败";
-    case "partial":  return "部分成功";
-    default:         return "无记录";
-  }
-}
-
 export default function DataStatusCard({
   data,
   isLoading,
+  t,
+  locale,
 }: {
   data?: DataStatus;
   isLoading?: boolean;
+  t: Dict;
+  locale: Locale;
 }) {
   if (isLoading) {
     return (
@@ -55,41 +38,46 @@ export default function DataStatusCard({
   return (
     <div className="bg-surface border border-hairline rounded-xl p-6">
       <h2 className="text-base font-semibold text-text-primary mb-4">
-        数据状态
+        {t.settings.dataStatus}
       </h2>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <div>
-          <div className="text-xs text-text-secondary mb-1">品牌总数</div>
+          <div className="text-xs text-text-secondary mb-1">{t.settings.brandTotal}</div>
           <div className="text-2xl font-semibold text-text-primary">
-            {status?.total_brands?.toLocaleString("en-US") ?? "--"}
+            {fmtNum(locale, status?.total_brands, "--")}
           </div>
         </div>
         <div>
-          <div className="text-xs text-text-secondary mb-1">展会届次</div>
+          <div className="text-xs text-text-secondary mb-1">{t.settings.editionTotal}</div>
           <div className="text-2xl font-semibold text-text-primary">
-            {status?.total_editions?.toLocaleString("en-US") ?? "--"}
+            {fmtNum(locale, status?.total_editions, "--")}
           </div>
         </div>
         <div>
-          <div className="text-xs text-text-secondary mb-1">最近采集状态</div>
+          <div className="text-xs text-text-secondary mb-1">{t.settings.lastCrawlStatus}</div>
           <div className="text-sm font-medium text-text-primary">
-            {crawlStatusLabel(status?.last_crawl_status ?? null)}
+            {status?.last_crawl_status
+              ? enumLabel(CRAWL_STATUS, t.enum.crawlStatus, status.last_crawl_status)
+              : t.enum.crawlStatus.none}
           </div>
           {status?.last_crawl_finished_at && (
             <div className="text-xs text-text-secondary mt-0.5">
-              {formatDateTime(status.last_crawl_finished_at)}
+              {fmtDateTime(locale, status.last_crawl_finished_at)}
             </div>
           )}
         </div>
         <div>
-          <div className="text-xs text-text-secondary mb-1">最近采集耗时</div>
+          <div className="text-xs text-text-secondary mb-1">{t.settings.lastCrawlDuration}</div>
           <div className="text-sm font-medium text-text-primary">
             {status?.last_crawl_started_at && status?.last_crawl_finished_at
               ? (() => {
                   const start = new Date(status.last_crawl_started_at).getTime();
                   const end = new Date(status.last_crawl_finished_at).getTime();
                   const min = Math.round((end - start) / 60000);
-                  return min < 1 ? "< 1 分钟" : `${min} 分钟`;
+                  // 单位不手拼：中文「分钟」/英文「min」的语序与写法都在字典里
+                  return min < 1
+                    ? t.settings.underMinute
+                    : fill(t.settings.minutes, { n: fmtNum(locale, min) });
                 })()
               : "--"}
           </div>

@@ -5,17 +5,32 @@ import { useRouter } from "next/navigation";
 import DataStatusCard, { type DataStatus } from "@/components/settings/DataStatusCard";
 import UsersTable, { UsersTableSkeleton, type UserEntry } from "@/components/settings/UsersTable";
 import SystemInfoBlock, { type SystemInfo } from "@/components/settings/SystemInfoBlock";
+import type { Dict, Locale } from "@/lib/i18n-shared";
+import { errorText } from "@/lib/i18n-shared"
 
 interface StatusResponse {
   data_status: DataStatus;
   system_info: SystemInfo;
 }
 
+/**
+ * 两个请求各自失败要分开呈现，所以错误对象带一个稳定的标记 ——
+ * 原先靠 `e.message.includes("用户")` 派发，接 i18n 后英文文案里没有「用户」二字，
+ * 派发会静默失效。标记与文案分开：标记派发、文案只负责显示。
+ */
+class LoadError extends Error {
+  constructor(readonly which: "users" | "status", message: string) {
+    super(message);
+  }
+}
+
 function ErrorCard({
   message,
+  retryLabel,
   onRetry,
 }: {
   message: string;
+  retryLabel: string;
   onRetry: () => void;
 }) {
   return (
@@ -28,13 +43,13 @@ function ErrorCard({
         onClick={onRetry}
         className="px-4 py-2 rounded-lg bg-accent text-[var(--color-accent-fg)] text-sm hover:bg-accent-hover transition-colors"
       >
-        点击重试
+        {retryLabel}
       </button>
     </div>
   );
 }
 
-export default function SettingContent() {
+export default function SettingContent({ t, locale }: { t: Dict; locale: Locale }) {
   const router = useRouter();
 
   // Auth + RBAC state
@@ -61,14 +76,14 @@ export default function SettingContent() {
       fetch("/api/users").then(async (r) => {
         if (!r.ok) {
           const body = await r.json().catch(() => ({}));
-          throw new Error(body.error || "无法加载用户数据");
+          throw new LoadError("users", errorText(t, body.error, body.values, t.settings.loadUsersFailed));
         }
         return r.json();
       }),
       fetch("/api/setting/status").then(async (r) => {
         if (!r.ok) {
           const body = await r.json().catch(() => ({}));
-          throw new Error(body.error || "无法加载系统状态");
+          throw new LoadError("status", errorText(t, body.error, body.values, t.settings.loadSystemFailed));
         }
         return r.json();
       }),
@@ -80,13 +95,10 @@ export default function SettingContent() {
         setIsLoading(false);
       })
       .catch((e) => {
-        if (e instanceof Error) {
-          if (e.message.includes("用户")) setUserError(e.message);
-          if (e.message.includes("系统")) setStatusError(e.message);
-        }
-        if (!userError && !statusError) {
-          setUserError(e instanceof Error ? e.message : "网络异常");
-        }
+        const msg = e instanceof Error ? e.message : t.settings.networkError;
+        if (e instanceof LoadError && e.which === "users") setUserError(msg);
+        else if (e instanceof LoadError && e.which === "status") setStatusError(msg);
+        else setUserError(msg);
         setIsLoading(false);
       });
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -105,10 +117,10 @@ export default function SettingContent() {
   if (isLoading) {
     return (
       <div className="space-y-6">
-        <h1 className="text-xl font-semibold text-text-primary">设置</h1>
-        <DataStatusCard isLoading />
+        <h1 className="text-xl font-semibold text-text-primary">{t.settings.title}</h1>
+        <DataStatusCard isLoading t={t} locale={locale} />
         <UsersTableSkeleton />
-        <SystemInfoBlock isLoading />
+        <SystemInfoBlock isLoading t={t} locale={locale} />
       </div>
     );
   }
@@ -133,29 +145,29 @@ export default function SettingContent() {
         setIsLoading(false);
       })
       .catch(() => {
-        setUserError("重试失败");
-        setStatusError("重试失败");
+        setUserError(t.settings.retryFailed);
+        setStatusError(t.settings.retryFailed);
         setIsLoading(false);
       });
   };
 
   return (
     <div className="space-y-6">
-      <h1 className="text-xl font-semibold text-text-primary">设置</h1>
+      <h1 className="text-xl font-semibold text-text-primary">{t.settings.title}</h1>
 
       {statusError && !dataStatus ? (
-        <ErrorCard message={statusError} onRetry={retry} />
+        <ErrorCard message={statusError} retryLabel={t.settings.clickRetry} onRetry={retry} />
       ) : (
-        <DataStatusCard data={dataStatus ?? undefined} />
+        <DataStatusCard data={dataStatus ?? undefined} t={t} locale={locale} />
       )}
 
       {userError && users.length === 0 ? (
-        <ErrorCard message={userError} onRetry={retry} />
+        <ErrorCard message={userError} retryLabel={t.settings.clickRetry} onRetry={retry} />
       ) : (
-        <UsersTable users={users} />
+        <UsersTable users={users} t={t} locale={locale} />
       )}
 
-      <SystemInfoBlock info={systemInfo ?? undefined} />
+      <SystemInfoBlock info={systemInfo ?? undefined} t={t} locale={locale} />
     </div>
   );
 }

@@ -185,6 +185,17 @@
     letter-spacing: 0;
   }
 
+  /** 英文版摘掉整条 CJK 字体栈（I18N-SPEC §1 第一层）。
+   *  lang 由 app/layout.tsx 按 cookie 种在 <html> 上，这里只认它 ——
+   *  组件里不要再各自写 inline 的 fontFamily 覆盖，机制只留这一处。
+   *  第二层（不下载 CJK webfont）在 layout.tsx：locale=en 时不挂 logo 的中文字体变量，
+   *  那个子集字体（1.3KB，只含「万象」两字）就不会被请求。 */
+  html[lang="en"],
+  html[lang="en"] body,
+  [lang="en"] {
+    font-family: var(--font-sans);
+  }
+
   body {
     background: var(--color-canvas);
     color: var(--color-fg);

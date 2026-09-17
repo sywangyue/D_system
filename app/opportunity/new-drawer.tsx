@@ -3,6 +3,9 @@
 import { useEffect, useRef, useState } from "react"
 import { X, Search, Loader2 } from "lucide-react"
 import { BIZ_LINES, STAGES, DEAL_TYPES, type BizLine, type DealType, type Stage } from "./types"
+import { COMPANY_STATUS, bizLineLabel, dealTypeLabel, enumLabel, stageLabel } from "@/lib/enums"
+import type { Dict, Locale } from "@/lib/i18n-shared"
+import { errorText } from "@/lib/i18n-shared"
 
 /**
  * 录入机会。三条业务线共用一张表，靠 type 区分，
@@ -15,10 +18,14 @@ import { BIZ_LINES, STAGES, DEAL_TYPES, type BizLine, type DealType, type Stage 
 interface CompanyHit { company_id: number; name: string; company_status: string | null }
 
 export default function NewDrawer({
-  defaultType, currentUser, onClose, onCreated,
+  defaultType, currentUser, locale, t, onClose, onCreated,
 }: {
   defaultType: BizLine
   currentUser: string
+  /** 与 pipeline / opportunity-detail 同一组签名。抽屉里眼下没有随语言变化的渲染
+   *  （日期、单位、枚举标签全走字典），但调用处不该因将来加一个日期格式而改签名。 */
+  locale: Locale
+  t: Dict
   onClose: () => void
   onCreated: () => void
 }) {
@@ -29,7 +36,7 @@ export default function NewDrawer({
   const [nextAction, setNextAction] = useState("")
   const [due, setDue] = useState("")
   // ma 专属
-  const [dealType, setDealType] = useState<DealType>("收购")
+  const [dealType, setDealType] = useState<DealType>(DEAL_TYPES[0])
   const [mdBrand, setMdBrand] = useState("")
   const [valuation, setValuation] = useState("")
   // greenfield 专属
@@ -70,7 +77,7 @@ export default function NewDrawer({
   }
 
   async function submit() {
-    if (!title.trim()) { setError("机会名称必填"); return }
+    if (!title.trim()) { setError(t.pipeline.drawer.nameRequired); return }
     setSaving(true); setError("")
     const body: Record<string, unknown> = {
       type, title: title.trim(), stage, priority, owner: currentUser,
@@ -87,7 +94,10 @@ export default function NewDrawer({
       method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body),
     })
     setSaving(false)
-    if (!res.ok) { setError((await res.json().catch(() => ({}))).error || "保存失败"); return }
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      setError(errorText(t, err.error, err.values, t.pipeline.drawer.saveFailed)); return
+    }
     onCreated()
   }
 
@@ -97,7 +107,7 @@ export default function NewDrawer({
       <aside className="overlay fixed right-0 top-0 bottom-0 w-[480px] z-50 bg-surface
                         hairline-l flex flex-col" style={{ borderLeft: "1px solid var(--color-hairline-active)" }}>
         <div className="flex items-center justify-between h-14 px-6 hairline-b shrink-0">
-          <h2 className="text-[15px] font-medium">录入机会</h2>
+          <h2 className="text-[15px] font-medium">{t.pipeline.create}</h2>
           <button onClick={onClose}
                   className="btn w-7 h-7 flex items-center justify-center rounded-[4px]
                              bg-transparent border-0 text-fg-muted hover:text-fg cursor-pointer">
@@ -113,35 +123,35 @@ export default function NewDrawer({
             </div>
           )}
 
-          <Field label="业务线">
+          <Field label={t.pipeline.col.type}>
             <div className="flex gap-1.5">
               {BIZ_LINES.map(l => (
                 <button key={l.key} onClick={() => setType(l.key)}
                   className={`btn h-7 px-3 rounded-[4px] text-[12px] cursor-pointer border
                     ${type === l.key ? "bg-surface-hover text-fg border-hairline-active"
                                      : "bg-transparent text-fg-muted border-hairline"}`}>
-                  {l.label}
+                  {bizLineLabel(t, l.key)}
                 </button>
               ))}
             </div>
           </Field>
 
-          <Field label="机会名称" required>
+          <Field label={t.pipeline.col.name} required>
             <input ref={titleRef} value={title} onChange={e => setTitle(e.target.value)}
-                   placeholder="如：华东半导体封装展 · 控股收购"
+                   placeholder={t.pipeline.drawer.phName}
                    className="input w-full h-9 px-3 rounded-[4px] bg-sidebar text-[13px]
                               border border-[rgb(255_255_255/9%)] placeholder:text-fg-faint" />
           </Field>
 
           <div className="grid grid-cols-2 gap-4">
-            <Field label="阶段">
+            <Field label={t.pipeline.col.stage}>
               <select value={stage} onChange={e => setStage(e.target.value as Stage)}
                       className="input w-full h-9 px-2.5 rounded-[4px] bg-sidebar text-[13px]
                                  border border-[rgb(255_255_255/9%)] cursor-pointer">
-                {STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
+                {STAGES.map(s => <option key={s.key} value={s.key}>{stageLabel(t, s.key)}</option>)}
               </select>
             </Field>
-            <Field label="优先级">
+            <Field label={t.opportunity.priority}>
               <div className="flex gap-1 items-center h-9">
                 {[1, 2, 3, 4, 5].map(n => (
                   <button key={n} onClick={() => setPriority(n)}
@@ -161,23 +171,24 @@ export default function NewDrawer({
           {type === "ma" && (
             <>
               <div className="grid grid-cols-2 gap-4">
-                <Field label="交易形式">
+                <Field label={t.pipeline.drawer.dealType}>
                   <select value={dealType} onChange={e => setDealType(e.target.value as DealType)}
                           className="input w-full h-9 px-2.5 rounded-[4px] bg-sidebar text-[13px]
                                      border border-[rgb(255_255_255/9%)] cursor-pointer">
-                    {DEAL_TYPES.map(d => <option key={d} value={d}>{d}</option>)}
+                    {/* DEAL_TYPES 的取值是中文原文（数据，发给接口的就是它），标签走字典 */}
+                    {DEAL_TYPES.map(d => <option key={d} value={d}>{dealTypeLabel(t, d)}</option>)}
                   </select>
                 </Field>
-                <Field label="对标 MD 品牌">
+                <Field label={t.opportunity.mdBrand}>
                   <input value={mdBrand} onChange={e => setMdBrand(e.target.value)}
                          placeholder="interpack / drupa …"
                          className="input lat w-full h-9 px-3 rounded-[4px] bg-sidebar text-[13px]
                                     border border-[rgb(255_255_255/9%)] placeholder:text-fg-faint" />
                 </Field>
               </div>
-              <Field label="对价区间">
+              <Field label={t.opportunity.priceRange}>
                 <input value={valuation} onChange={e => setValuation(e.target.value)}
-                       placeholder="如：8000–12000 万"
+                       placeholder={t.pipeline.drawer.phPrice}
                        className="input w-full h-9 px-3 rounded-[4px] bg-sidebar text-[13px]
                                   border border-[rgb(255_255_255/9%)] placeholder:text-fg-faint" />
               </Field>
@@ -186,15 +197,15 @@ export default function NewDrawer({
 
           {type === "greenfield" && (
             <>
-              <Field label="市场规模判断">
+              <Field label={t.opportunity.ma.marketSize}>
                 <input value={marketSize} onChange={e => setMarketSize(e.target.value)}
-                       placeholder="如：国内年规模约 40 亿，无主力展会"
+                       placeholder={t.pipeline.drawer.phMarket}
                        className="input w-full h-9 px-3 rounded-[4px] bg-sidebar text-[13px]
                                   border border-[rgb(255_255_255/9%)] placeholder:text-fg-faint" />
               </Field>
-              <Field label="现有玩家">
+              <Field label={t.opportunity.ma.players}>
                 <input value={players} onChange={e => setPlayers(e.target.value)}
-                       placeholder="逗号分隔"
+                       placeholder={t.pipeline.drawer.hintComma}
                        className="input w-full h-9 px-3 rounded-[4px] bg-sidebar text-[13px]
                                   border border-[rgb(255_255_255/9%)] placeholder:text-fg-faint" />
               </Field>
@@ -203,14 +214,14 @@ export default function NewDrawer({
 
           {type === "project_support" && (
             <>
-              <Field label="需求方项目组">
+              <Field label={t.opportunity.ma.demandSide}>
                 <input value={requester} onChange={e => setRequester(e.target.value)}
                        className="input w-full h-9 px-3 rounded-[4px] bg-sidebar text-[13px]
                                   border border-[rgb(255_255_255/9%)]" />
               </Field>
-              <Field label="交付物">
+              <Field label={t.opportunity.ma.deliverables}>
                 <input value={deliverable} onChange={e => setDeliverable(e.target.value)}
-                       placeholder="数据工具 / 合作方对接 / 线索清单"
+                       placeholder={t.pipeline.drawer.phDeliverables}
                        className="input w-full h-9 px-3 rounded-[4px] bg-sidebar text-[13px]
                                   border border-[rgb(255_255_255/9%)] placeholder:text-fg-faint" />
               </Field>
@@ -218,7 +229,7 @@ export default function NewDrawer({
           )}
 
           {/* ── 关联公司 ───────────────────────────────────── */}
-          <Field label="关联公司" hint="挂上后，该公司名下的调研报告与原始数据会出现在详情页">
+          <Field label={t.opportunity.company.title} hint={t.opportunity.company.emptyHint}>
             {company ? (
               <div className="flex items-center justify-between h-9 px-3 rounded-[4px]
                               bg-surface-hover text-[13px]">
@@ -232,7 +243,7 @@ export default function NewDrawer({
               <div className="relative">
                 <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle" />
                 <input value={cq} onChange={e => setCq(e.target.value)}
-                       placeholder="搜索公司名或信用代码"
+                       placeholder={t.company.search}
                        className="input w-full h-9 pl-8 pr-3 rounded-[4px] bg-sidebar text-[13px]
                                   border border-[rgb(255_255_255/9%)] placeholder:text-fg-faint" />
                 {hits.length > 0 && (
@@ -244,7 +255,10 @@ export default function NewDrawer({
                               className="btn w-full text-left px-2.5 py-2 rounded-[4px] bg-transparent
                                          border-0 cursor-pointer text-[12px] hover:bg-surface-hover">
                         <div className="truncate">{h.name}</div>
-                        <div className="text-[11px] text-fg-subtle">{h.company_status}</div>
+                        <div className="text-[11px] text-fg-subtle">
+                          {enumLabel(COMPANY_STATUS, t.enum.companyStatus as Record<string, string>,
+                                     h.company_status)}
+                        </div>
                       </button>
                     ))}
                   </div>
@@ -254,13 +268,13 @@ export default function NewDrawer({
           </Field>
 
           <div className="grid grid-cols-[1fr_140px] gap-4">
-            <Field label="下一步">
+            <Field label={t.opportunity.nextAction}>
               <input value={nextAction} onChange={e => setNextAction(e.target.value)}
-                     placeholder="如：核实展位销售率"
+                     placeholder={t.pipeline.drawer.phNextAction}
                      className="input w-full h-9 px-3 rounded-[4px] bg-sidebar text-[13px]
                                 border border-[rgb(255_255_255/9%)] placeholder:text-fg-faint" />
             </Field>
-            <Field label="到期日">
+            <Field label={t.common.due}>
               <input type="date" value={due} onChange={e => setDue(e.target.value)}
                      className="input num w-full h-9 px-2.5 rounded-[4px] bg-sidebar text-[12px]
                                 border border-[rgb(255_255_255/9%)]" />
@@ -271,12 +285,12 @@ export default function NewDrawer({
         <div className="flex items-center justify-end gap-2 h-14 px-6 hairline-t shrink-0">
           <button onClick={onClose}
                   className="btn h-8 px-3.5 rounded-[4px] bg-transparent border border-hairline
-                             text-[12px] text-fg-muted cursor-pointer">取消</button>
+                             text-[12px] text-fg-muted cursor-pointer">{t.common.cancel}</button>
           <button onClick={submit} disabled={saving} data-loading={saving}
                   className="btn h-8 px-4 rounded-[4px] bg-accent text-[var(--color-accent-fg)] text-[12px]
                              font-semibold border-0 cursor-pointer flex items-center gap-1.5">
             {saving && <Loader2 size={13} className="animate-spin" />}
-            保存
+            {t.common.save}
           </button>
         </div>
       </aside>

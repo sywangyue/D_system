@@ -4,9 +4,12 @@ import { useCallback, useEffect, useState } from "react"
 import Link from "next/link"
 import { AlertCircle, ArrowLeft, ArrowRight, FileText } from "lucide-react"
 import ResourceList, { type ResourceItem } from "@/components/resource/ResourceList"
-// 阶段中文只此一份（app/opportunity/types.ts）。跨路由引用一个纯数据模块，
-// 好过在这里再抄一份五档映射 —— 两处映射早晚对不上。
-import { STAGES } from "@/app/opportunity/types"
+import { fill, fmtDateTime, fmtNum, type Dict, type Locale } from "@/lib/i18n-shared"
+import { errorText } from "@/lib/i18n-shared"
+import {
+  COMPANY_STATUS, COMPANY_TYPE, SOURCE_TYPE,
+  bizLineLabel, enumLabel, slugLabel, stageLabel,
+} from "@/lib/enums"
 
 /**
  * 公司详情 —— 五块全都要落到页面上（TASK-C §2.2）：
@@ -14,6 +17,11 @@ import { STAGES } from "@/app/opportunity/types"
  *
  * 资源区是重点，用 components/resource/ResourceList（任务 G 提出来放进 components/ 的那份），
  * 不在这里重写一遍 —— 同一张列表维护两处早晚漂移。
+ *
+ * 文案一律走字典（t / locale 由 app/company/[id]/page.tsx 传下来）；
+ * 闭集取值（类型 / 经营状态 / 来源 / 报告类型 / 业务线 / 阶段）的中文映射
+ * 只此一份，在 lib/enums.ts + locales/*.json —— 这里不再各抄一张表。
+ * 自由文本（公司名 / 品牌名 / 机会标题 / 报告标题 / 法定代表人）原样显示，不查字典。
  *
  * ⚠️ company 表没有 is_archived，所以没有归档过滤，也不做删除入口。
  */
@@ -77,20 +85,7 @@ interface CompanyData {
   reports: ReportRow[]
 }
 
-const BIZ_LINE: Record<string, string> = {
-  ma: "并购标的", greenfield: "全新品类", project_support: "项目组支持",
-}
-const REPORT_TYPE: Record<string, string> = {
-  batch_prospect: "批量线索", industry_research: "行业调研", company_research: "公司尽调",
-}
-
-const stageLabel = (s: string | null) =>
-  STAGES.find(x => x.key === s)?.label ?? (s || "—")
-
-const fmtNum = (n: number | null | undefined) =>
-  n === null || n === undefined || !Number.isFinite(n) ? "—" : n.toLocaleString("en-US")
-
-export default function CompanyDetail({ id }: { id: string }) {
+export default function CompanyDetail({ id, locale, t }: { id: string; locale: Locale; t: Dict }) {
   const [data, setData] = useState<CompanyData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState("")
@@ -99,17 +94,27 @@ export default function CompanyDetail({ id }: { id: string }) {
     setLoading(true); setError("")
     try {
       const res = await fetch(`/api/company/${id}`)
-      if (res.status === 404) throw new Error("公司不存在")
-      if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || "加载失败")
+      if (res.status === 404) throw new Error(t.company.notFound)
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({}))
+        throw new Error(errorText(t, err.error, err.values, t.empty.loadFailed))
+      }
       setData(await res.json())
     } catch (e) {
       setError((e as Error).message)
     } finally {
       setLoading(false)
     }
-  }, [id])
+  }, [id, t])
 
   useEffect(() => { load() }, [load])
+
+  // 标签表：enum.* 的键是 slug，取值表在 lib/enums.ts
+  const statusMap = t.enum.companyStatus as Record<string, string>
+  const typeMap = t.enum.companyType as Record<string, string>
+  const sourceMap = t.enum.sourceType as Record<string, string>
+  const reportTypeMap = t.enum.reportType as Record<string, string>
+  const reportStatusMap = t.enum.reportStatus as Record<string, string>
 
   if (loading) {
     return (
@@ -126,13 +131,13 @@ export default function CompanyDetail({ id }: { id: string }) {
       <div className="max-w-[1180px] mx-auto px-8 py-9">
         <Link href="/company"
               className="inline-flex items-center gap-1.5 text-[13px] text-fg-subtle hover:text-fg mb-6">
-          <ArrowLeft size={13} /> 返回公司库
+          <ArrowLeft size={13} /> {t.nav.entities}
         </Link>
         <div className="flex items-center gap-2 text-[14px] text-[var(--color-error-text)]">
           <AlertCircle size={15} /> {error}
           <button onClick={load}
                   className="btn text-fg bg-transparent border-0 cursor-pointer text-[13px]
-                             underline underline-offset-4 ml-2">重试</button>
+                             underline underline-offset-4 ml-2">{t.common.retry}</button>
         </div>
       </div>
     )
@@ -141,43 +146,52 @@ export default function CompanyDetail({ id }: { id: string }) {
   if (!data) return null
   const c = data.company
 
+  // 工商信息：label 全部走字典，自由文本字段原样显示，空值整行不渲染
   const info: { label: string; value: string; mono?: boolean }[] = [
-    { label: "统一社会信用代码", value: c.credit_code || "", mono: true },
-    { label: "法定代表人",       value: c.oper_name || "" },
-    { label: "成立日期",         value: c.start_date || "", mono: true },
-    { label: "注册号",           value: c.reg_no || "", mono: true },
-    { label: "注册地址",         value: c.address || "" },
-    { label: "邮箱",             value: c.email || "" },
+    { label: t.company.creditCode, value: c.credit_code || "", mono: true },
+    { label: t.company.legalRep,   value: c.oper_name || "" },
+    { label: t.company.founded,    value: c.start_date || "", mono: true },
+    { label: t.company.regNo,      value: c.reg_no || "", mono: true },
+    { label: t.company.address,    value: c.address || "" },
+    { label: t.company.email,      value: c.email || "" },
   ].filter(r => r.value !== "")
+
+  // 最新一届：数字走 Intl 格式化后再填进模板，单位与语序由字典决定（中英不同序）
+  const editionStats = (b: Brand) => fill(t.company.editionStats, {
+    year:       fmtNum(locale, b.year),
+    area:       fmtNum(locale, b.area_sqm),
+    exhibitors: fmtNum(locale, b.exhibitors_count),
+    visitors:   fmtNum(locale, b.visitors_count),
+  })
 
   return (
     <div className="max-w-[1180px] mx-auto px-8 py-9">
       <Link href="/company"
             className="inline-flex items-center gap-1.5 text-[13px] text-fg-subtle hover:text-fg mb-6">
-        <ArrowLeft size={13} /> 返回公司库
+        <ArrowLeft size={13} /> {t.nav.entities}
       </Link>
 
       {/* ── 头部：公司名 + 类型徽标 + 经营状态 ──────────────── */}
       <div className="hairline-b pb-6 mb-6">
         <div className="flex items-baseline gap-2.5 flex-wrap mb-2">
           <h1 className="text-[1.5rem] font-medium leading-tight">{c.name || `#${c.company_id}`}</h1>
-          {/* type 仓库里没有中文映射，原样显示英文值（见交付说明） */}
-          {c.type && <span className="lat text-[11px]"><Tag>{c.type}</Tag></span>}
-          {c.company_status && <Tag>{c.company_status}</Tag>}
+          {/* 类型与经营状态是闭集，按 locale 出标签；自由文本（公司名）不翻 */}
+          {c.type && <span className="text-[11px]"><Tag>{enumLabel(COMPANY_TYPE, typeMap, c.type)}</Tag></span>}
+          {c.company_status && <Tag>{enumLabel(COMPANY_STATUS, statusMap, c.company_status)}</Tag>}
         </div>
         {c.name_en && <div className="lat text-[12px] text-fg-subtle mb-2">{c.name_en}</div>}
         <div className="flex items-center gap-4 flex-wrap text-[12px] text-fg-subtle">
-          <span>来源 <span className="lat text-fg-muted">{c.source_type || "—"}</span></span>
-          <span className="num">更新 {(c.updated_at || "").slice(0, 16) || "—"}</span>
+          <span>{t.company.source} <span className="text-fg-muted">{enumLabel(SOURCE_TYPE, sourceMap, c.source_type)}</span></span>
+          <span className="num">{t.common.updated} {fmtDateTime(locale, c.updated_at)}</span>
         </div>
       </div>
 
       <div className="grid grid-cols-[65fr_35fr] gap-8 items-start">
         {/* ── 左：工商信息 + 资源 ─────────────────────────── */}
         <div className="min-w-0 flex flex-col gap-7">
-          <Section label="工商信息" lat="Registration">
+          <Section label={t.company.registration} lat="Registration">
             {info.length === 0 ? (
-              <p className="text-[12px] text-fg-faint">这家公司还没有工商信息</p>
+              <p className="text-[12px] text-fg-faint">{t.company.registrationEmpty}</p>
             ) : (
               <div className="rounded-[6px] border border-hairline overflow-hidden">
                 {info.map((r, i) => (
@@ -193,27 +207,25 @@ export default function CompanyDetail({ id }: { id: string }) {
             )}
           </Section>
 
-          <Section label={`资源 · ${data.resources.length}`} lat="Resources">
-            <ResourceList resources={data.resources} emptyText="这家公司名下还没有资源" />
+          <Section label={fill(t.company.resources, { count: String(data.resources.length) })} lat="Resources">
+            <ResourceList resources={data.resources} t={t} locale={locale}
+                          emptyText={t.company.resourcesEmpty} />
           </Section>
 
           {/* brand 为 null 时整块不渲染（规格 §2.2） */}
           {data.brand && (
-            <Section label="关联展会品牌" lat="Brand">
+            <Section label={t.company.brand} lat="Brand">
               <div className="rounded-[6px] border border-hairline overflow-hidden">
-                <InfoRow label="品牌名" value={data.brand.name_cn || data.brand.brand_id} />
-                {data.brand.name_en && <InfoRow label="英文名" value={data.brand.name_en} lat />}
-                {data.brand.city && <InfoRow label="城市" value={data.brand.city} />}
-                {data.brand.organizer && <InfoRow label="主办方" value={data.brand.organizer} />}
+                <InfoRow label={t.company.brandName} value={data.brand.name_cn || data.brand.brand_id} />
+                {data.brand.name_en && <InfoRow label={t.company.brandNameEn} value={data.brand.name_en} lat />}
+                {data.brand.city && <InfoRow label={t.company.city} value={data.brand.city} />}
+                {data.brand.organizer && <InfoRow label={t.company.organizer} value={data.brand.organizer} />}
                 {(data.brand.industry_l1 || data.brand.industry_l2) && (
-                  <InfoRow label="行业"
+                  <InfoRow label={t.company.industry}
                            value={[data.brand.industry_l1, data.brand.industry_l2].filter(Boolean).join(" / ")} />
                 )}
                 {data.brand.year !== null && (
-                  <InfoRow label="最新一届"
-                           value={`${data.brand.year} 年 · 面积 ${fmtNum(data.brand.area_sqm)} ㎡ · `
-                                  + `展商 ${fmtNum(data.brand.exhibitors_count)} · `
-                                  + `观众 ${fmtNum(data.brand.visitors_count)}`} />
+                  <InfoRow label={t.company.latestEdition} value={editionStats(data.brand)} />
                 )}
               </div>
             </Section>
@@ -222,9 +234,10 @@ export default function CompanyDetail({ id }: { id: string }) {
 
         {/* ── 右：关联机会 + 关联报告 ─────────────────────── */}
         <aside className="flex flex-col gap-7">
-          <Section label={`关联机会 · ${data.opportunities.length}`} lat="Opportunities">
+          <Section label={fill(t.company.opportunities, { count: String(data.opportunities.length) })}
+                   lat="Opportunities">
             {data.opportunities.length === 0 ? (
-              <p className="text-[12px] text-fg-faint">还没有引用这家公司的机会</p>
+              <p className="text-[12px] text-fg-faint">{t.company.opportunitiesEmpty}</p>
             ) : (
               <div className="hairline-t">
                 {data.opportunities.map(o => (
@@ -233,8 +246,8 @@ export default function CompanyDetail({ id }: { id: string }) {
                     <span className="text-[12px] text-fg-muted truncate flex-1">
                       {o.title || `#${o.opp_id}`}
                     </span>
-                    <span className="shrink-0"><Tag>{BIZ_LINE[o.type || ""] || o.type || "—"}</Tag></span>
-                    <span className="text-[11px] text-fg-subtle shrink-0">{stageLabel(o.stage)}</span>
+                    <span className="shrink-0"><Tag>{bizLineLabel(t, o.type)}</Tag></span>
+                    <span className="text-[11px] text-fg-subtle shrink-0">{stageLabel(t, o.stage)}</span>
                     <ArrowRight size={11} className="text-fg-faint shrink-0" />
                   </Link>
                 ))}
@@ -242,9 +255,9 @@ export default function CompanyDetail({ id }: { id: string }) {
             )}
           </Section>
 
-          <Section label={`关联报告 · ${data.reports.length}`} lat="Reports">
+          <Section label={fill(t.company.reports, { count: String(data.reports.length) })} lat="Reports">
             {data.reports.length === 0 ? (
-              <p className="text-[12px] text-fg-faint">这家公司名下还没有调研报告</p>
+              <p className="text-[12px] text-fg-faint">{t.company.reportsEmpty}</p>
             ) : (
               <div className="hairline-t">
                 {data.reports.map(r => (
@@ -252,9 +265,9 @@ export default function CompanyDetail({ id }: { id: string }) {
                         className="row flex items-center gap-2.5 h-11 px-1 hairline-b">
                     <FileText size={12} className="text-fg-faint shrink-0" />
                     <span className="text-[12px] text-fg-muted truncate flex-1">
-                      {r.title || REPORT_TYPE[r.report_type] || r.report_type}
+                      {r.title || slugLabel(reportTypeMap, r.report_type)}
                     </span>
-                    {r.status === "draft" && <Tag>草稿</Tag>}
+                    {r.status === "draft" && <Tag>{slugLabel(reportStatusMap, r.status)}</Tag>}
                     <ArrowRight size={11} className="text-fg-faint shrink-0" />
                   </Link>
                 ))}

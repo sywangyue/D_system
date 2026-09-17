@@ -13,6 +13,8 @@
  * 改了这里的几何，必须重跑那个脚本，否则资产会与实渲染对不上。
  */
 
+import { BRAND_CN } from "@/lib/brand"
+
 type Props = {
   /**
    * 三档尺寸，全部引用 globals.css 的 --logo-* 变量。
@@ -77,7 +79,7 @@ export default function BrandLockup({ size = "dense", showCn = true }: Props) {
               whiteSpace: "nowrap",
             }}
           >
-            万象
+            {BRAND_CN}
           </span>
         </>
       )}

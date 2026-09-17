@@ -3,7 +3,8 @@
 import { useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import { AlertCircle } from "lucide-react"
-import { LOCALE_LABELS, LOCALE_COOKIE, type Locale, type Dict } from "@/lib/i18n-shared"
+import { LOCALE_LABELS, LOCALE_COOKIE, fill, fmtNum, type Locale, type Dict } from "@/lib/i18n-shared"
+import { errorText } from "@/lib/i18n-shared"
 import BrandLockup from "@/components/brand/BrandLockup"
 
 /**
@@ -13,13 +14,16 @@ import BrandLockup from "@/components/brand/BrandLockup"
  *  - 删掉 Matrix 数字雨、打字机、日文半角假名（调性完全跑偏，且 SSR 水合报错）
  *  - 不再 saveAuth 到 localStorage —— cookie 是唯一登录态，成功后 refresh 即可
  *  - lang=en 时摘掉中文字体栈，英文版不出现中文字体
+ *    （机制在 globals.css 的 html[lang="en"] 规则里，组件不再自己写 inline 覆盖）
  */
 
-const STATS: { n: string; zh: string; en: string }[] = [
-  { n: "7,401", zh: "展会品牌", en: "Expo brands" },
-  { n: "9,740", zh: "主办方索引", en: "Organizers" },
-  { n: "7,703", zh: "历史届次", en: "Editions" },
-  { n: "2,061", zh: "白地信号", en: "Greenfield signals" },
+/** 左栏的四个实据。数字走 Intl，标签走字典 —— 原先这里是 zh/en 两份硬编码文案，
+ *  与字典形成两套机制，接 i18n 时合并掉了。 */
+const STATS: { n: number; slug: keyof Dict["login"] }[] = [
+  { n: 7401, slug: "panelBrands" },
+  { n: 9740, slug: "panelOrganizers" },
+  { n: 7703, slug: "panelEditions" },
+  { n: 2061, slug: "panelGreenfield" },
 ]
 
 export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
@@ -51,7 +55,7 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
       })
       if (!res.ok) {
         const body = await res.json().catch(() => ({}))
-        setError(res.status === 401 ? t.login.errCredentials : body.error || t.login.errNetwork)
+        setError(res.status === 401 ? t.login.errCredentials : errorText(t, body.error, body.values, t.login.errNetwork))
         setLoading(false)
         return
       }
@@ -67,8 +71,8 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
   return (
     <div
       className="flex min-h-screen bg-canvas"
-      // 英文版摘掉 CJK 字体栈，不让任何中文字体参与渲染
-      style={isEn ? { fontFamily: "var(--font-sans)" } : undefined}
+      // 英文版摘掉 CJK 字体栈由 globals.css 的 html[lang="en"] 规则负责（第一层），
+      // 这里只声明语言本身
       lang={isEn ? "en" : "zh-CN"}
     >
       {/* ── 左栏 58%：品牌与实据 ─────────────────────────── */}
@@ -85,22 +89,23 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
             Messe Düsseldorf Shanghai · Business Development
           </div>
           <h1 className="text-[2.625rem] leading-[1.25] font-medium mb-4 text-fg-muted">
-            {isEn ? <>Structural view of</> : <>中国展会市场的</>}
+            {t.login.headlineLead}
             <br />
-            <span className="text-fg">{isEn ? "China’s expo market" : "结构化盘面"}</span>
+            <span className="text-fg">{t.login.headlineFocus}</span>
           </h1>
           <p className="text-[14px] text-fg-muted mb-10">
-            {isEn
-              ? "7,401 expo brands · 9,740 organizers"
-              : "7,401 个展会品牌 · 9,740 家主办方"}
+            {fill(t.login.stats, {
+              brands: fmtNum(locale, 7401),
+              organizers: fmtNum(locale, 9740),
+            })}
           </p>
 
           <div className="grid grid-cols-2 gap-px bg-hairline max-w-md">
             {STATS.map(s => (
-              <div key={s.n} className="bg-canvas p-4">
-                <div className="num text-[26px] leading-none mb-1.5">{s.n}</div>
+              <div key={s.slug} className="bg-canvas p-4">
+                <div className="num text-[26px] leading-none mb-1.5">{fmtNum(locale, s.n)}</div>
                 <div className="text-[11px] uppercase tracking-wider text-fg-subtle">
-                  {isEn ? s.en : s.zh}
+                  {t.login[s.slug]}
                 </div>
               </div>
             ))}

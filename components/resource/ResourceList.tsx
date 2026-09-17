@@ -1,6 +1,8 @@
 "use client"
 
 import { Download } from "lucide-react"
+import { fill, fmtDate, type Dict, type Locale } from "@/lib/i18n-shared"
+import { RESOURCE_KIND, slugLabel } from "@/lib/enums"
 
 /**
  * 资源列表 —— 机会详情页与公司详情页共用。
@@ -9,8 +11,8 @@ import { Download } from "lucide-react"
  * 按 collected_at 倒序，每行 kind 徽标 + 标题 + 大小 + 采集时间 + 下载按钮。
  * 因此收到 components/ 下成为一份实现 —— 否则同一张列表要维护两份，早晚漂移。
  *
- * 组件只接收资源数组，不夹带机会或公司的业务判断（任务 C 要原样复用）。
- * 空态文案是唯一留的口子：两个页面的说法不同，由调用方传。
+ * 组件只接收资源数组与字典，不夹带机会或公司的业务判断（任务 C 要原样复用）。
+ * 空态文案是唯一留的口子：几个页面的说法不同，由调用方传。
  *
  * 下载一律用 <a download> 让浏览器自己流式处理。
  * 不要 fetch + createObjectURL —— 那会把整个文件读进内存。
@@ -27,30 +29,29 @@ export interface ResourceItem {
   source?: string | null
 }
 
-const KIND_LABEL: Record<string, string> = {
-  report: "调研报告", raw: "采集原始", export: "导出", roster: "名录", note: "笔记",
-}
-
 function fmtSize(b: number | null | undefined): string {
   if (b === null || b === undefined || !Number.isFinite(b) || b <= 0) return "—"
   // KB 与 MB 一律给一位小数：取整会把 44.75 KB 显示成 45 KB，
   // 同屏两个文件差了 1KB 以上却看着一样大。
+  // 小数点是千分位之外的东西，两种语言一致，不需要走 Intl。
   if (b >= 1024 * 1024) return `${(b / 1024 / 1024).toFixed(1)} MB`
   if (b >= 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${b} B`
 }
 
 export default function ResourceList({
-  resources, emptyText = "还没有资源",
+  resources, t, locale, emptyText,
 }: {
   resources: ResourceItem[]
+  t: Dict
+  locale: Locale
   emptyText?: string
 }) {
   if (resources.length === 0) {
     return (
       <div className="rounded-[4px] border border-hairline bg-surface px-3.5 py-3
                       text-[12px] text-fg-faint">
-        {emptyText}
+        {emptyText ?? t.resource.empty}
       </div>
     )
   }
@@ -62,18 +63,20 @@ export default function ResourceList({
           <span className="shrink-0">
             <span className="inline-block px-1.5 h-[17px] leading-[17px] rounded-[2px] text-[10px]
                              bg-surface-elevated border border-hairline text-fg-subtle align-middle">
-              {KIND_LABEL[r.kind] || r.kind}
+              {/* 资源类型是闭集枚举，按 locale 取标签；未知值回退原值 */}
+              {slugLabel(t.enum.resourceKind, r.kind)}
             </span>
           </span>
           <div className="min-w-0 flex-1">
+            {/* 标题是数据（文件名/报告名），原样显示，不查字典 */}
             <div className="text-[12px] text-fg-muted truncate" title={r.title}>{r.title}</div>
             <div className="num text-[10px] text-fg-faint">
               {fmtSize(r.size_bytes)}
-              {r.collected_at ? ` · ${r.collected_at.slice(0, 10)}` : ""}
+              {r.collected_at ? ` · ${fmtDate(locale, r.collected_at)}` : ""}
             </div>
           </div>
           <a href={`/api/resource/${r.resource_id}/download`} download
-             title={`下载 ${r.title}`}
+             title={fill(t.resource.download, { name: r.title })}
              className="shrink-0 w-6 h-6 rounded-[4px] border border-hairline
                         flex items-center justify-center text-fg-subtle hover:text-fg">
             <Download size={12} />

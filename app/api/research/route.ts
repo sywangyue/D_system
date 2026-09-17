@@ -124,20 +124,20 @@ export async function POST(request: Request) {
   try {
     body = await request.json()
   } catch {
-    return NextResponse.json({ error: '请求体不是合法 JSON' }, { status: 400 })
+    return NextResponse.json({ error: "badJson" }, { status: 400 })
   }
 
   if (!body.title || typeof body.title !== 'string' || !body.title.trim()) {
-    return NextResponse.json({ error: '报告标题必填' }, { status: 400 })
+    return NextResponse.json({ error: "reportTitleRequired" }, { status: 400 })
   }
   if (!REPORT_TYPES.includes(body.report_type as string)) {
     return NextResponse.json(
-      { error: `报告类型只能是 ${REPORT_TYPES.join(' / ')}` },
+      { error: "badReportType", values: REPORT_TYPES.join(" / ") },
       { status: 400 }
     )
   }
   if (body.status != null && !STATUSES.includes(body.status as string)) {
-    return NextResponse.json({ error: `报告状态只能是 ${STATUSES.join(' / ')}` }, { status: 400 })
+    return NextResponse.json({ error: "badReportStatus", values: STATUSES.join(" / ") }, { status: 400 })
   }
 
   // params_json 允许传对象或字符串，统一存成字符串
@@ -166,13 +166,13 @@ export async function POST(request: Request) {
   } catch (e) {
     const msg = (e as Error).message
     if (msg.includes('FOREIGN KEY')) {
-      return NextResponse.json({ error: '关联的公司、展会品牌或机会不存在' }, { status: 400 })
+      return NextResponse.json({ error: "badCompanyBrandOrOpp" }, { status: 400 })
     }
     if (msg.includes('CHECK')) {
-      return NextResponse.json({ error: '字段取值不符合约束' }, { status: 400 })
+      return NextResponse.json({ error: "invalidValue" }, { status: 400 })
     }
     if (msg.includes('NOT NULL')) {
-      return NextResponse.json({ error: '必填字段不能为空' }, { status: 400 })
+      return NextResponse.json({ error: "requiredField" }, { status: 400 })
     }
     throw e
   } finally {
