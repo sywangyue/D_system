@@ -55,9 +55,6 @@
 | 界面不碰品牌橙 | `grep -rn 'color-brand' app/ components/ --include="*.tsx"` 只应命中 `BrandLockup.tsx` |
 | 数据未受损 | 对照 §3 基线 |
 
-> `pytest` 里 `test_jufair_insert_batch_dedup_count` 是先前就存在的签名漂移
-> （`insert_batch` 返回三元组、测试断言 int），**与任何新任务无关，不要让 DS 去动它**。
-
 ### 2.3 返工规则
 
 | 情形 | 做法 |

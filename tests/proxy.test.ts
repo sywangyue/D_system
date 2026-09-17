@@ -90,12 +90,12 @@ describe("middleware", () => {
     expect(res.status).toBe(401)
   })
 
-  // 无 token 的页面路由跳 /pitch.html（pitch 改版后的公开主入口），不是 /login
-  it("should redirect page routes to /pitch.html when no token", async () => {
+  // 无 token 的页面路由跳 /login（阶段 5 静态页退役后 /pitch.html 不再存在）
+  it("should redirect page routes to /login when no token", async () => {
     const req = makeRequest("/dashboard.html")
     const res = await middleware(req)
     expect(res.status).toBe(307) // redirect
-    expect(res.headers.get("location")).toContain("/pitch.html")
+    expect(res.headers.get("location")).toContain("/login")
   })
 
   // token 存在但验签失败 → 回 /login 重新登录
@@ -108,7 +108,7 @@ describe("middleware", () => {
     expect(res.headers.get("location")).toContain("/login")
   })
 
-  it("should redirect non-admin to /dashboard.html from /setting", async () => {
+  it("should redirect non-admin to /overview from /setting", async () => {
     vi.mocked(jwtVerify).mockResolvedValueOnce({
       payload: { email: "manager@mwlab.com", role: "manager" } as any,
       protectedHeader: { alg: "HS256" },
@@ -118,7 +118,7 @@ describe("middleware", () => {
     const req = makeRequest("/setting", { token: "valid-manager-jwt" })
     const res = await middleware(req)
     expect(res.status).toBe(307)
-    expect(res.headers.get("location")).toContain("/dashboard.html")
+    expect(res.headers.get("location")).toContain("/overview")
   })
 
   it("should let admin access /setting", async () => {

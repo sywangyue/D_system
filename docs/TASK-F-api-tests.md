@@ -138,10 +138,8 @@ tests/api/overview.test.ts
 ## 5. 验收
 
 ```bash
-npm test
-# 全绿。现有 143 passed / 1 failed 中的那条
-# test_jufair_insert_batch_dedup_count 是 pytest 侧先前就存在的签名漂移，
-# 与本任务无关，不要动它。
+npm test                      # 全绿
+python3 -m pytest tests/ -q   # 全绿
 
 npx tsc --noEmit && npm run build   # 零错误零告警
 ```
