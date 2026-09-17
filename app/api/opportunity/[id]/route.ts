@@ -1,12 +1,16 @@
 import { NextResponse } from 'next/server'
-import { getDb, getWritableDb } from '@/lib/db'
+import { getWritableDb } from '@/lib/db'
 import { requireUser, requireWriter } from '@/lib/api-guard'
+import { getOpportunityDetail } from '@/lib/queries/opportunity'
 
 /**
  * 机会详情 —— 二阶端点（参考实现）
  *
  * 一阶只给 5 个字段，全部细节在这里一次取齐：
  * 机会全字段 + 关联公司 + 关联展会 + 关联资源 + 时间线 + 关联报告。
+ *
+ * GET 的六块查询走 lib/queries/opportunity.ts —— 与详情页共用一份，
+ * 避免「页面一套 SQL、接口一套 SQL」改一处漏一处。
  *
  * resources 是必须带的 —— 本系统的核心是存储报告与采集资源，
  * 任何详情页都要能看到并下载该对象名下的资源。
@@ -28,63 +32,10 @@ export async function GET(
   if (!user) return NextResponse.json({ error: 'unauthorized' }, { status: 401 })
 
   const { id } = await params
-  const db = getDb()
+  const detail = getOpportunityDetail(id)
+  if (!detail) return NextResponse.json({ error: 'not found' }, { status: 404 })
 
-  const row = db.prepare('SELECT * FROM opportunity WHERE opp_id = ?').get(id) as
-    Record<string, unknown> | undefined
-  if (!row) return NextResponse.json({ error: 'not found' }, { status: 404 })
-
-  // detail_json 存的是字符串，出口解析成对象，前端不必再 parse 一次
-  let detail: unknown = {}
-  try {
-    detail = JSON.parse((row.detail_json as string) || '{}')
-  } catch {
-    detail = {}   // 脏数据不应让整个详情页 500
-  }
-  const opportunity = { ...row, detail_json: detail }
-
-  const company = row.company_id
-    ? db.prepare('SELECT * FROM company WHERE company_id = ?').get(row.company_id)
-    : null
-
-  const brand = row.brand_id
-    ? db.prepare(`
-        SELECT b.brand_id, b.name_cn, b.name_en, b.city, b.organizer,
-               b.industry_l1, b.industry_l2, b.is_ufi_certified,
-               e.year, e.area_sqm, e.exhibitors_count, e.visitors_count
-        FROM exhibition_brand b
-        LEFT JOIN exhibition_edition e
-          ON e.brand_id = b.brand_id
-         AND e.edition_id = (SELECT edition_id FROM exhibition_edition
-                             WHERE brand_id = b.brand_id
-                             ORDER BY year DESC, edition_id DESC LIMIT 1)
-        WHERE b.brand_id = ?
-      `).get(row.brand_id)
-    : null
-
-  // 资源：直接挂在本机会上的，加上挂在其关联公司上的
-  const resources = db.prepare(`
-    SELECT resource_id, kind, title, file_path, mime, size_bytes, collected_at, source
-    FROM resource
-    WHERE opp_id = ? OR (company_id IS NOT NULL AND company_id = ?)
-    ORDER BY collected_at DESC
-  `).all(id, row.company_id ?? -1)
-
-  const events = db.prepare(`
-    SELECT event_id, event_type, content, file_path, occurred_at, created_by, created_at
-    FROM opportunity_event
-    WHERE opp_id = ?
-    ORDER BY created_at DESC
-  `).all(id)
-
-  const reports = db.prepare(`
-    SELECT id, title, report_type, status, updated_at
-    FROM intel_report
-    WHERE opp_id = ? OR (company_id IS NOT NULL AND company_id = ?)
-    ORDER BY updated_at DESC
-  `).all(id, row.company_id ?? -1)
-
-  return NextResponse.json({ opportunity, company, brand, resources, events, reports })
+  return NextResponse.json(detail)
 }
 
 export async function PATCH(

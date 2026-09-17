@@ -1,11 +1,43 @@
-import Placeholder from "@/components/layout/Placeholder"
-export default function Page() {
-  return <Placeholder title="机会详情" lat="Opportunity" phase="阶段 5.5"
-    back={{ href: "/opportunity", label: "返回机会台" }}
-    items={[
-      "概览 / 深度调研 / 时间线 / 关联展会 四个 tab",
-      "右栏：关联公司工商信息、对标 MD 品牌、对价区间、下一步",
-      "该机会及其关联公司名下的全部资源，可直接下载",
-      "接口 /api/opportunity/[id] 已就绪，六块数据一次取齐",
-    ]} />
+import { notFound, redirect } from "next/navigation"
+import { getSessionUser } from "@/lib/session"
+import { getOpportunityDetail } from "@/lib/queries/opportunity"
+import OpportunityDetail from "./opportunity-detail"
+
+/**
+ * 机会详情 —— 全系统价值链的兑现处：
+ * 机会挂上公司之后，该公司名下的调研报告与企查查原始数据自动出现在这里。
+ *
+ * 服务端直接调查询函数（与 /api/opportunity/[id] 共用同一份，见 lib/queries/opportunity.ts），
+ * 不对自己发一次 HTTP —— 与 app/overview/page.tsx 同一做法。
+ * 六块数据一次取齐，交给客户端组件负责 tab 切换与阶段推进。
+ */
+export default async function OpportunityDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}) {
+  const user = await getSessionUser()
+  if (!user) redirect("/login")
+
+  const { id } = await params
+  const detail = getOpportunityDetail(id)
+  if (!detail) notFound()
+
+  // 逾期判定放服务端算：客户端算会在服务端渲染与 hydration 之间
+  // 因时区/跨日产生不一致，React 会报 hydration 警告。
+  // 口径与 lib/queries/overview.ts 的 date('now','localtime') 对齐，用本地日期。
+  const now = new Date()
+  const today = [
+    now.getFullYear(),
+    String(now.getMonth() + 1).padStart(2, "0"),
+    String(now.getDate()).padStart(2, "0"),
+  ].join("-")
+
+  return (
+    <OpportunityDetail
+      detail={detail}
+      canWrite={user.role !== "readonly"}
+      today={today}
+    />
+  )
 }
