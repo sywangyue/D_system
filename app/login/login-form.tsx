@@ -4,6 +4,7 @@ import { useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
 import { AlertCircle } from "lucide-react"
 import { LOCALE_LABELS, LOCALE_COOKIE, type Locale, type Dict } from "@/lib/i18n-shared"
+import BrandLockup from "@/components/brand/BrandLockup"
 
 /**
  * 登录表单。四个状态（default / focused / error / loading）全部实现。
@@ -72,15 +73,11 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
     >
       {/* ── 左栏 58%：品牌与实据 ─────────────────────────── */}
       <div className="hidden lg:flex lg:w-[58%] flex-col justify-between p-12 hairline-r relative">
-        {/* 英文版只留拉丁字标 —— 「万象」二字本身就需要 CJK 字体 */}
-        <div className="flex items-center gap-2.5">
-          <span className="lat text-[15px] font-semibold tracking-tight">MWLAB</span>
-          {!isEn && (
-            <>
-              <span className="w-px h-3.5 bg-hairline-active" />
-              <span className="text-[13px] text-fg-muted">万象</span>
-            </>
-          )}
+        {/* 英文版只留拉丁字标 —— 「万象」二字走的是只含这两个字的 CJK 子集。
+            用展示态（= 密集态 ×4，板 270×92）：登录页是唯一有地方把品牌放大的面，
+            左栏 58% 宽、上下留白充足，标小了整块版面就压不住。 */}
+        <div className="flex items-center">
+          <BrandLockup size="display" showCn={!isEn} />
         </div>
 
         <div>
@@ -117,7 +114,10 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
       </div>
 
       {/* ── 右栏 42%：表单 ───────────────────────────────── */}
-      <div className="flex-1 flex flex-col bg-[#0E0E10]">
+      {/* 表单栏用 bg-sidebar（浅场 #f2f2f2）：左栏是白画布也用它压出层次，
+          输入框走 bg-canvas 的白底，两者才分得开。原来这里写死 #0E0E10，
+          是本次反置里唯一一处硬编码色 —— 已收进令牌层。 */}
+      <div className="flex-1 flex flex-col bg-sidebar">
         <div className="flex justify-end p-8 gap-1">
           {(Object.keys(LOCALE_LABELS) as Locale[]).map(l => (
             <button

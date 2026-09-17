@@ -13,6 +13,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Noto+Sans+SC:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- 品牌锁定里的「万象」两个字：与问津的「问津」同款，只切这两个字的子集（同 whenjin 的做法） -->
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&text=%E4%B8%87%E8%B1%A1&display=swap" rel="stylesheet">
 <style>
   html, body { margin:0; padding:0; background:#0A0A0B; color:#F5F5F7; -webkit-font-smoothing:antialiased; }
   body { font-family:'Geist','Noto Sans SC',system-ui,sans-serif; }
@@ -51,7 +53,7 @@
     <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:12px;margin-bottom:32px">
       <span style="font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11px;letter-spacing:.08em;color:#52525A">01</span>
       <h2 style="margin:0;font:600 24px/1.3 'Geist',sans-serif;letter-spacing:-.015em;color:#F5F5F7">Token 表</h2>
-      <span style="font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">12 色 · 8 级字阶 · 圆角 · 间距 — Tailwind v4 <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F5F5F7">@theme</code> 口径</span>
+      <span style="font:400 13px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">16 色 · 8 级字阶 · 圆角 · 间距 — Tailwind v4 <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F5F5F7">@theme</code> 口径</span>
     </div>
 
     <div style="border:1px solid rgba(254,92,0,.28);background:rgba(254,92,0,.05);border-radius:6px;padding:16px 18px;margin-bottom:32px;display:flex;gap:16px;align-items:flex-start">
@@ -69,82 +71,110 @@
       </div>
     </div>
 
+  <div style="margin:0 0 40px;padding:14px 18px;border:1px solid rgba(254,92,0,.28);background:rgba(254,92,0,.05);border-radius:6px;display:flex;gap:14px">
+    <span style="flex:none;width:6px;height:6px;border-radius:9999px;background:#FE5C00;margin-top:7px"></span>
+    <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;color:#8A8A93"><b style="font-weight:600;color:#F5F5F7">2026-09-17 · 看板已整体反置为浅色</b> —— Token 表、@theme 代码块、品牌锁定实样三处已同步为浅色真值（取值来自 Vercel Geist 实测）。本板自身的底色仍是旧的暗色（文档壳，不影响产品），<b style="font-weight:600;color:#F5F5F7">04 组件状态对照板仍是按暗色画的，尚未重绘</b>；产品的真实取值以 <code style="font-family:'JetBrains Mono',monospace;font-size:12px;color:#F5F5F7">app/globals.css</code> 为准。</div>
+  </div>
     <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.07);border-radius:6px;overflow:hidden;margin-bottom:16px">
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#0A0A0B;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="height:44px;border-radius:4px;background:#ffffff;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
         <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">bg-canvas</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#0A0A0B</div>
-        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">主画布 · 分栏沟槽 · 表格奇数带</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#ffffff</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">主画布 · 分栏沟槽</div>
       </div>
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#0E0E10;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="height:44px;border-radius:4px;background:#f2f2f2;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
         <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">bg-sidebar</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#0E0E10</div>
-        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">侧栏 · 表头 · 输入框底</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#f2f2f2</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">侧栏 · 输入框底 · 表头</div>
       </div>
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#141416;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="height:44px;border-radius:4px;background:#fafafa;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
         <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">bg-surface</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#141416</div>
-        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">面板 · 卡片 · 表格容器</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#fafafa</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">面板 · 卡片 · 抽屉</div>
       </div>
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#1A1A1E;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="height:44px;border-radius:4px;background:#ffffff;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
         <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">bg-surface-elevated</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#1A1A1E</div>
-        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">浮层 · 下拉 · 命令面板</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#ffffff</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">浮层 · 下拉 · 选中态 · 徽标</div>
       </div>
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#1F1F24;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="height:44px;border-radius:4px;background:#e6e6e6;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
         <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">bg-surface-hover</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#1F1F24</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#e6e6e6</div>
         <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">hover · 选中行底 · 激活 tab</div>
       </div>
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#0E0E10;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
+        <div style="height:44px;border-radius:4px;background:#00000014;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
         <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">border-hairline</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">rgba(255,255,255,.07)</div>
-        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">默认发丝线 · 唯一分隔手段</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#00000014</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">默认发丝线（8% 黑）· 唯一分隔手段</div>
       </div>
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#0E0E10;border:1px solid rgba(255,255,255,.14);margin-bottom:12px"></div>
+        <div style="height:44px;border-radius:4px;background:#00000036;border:1px solid rgba(255,255,255,.07);margin-bottom:12px"></div>
         <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">border-active</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">rgba(255,255,255,.14)</div>
-        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">hover 边 · focus-visible 边</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#00000036</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">hover 边 · focus-visible 边（21% 黑）</div>
       </div>
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#F5F5F7;margin-bottom:12px"></div>
+        <div style="height:44px;border-radius:4px;background:#171717;margin-bottom:12px"></div>
         <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">text-primary</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#F5F5F7</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#171717</div>
         <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">标题 · 数值 · 主字段</div>
       </div>
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#8A8A93;margin-bottom:12px"></div>
+        <div style="height:44px;border-radius:4px;background:#4d4d4d;margin-bottom:12px"></div>
         <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">text-secondary</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#8A8A93</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#4d4d4d</div>
         <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">正文 · 次字段 · 图标默认</div>
       </div>
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#52525A;margin-bottom:12px"></div>
+        <div style="height:44px;border-radius:4px;background:#8f8f8f;margin-bottom:12px"></div>
         <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">text-tertiary</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#52525A</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#8f8f8f</div>
         <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">表头 · 占位符 · 元数据</div>
       </div>
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#FE5C00;margin-bottom:12px"></div>
-        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">accent</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#FE5C00</div>
-        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">每屏最多 3 次 — 见 05</div>
+        <div style="height:44px;border-radius:4px;background:#a8a8a8;margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">text-quaternary</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#a8a8a8</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">最弱的元信息，慎用</div>
       </div>
       <div style="background:#141416;padding:16px">
-        <div style="height:44px;border-radius:4px;background:#FF7324;margin-bottom:12px"></div>
+        <div style="height:44px;border-radius:4px;background:#171717;margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">accent</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#171717</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">主 CTA 黑底白字 · 每屏最多 3 处</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#000000;margin-bottom:12px"></div>
         <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">accent-hover</div>
-        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#FF7324</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#000000</div>
         <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">仅 accent 元素的 hover</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#FE5C00;margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">brand</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#FE5C00</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">品牌橙 —— 只上版，不上 UI</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#111111;margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">brand-ink</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#111111</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">品牌锁定里的「万象」墨色</div>
+      </div>
+      <div style="background:#141416;padding:16px">
+        <div style="height:44px;border-radius:4px;background:#E2E2E0;margin-bottom:12px"></div>
+        <div style="font:500 13px/1.45 'Geist',sans-serif;color:#F5F5F7">logo-rule</div>
+        <div style="font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;font-size:11px;line-height:1.6;color:#52525A;margin-top:3px">#E2E2E0</div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93;margin-top:8px">品牌锁定竖线 · 浅场发丝线</div>
       </div>
     </div>
 
-    <p style="margin:0 0 40px;font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A">12 个，不多不少。没有语义色族、没有第二强调色、没有 tonal palette。成功 / 失败 / 警告一律用中性灰 + 文案承担，只有「错误」允许借 accent 的红向邻位（见 04 输入框 error 态）。</p>
+    <p style="margin:0 0 40px;font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A">16 个，2026-09-17 随看板整体反置为浅色重列 —— 取值全部来自 <b style="font-weight:600;color:#8A8A93">Vercel Geist</b>（vercel.com/geist/colors 的 --ds-* 实测值），四个面由浅到深 #ffffff → #fafafa → #f2f2f2 → #e6e6e6，边框用 gray-alpha 而非实色。没有语义色族、没有 tonal palette：成功 / 失败 / 警告一律用中性灰 + 文案承担，只有「错误」借 Geist 的 red 三件套；彩色只剩品牌橙一处，且只上版不上 UI。</p>
 
     <div style="display:flex;align-items:baseline;gap:14px;border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:12px;margin-bottom:28px">
       <span style="font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:.08em;color:#52525A">02</span>
@@ -272,21 +302,29 @@
           <span style="font-family:'JetBrains Mono',monospace;font-size:11px;color:#52525A">@theme</span>
         </div>
         <pre style="margin:0;padding:18px 16px;font-family:'JetBrains Mono',ui-monospace,SFMono-Regular,monospace;font-size:12px;line-height:1.75;color:#8A8A93;overflow-x:auto">@theme {
-  --color-canvas:           #0A0A0B;
-  --color-sidebar:          #0E0E10;
-  --color-surface:          #141416;
-  --color-surface-elevated: #1A1A1E;
-  --color-surface-hover:    #1F1F24;
-  --color-hairline:         rgb(255 255 255 / 7%);
-  --color-hairline-active:  rgb(255 255 255 / 14%);
-  --color-fg:               #F5F5F7;
-  --color-fg-muted:         #8A8A93;
-  --color-fg-faint:         #52525A;
-  --color-accent:           #FE5C00;
-  --color-accent-hover:     #FF7324;
+  /* 2026-09-17 · 看板反置为浅色，取值全部来自 Vercel Geist 实测 */
+  --color-canvas:           #FFFFFF;   /* Background-1 */
+  --color-sidebar:          #F2F2F2;   /* gray-100  侧栏·输入框底·表头 */
+  --color-surface:          #FAFAFA;   /* Background-2  面板·卡片 */
+  --color-surface-elevated: #FFFFFF;   /* 浮层·下拉·选中态 */
+  --color-surface-hover:    #E6E6E6;   /* gray-300  卡片上的 hover */
+  --color-hairline:         #00000014; /* gray-alpha-400  默认边  8% */
+  --color-hairline-active:  #00000036; /* gray-alpha-500  hover 边 21% */
+  --color-fg:               #171717;   /* gray-1000  primary */
+  --color-fg-muted:         #4D4D4D;   /* gray-900   secondary */
+  --color-fg-subtle:        #8F8F8F;   /* gray-700   tertiary */
+  --color-fg-faint:         #A8A8A8;   /* gray-600   quaternary */
+  --color-accent:           #171717;   /* 高对比一对：黑底白字 */
+  --color-accent-fg:        #FFFFFF;
+  --color-accent-hover:     #000000;
+
+  /* 品牌：只上版，不上 UI（每屏最多 3 处橙） */
+  --color-brand:            #FE5C00;
+  --color-brand-ink:        #111111;   /* 字标「万象」墨色 */
 
   --font-sans: 'Geist', system-ui, sans-serif;
-  --font-cjk:  'Noto Sans SC', 'PingFang SC', sans-serif;
+  --font-cjk:  'PingFang SC', 'HarmonyOS Sans SC',
+               'Microsoft YaHei', sans-serif;
   --font-mono: 'JetBrains Mono', ui-monospace,
                SFMono-Regular, monospace;
 
@@ -481,41 +519,55 @@
       </div>
 
       <div style="background:#0E0E10;border:1px solid rgba(255,255,255,.07);border-radius:6px;padding:22px 24px;grid-column:span 2">
-        <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:18px">品牌锁定 · P0-1 · 四个应用屏语序已反正</div>
+        <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#52525A;margin-bottom:18px">品牌锁定 · 2026-09-17 重塑 · 橙板 ＋ 衬线中文（规范 docs/BRAND-LOGO.md）</div>
         <div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:1px;background:rgba(255,255,255,.07);border-radius:4px;overflow:hidden">
-          <div style="background:#0A0A0B;padding:20px 18px">
-            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✕ 现状 · 4 屏</div>
+          <div style="background:#ffffff;padding:20px 18px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✕ 旧版 · 2026-09-16</div>
             <div style="display:flex;align-items:center;gap:10px">
-              <span style="font:500 20px/1 'Noto Sans SC',sans-serif;color:#8A8A93">万象</span>
-              <span style="width:1px;height:14px;background:rgba(255,255,255,.18)"></span>
-              <span style="font:400 15px/1 'Geist',sans-serif;color:#8A8A93">MWLAB</span>
+              <span style="font:600 20px/1 'Geist',sans-serif;letter-spacing:-.02em;color:#8A8A93">MWLAB</span>
+              <span style="width:1px;height:15px;background:#E2E2E0"></span>
+              <span style="font:400 17px/1 'Noto Sans SC',sans-serif;color:#111111">万象</span>
             </div>
+            <div style="font:400 10px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:10px">无品牌色、无标记、中文是黑体</div>
           </div>
-          <div style="background:#0A0A0B;padding:20px 18px">
-            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✓ 标准态 · 20/17</div>
+          <div style="background:#ffffff;padding:20px 18px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✓ 标准态 · 拉丁 20 / 板 92×33</div>
             <div style="display:flex;align-items:center;gap:12px">
-              <span style="font:600 20px/1 'Geist',sans-serif;letter-spacing:-.02em;color:#F5F5F7">MWLAB</span>
-              <span style="width:1px;height:15px;background:rgba(255,255,255,.18)"></span>
-              <span style="font:400 17px/1 'Noto Sans SC',sans-serif;letter-spacing:0;color:#F5F5F7">万象</span>
+              <span style="background:#FE5C00;padding:6.5px 9px;display:inline-flex;align-items:center"><span style="font:600 20px/1 'Geist',sans-serif;letter-spacing:-.02em;color:#fff">MWLAB</span></span>
+              <span style="width:1px;height:15px;background:#E2E2E0"></span>
+              <span style="font:700 17px/1 'Noto Serif SC',serif;letter-spacing:.06em;color:#111111">万象</span>
             </div>
+            <div style="font:400 10px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:10px">文档 / PPT / 物料</div>
           </div>
-          <div style="background:#0A0A0B;padding:20px 18px">
-            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✓ 密集态 · 15/13</div>
+          <div style="background:#ffffff;padding:20px 18px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✓ 密集态 · 拉丁 15 / 板 67.5×23</div>
             <div style="display:flex;align-items:center;gap:9px">
-              <span style="font:600 15px/1 'Geist',sans-serif;letter-spacing:-.02em;color:#F5F5F7">MWLAB</span>
-              <span style="width:1px;height:11px;background:rgba(255,255,255,.18)"></span>
-              <span style="font:400 13px/1 'Noto Sans SC',sans-serif;letter-spacing:0;color:#8A8A93">万象</span>
+              <span style="background:#FE5C00;padding:4px 6px;display:inline-flex;align-items:center"><span style="font:600 15px/1 'Geist',sans-serif;letter-spacing:-.02em;color:#fff">MWLAB</span></span>
+              <span style="width:1px;height:11px;background:#E2E2E0"></span>
+              <span style="font:700 13px/1 'Noto Serif SC',serif;letter-spacing:.06em;color:#111111">万象</span>
             </div>
+            <div style="font:400 10px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:10px">侧栏 / 登录页（应用里只用这一档）</div>
           </div>
-          <div style="background:#0A0A0B;padding:20px 18px">
-            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✓ 图标态 · 侧栏收起</div>
+          <div style="background:#ffffff;padding:20px 18px">
+            <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✓ 图标态 · favicon / 收起态 28px</div>
             <div style="display:flex;align-items:center;gap:14px">
-              <span style="width:28px;height:28px;border:1px solid rgba(255,255,255,.14);border-radius:4px;display:flex;align-items:center;justify-content:center;font:400 15px/1 'Noto Sans SC',sans-serif;color:#F5F5F7">象</span>
-              <span style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A">兄弟项目同构<br>WHENJIN │ 问津 →「津」</span>
+              <span style="width:28px;height:28px;background:#FE5C00;display:flex;align-items:center;justify-content:center">
+                <svg width="28" height="28" viewBox="0 0 100 100"><polyline points="18,74 34,24 50,56 66,24 82,74" fill="none" stroke="#fff" stroke-width="13"></polyline></svg>
+              </span>
+              <span style="font:400 11px/1.6 'Noto Sans SC',sans-serif;color:#52525A">橙方＋白 M ＝ 问津 W 的垂直镜像<br>WHENJIN │ 问津 → 红方＋白 W</span>
             </div>
+            <div style="font:400 10px/1.6 'Noto Sans SC',sans-serif;color:#52525A;margin-top:10px">不用「象」字：16px 下糊成一团</div>
           </div>
         </div>
-        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A;margin-top:14px">规则：拉丁在前，字重 600、字距 -0.02em；发丝竖线 1px / rgba(255,255,255,.18) / 高度 = 拉丁字号 ×0.75；中文在后，字重低一档、视觉尺寸小一号、字距 0。三者间距 12px（密集态 9px）。</div>
+        <div style="margin-top:1px;background:#ffffff;padding:20px 18px;border:1px solid rgba(255,255,255,.07);border-top:0">
+          <div style="font:600 11px/1.1 'Geist',sans-serif;letter-spacing:.08em;color:#52525A;margin-bottom:14px">✓ 展示态 · 拉丁 60 / 板 270.1×92 ＝ 密集态 ×4（登录页左栏）</div>
+          <div style="display:flex;align-items:center;gap:36px">
+            <span style="background:#FE5C00;padding:16px 24px;display:inline-flex;align-items:center"><span style="font:600 60px/1 'Geist',sans-serif;letter-spacing:-.02em;color:#fff">MWLAB</span></span>
+            <span style="width:1px;height:44px;background:#E2E2E0"></span>
+            <span style="font:700 52px/1 'Noto Serif SC',serif;letter-spacing:.06em;color:#111111">万象</span>
+          </div>
+        </div>
+        <div style="font:400 12px/1.65 'Noto Sans SC',sans-serif;letter-spacing:0;color:#52525A;margin-top:14px">规则：橙板内拉丁在前（Geist 600 / 字距 −0.02em / 白字），板内距 6.5·9（密集态 4·6）；发丝竖线 1px / #E2E2E0 / 高度 = 拉丁字号 ×0.75；中文在后，<b style="font-weight:600;color:#8A8A93">Noto Serif SC 700 与问津同一款字</b> + 0.06em 字距。段间距 12px（密集态 9px）。板不圆角 —— 与问津的硬方标同一套几何观。</div>
       </div>
     </div>
   </section>

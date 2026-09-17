@@ -6,10 +6,11 @@ import {
   LayoutDashboard, Target, Building2, FileText, Map, Settings, LogOut,
 } from "lucide-react"
 import type { SessionUser } from "@/lib/session"
+import BrandLockup from "@/components/brand/BrandLockup"
 
 /**
  * 侧栏。user 由服务端组件经 AppShell 传入 —— 客户端不再自己读登录态。
- * 品牌锁定：拉丁在前、中文在后，永不调换。收起态只留单字「象」。
+ * 品牌锁定走 BrandLockup（橙板 + 衬线中文），规范见 docs/BRAND-LOGO.md。
  */
 
 const NAV = [
@@ -36,11 +37,11 @@ export default function Sidebar({ user }: { user: SessionUser }) {
 
   return (
     <aside className="w-[200px] shrink-0 h-full flex flex-col bg-sidebar hairline-r">
-      {/* 品牌锁定 —— 拉丁在前，中文在后 */}
-      <div className="h-14 flex items-center gap-2.5 px-5 hairline-b">
-        <span className="lat text-[15px] font-semibold tracking-tight text-fg">MWLAB</span>
-        <span className="w-px h-3.5 bg-hairline-active" />
-        <span className="text-[13px] font-normal text-fg-muted">万象</span>
+      {/* 品牌锁定 —— 橙板内拉丁在前、发丝线、衬线中文在后。规范见 docs/BRAND-LOGO.md
+          用标准态：这块 56px 高、200px 宽的栏能容下的最大一档（板 92×33，两侧余 8px）。
+          再大就得动侧栏宽度与表头高度，那是另一个决定。 */}
+      <div className="h-14 flex items-center px-5 hairline-b">
+        <BrandLockup size="standard" />
       </div>
 
       <nav className="flex-1 py-2">

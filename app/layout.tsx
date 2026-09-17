@@ -24,6 +24,19 @@ const jetbrains = localFont({
   display: "swap",
 });
 
+/**
+ * 品牌锁定里的「万象」两个字。子集只有万(U+4E07)、象(U+8C61)两字，1.3KB。
+ * 与兄弟品牌问津的「问津」同款：Noto Serif SC 700 —— 同一套体系里，
+ * 两个品牌的中文字标必须是一款字，这是它们唯一的视觉联结。
+ * 正文不加载任何 CJK webfont，仍走系统栈（见 globals.css 的 --font-cjk）。
+ */
+const notoSerifScLogo = localFont({
+  src: "../public/fonts/noto-serif-sc-logo.woff2",
+  variable: "--font-logo-serif",
+  weight: "700",
+  display: "block",   // 两个字，等它加载完再画，免得先闪一下回退的宋体
+});
+
 export const metadata: Metadata = {
   title: "MWLAB 万象 · 竞争盘面看板",
   description: "Messe Düsseldorf Shanghai · Business Development",
@@ -45,7 +58,7 @@ export default async function RootLayout({
   const user = await getSessionUser();
 
   return (
-    <html lang="zh-CN" className={`${geist.variable} ${jetbrains.variable}`}>
+    <html lang="zh-CN" className={`${geist.variable} ${jetbrains.variable} ${notoSerifScLogo.variable}`}>
       <body>
         <AppShell user={user}>{children}</AppShell>
       </body>

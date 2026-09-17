@@ -12,44 +12,79 @@
      → 拉丁两款自托管（public/fonts/*.woff2，共 60KB，见 app/layout.tsx）
      → 中文走系统栈，不加载 CJK webfont（一个常用字子集也要 1MB+，
        而 PingFang SC / 微软雅黑 / Noto Sans CJK SC 已是各平台原生高质量字体）
+     → 唯一例外：品牌锁定里的「万象」两个字。它必须与兄弟品牌问津的
+       「问津」用同一款衬线，系统栈里没有，所以自托管一个 2 字子集
+       （1.3KB，见 --font-logo-cn）。只给 logo 用，正文仍然不加载 CJK webfont。
    ========================================================================== */
 
 @theme {
-  /* ── 色板：严格取自 linear.app 的实测计算值 ─────────────
-     取值方式：browse 打开 linear.app，读 :root 上的 --color-* 计算值。
-     不是凭印象配的。
+  /* ── 色板：2026-09-17 整体反置为浅色，取值全部来自 Vercel Geist ────
+     取值方式：browse 打开 vercel.com/geist/colors，抓 :root 上的 --ds-* 计算值
+     与色块实测值。不是凭印象配的。
 
-     此前的问题：文字只有三档，且整体压暗了一整级 ——
-     我的「次级 #8A8A93」其实等于 Linear 的三级 #8a8f98，
-     我的「三级 #52525A」比 Linear 最暗的四级 #62666d 还暗。
-     所以辅助文字在 #0A0A0B 上几乎看不见。现在补齐四档。 */
+     Geist 浅色灰阶（hsl 0,0%,X）：
+       gray-100 95% #f2f2f2   gray-200 92% #ebebeb   gray-300 90% #e6e6e6
+       gray-500 79% #c9c9c9   gray-600 66% #a8a8a8   gray-700 56% #8f8f8f
+       gray-800 49% #7d7d7d   gray-900 30% #4d4d4d   gray-1000 9% #171717
+       Background 1 (0,0%,100%) #ffffff    Background 2 (0,0%,98%) #fafafa
+     Geist 边框（Borders 段）用 gray-alpha：
+       alpha-400 #00000014（Default 8%）· alpha-500 #00000036（Hover 21%）
 
-  --color-canvas:           #08090a;   /* Linear bg-primary */
-  --color-sidebar:          #0f1011;   /* 侧栏 · 表头 · 输入框底 */
-  --color-surface:          #1c1c1f;   /* Linear bg-secondary：面板 · 卡片 */
-  --color-surface-elevated: #232326;   /* Linear bg-tertiary：浮层 · 下拉 */
-  --color-surface-hover:    #2a2a2e;   /* hover · 选中行 */
+     四个面由浅到深，每一处「谁压在谁上」都逐一对过：
+       #ffffff 画布 · 浮层 · 选中态 · 输入框底（登录页）
+       #fafafa 卡片 · 面板 · 抽屉          ← Background 2
+       #f2f2f2 侧栏 · 输入框底 · 表头       ← gray-100
+       #e6e6e6 卡片上的 hover / 选中        ← gray-300
+     反置时没有改任何组件的配色 —— 全站颜色都走这一层令牌，
+     靠的就是原来那些「相邻面必须能分辨」的关系被原样保住。 */
 
-  --color-hairline:         #23252a;   /* Linear border-primary，实色而非 alpha */
-  --color-hairline-active:  #34343a;   /* Linear border-secondary */
+  --color-canvas:           #ffffff;   /* Geist Background 1 */
+  --color-sidebar:          #f2f2f2;   /* gray-100：侧栏 · 输入框底 · 表头 */
+  --color-surface:          #fafafa;   /* Geist Background 2：面板 · 卡片 · 抽屉 */
+  --color-surface-elevated: #ffffff;   /* 白：浮层 · 下拉 · 选中态 · 徽标 */
+  --color-surface-hover:    #e6e6e6;   /* gray-300：卡片上的 hover / 选中 */
 
-  /* 四档文字，缺一档就会出现「只能在太亮和看不见之间二选一」 */
-  --color-fg:        #f7f8f8;   /* primary    标题 · 主数据 */
-  --color-fg-muted:  #d0d6e0;   /* secondary  正文 · 表格单元 · 导航项 */
-  --color-fg-subtle: #8a8f98;   /* tertiary   表头 · 标签 · 提示 */
-  --color-fg-faint:  #62666d;   /* quaternary 最弱的元信息，慎用 */
+  --color-hairline:         #00000014;  /* gray-alpha-400 = Default border 8% */
+  --color-hairline-active:  #00000036;  /* gray-alpha-500 = Hover border 21% */
 
-  /* 强调色：橙色已整体移除，等 Max 单独指定 1–2 个点位。
-     在那之前主 CTA 走 Linear 的做法 —— 高对比中性（白底深字），
-     不引入任何彩色。这个 token 保留是为了将来一行改回来。 */
-  --color-accent:       #f7f8f8;
-  --color-accent-fg:    #08090a;
-  --color-accent-hover: #ffffff;
+  /* 四档文字，缺一档就会出现「只能在太黑和看不见之间二选一」 */
+  --color-fg:        #171717;   /* gray-1000  primary    标题 · 主数据 */
+  --color-fg-muted:  #4d4d4d;   /* gray-900   secondary  正文 · 表格单元 · 导航项 */
+  --color-fg-subtle: #8f8f8f;   /* gray-700   tertiary   表头 · 标签 · 提示 */
+  --color-fg-faint:  #a8a8a8;   /* gray-600   quaternary 最弱的元信息，慎用 */
 
-  /* 错误态：取 Linear 暗色主题的 error 三件套 */
-  --color-error-bg:     hsl(358 76% 10%);
-  --color-error-border: hsl(357 89% 16%);
-  --color-error-text:   hsl(358 100% 81%);
+  /* 强调色：Geist 的 High Contrast 一对 —— 黑底白字。
+     橙色仍然只属于品牌板，不进 CTA（简报 P1-5：每屏最多 3 处橙）。 */
+  --color-accent:       #171717;
+  --color-accent-fg:    #ffffff;
+  --color-accent-hover: #000000;
+
+  /* 错误态：取 Geist 浅色 red 三件套（red-100 / red-400 / red-900） */
+  --color-error-bg:     hsl(0 100% 97%);
+  --color-error-border: hsl(0 90% 92%);
+  --color-error-text:   hsl(358 66% 48%);
+
+  /* ── 品牌色（2026-09-17 品牌重塑，规范见 docs/BRAND-LOGO.md）──────
+     兄弟品牌「问津 Whenjin」与本项目共用一条规矩：色块 + 白色标记。
+       问津 ＝ 红 #c2261c 方块 + 白色几何 W  + 衬线拉丁（报）
+       万象 ＝ 橙 #FE5C00 色板 + 白色 MWLAB  + 无衬线拉丁（工具）
+     两个都在浅场上（2026-09-17 看板整体反置后，原先「一暗一浅」的区分不再成立），
+     品牌区分改由色相、标记形态、拉丁字体三件事承担。中文仍是同一款衬线。
+     橙的出处：docs/CLAUDE-DESIGN-BRIEF.md P0-4 的 accent / accent-hover，
+     不是现配的。问津的红只属于问津，不进本项目。
+
+     橙色不进 CTA —— 主 CTA 走 Geist 的黑白高对比（简报 P1-5：每屏最多 3 处橙）。 */
+  --color-brand:       #fe5c00;
+  --color-brand-fg:    #ffffff;
+  --color-brand-hover: #ff7324;
+  --color-brand-rule:  #e2e2e0;   /* 浅场发丝线，取自 whenjin --color-rule */
+  --color-brand-ink:   #111111;   /* 浅场墨色，取自 whenjin --color-text */
+
+  /* ── 品牌锁定（logo）三态数值 ────────────────────────────
+     组件里只许引用这些变量，不许另立字面量（与文件头的规则同）。
+     几何那组（--logo-*）不在这里，在文件末尾的普通 :root —— 见那里的说明。 */
+  /* 竖线：浅场取值，与 whenjin --color-rule、与 mwlab-lockup-light.svg 同值 */
+  --color-logo-rule: #e2e2e0;
 
   /* ── 字体栈 ─────────────────────────────────────────────
      R5：数字永远走拉丁等宽。Geist 绝不能出现在等宽栈里，
@@ -58,6 +93,12 @@
   --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
   --font-cjk:  "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei",
                "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+
+  /* ── 品牌锁定专用中文（只两个字）──────────────────────────
+     与 whenjin 的「问津」同款：Noto Serif SC 700 + 0.06em 字距。
+     ⚠️ 子集里只有「万」「象」两字，拿它排别的中文会掉进回退字体。 */
+  --font-logo-cn: var(--font-logo-serif), "Songti SC", "SimSun", serif;
+  --logo-cn-tracking: 0.06em;
 
   /* ── 8 级字阶（拉丁）─────────────────────────────────── */
   --text-micro:   0.6875rem;  /* 11px  标签 · 表头 */
@@ -85,6 +126,49 @@
   --radius-control: 4px;
   --radius-panel:   6px;
   --radius-card:    8px;
+}
+
+/* ============================================================================
+   MWLAB 万象 · 品牌锁定（logo）几何
+   ----------------------------------------------------------------------------
+   为什么这组不在上面的 @theme 里：
+   Tailwind v4 只认它自己那套命名空间（--color-* / --font-* / --text-* …），
+   塞进 @theme 的自定义命名空间（--logo-*）会被**部分裁掉** ——
+   实测标准态那几条侥幸留下，带 -dense 后缀的与 --logo-icon-size 全部消失，
+   结果组件里的 var() 全部落空、版面塌成一行字。走普通 :root 才不会被碰。
+
+   数值出处与三态定义见 docs/BRAND-LOGO.md §2；资产由
+   tools/build_logo_svg.py 按同一套数值烘出，改这里必须重跑它。
+   ========================================================================== */
+:root {
+  /* 标准态：文档 / PPT / 物料 */
+  --logo-latin-size:           20px;
+  --logo-plate-pad-y:          6.5px;
+  --logo-plate-pad-x:          9px;
+  --logo-divider-height:       15px;
+  --logo-cn-size:              17px;
+  --logo-gap:                  12px;
+
+  /* 密集态：应用内（侧栏表头等窄容器） */
+  --logo-latin-size-dense:     15px;
+  --logo-plate-pad-y-dense:    4px;
+  --logo-plate-pad-x-dense:    6px;
+  --logo-divider-height-dense: 11px;
+  --logo-cn-size-dense:        13px;
+  --logo-gap-dense:            9px;
+
+  /* 展示态：登录页左栏。**＝ 密集态 ×4**，六个数一一对应乘 4，
+     不是另配的。要改就六个一起改，否则比例会走形。 */
+  --logo-latin-size-display:     60px;
+  --logo-plate-pad-y-display:    16px;
+  --logo-plate-pad-x-display:    24px;
+  --logo-divider-height-display: 44px;
+  --logo-cn-size-display:        52px;
+  --logo-gap-display:            36px;
+
+  /* 图标态：favicon / 侧栏收起 */
+  --logo-icon-size:            28px;
+  --logo-icon-glyph-size:      19px;   /* 0.66 × 方标边 */
 }
 
 /* ============================================================================
@@ -127,6 +211,9 @@
   }
 
   a { color: inherit; text-decoration: none; }
+
+  /* 占位文字：显式给色，不吃浏览器默认（各平台默认灰差得远，浅场下深浅不一） */
+  ::placeholder { color: var(--color-fg-faint); opacity: 1; }
 
   /* 焦点环由 design/motion.css 统一提供，这里只清掉默认 outline */
   :focus { outline: none; }

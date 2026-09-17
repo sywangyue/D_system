@@ -1,5 +1,11 @@
 # Claude Design 深度设计 Brief · MWLAB 万象
 
+> ⚠️ **本简报的色板部分已作废（2026-09-17）**：看板整体反置为浅色，色值改取
+> **Vercel Geist**（黑白色界面），不再是本文 §1 保留的 `#0A0A0B / #0E0E10 / #141416`
+> 那套暗色。以 `app/globals.css` 的 `@theme` 与 `design/MWLAB 设计系统板.dc.html`
+> 的 Token 表为准。本文其余部分（§2 问题清单、§3 字阶、§4 中文排版 7 条）
+> 仍然有效，未受影响。
+
 **日期**：2026-09-16
 **输入**：`design/stitch/` — Stitch 交付 9 屏（6 个界面 + 登录 4 态）
 **上游**：`docs/REBUILD-2026-09-PLAN.md`（§1 信息架构 · §2 品牌 · §5 Stitch prompt）
