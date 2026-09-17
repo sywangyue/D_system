@@ -105,6 +105,29 @@ describe("middleware", () => {
     expect(res.headers.get("location")).toBeNull()
   })
 
+  // 落地页登录与否都显示：/ 打上 x-mwlab-bare，根布局据此不渲染后台侧栏
+  it("should mark / as bare (no app shell) for both anonymous and signed-in users", async () => {
+    for (const token of [undefined, "valid-jwt"]) {
+      const res = await middleware(makeRequest("/", token ? { token } : undefined))
+      expect(res.status).toBe(200)
+      expect(res.headers.get("x-middleware-request-x-mwlab-bare")).toBe("1")
+    }
+  })
+
+  // 其余页面不接受客户端伪造的 x-mwlab-bare（否则可以把后台页面的侧栏藏掉）
+  it("should strip a forged x-mwlab-bare header on app pages", async () => {
+    vi.mocked(jwtVerify).mockResolvedValueOnce({
+      payload: { email: "manager@mwlab.com", role: "manager" } as any,
+      protectedHeader: { alg: "HS256" },
+      key: {} as any,
+    })
+    const res = await middleware(makeRequest("/overview", {
+      token: "valid-jwt", headers: { "x-mwlab-bare": "1" },
+    }))
+    expect(res.status).toBe(200)
+    expect(res.headers.get("x-middleware-request-x-mwlab-bare")).toBeNull()
+  })
+
   // 但放行必须**只放 /**：写成 startsWith('/') 就等于放行全站
   it("should still protect other pages (the '/' exemption is exact, not a prefix)", async () => {
     for (const p of ["/overview", "/company", "/expo", "/knowledge"]) {

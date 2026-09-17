@@ -8,13 +8,18 @@ export default async function middleware(request: NextRequest) {
   const token = request.cookies.get('session')?.value
   const { pathname } = request.nextUrl
 
+  // 官网落地页（TASK-J）：公开，登录与否都显示落地页（2026-09-17 Max 定）。
+  // ⚠️ 必须写成精确相等 —— 写成 startsWith('/') 等于放行全站。
+  // 打上 x-mwlab-bare 标记：根布局据此不渲染后台侧栏，已登录用户看到的也是完整落地页。
+  if (pathname === '/') {
+    const bareHeaders = new Headers(request.headers)
+    bareHeaders.set('x-mwlab-bare', '1')
+    return NextResponse.next({ request: { headers: bareHeaders } })
+  }
+
   // 完全公开路径——始终放行，不注入头部
   if (
     pathname === '/login' ||
-    // 官网落地页（TASK-J）：未登录也能看。
-    // ⚠️ 必须写成精确相等 —— 写成 startsWith('/') 等于放行全站。
-    // 已登录用户访问 / 的分流由 app/page.tsx 里的 getSessionUser() 完成，不在这里做。
-    pathname === '/' ||
     // 地图的陆地轮廓 GeoJSON（public/countries-110m.json）。
     // 纯静态世界地图数据、不含任何业务信息，但扩展名不在下面 matcher 的负向预查里
     // （那里只排除了图片），所以必须显式放行 —— 否则匿名访客的地图只有点位、
@@ -62,6 +67,7 @@ export default async function middleware(request: NextRequest) {
     const requestHeaders = new Headers(request.headers)
     requestHeaders.delete('x-user-email')
     requestHeaders.delete('x-user-role')
+    requestHeaders.delete('x-mwlab-bare')   // 只有 / 由上面打这个标记，其余页面不接受客户端传入
     requestHeaders.set('x-user-email', payload.email as string)
     requestHeaders.set('x-user-role', payload.role as string)
 

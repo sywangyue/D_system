@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import AppShell from "@/components/layout/AppShell";
@@ -70,9 +71,11 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
   // 登录态与语言都在这里各读一次，往下传。全站唯一的读取点。
-  const [user, locale, t] = await Promise.all([
-    getSessionUser(), getLocale(), getDict(),
+  const [user, locale, t, h] = await Promise.all([
+    getSessionUser(), getLocale(), getDict(), headers(),
   ]);
+  // 落地页（/）由中间件打上 x-mwlab-bare：登录与否都不套后台外壳
+  const bare = h.get("x-mwlab-bare") === "1";
 
   const fontVars = [
     geist.variable,
@@ -83,7 +86,7 @@ export default async function RootLayout({
   return (
     <html lang={locale === "en" ? "en" : "zh-CN"} className={fontVars}>
       <body>
-        <AppShell user={user} locale={locale} t={t}>{children}</AppShell>
+        <AppShell user={bare ? null : user} locale={locale} t={t}>{children}</AppShell>
       </body>
     </html>
   );

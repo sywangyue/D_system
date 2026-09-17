@@ -10,11 +10,12 @@ import type { Coverage } from "@/lib/queries/landing"
  * 标题下方是产品截图：1px 发丝边框、12px 圆角、底边渐隐到页面背景（§4.2）。
  */
 export default function LandingHero({
-  locale, t, coverage,
+  locale, t, coverage, enterHref,
 }: {
   locale: Locale
   t: Dict
   coverage: Coverage
+  enterHref: string
 }) {
   const l = t.landing.hero
   // 字号按语种取一节（设计板的中英配对：72/68）
@@ -39,7 +40,7 @@ export default function LandingHero({
 
       <div className="mt-10 flex items-center gap-7">
         <Link
-          href="/login"
+          href={enterHref}
           className="btn inline-flex h-10 items-center rounded-[4px] bg-accent px-5 text-[14px] font-medium text-accent-fg"
         >
           {l.enter}

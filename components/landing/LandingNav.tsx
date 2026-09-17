@@ -12,7 +12,9 @@ import type { Dict, Locale } from "@/lib/i18n-shared"
  * 没有 DE：`locales/` 里只有 zh 与 en，德文待人工翻译。
  * 放一个点了没反应的按钮比不放更糟。
  */
-export default function LandingNav({ locale, t }: { locale: Locale; t: Dict }) {
+export default function LandingNav({
+  locale, t, enterHref,
+}: { locale: Locale; t: Dict; enterHref: string }) {
   const l = t.landing.nav
   const anchors: { href: string; label: string }[] = [
     { href: "#data", label: l.data },
@@ -39,7 +41,7 @@ export default function LandingNav({ locale, t }: { locale: Locale; t: Dict }) {
           <LocaleSwitch locale={locale} />
 
           <Link
-            href="/login"
+            href={enterHref}
             className="btn inline-flex h-8 items-center rounded-[4px] bg-accent px-3.5 text-[13px] font-medium text-accent-fg"
           >
             {l.enter}

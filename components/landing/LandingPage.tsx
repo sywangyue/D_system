@@ -18,24 +18,26 @@ import LandingFooter from "./LandingFooter"
  * 开发者署名、技术栈展示（§1）。
  */
 export default function LandingPage({
-  locale, t, data,
+  locale, t, data, enterHref,
 }: {
   locale: Locale
+  /** 「进入系统」的去向：已登录 /overview，未登录 /login */
+  enterHref: string
   t: Dict
   data: LandingData
 }) {
   return (
     <div className="min-h-screen bg-canvas">
-      <LandingNav locale={locale} t={t} />
+      <LandingNav locale={locale} t={t} enterHref={enterHref} />
 
       <main>
-        <LandingHero locale={locale} t={t} coverage={data.coverage} />
+        <LandingHero locale={locale} t={t} coverage={data.coverage} enterHref={enterHref} />
         <CoverageBand locale={locale} t={t} coverage={data.coverage} />
         <DataFacets locale={locale} t={t} data={data} />
         <BusinessLines locale={locale} t={t} />
       </main>
 
-      <LandingFooter locale={locale} t={t} />
+      <LandingFooter locale={locale} t={t} enterHref={enterHref} />
     </div>
   )
 }

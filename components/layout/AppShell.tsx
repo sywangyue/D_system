@@ -5,7 +5,8 @@ import type { Dict, Locale } from "@/lib/i18n-shared"
 /**
  * 应用外壳。服务端组件 —— user 与字典都在 layout 里读好传进来，
  * 客户端不自己判断登录态，也不自己读语言 cookie。
- * 未登录时（user 为 null）不渲染外壳，让 /login 与落地页自己占满整屏。
+ * user 为 null 时不渲染外壳，让 /login 与落地页自己占满整屏。
+ * 落地页对已登录用户也传 null（根布局按中间件的 x-mwlab-bare 标记处理）。
  */
 export default function AppShell({
   user, locale, t, children,
