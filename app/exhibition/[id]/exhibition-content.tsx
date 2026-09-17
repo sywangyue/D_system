@@ -4,7 +4,6 @@ import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft } from "lucide-react"
-import { getUserInfo } from "@/lib/auth"
 
 type Brand = {
   brand_id: string; name_cn: string; name_en?: string
@@ -44,8 +43,7 @@ export default function ExhibitionContent({ id }: { id: string }) {
   // Form fields
 
   useEffect(() => {
-    const user = getUserInfo()
-    if (!user) { router.push('/login'); return }
+    // 未登录的页面请求由中间件拦截，这里不再重复判断
     fetchData()
   }, [id])
 

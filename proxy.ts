@@ -11,7 +11,6 @@ export default async function middleware(request: NextRequest) {
   // 完全公开路径——始终放行，不注入头部
   if (
     pathname === '/login' ||
-    pathname === '/pitch.html' ||
     pathname.startsWith('/_next') ||
     pathname.startsWith('/api/auth/') ||
     pathname.match(/\.(svg|png|jpg|jpeg|gif|webp|ico|css|js|woff2|woff|ttf)$/)
@@ -37,9 +36,10 @@ export default async function middleware(request: NextRequest) {
     }
   }
 
-  // 页面路由：无 token → 重定向到 /pitch.html（主入口）
+  // 页面路由：无 token → 回登录页。
+  // （原先重定向到 /pitch.html，该静态页已随阶段 5 退役）
   if (!token) {
-    return NextResponse.redirect(new URL('/pitch.html', request.url))
+    return NextResponse.redirect(new URL('/login', request.url))
   }
 
   try {
@@ -53,7 +53,7 @@ export default async function middleware(request: NextRequest) {
 
     // admin-only 路由守卫：/setting
     if (pathname.startsWith('/setting') && payload.role !== 'admin') {
-      return NextResponse.redirect(new URL('/dashboard.html', request.url))
+      return NextResponse.redirect(new URL('/overview', request.url))
     }
 
     return NextResponse.next({ request: { headers: requestHeaders } })

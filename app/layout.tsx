@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import AppShell from "@/components/layout/AppShell";
+import { getSessionUser } from "@/lib/session";
 import "./globals.css";
 import "../design/motion.css";
 
@@ -35,15 +36,18 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // 登录态在这里读一次，往下传。全站唯一的读取点。
+  const user = await getSessionUser();
+
   return (
     <html lang="zh-CN" className={`${geist.variable} ${jetbrains.variable}`}>
       <body>
-        <AppShell>{children}</AppShell>
+        <AppShell user={user}>{children}</AppShell>
       </body>
     </html>
   );

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getUserInfo } from "@/lib/auth";
 import DataStatusCard, { type DataStatus } from "@/components/settings/DataStatusCard";
 import UsersTable, { UsersTableSkeleton, type UserEntry } from "@/components/settings/UsersTable";
 import SystemInfoBlock, { type SystemInfo } from "@/components/settings/SystemInfoBlock";
@@ -50,11 +49,8 @@ export default function SettingContent() {
   const [statusError, setStatusError] = useState<string | null>(null);
 
   useEffect(() => {
-    const info = getUserInfo();
-    if (!info || info.role !== "admin") {
-      router.replace("/dashboard.html");
-      return;
-    }
+    // 角色校验由中间件负责（proxy.ts 里 /setting 非 admin 直接重定向），
+    // 此处不再重复判断，避免与 cookie 登录态形成第二个真源。
     setRoleChecked(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
