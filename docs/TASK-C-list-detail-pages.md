@@ -58,13 +58,22 @@
 | 关联报告 | `reports[]`，点击进 `/research/[id]` |
 | 关联展会品牌 | `brand`，为 null 时整块不渲染 |
 
-**资源区是这个页面的重点**。下载链接直接指向：
+**资源区是这个页面的重点**。
 
-```
-/api/resource/{resource_id}/download
+**这块组件已经存在，直接复用，不要重写**：`components/resource/ResourceList.tsx`。
+任务 G 的机会详情页在用同一个，规格与这里的资源区逐字对得上（倒序、kind 徽标、
+标题、大小、采集时间、下载按钮），所以它已经从 G 里提出来放进 `components/` 了。
+再写一份等于同一张列表维护两处，早晚漂移。
+
+```tsx
+<ResourceList resources={data.resources} emptyText="这家公司名下还没有资源" />
 ```
 
-用 `<a href download>`，不要用 fetch 再 createObjectURL —— 那会把整个文件读进内存。
+`emptyText` 是唯一留的口子 —— 机会详情页那边写的是「这一机会及其关联公司名下还没有资源」，
+这里的说法不一样。除此之外组件不接任何业务判断，别往里加公司相关的分支。
+
+下载链接由组件自己指向 `/api/resource/{resource_id}/download`，用 `<a href download>`，
+不要 fetch 再 createObjectURL —— 那会把整个文件读进内存。
 
 ---
 

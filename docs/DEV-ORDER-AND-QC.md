@@ -66,7 +66,11 @@
 
 ---
 
-## §3 数据基线（质检时对照，任何任务都不该改变它们）
+## §3 数据基线（质检时对照）
+
+截至 2026-09-17，库里 14 张表，**全部列在下面**。分两组，验收方式不同。
+
+### 3.1 存量表 —— 任何任务都不该改变它们
 
 ```
 exhibition_brand      7,401      其中 display_ready=1  7,378
@@ -77,12 +81,34 @@ company                 501      494 来自 CIBS2026 批量线索 + 6 家深度�
 data_provenance       9,825
 manual_tag_history   12,302
 resource                 50      report 11 / raw 11 / export 16 / roster 10 / note 2
-intel_report              2      ← 任务 D 之后应为 13
-schema_version           16
+intel_report             13      任务 D 回填 11 份历史 docx 后的值
+crawl_log                 7
+user                      3      admin / manager / readonly，就这三个
+schema_version           17      017 = intel_report.report_type 补 company_research
 ```
 
+**`user` 必须是 3 行。** 验收要造账号就用现成这三个，或者用 `JWT_SECRET` 自己签一个
+令牌（`lib/session.ts` 只认签名，不查建账时间）。往 `user` 表插行的后果是留下一把
+不知道密码的钥匙 —— 任务 G 第一轮就是这么漏了一个 `role=admin, is_active=1` 的账号，
+而当时的基线里没有 `user`，十一项全对，污染照样漏过去了。
+
+### 3.2 业务表 —— 会随日常使用增长，只核对「变化是否解释得通」
+
+```
+opportunity               1
+opportunity_event         0
+```
+
+这两张是 Max 每天在写的表，不是定值。质检时的要求是：**跑完验收后回到跑之前的值**。
+造验收数据用完就删，连同 `opportunity_event` 里的 `stage_change` 一起
+（软删除 `is_archived=1` 是给真实机会用的，验收数据要硬删，别留脏行）。
+
+### 3.3 通用规矩
+
 改库前一律 `cp data/mwlab.db data/backups/mwlab_pre-<任务>-$(date +%Y%m%d).db`。
+
 **行数对得上不代表没丢数据** —— 014 迁移就是这么丢过一列的。
+**表没列进基线，就等于没人看它** —— 任务 G 的账号污染是这么漏的，所以 3.1 现在是全表。
 
 ---
 
