@@ -1,90 +1,149 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   MWLAB 万象 · Design Tokens
+   ----------------------------------------------------------------------------
+   唯一真源。值全部来自 design/MWLAB 设计系统板.dc.html，不得在组件里另立字面量。
+   旧的橙底浅色 token（--color-orange-* / --color-surface-card 等）已整体废除。
+
+   字体策略（与设计稿的差异，有意为之）：
+     设计稿用 fonts.googleapis.com 拉 Geist / JetBrains Mono / Noto Sans SC。
+     但用户在中国大陆、服务器在阿里云，线上渲染不能赌 Google 可达。
+     → 拉丁两款自托管（public/fonts/*.woff2，共 60KB，见 app/layout.tsx）
+     → 中文走系统栈，不加载 CJK webfont（一个常用字子集也要 1MB+，
+       而 PingFang SC / 微软雅黑 / Noto Sans CJK SC 已是各平台原生高质量字体）
+   ========================================================================== */
+
 @theme {
-  /* 主色梯度 */
-  --color-orange-500: #FE5C00;
-  --color-orange-400: #FF7A2F;
-  --color-orange-300: #FF9A60;
-  --color-orange-200: #FFBF99;
-  --color-orange-100: #FFF2EC;
-  --color-orange-50:  #FFF8F5;
+  /* ── 色板：12 个，没有第 13 个 ───────────────────────────── */
+  --color-canvas:           #0A0A0B;   /* 主画布 · 分栏沟槽 */
+  --color-sidebar:          #0E0E10;   /* 侧栏 · 表头 · 输入框底 */
+  --color-surface:          #141416;   /* 面板 · 卡片 · 表格容器 */
+  --color-surface-elevated: #1A1A1E;   /* 浮层 · 下拉 · 命令面板 */
+  --color-surface-hover:    #1F1F24;   /* hover · 选中行 */
+  --color-hairline:         rgb(255 255 255 / 7%);
+  --color-hairline-active:  rgb(255 255 255 / 14%);
+  --color-fg:               #F5F5F7;
+  --color-fg-muted:         #8A8A93;
+  --color-fg-faint:         #52525A;
+  --color-accent:           #FE5C00;
+  --color-accent-hover:     #FF7324;
 
-  /* 中性色 */
-  --color-black:   #1D1D1F;
-  --color-gray-80: #3D3D3F;
-  --color-gray-60: #6E6E73;
-  --color-gray-40: #AEAEB2;
-  --color-gray-20: #D1D1D6;
-  --color-gray-10: #F2F2F7;
-  --color-white:   #FFFFFF;
+  /* ── 字体栈 ─────────────────────────────────────────────
+     R5：数字永远走拉丁等宽。Geist 绝不能出现在等宽栈里，
+     否则它会先命中，JetBrains Mono 永远轮不到。 */
+  --font-sans: var(--font-geist), system-ui, -apple-system, sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, SFMono-Regular, monospace;
+  --font-cjk:  "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei",
+               "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
 
-  /* 语义 token */
-  --color-surface:        var(--color-gray-10);
-  --color-surface-card:   var(--color-white);
-  --color-accent:         var(--color-orange-500);
-  --color-accent-dark:    #E55300;
-  --color-accent-surface: var(--color-orange-50);
-  --color-border:         var(--color-gray-20);
-  --color-text-primary:   var(--color-black);
-  --color-text-secondary: var(--color-gray-60);
-  --color-text-tertiary:  var(--color-gray-40);
-  --color-destructive:    var(--color-orange-500);
+  /* ── 8 级字阶（拉丁）─────────────────────────────────── */
+  --text-micro:   0.6875rem;  /* 11px  标签 · 表头 */
+  --text-ui:      0.8125rem;  /* 13px  表格 · 控件 */
+  --text-body:    0.9375rem;  /* 15px  正文 */
+  --text-subhead: 1.125rem;   /* 18px  小标题 */
+  --text-heading: 1.5rem;     /* 24px  区块标题 */
+  --text-title:   1.75rem;    /* 28px  页标题 */
+  --text-hero:    2.75rem;    /* 44px  登录页主标 */
+  --text-display: 4.5rem;     /* 72px  落地页主标 */
 
-  /* 科技感 */
-  --color-glass-bg:     rgba(255, 255, 255, 0.7);
-  --color-glass-border: rgba(255, 255, 255, 0.3);
+  /* ── 同级中文字号（R4：比拉丁小，补偿中文字面率）────────
+     配对取自设计板：72/68 · 44/42 · 28/27 · 24/23 · 18/17 · 15/14 · 13/12 · 11/11 */
+  --text-micro-cjk:   0.6875rem;  /* 11 */
+  --text-ui-cjk:      0.75rem;    /* 12 */
+  --text-body-cjk:    0.875rem;   /* 14 */
+  --text-subhead-cjk: 1.0625rem;  /* 17 */
+  --text-heading-cjk: 1.4375rem;  /* 23 */
+  --text-title-cjk:   1.6875rem;  /* 27 */
+  --text-hero-cjk:    2.625rem;   /* 42 */
+  --text-display-cjk: 4.25rem;    /* 68 */
 
-  /* Shadow 层级 */
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.10);
-  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-  --shadow-xl: 0 12px 36px rgba(0,0,0,0.16);
-
-  /* Border-Radius */
-  --radius-sm: 6px;
-  --radius-md: 8px;
-  --radius-lg: 12px;
-
-  /* Hover 过渡 */
-  --transition-default: 150ms ease;
-
-  /* Layout */
-  --spacing-sidebar: 200px;
-  --spacing-nav-item: 44px;
+  /* ── 圆角 ─────────────────────────────────────────────── */
+  --radius-badge:   2px;
+  --radius-control: 4px;
+  --radius-panel:   6px;
+  --radius-card:    8px;
 }
 
+/* ============================================================================
+   中文排版规范 —— 设计板 §中文排版规范 的 7 条，在这里落成 CSS。
+   不要在组件里重新发明，也不要绕过这一层。
+   ========================================================================== */
 @layer base {
   html {
-    font-family: var(--font-montserrat), "Arial", ui-sans-serif, system-ui, sans-serif;
+    /* 中文在后。R5 的数字规则由 .num / .tabular 负责，不靠这条栈 */
+    font-family: var(--font-sans), var(--font-cjk);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    /* R2：中文永不负字距。全局归零，需要负字距的拉丁用 .lat 单独开 */
+    letter-spacing: 0;
   }
 
   body {
-    color: var(--color-text-primary);
-    background-color: var(--color-surface);
+    background: var(--color-canvas);
+    color: var(--color-fg);
+    font-size: var(--text-ui-cjk);
+    /* R3：中文行高高于拉丁（UI 场景 1.65） */
+    line-height: 1.65;
+    /* R1 + R6：正文中文 400；标题另见下方 h1–h4，上限 500 */
+    font-weight: 400;
   }
 
-  :focus-visible {
-    outline: none;
-    box-shadow: 0 0 0 2px var(--color-accent);
-    border-radius: 2px;
+  /* R3 + R6：标题行高 1.20–1.40，字重上限 500。
+     ≥700 会让系统回退字体触发伪粗体，边缘发毛。 */
+  h1, h2, h3, h4 {
+    font-weight: 500;
+    line-height: 1.3;
+    letter-spacing: 0;
   }
+
+  /* 表单控件不继承字体是浏览器默认行为，显式接回来 */
+  button, input, select, textarea {
+    font: inherit;
+    color: inherit;
+    letter-spacing: 0;
+  }
+
+  a { color: inherit; text-decoration: none; }
+
+  /* 焦点环由 design/motion.css 统一提供，这里只清掉默认 outline */
+  :focus { outline: none; }
 }
 
 @layer components {
-  .glass-card {
-    background: var(--color-glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid var(--color-glass-border);
-    border-radius: 12px;
+  /**
+   * R1 + R7：拉丁片段包一层 .lat。
+   *   - 切回拉丁字体
+   *   - 字重升一档（中文 400 ↔ 拉丁 500；中文 500 ↔ 拉丁 600）
+   *   - 中英之间 0.25em 间隙由样式给，数据库字段里不得含补位空格
+   *   - 拉丁才允许负字距
+   */
+  .lat {
+    font-family: var(--font-sans);
+    font-weight: 500;
+    letter-spacing: -0.01em;
+    margin-inline: 0.25em;
+  }
+  .lat:first-child { margin-inline-start: 0; }
+  .lat:last-child  { margin-inline-end: 0; }
+
+  /** R5：任何数字都用这个，绝不让它落进 CJK 字体 */
+  .num {
+    font-family: var(--font-mono);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: -0.01em;
   }
 
-  .kpi-value {
-    font-size: 2.25rem;
-    font-weight: 600;
-    line-height: 1.1;
-    letter-spacing: -0.02em;
+  /** R3：长文中文行高 1.80（详情页的调研报告正文用） */
+  .prose-cjk {
+    font-size: var(--text-body-cjk);
+    line-height: 1.8;
+    font-weight: 400;
   }
+
+  /** 发丝线分隔，取代 border 与投影混用 */
+  .hairline   { border-color: var(--color-hairline); }
+  .hairline-b { border-bottom: 1px solid var(--color-hairline); }
+  .hairline-r { border-right: 1px solid var(--color-hairline); }
+  .hairline-t { border-top: 1px solid var(--color-hairline); }
 }
