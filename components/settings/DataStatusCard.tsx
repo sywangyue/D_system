@@ -40,11 +40,11 @@ export default function DataStatusCard({
 }) {
   if (isLoading) {
     return (
-      <div className="bg-white border border-border rounded-xl p-6 space-y-3 animate-pulse">
-        <div className="h-5 w-24 bg-gray-200 rounded" />
+      <div className="bg-surface border border-hairline rounded-xl p-6 space-y-3 animate-pulse">
+        <div className="h-5 w-24 bg-surface-elevated rounded" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map((i) => (
-            <div key={i} className="h-16 bg-gray-100 rounded-lg" />
+            <div key={i} className="h-16 bg-surface-elevated rounded-lg" />
           ))}
         </div>
       </div>
@@ -53,7 +53,7 @@ export default function DataStatusCard({
 
   const status = data;
   return (
-    <div className="bg-white border border-border rounded-xl p-6">
+    <div className="bg-surface border border-hairline rounded-xl p-6">
       <h2 className="text-base font-semibold text-text-primary mb-4">
         数据状态
       </h2>

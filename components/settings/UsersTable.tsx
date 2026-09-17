@@ -13,14 +13,14 @@ function getUserStatus(user: UserEntry): { label: string; color: string } {
     const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
     if (lastLogin > thirtyDaysAgo) return { label: "活跃", color: "bg-green-100 text-green-800" };
   }
-  return { label: "未活跃", color: "bg-gray-100 text-gray-600" };
+  return { label: "未活跃", color: "bg-surface-elevated text-fg-muted" };
 }
 
 function getRoleBadge(role: string): { label: string; color: string } {
   switch (role) {
     case "admin":   return { label: "管理员", color: "bg-red-100 text-red-700" };
     case "manager": return { label: "经理",   color: "bg-blue-100 text-blue-700" };
-    default:        return { label: "只读",   color: "bg-gray-100 text-gray-600" };
+    default:        return { label: "只读",   color: "bg-surface-elevated text-fg-muted" };
   }
 }
 
@@ -41,15 +41,15 @@ function formatDateTime(iso: string | null): string {
 
 export function UsersTableSkeleton() {
   return (
-    <div className="bg-white border border-border rounded-xl overflow-hidden animate-pulse">
-      <div className="h-10 bg-gray-100 mx-6 mt-5 rounded w-28" />
+    <div className="bg-surface border border-hairline rounded-xl overflow-hidden animate-pulse">
+      <div className="h-10 bg-surface-elevated mx-6 mt-5 rounded w-28" />
       <div className="px-6 py-3 space-y-3">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="flex gap-4">
-            <div className="h-5 w-48 bg-gray-100 rounded" />
-            <div className="h-5 w-16 bg-gray-100 rounded-full" />
-            <div className="h-5 w-12 bg-gray-100 rounded-full" />
-            <div className="h-5 w-32 bg-gray-100 rounded" />
+            <div className="h-5 w-48 bg-surface-elevated rounded" />
+            <div className="h-5 w-16 bg-surface-elevated rounded-full" />
+            <div className="h-5 w-12 bg-surface-elevated rounded-full" />
+            <div className="h-5 w-32 bg-surface-elevated rounded" />
           </div>
         ))}
       </div>
@@ -60,21 +60,21 @@ export function UsersTableSkeleton() {
 export default function UsersTable({ users }: { users: UserEntry[] }) {
   if (users.length === 0) {
     return (
-      <div className="bg-white border border-border rounded-xl p-6 text-center text-sm text-text-secondary">
+      <div className="bg-surface border border-hairline rounded-xl p-6 text-center text-sm text-text-secondary">
         暂无用户数据
       </div>
     );
   }
 
   return (
-    <div className="bg-white border border-border rounded-xl overflow-hidden">
+    <div className="bg-surface border border-hairline rounded-xl overflow-hidden">
       <h2 className="text-base font-semibold text-text-primary px-6 pt-5 pb-3">
         用户管理 ({users.length})
       </h2>
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
-            <tr className="border-b border-border">
+            <tr className="border-b border-hairline">
               <th className="text-left px-6 py-3 text-xs font-medium text-text-secondary uppercase">
                 邮箱
               </th>
@@ -96,7 +96,7 @@ export default function UsersTable({ users }: { users: UserEntry[] }) {
               return (
                 <tr
                   key={user.user_id}
-                  className="border-b border-border last:border-0 hover:bg-gray-50 transition-colors"
+                  className="border-b border-hairline last:border-0 hover:bg-surface-elevated transition-colors"
                 >
                   <td className="px-6 py-3 font-mono text-xs text-text-primary">
                     {user.email}

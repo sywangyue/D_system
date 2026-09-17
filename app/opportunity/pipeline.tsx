@@ -80,13 +80,13 @@ export default function Pipeline({
       <div className="flex items-center justify-between px-8 h-14 hairline-b shrink-0">
         <div className="flex items-baseline gap-3">
           <h1 className="text-[17px] font-medium">机会台</h1>
-          <span className="lat text-[11px] uppercase tracking-wider text-fg-faint">Pipeline</span>
+          <span className="lat text-[11px] uppercase tracking-wider text-fg-subtle">Pipeline</span>
           <span className="num text-[12px] text-fg-muted">{total}</span>
         </div>
         {canWrite && (
           <button
             onClick={() => setDrawer(true)}
-            className="btn flex items-center gap-1.5 h-7 px-3 rounded-[4px] bg-accent text-canvas
+            className="btn flex items-center gap-1.5 h-7 px-3 rounded-[4px] bg-accent text-[var(--color-accent-fg)]
                        text-[12px] font-semibold border-0 cursor-pointer"
           >
             <Plus size={13} /> 录入机会
@@ -105,7 +105,7 @@ export default function Pipeline({
           >
             {l.label}
             {tab === l.key && (
-              <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-accent" />
+              <span className="absolute left-0 right-0 bottom-0 h-0.5 bg-fg" />
             )}
           </button>
         ))}
@@ -123,7 +123,7 @@ export default function Pipeline({
         <Pill active={mine} onClick={() => setMine(v => !v)}>只看我的</Pill>
 
         <div className="relative ml-auto">
-          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-fg-faint" />
+          <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-fg-subtle" />
           <input
             value={q}
             onChange={e => setQ(e.target.value)}
@@ -173,7 +173,7 @@ export default function Pipeline({
                   />
                 </td>
                 <td className="lat px-3 text-[12px] text-fg-muted truncate">{r.owner || "—"}</td>
-                <td className="num px-8 text-[11px] text-fg-faint text-right">
+                <td className="num px-8 text-[11px] text-fg-subtle text-right">
                   {(r.updated_at || "").slice(5, 10)}
                 </td>
               </tr>
@@ -183,7 +183,7 @@ export default function Pipeline({
 
         {!loading && error && (
           <Empty icon={<AlertCircle size={22} />} title={error}
-                 action={<button onClick={load} className="btn text-accent bg-transparent border-0 cursor-pointer text-[13px]">重试</button>} />
+                 action={<button onClick={load} className="btn text-fg bg-transparent border-0 cursor-pointer text-[13px] underline underline-offset-4">重试</button>} />
         )}
 
         {!loading && !error && rows.length === 0 && (
@@ -191,7 +191,7 @@ export default function Pipeline({
             ? <Empty icon={<Search size={22} />} title="没有符合条件的机会"
                      hint="试着放宽筛选条件"
                      action={<button onClick={() => { setStage(""); setMine(false); setQ("") }}
-                                     className="btn text-accent bg-transparent border-0 cursor-pointer text-[13px]">清除筛选</button>} />
+                                     className="btn text-fg bg-transparent border-0 cursor-pointer text-[13px] underline underline-offset-4">清除筛选</button>} />
             : <Empty icon={<Inbox size={22} />} title="还没有机会"
                      hint={canWrite ? "点右上角录入第一条" : "等待管理员录入"} />
         )}
@@ -203,7 +203,7 @@ export default function Pipeline({
           <button disabled={page <= 1} onClick={() => setPage(p => p - 1)}
                   className="btn h-6 px-2.5 rounded-[4px] bg-transparent border border-hairline
                              text-fg-muted cursor-pointer disabled:opacity-35">上一页</button>
-          <span className="num text-fg-faint">{page} / {pages}</span>
+          <span className="num text-fg-subtle">{page} / {pages}</span>
           <button disabled={page >= pages} onClick={() => setPage(p => p + 1)}
                   className="btn h-6 px-2.5 rounded-[4px] bg-transparent border border-hairline
                              text-fg-muted cursor-pointer disabled:opacity-35">下一页</button>
@@ -227,7 +227,7 @@ export default function Pipeline({
 function Th({ children, className = "" }: { children: React.ReactNode; className?: string }) {
   return (
     <th className={`h-7 px-3 first:pl-8 last:pr-8 text-left text-[10px] font-semibold uppercase
-                    tracking-[0.06em] text-fg-faint hairline-b ${className}`}>
+                    tracking-[0.06em] text-fg-subtle hairline-b ${className}`}>
       {children}
     </th>
   )
@@ -275,7 +275,7 @@ function StageCell({ value, disabled, onChange }: {
       >
         {STAGES.map(s => <option key={s.key} value={s.key}>{s.label}</option>)}
       </select>
-      <span className="num text-[10px] text-fg-faint">{idx + 1}/5</span>
+      <span className="num text-[10px] text-fg-subtle">{idx + 1}/5</span>
     </div>
   )
 }
@@ -284,7 +284,7 @@ function Empty({ icon, title, hint, action }: {
   icon: React.ReactNode; title: string; hint?: string; action?: React.ReactNode
 }) {
   return (
-    <div className="flex flex-col items-center justify-center py-24 gap-2.5 text-fg-faint">
+    <div className="flex flex-col items-center justify-center py-24 gap-2.5 text-fg-subtle">
       <div className="opacity-40">{icon}</div>
       <div className="text-[14px] text-fg-muted">{title}</div>
       {hint && <div className="text-[12px]">{hint}</div>}

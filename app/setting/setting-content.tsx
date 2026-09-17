@@ -21,12 +21,12 @@ function ErrorCard({
   return (
     <div
       role="alert"
-      className="flex flex-col items-center justify-center py-12 bg-white border border-border rounded-xl text-center"
+      className="flex flex-col items-center justify-center py-12 bg-surface border border-hairline rounded-xl text-center"
     >
       <div className="text-sm text-destructive mb-3">{message}</div>
       <button
         onClick={onRetry}
-        className="px-4 py-2 rounded-lg bg-accent text-white text-sm hover:bg-accent-dark transition-colors"
+        className="px-4 py-2 rounded-lg bg-accent text-[var(--color-accent-fg)] text-sm hover:bg-accent-hover transition-colors"
       >
         点击重试
       </button>

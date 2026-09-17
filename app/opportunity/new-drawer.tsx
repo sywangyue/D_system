@@ -107,8 +107,8 @@ export default function NewDrawer({
 
         <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
           {error && (
-            <div className="flex items-center gap-2 px-3 h-9 rounded-[4px] text-[12px] text-accent"
-                 style={{ background: "#1F1214", border: "1px solid rgb(254 92 0 / 35%)" }}>
+            <div className="flex items-center gap-2 px-3 h-9 rounded-[4px] text-[12px] text-[var(--color-error-text)]"
+                 style={{ background: "var(--color-error-bg)", border: "1px solid var(--color-error-border)" }}>
               {error}
             </div>
           )}
@@ -224,13 +224,13 @@ export default function NewDrawer({
                               bg-surface-hover text-[13px]">
                 <span className="truncate">{company.name}</span>
                 <button onClick={() => { setCompany(null); setCq("") }}
-                        className="btn bg-transparent border-0 text-fg-faint hover:text-fg cursor-pointer">
+                        className="btn bg-transparent border-0 text-fg-subtle hover:text-fg cursor-pointer">
                   <X size={13} />
                 </button>
               </div>
             ) : (
               <div className="relative">
-                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-faint" />
+                <Search size={13} className="absolute left-3 top-1/2 -translate-y-1/2 text-fg-subtle" />
                 <input value={cq} onChange={e => setCq(e.target.value)}
                        placeholder="搜索公司名或信用代码"
                        className="input w-full h-9 pl-8 pr-3 rounded-[4px] bg-sidebar text-[13px]
@@ -244,7 +244,7 @@ export default function NewDrawer({
                               className="btn w-full text-left px-2.5 py-2 rounded-[4px] bg-transparent
                                          border-0 cursor-pointer text-[12px] hover:bg-surface-hover">
                         <div className="truncate">{h.name}</div>
-                        <div className="text-[11px] text-fg-faint">{h.company_status}</div>
+                        <div className="text-[11px] text-fg-subtle">{h.company_status}</div>
                       </button>
                     ))}
                   </div>
@@ -273,7 +273,7 @@ export default function NewDrawer({
                   className="btn h-8 px-3.5 rounded-[4px] bg-transparent border border-hairline
                              text-[12px] text-fg-muted cursor-pointer">取消</button>
           <button onClick={submit} disabled={saving} data-loading={saving}
-                  className="btn h-8 px-4 rounded-[4px] bg-accent text-canvas text-[12px]
+                  className="btn h-8 px-4 rounded-[4px] bg-accent text-[var(--color-accent-fg)] text-[12px]
                              font-semibold border-0 cursor-pointer flex items-center gap-1.5">
             {saving && <Loader2 size={13} className="animate-spin" />}
             保存
@@ -290,10 +290,10 @@ function Field({ label, hint, required, children }: {
   return (
     <div>
       <label className="block text-[11px] uppercase tracking-wider text-fg-muted mb-1.5">
-        {label}{required && <span className="text-accent ml-0.5">*</span>}
+        {label}{required && <span className="text-[var(--color-error-text)] ml-0.5">*</span>}
       </label>
       {children}
-      {hint && <p className="text-[11px] text-fg-faint mt-1.5">{hint}</p>}
+      {hint && <p className="text-[11px] text-fg-subtle mt-1.5">{hint}</p>}
     </div>
   )
 }

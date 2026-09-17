@@ -15,19 +15,41 @@
    ========================================================================== */
 
 @theme {
-  /* ── 色板：12 个，没有第 13 个 ───────────────────────────── */
-  --color-canvas:           #0A0A0B;   /* 主画布 · 分栏沟槽 */
-  --color-sidebar:          #0E0E10;   /* 侧栏 · 表头 · 输入框底 */
-  --color-surface:          #141416;   /* 面板 · 卡片 · 表格容器 */
-  --color-surface-elevated: #1A1A1E;   /* 浮层 · 下拉 · 命令面板 */
-  --color-surface-hover:    #1F1F24;   /* hover · 选中行 */
-  --color-hairline:         rgb(255 255 255 / 7%);
-  --color-hairline-active:  rgb(255 255 255 / 14%);
-  --color-fg:               #F5F5F7;
-  --color-fg-muted:         #8A8A93;
-  --color-fg-faint:         #52525A;
-  --color-accent:           #FE5C00;
-  --color-accent-hover:     #FF7324;
+  /* ── 色板：严格取自 linear.app 的实测计算值 ─────────────
+     取值方式：browse 打开 linear.app，读 :root 上的 --color-* 计算值。
+     不是凭印象配的。
+
+     此前的问题：文字只有三档，且整体压暗了一整级 ——
+     我的「次级 #8A8A93」其实等于 Linear 的三级 #8a8f98，
+     我的「三级 #52525A」比 Linear 最暗的四级 #62666d 还暗。
+     所以辅助文字在 #0A0A0B 上几乎看不见。现在补齐四档。 */
+
+  --color-canvas:           #08090a;   /* Linear bg-primary */
+  --color-sidebar:          #0f1011;   /* 侧栏 · 表头 · 输入框底 */
+  --color-surface:          #1c1c1f;   /* Linear bg-secondary：面板 · 卡片 */
+  --color-surface-elevated: #232326;   /* Linear bg-tertiary：浮层 · 下拉 */
+  --color-surface-hover:    #2a2a2e;   /* hover · 选中行 */
+
+  --color-hairline:         #23252a;   /* Linear border-primary，实色而非 alpha */
+  --color-hairline-active:  #34343a;   /* Linear border-secondary */
+
+  /* 四档文字，缺一档就会出现「只能在太亮和看不见之间二选一」 */
+  --color-fg:        #f7f8f8;   /* primary    标题 · 主数据 */
+  --color-fg-muted:  #d0d6e0;   /* secondary  正文 · 表格单元 · 导航项 */
+  --color-fg-subtle: #8a8f98;   /* tertiary   表头 · 标签 · 提示 */
+  --color-fg-faint:  #62666d;   /* quaternary 最弱的元信息，慎用 */
+
+  /* 强调色：橙色已整体移除，等 Max 单独指定 1–2 个点位。
+     在那之前主 CTA 走 Linear 的做法 —— 高对比中性（白底深字），
+     不引入任何彩色。这个 token 保留是为了将来一行改回来。 */
+  --color-accent:       #f7f8f8;
+  --color-accent-fg:    #08090a;
+  --color-accent-hover: #ffffff;
+
+  /* 错误态：取 Linear 暗色主题的 error 三件套 */
+  --color-error-bg:     hsl(358 76% 10%);
+  --color-error-border: hsl(357 89% 16%);
+  --color-error-text:   hsl(358 100% 81%);
 
   /* ── 字体栈 ─────────────────────────────────────────────
      R5：数字永远走拉丁等宽。Geist 绝不能出现在等宽栈里，

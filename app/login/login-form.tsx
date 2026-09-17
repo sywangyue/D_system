@@ -84,13 +84,13 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
         </div>
 
         <div>
-          <div className="lat text-[11px] uppercase tracking-[0.12em] text-fg-faint mb-6">
+          <div className="lat text-[11px] uppercase tracking-[0.12em] text-fg-subtle mb-6">
             Messe Düsseldorf Shanghai · Business Development
           </div>
-          <h1 className="text-[2.625rem] leading-[1.25] font-medium mb-4">
+          <h1 className="text-[2.625rem] leading-[1.25] font-medium mb-4 text-fg-muted">
             {isEn ? <>Structural view of</> : <>中国展会市场的</>}
             <br />
-            <span className="text-accent">{isEn ? "China’s expo market" : "结构化盘面"}</span>
+            <span className="text-fg">{isEn ? "China’s expo market" : "结构化盘面"}</span>
           </h1>
           <p className="text-[14px] text-fg-muted mb-10">
             {isEn
@@ -102,7 +102,7 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
             {STATS.map(s => (
               <div key={s.n} className="bg-canvas p-4">
                 <div className="num text-[26px] leading-none mb-1.5">{s.n}</div>
-                <div className="text-[11px] uppercase tracking-wider text-fg-faint">
+                <div className="text-[11px] uppercase tracking-wider text-fg-subtle">
                   {isEn ? s.en : s.zh}
                 </div>
               </div>
@@ -110,7 +110,7 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
           </div>
         </div>
 
-        <div className="text-[11px] text-fg-faint leading-relaxed">
+        <div className="text-[11px] text-fg-subtle leading-relaxed">
           <div>{t.login.internalOnly}</div>
           <div className="lat">© 2026 Messe Düsseldorf Shanghai</div>
         </div>
@@ -124,7 +124,7 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
               key={l}
               onClick={() => switchLocale(l)}
               className={`btn h-7 px-3 text-[12px] rounded-[4px] border-0 cursor-pointer
-                ${l === locale ? "bg-accent text-canvas font-medium" : "bg-transparent text-fg-muted hover:text-fg"}`}
+                ${l === locale ? "bg-surface-elevated text-fg font-medium" : "bg-transparent text-fg-subtle hover:text-fg"}`}
             >
               {LOCALE_LABELS[l]}
             </button>
@@ -137,8 +137,8 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
             <div className="h-[52px] mb-1">
               {error && (
                 <div
-                  className="flex items-center gap-2 h-10 px-3 rounded-[6px] text-[13px] text-accent"
-                  style={{ background: "#1F1214", border: "1px solid rgb(254 92 0 / 35%)" }}
+                  className="flex items-center gap-2 h-10 px-3 rounded-[6px] text-[13px] text-[var(--color-error-text)]"
+                  style={{ background: "var(--color-error-bg)", border: "1px solid var(--color-error-border)" }}
                   role="alert"
                 >
                   <AlertCircle size={15} className="shrink-0" />
@@ -181,17 +181,17 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
               type="submit"
               data-loading={loading}
               disabled={loading}
-              className="btn w-full h-11 rounded-[4px] bg-accent text-canvas text-[14px]
+              className="btn w-full h-11 rounded-[4px] bg-accent text-[var(--color-accent-fg)] text-[14px]
                          font-semibold tracking-[0.2em] border-0 cursor-pointer"
             >
               {t.login.submit}
             </button>
 
-            <p className="text-center text-[12px] text-fg-faint mt-4">{t.login.accountNote}</p>
+            <p className="text-center text-[12px] text-fg-subtle mt-4">{t.login.accountNote}</p>
           </form>
         </div>
 
-        <div className="p-8 text-[12px] text-fg-faint">{t.login.accessNote}</div>
+        <div className="p-8 text-[12px] text-fg-subtle">{t.login.accessNote}</div>
       </div>
     </div>
   )

@@ -51,11 +51,10 @@ export default function Sidebar({ user }: { user: SessionUser }) {
               key={href}
               href={href}
               className={`relative flex items-center gap-3 h-9 px-5 text-[13px]
-                ${active ? "text-fg bg-surface-hover" : "text-fg-muted hover:text-fg hover:bg-surface"}`}
+                ${active ? "text-fg bg-surface-elevated" : "text-fg-muted hover:text-fg hover:bg-surface"}`}
               style={{ transition: "background-color var(--dur-fast) var(--ease-standard)" }}
             >
-              {active && <span className="absolute left-0 top-0 bottom-0 w-0.5 bg-accent" />}
-              <Icon size={16} className={active ? "text-accent" : "text-fg-faint"} />
+              <Icon size={16} className={active ? "text-fg" : "text-fg-subtle"} />
               <span>{label}</span>
               <span className="lat ml-auto text-[10px] uppercase tracking-wider text-fg-faint">
                 {lat}
@@ -67,10 +66,10 @@ export default function Sidebar({ user }: { user: SessionUser }) {
 
       <div className="p-4 hairline-t">
         <div className="text-[12px] text-fg-muted truncate">{user.display_name}</div>
-        <div className="lat text-[11px] text-fg-faint truncate mb-2">{user.email}</div>
+        <div className="lat text-[11px] text-fg-subtle truncate mb-2">{user.email}</div>
         <button
           onClick={handleLogout}
-          className="btn flex items-center gap-1.5 text-[12px] text-fg-faint hover:text-fg bg-transparent border-0 p-0 cursor-pointer"
+          className="btn flex items-center gap-1.5 text-[12px] text-fg-subtle hover:text-fg bg-transparent border-0 p-0 cursor-pointer"
         >
           <LogOut size={13} />
           <span>退出</span>

@@ -28,18 +28,18 @@ export default function SystemInfoBlock({
 }) {
   if (isLoading) {
     return (
-      <div className="bg-white border border-border rounded-xl p-6 animate-pulse space-y-3">
-        <div className="h-5 w-20 bg-gray-200 rounded" />
-        <div className="h-4 w-64 bg-gray-100 rounded" />
-        <div className="h-4 w-48 bg-gray-100 rounded" />
-        <div className="h-4 w-56 bg-gray-100 rounded" />
+      <div className="bg-surface border border-hairline rounded-xl p-6 animate-pulse space-y-3">
+        <div className="h-5 w-20 bg-surface-elevated rounded" />
+        <div className="h-4 w-64 bg-surface-elevated rounded" />
+        <div className="h-4 w-48 bg-surface-elevated rounded" />
+        <div className="h-4 w-56 bg-surface-elevated rounded" />
       </div>
     );
   }
 
   const sys = info;
   return (
-    <div className="bg-white border border-border rounded-xl p-6">
+    <div className="bg-surface border border-hairline rounded-xl p-6">
       <h2 className="text-base font-semibold text-text-primary mb-3">
         系统信息
       </h2>

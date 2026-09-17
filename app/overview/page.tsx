@@ -16,7 +16,7 @@ export default async function OverviewPage() {
         欢迎回来，{user.display_name}
       </p>
       <div className="rounded-[8px] bg-surface p-8 hairline border">
-        <div className="text-[11px] uppercase tracking-wider text-fg-faint mb-3">
+        <div className="text-[11px] uppercase tracking-wider text-fg-subtle mb-3">
           阶段 5.3 待实现
         </div>
         <p className="text-[14px] text-fg-muted leading-relaxed">
