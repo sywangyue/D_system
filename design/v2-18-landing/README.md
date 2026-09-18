@@ -14,6 +14,9 @@
 | 6 | 完整界面框架 | `current/03-expo-full.png` |
 | 7 | Linear 参考 | 自行截图：首屏 + 「Build, review, and ship」段 |
 
+**Prompt 在 `stitch-prompt.md`** —— 已把第 6 节的视觉要求提炼成 Stitch 能吃的形式，
+并带上真实文案与数字（上一轮 Stitch 编了 43 条假展会名，必须给原文）。
+
 ## 截图说明
 
 | 文件 | 内容 |
