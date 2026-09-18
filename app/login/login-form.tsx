@@ -2,31 +2,30 @@
 
 import { useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
-import { AlertCircle } from "lucide-react"
-import { fill, fmtNum, type Locale, type Dict } from "@/lib/i18n-shared"
-import { errorText } from "@/lib/i18n-shared"
-import BrandLockup from "@/components/brand/BrandLockup"
+import Link from "next/link"
+import { AlertCircle, Loader2 } from "lucide-react"
+import { type Locale, type Dict, errorText } from "@/lib/i18n-shared"
 import LocaleSwitch from "@/components/layout/LocaleSwitch"
+import LoginBackdrop from "@/components/login/LoginBackdrop"
 
 /**
- * 登录表单。四个状态（default / focused / error / loading）全部实现。
+ * 登录表单（V2-18 改版）。
  *
- * 与旧版的差别：
- *  - 删掉 Matrix 数字雨、打字机、日文半角假名（调性完全跑偏，且 SSR 水合报错）
- *  - 不再 saveAuth 到 localStorage —— cookie 是唯一登录态，成功后 refresh 即可
- *  - lang=en 时摘掉中文字体栈，英文版不出现中文字体
- *    （机制在 globals.css 的 html[lang="en"] 规则里，组件不再自己写 inline 覆盖）
+ * **Stitch 稿的 1:1 还原**（design/v2-18-landing/stitch-login/）：整页一张画布，
+ * 等距 3D 几何背景（LoginBackdrop），420px 白卡片居中悬浮。
+ * 旧版的左右分栏、左栏大标题与四个统计数字全部去掉 —— 登录页不需要讲这些。
+ *
+ * 稿子上没有、但代码里一个都不能少的东西：
+ *   - 四个状态：default / focused / error / loading，稿子都画了，这里全部接上真实逻辑
+ *   - `autoComplete` username / current-password —— 浏览器密码填充靠它，丢了体验就废一半
+ *   - `aria-invalid` 与 `role="alert"` —— 读屏要靠它们知道哪里错了
+ *   - LocaleSwitch 用现成组件，不是稿子里那两个 onclick 按钮
+ *   - cookie 是唯一登录态，成功后 refresh，不写任何客户端存储
+ *
+ * 卡片顶部的品牌锁定同时是回首页的链接（稿子的设计，参考 workbuddy）。
+ * 这里没有复用 BrandLockup 组件：稿子给的尺寸（橙板 92×33 / 竖线 15px / 中文 17px）
+ * 与 standard 态一致，但它要整体可点且带 hover 位移，包一层 Link 更直接。
  */
-
-/** 左栏的四个实据。数字走 Intl，标签走字典 —— 原先这里是 zh/en 两份硬编码文案，
- *  与字典形成两套机制，接 i18n 时合并掉了。 */
-const STATS: { n: number; slug: keyof Dict["login"] }[] = [
-  { n: 7401, slug: "panelBrands" },
-  { n: 9740, slug: "panelOrganizers" },
-  { n: 7703, slug: "panelEditions" },
-  { n: 2061, slug: "panelGreenfield" },
-]
-
 export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
   const router = useRouter()
   const [email, setEmail] = useState("")
@@ -64,128 +63,130 @@ export default function LoginForm({ locale, t }: { locale: Locale; t: Dict }) {
     }
   }
 
+  const l = t.login
+
   return (
     <div
-      className="flex min-h-screen bg-canvas"
-      // 英文版摘掉 CJK 字体栈由 globals.css 的 html[lang="en"] 规则负责（第一层），
-      // 这里只声明语言本身
+      className="relative flex min-h-screen select-none flex-col justify-between overflow-hidden bg-canvas"
+      // 英文版摘掉 CJK 字体栈由 globals.css 的 html[lang="en"] 规则负责，这里只声明语言
       lang={isEn ? "en" : "zh-CN"}
     >
-      {/* ── 左栏 58%：品牌与实据 ─────────────────────────── */}
-      <div className="hidden lg:flex lg:w-[58%] flex-col justify-between p-12 hairline-r relative">
-        {/* 英文版只留拉丁字标 —— 「万象」二字走的是只含这两个字的 CJK 子集。
-            用展示态（= 密集态 ×4，板 270×92）：登录页是唯一有地方把品牌放大的面，
-            左栏 58% 宽、上下留白充足，标小了整块版面就压不住。 */}
-        <div className="flex items-center">
-          <BrandLockup size="display" showCn={!isEn} />
-        </div>
+      <LoginBackdrop />
 
-        <div>
-          <div className="lat text-[11px] uppercase tracking-[0.12em] text-fg-subtle mb-6">
-            Messe Düsseldorf Shanghai · Business Development
+      {/* 顶栏：只有语言切换 */}
+      <header className="relative z-20 flex w-full items-center justify-end px-10 py-8">
+        <LocaleSwitch locale={locale} />
+      </header>
+
+      {/* 卡片区 */}
+      <main className="relative z-10 flex flex-1 items-center justify-center px-4">
+        <div className="login-card flex w-full max-w-[420px] flex-col items-center rounded-[8px] bg-surface-elevated p-10">
+          {/* 品牌锁定 = 回首页入口 */}
+          <Link
+            href="/"
+            aria-label={l.homeAria}
+            title={l.homeAria}
+            className="group mb-6 inline-flex items-center rounded-sm transition-all duration-200 hover:-translate-y-0.5 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-fg focus:ring-offset-4"
+          >
+            <span
+              className="flex select-none items-center justify-center bg-brand font-semibold leading-none tracking-[-0.02em] text-brand-fg"
+              style={{ width: 92, height: 33, fontSize: 20, fontFamily: "var(--font-sans)" }}
+            >
+              MWLAB
+            </span>
+            <span className="mx-[12px] h-[15px] w-px bg-logo-rule" />
+            <span
+              className="select-none font-bold leading-none"
+              style={{
+                fontSize: 17,
+                fontFamily: "var(--font-logo-cn)",
+                letterSpacing: "var(--logo-cn-tracking)",
+                color: "var(--color-brand-ink)",
+              }}
+            >
+              万象
+            </span>
+          </Link>
+
+          {/* 三行文字 */}
+          <div className="mb-8 w-full text-center">
+            <p className="mb-1 text-[13px] font-normal tracking-wide text-fg-subtle">{l.poweredBy}</p>
+            <h1 className="text-[27px] font-medium leading-snug tracking-normal text-fg">{l.title}</h1>
+            <p className="mt-1 text-[13px] tracking-normal text-fg-subtle">{l.subtitle}</p>
           </div>
-          <h1 className="text-[2.625rem] leading-[1.25] font-medium mb-4 text-fg-muted">
-            {t.login.headlineLead}
-            <br />
-            <span className="text-fg">{t.login.headlineFocus}</span>
-          </h1>
-          <p className="text-[14px] text-fg-muted mb-10">
-            {fill(t.login.stats, {
-              brands: fmtNum(locale, 7401),
-              organizers: fmtNum(locale, 9740),
-            })}
-          </p>
 
-          <div className="grid grid-cols-2 gap-px bg-hairline max-w-md">
-            {STATS.map(s => (
-              <div key={s.slug} className="bg-canvas p-4">
-                <div className="num text-[26px] leading-none mb-1.5">{fmtNum(locale, s.n)}</div>
-                <div className="text-[11px] uppercase tracking-wider text-fg-subtle">
-                  {t.login[s.slug]}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
+          {/* 错误态 */}
+          {error && (
+            <div
+              role="alert"
+              aria-live="assertive"
+              className="mb-5 flex w-full items-center gap-2 rounded-[4px] px-3.5 py-2.5 text-[12px]"
+              style={{
+                background: "var(--color-error-bg)",
+                border: "1px solid var(--color-error-border)",
+                color: "var(--color-error-text)",
+              }}
+            >
+              <AlertCircle size={16} className="shrink-0" />
+              <span className="font-medium tracking-normal">{error}</span>
+            </div>
+          )}
 
-        <div className="text-[11px] text-fg-subtle leading-relaxed">
-          <div>{t.login.internalOnly}</div>
-          <div className="lat">© 2026 Messe Düsseldorf Shanghai</div>
-        </div>
-      </div>
-
-      {/* ── 右栏 42%：表单 ───────────────────────────────── */}
-      {/* 表单栏用 bg-sidebar（浅场 #f2f2f2）：左栏是白画布也用它压出层次，
-          输入框走 bg-canvas 的白底，两者才分得开。原来这里写死 #0E0E10，
-          是本次反置里唯一一处硬编码色 —— 已收进令牌层。 */}
-      <div className="flex-1 flex flex-col bg-sidebar">
-        <div className="flex justify-end p-8">
-          {/* 语言切换与落地页共用同一组件（V2-14 §4.1） */}
-          <LocaleSwitch locale={locale} />
-        </div>
-
-        <div className="flex-1 flex items-center justify-center px-8">
-          <form onSubmit={onSubmit} className="w-full max-w-[360px]">
-            {/* 错误条占位常驻，出现时布局不跳动 */}
-            <div className="h-[52px] mb-1">
-              {error && (
-                <div
-                  className="flex items-center gap-2 h-10 px-3 rounded-[6px] text-[13px] text-[var(--color-error-text)]"
-                  style={{ background: "var(--color-error-bg)", border: "1px solid var(--color-error-border)" }}
-                  role="alert"
-                >
-                  <AlertCircle size={15} className="shrink-0" />
-                  <span>{error}</span>
-                </div>
-              )}
+          <form className="w-full space-y-4" onSubmit={onSubmit} noValidate>
+            <div className="space-y-1.5 text-left">
+              <label htmlFor="login-email" className="block text-[12px] font-normal text-fg-muted">
+                {l.email}
+              </label>
+              <input
+                id="login-email"
+                name="email"
+                type="email"
+                autoComplete="username"
+                required
+                aria-invalid={!!error}
+                placeholder={l.emailPlaceholder}
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="login-input h-[42px] w-full rounded-[4px] px-3.5 text-[13px] text-fg outline-none"
+              />
             </div>
 
-            <h2 className="text-[26px] font-medium mb-1.5">{t.login.title}</h2>
-            <p className="text-[13px] text-fg-muted mb-8">{t.login.subtitle}</p>
+            <div className="space-y-1.5 text-left">
+              <label htmlFor="login-password" className="block text-[12px] font-normal text-fg-muted">
+                {l.password}
+              </label>
+              <input
+                id="login-password"
+                name="password"
+                type="password"
+                autoComplete="current-password"
+                required
+                aria-invalid={!!error}
+                placeholder="••••••••"
+                value={password}
+                onChange={e => setPassword(e.target.value)}
+                className="login-input h-[42px] w-full rounded-[4px] px-3.5 text-[13px] text-fg outline-none"
+              />
+            </div>
 
-            <label className="block text-[11px] uppercase tracking-wider text-fg-muted mb-2">
-              {t.login.email}
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              placeholder={t.login.emailPlaceholder}
-              aria-invalid={!!error}
-              autoComplete="username"
-              className="input lat w-full h-11 px-3.5 mb-5 rounded-[4px] bg-canvas text-fg
-                         border border-[rgb(255_255_255/9%)] placeholder:text-fg-faint"
-            />
-
-            <label className="block text-[11px] uppercase tracking-wider text-fg-muted mb-2">
-              {t.login.password}
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={e => setPassword(e.target.value)}
-              aria-invalid={!!error}
-              autoComplete="current-password"
-              className="input w-full h-11 px-3.5 mb-6 rounded-[4px] bg-canvas text-fg
-                         border border-[rgb(255_255_255/9%)]"
-            />
-
-            <button
-              type="submit"
-              data-loading={loading}
-              disabled={loading}
-              className="btn w-full h-11 rounded-[4px] bg-accent text-[var(--color-accent-fg)] text-[14px]
-                         font-semibold tracking-[0.2em] border-0 cursor-pointer"
-            >
-              {t.login.submit}
-            </button>
-
-            <p className="text-center text-[12px] text-fg-subtle mt-4">{t.login.accountNote}</p>
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={loading}
+                className="flex h-[42px] w-full items-center justify-center rounded-[4px] bg-accent text-[14px] font-medium tracking-wide text-accent-fg transition-colors duration-150 hover:bg-accent-hover focus:outline-none focus:ring-2 focus:ring-fg focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <span>{loading ? l.submitting : l.submit}</span>
+                {loading && <Loader2 size={16} className="ml-2 animate-spin" />}
+              </button>
+            </div>
           </form>
-        </div>
 
-        <div className="p-8 text-[12px] text-fg-subtle">{t.login.accessNote}</div>
-      </div>
+          <p className="mt-6 text-center text-[12px] font-normal tracking-normal text-fg-subtle">{l.hint}</p>
+        </div>
+      </main>
+
+      {/* 底部留白，与顶栏对称 —— 稿子里这里是设计验收用的状态切换器，不上线 */}
+      <div className="relative z-20 pb-5" />
     </div>
   )
 }

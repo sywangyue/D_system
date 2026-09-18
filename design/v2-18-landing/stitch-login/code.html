@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>MWLAB 万象 · 系统登录</title>
+<!-- Tailwind CSS v3 with forms and container-queries -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- BEGIN: StyleConfigurations -->
+<style data-purpose="design-tokens">
+    :root {
+      --color-canvas: #fafbfc;
+      --color-sidebar: #f2f2f2;
+      --color-surface: #ffffff;
+      --color-surface-hover: #f3f4f6;
+      --color-hairline: rgba(0, 0, 0, 0.06);
+      --color-hairline-active: rgba(0, 0, 0, 0.16);
+      --color-fg: #171717;
+      --color-fg-muted: #4d4d4d;
+      --color-fg-subtle: #8f8f8f;
+      --color-fg-faint: #a8a8a8;
+      --color-accent: #171717;
+      --color-accent-fg: #ffffff;
+      --color-brand: #fe5c00;
+      --color-brand-hover: #ff7324;
+      --color-brand-rule: #e2e2e0;
+      --color-brand-ink: #111111;
+      
+      --color-error-bg: hsl(0 100% 97%);
+      --color-error-border: hsl(0 90% 92%);
+      --color-error-text: hsl(358 66% 48%);
+
+      --radius-control: 4px;
+      --radius-card: 8px;
+    }
+  </style>
+<style data-purpose="typography-and-customs">
+    /* CJK typography rules: No negative tracking, correct weight balance */
+    body {
+      background-color: var(--color-canvas);
+      color: var(--color-fg);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", sans-serif;
+      letter-spacing: 0;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-num {
+      font-family: "JetBrains Mono", ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    }
+
+    .font-logo-cn {
+      font-family: "Noto Serif SC", "Source Han Serif SC", SimSun, serif;
+      letter-spacing: 0.06em;
+    }
+
+    /* Elegant diffused multi-layer elevation for login modal */
+    .elevation-card {
+      box-shadow: 
+        0 0 0 1px rgba(0, 0, 0, 0.05),
+        0 4px 20px -2px rgba(0, 0, 0, 0.04),
+        0 20px 48px -8px rgba(0, 0, 0, 0.06);
+    }
+
+    .floating-anim-slow {
+      animation: floatGentle 12s ease-in-out infinite;
+    }
+
+    .floating-anim-alt {
+      animation: floatGentleAlt 14s ease-in-out infinite;
+    }
+
+    .floating-anim-subtle {
+      animation: floatSubtle 16s ease-in-out infinite;
+    }
+
+    @keyframes floatGentle {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-8px) rotate(0.5deg); }
+    }
+
+    @keyframes floatGentleAlt {
+      0%, 100% { transform: translateY(0px) rotate(0deg); }
+      50% { transform: translateY(-10px) rotate(-0.5deg); }
+    }
+
+    @keyframes floatSubtle {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .floating-anim-slow, .floating-anim-alt, .floating-anim-subtle {
+        animation: none !important;
+      }
+    }
+  </style>
+<!-- END: StyleConfigurations -->
+</head>
+<body class="h-screen w-screen overflow-hidden select-none relative flex flex-col justify-between bg-[#fafbfc]">
+<!-- BEGIN: GeometricBackgroundCanvas -->
+<!-- Precision Isometric Vector Geometry: Linear/Stripe engineering aesthetics with topological wireframes & data lattices -->
+<div aria-hidden="true" class="absolute inset-0 pointer-events-none overflow-hidden z-0 select-none" data-purpose="3d-geometric-background">
+<!-- Global Tech Grid Pattern (Isometric Dot Matrix & Micro Crosshairs) -->
+<svg class="absolute inset-0 w-full h-full opacity-[0.45]" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<pattern height="60" id="iso-tech-grid" patternunits="userSpaceOnUse" width="60">
+<!-- Coordinate Intersection Point -->
+<circle cx="30" cy="30" fill="#9ca3af" opacity="0.35" r="1"></circle>
+<!-- Fine crosshair at 0,0 -->
+<path d="M-4 0 L4 0 M0 -4 L0 4" opacity="0.45" stroke="#d1d5db" stroke-width="0.75"></path>
+<path d="M56 60 L64 60 M60 56 L60 64" opacity="0.45" stroke="#d1d5db" stroke-width="0.75"></path>
+</pattern>
+<!-- Precision gradients for lattices -->
+<lineargradient id="poly-wire-orange" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#fe5c00" stop-opacity="0.9"></stop>
+<stop offset="100%" stop-color="#ff8940" stop-opacity="0.25"></stop>
+</lineargradient>
+<lineargradient id="facet-orange-top" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#ff6b18" stop-opacity="0.85"></stop>
+<stop offset="100%" stop-color="#fe5c00" stop-opacity="0.95"></stop>
+</lineargradient>
+<lineargradient id="facet-orange-side" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#e24a00" stop-opacity="0.9"></stop>
+<stop offset="100%" stop-color="#be3a00" stop-opacity="0.95"></stop>
+</lineargradient>
+<lineargradient id="facet-neutral-top" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#ffffff" stop-opacity="0.95"></stop>
+<stop offset="100%" stop-color="#f3f4f6" stop-opacity="0.8"></stop>
+</lineargradient>
+<lineargradient id="facet-glass-glow" x1="0%" x2="100%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#fe5c00" stop-opacity="0.12"></stop>
+<stop offset="50%" stop-color="#ffffff" stop-opacity="0.04"></stop>
+<stop offset="100%" stop-color="#fe5c00" stop-opacity="0.02"></stop>
+</lineargradient>
+</defs>
+<rect fill="url(#iso-tech-grid)" height="100%" width="100%"></rect>
+</svg>
+<!-- Top-Left Complex: Precision Multi-layer Stepped Data Platform & Topological Lattice -->
+<div class="absolute -top-10 left-8 w-[380px] h-[380px] floating-anim-slow">
+<svg class="w-full h-full" fill="none" viewbox="0 0 380 380" xmlns="http://www.w3.org/2000/svg">
+<!-- Precision Axis Lines & Coordinate Guides -->
+<g opacity="0.4" stroke="#94a3b8" stroke-dasharray="3 3" stroke-width="0.5">
+<line x1="40" x2="340" y1="210" y2="40"></line>
+<line x1="190" x2="190" y1="20" y2="350"></line>
+<line x1="40" x2="340" y1="70" y2="240"></line>
+</g>
+<!-- Crosshair Markers & Angle Annotations -->
+<g fill="#94a3b8" font-family="JetBrains Mono, monospace" font-size="8" opacity="0.6">
+<text x="50" y="80">+ AXIS_L1 // 30°</text>
+<text x="260" y="60">SEC_01 // 0.84</text>
+<!-- Mini Crosshairs -->
+<path d="M48 95 h8 M52 91 v8" stroke="#64748b" stroke-width="0.75"></path>
+<path d="M300 120 h8 M304 116 v8" stroke="#64748b" stroke-width="0.75"></path>
+</g>
+<!-- Stepped Hexagonal Foundation Layer 1 (Lower Plane) -->
+<polygon fill="#f8fafc" points="190,120 280,172 280,188 190,240 100,188 100,172" stroke="#e2e8f0" stroke-width="0.75"></polygon>
+<polygon fill="#e2e8f0" points="100,188 190,240 190,250 100,198" stroke="#cbd5e1" stroke-width="0.5"></polygon>
+<polygon fill="#cbd5e1" points="280,188 190,240 190,250 280,198" stroke="#94a3b8" stroke-width="0.5"></polygon>
+<!-- Stepped Layer 2 (Raised Isometric Slab with Hairline Grid Internal) -->
+<polygon fill="url(#facet-neutral-top)" points="190,80 260,120 190,160 120,120" stroke="#cbd5e1" stroke-width="0.75"></polygon>
+<polygon fill="#f1f5f9" points="120,120 190,160 190,175 120,135" stroke="#cbd5e1" stroke-width="0.75"></polygon>
+<polygon fill="#e2e8f0" points="260,120 190,160 190,175 260,135" stroke="#cbd5e1" stroke-width="0.75"></polygon>
+<!-- Top Face Micro Coordinate Lines & Contours -->
+<path d="M140,110 L210,150 M165,95 L235,135 M155,140 L225,100 M175,151 L245,111" stroke="#e2e8f0" stroke-linecap="round" stroke-width="0.75"></path>
+<!-- Precision Wireframe Prism Cage (Suspended Matrix) -->
+<g opacity="0.65" stroke="#94a3b8" stroke-width="0.65">
+<polygon fill="none" points="190,45 235,71 190,97 145,71" stroke="#64748b" stroke-dasharray="2 2"></polygon>
+<line x1="145" x2="145" y1="71" y2="105"></line>
+<line x1="235" x2="235" y1="71" y2="105"></line>
+<line x1="190" x2="190" y1="97" y2="130"></line>
+<line stroke-dasharray="1 2" x1="190" x2="190" y1="45" y2="78"></line>
+</g>
+<!-- Small Apex Glass Prism Node -->
+<polygon fill="#ffffff" fill-opacity="0.7" points="190,55 215,69 190,83 165,69" stroke="#000000" stroke-opacity="0.15" stroke-width="0.75"></polygon>
+<!-- Tech tick marks on edge -->
+<g stroke="#94a3b8" stroke-width="0.75">
+<line x1="120" x2="116" y1="123" y2="125"></line>
+<line x1="130" x2="126" y1="129" y2="131"></line>
+<line x1="140" x2="136" y1="135" y2="137"></line>
+<line x1="150" x2="146" y1="141" y2="143"></line>
+</g>
+</svg>
+</div>
+<!-- Bottom-Left Focal Anchor: High-Precision Engineered Isometric Data Polyhedron with Brand Orange Accent Facets -->
+<div class="absolute bottom-6 left-12 w-[340px] h-[340px] floating-anim-alt">
+<svg class="w-full h-full" fill="none" viewbox="0 0 340 340" xmlns="http://www.w3.org/2000/svg">
+<!-- Radiating Construction & Projection Lines -->
+<g opacity="0.18" stroke="#fe5c00" stroke-width="0.6">
+<line stroke-dasharray="4 4" x1="20" x2="310" y1="170" y2="170"></line>
+<line stroke-dasharray="4 4" x1="170" x2="170" y1="20" y2="310"></line>
+<line x1="60" x2="280" y1="240" y2="100"></line>
+<line x1="60" x2="280" y1="100" y2="240"></line>
+</g>
+<!-- Technical Outer Caliper Ring -->
+<circle cx="170" cy="170" opacity="0.6" r="120" stroke="#cbd5e1" stroke-dasharray="2 6" stroke-width="0.5"></circle>
+<circle cx="170" cy="170" opacity="0.3" r="135" stroke="#fe5c00" stroke-dasharray="1 8" stroke-width="0.5"></circle>
+<!-- Dimension Scale Labels -->
+<g fill="#64748b" font-family="JetBrains Mono, monospace" font-size="8" opacity="0.7">
+<text x="35" y="165">RAD: 120.00</text>
+<text x="180" y="305">TANGENT_03 [OK]</text>
+<text fill="#fe5c00" opacity="0.8" x="240" y="125">0xFE5C00 // M1</text>
+</g>
+<!-- Main Engineered 3D Monolith: Cut-Facet Polyhedron -->
+<!-- Back Shadow Plane for Floating Depth -->
+<polygon fill="#000000" fill-opacity="0.02" points="170,250 250,205 170,160 90,205" style="filter: blur(10px);"></polygon>
+<!-- Lower Geometric Bevels (Engineered Gray/White Crystal structure) -->
+<polygon fill="#e2e8f0" points="90,195 170,240 170,265 90,220" stroke="#cbd5e1" stroke-width="0.75"></polygon>
+<polygon fill="#cbd5e1" points="170,240 250,195 250,220 170,265" stroke="#94a3b8" stroke-width="0.75"></polygon>
+<polygon fill="#f8fafc" points="90,195 170,240 250,195 170,150" stroke="#e2e8f0" stroke-width="0.75"></polygon>
+<!-- Hero Focal: Vibrant Brand Orange Precision Cut Isometric Cube -->
+<!-- Ambient Glow Behind Node -->
+<ellipse cx="170" cy="140" fill="url(#facet-glass-glow)" rx="60" ry="35"></ellipse>
+<!-- Top Facet (Laser Crisp Bright Orange with Grid Lines) -->
+<polygon fill="url(#facet-orange-top)" points="170,65 235,102 170,140 105,102" stroke="#ffffff" stroke-width="1"></polygon>
+<!-- Hairline Laser Contours on Top Face -->
+<path d="M125,90 L190,127 M145,78 L210,115 M135,120 L198,84" stroke="#ffffff" stroke-dasharray="2 2" stroke-opacity="0.45" stroke-width="0.6"></path>
+<!-- Left Facet (Direct Light Orange) -->
+<polygon fill="url(#poly-wire-orange)" points="105,102 170,140 170,215 105,177" stroke="#ffffff" stroke-opacity="0.3" stroke-width="0.75"></polygon>
+<polygon fill="#fe5c00" fill-opacity="0.95" points="105,102 170,140 170,215 105,177"></polygon>
+<!-- Sub-division internal grating line -->
+<line stroke="#ffffff" stroke-dasharray="1 2" stroke-opacity="0.4" stroke-width="0.5" x1="137" x2="137" y1="121" y2="196"></line>
+<line stroke="#ffffff" stroke-opacity="0.35" stroke-width="0.5" x1="105" x2="170" y1="139" y2="177"></line>
+<!-- Right Facet (Deep Chiseled Shadow Orange) -->
+<polygon fill="url(#facet-orange-side)" points="235,102 170,140 170,215 235,177" stroke="#ffffff" stroke-opacity="0.25" stroke-width="0.75"></polygon>
+<!-- Sub-division internal grating line -->
+<line stroke="#ffffff" stroke-dasharray="1 2" stroke-opacity="0.3" stroke-width="0.5" x1="202" x2="202" y1="121" y2="196"></line>
+<line stroke="#ffffff" stroke-opacity="0.25" stroke-width="0.5" x1="170" x2="235" y1="177" y2="139"></line>
+<!-- Sharp Corner Nodes (Vector Engineering Dots) -->
+<circle cx="170" cy="65" fill="#ffffff" r="2" stroke="#fe5c00" stroke-width="1"></circle>
+<circle cx="235" cy="102" fill="#ffffff" r="1.75" stroke="#fe5c00" stroke-width="0.75"></circle>
+<circle cx="105" cy="102" fill="#ffffff" r="1.75" stroke="#fe5c00" stroke-width="0.75"></circle>
+<circle cx="170" cy="140" fill="#ffffff" r="2.25" stroke="#fe5c00" stroke-width="1.25"></circle>
+<circle cx="170" cy="215" fill="#ffffff" r="1.75" stroke="#fe5c00" stroke-width="0.75"></circle>
+</svg>
+</div>
+<!-- Top-Right Complex: Suspended Cylindrical Data Vector & Wireframe Projection Beam -->
+<div class="absolute top-10 right-16 w-[340px] h-[340px] floating-anim-alt">
+<svg class="w-full h-full" fill="none" viewbox="0 0 340 340" xmlns="http://www.w3.org/2000/svg">
+<!-- Orthographic Guideline Track to Center/Right -->
+<g opacity="0.5" stroke="#94a3b8" stroke-dasharray="3 3" stroke-width="0.5">
+<line x1="20" x2="280" y1="260" y2="60"></line>
+<line x1="70" x2="290" y1="70" y2="200"></line>
+</g>
+<!-- Digital Metrology Details -->
+<g fill="#94a3b8" font-family="JetBrains Mono, monospace" font-size="7.5" opacity="0.75">
+<text x="140" y="80">P-INDEX: 094.22 // LAT</text>
+<text x="210" y="240">SEC: DELTA-T</text>
+<path d="M128 78 h6 M131 75 v6" stroke="#94a3b8" stroke-width="0.75"></path>
+</g>
+<!-- Precision Cylindrical Data Column (Semi-Transparent Glass/Wireframe) -->
+<!-- Base ellipse -->
+<ellipse cx="130" cy="180" fill="#f1f5f9" rx="38" ry="16" stroke="#cbd5e1" stroke-width="0.75"></ellipse>
+<!-- Cylinder side walls -->
+<path d="M92 110 L92 180 A38 16 0 0 0 168 180 L168 110 Z" fill="url(#facet-neutral-top)" fill-opacity="0.8" stroke="#cbd5e1" stroke-width="0.75"></path>
+<!-- Internal Contour/Raster Lines inside cylinder -->
+<ellipse cx="130" cy="155" fill="none" rx="38" ry="16" stroke="#e2e8f0" stroke-dasharray="2 3" stroke-width="0.75"></ellipse>
+<ellipse cx="130" cy="132" fill="none" rx="38" ry="16" stroke="#e2e8f0" stroke-width="0.75"></ellipse>
+<!-- Cylinder top rim -->
+<ellipse cx="130" cy="110" fill="#ffffff" rx="38" ry="16" stroke="#94a3b8" stroke-width="0.85"></ellipse>
+<!-- Cylinder top target center -->
+<circle cx="130" cy="110" fill="#fe5c00" r="1.5"></circle>
+<circle cx="130" cy="110" r="6" stroke="#cbd5e1" stroke-dasharray="1 2" stroke-width="0.5"></circle>
+<!-- Linear Trajectory Line Connecting to Crisp Accent Mini-Cube -->
+<line opacity="0.6" stroke="#fe5c00" stroke-dasharray="2 2" stroke-width="0.75" x1="155" x2="225" y1="110" y2="135"></line>
+<circle cx="190" cy="122" fill="#fe5c00" r="1"></circle>
+<!-- Precision Floating Micro Polyhedron (Secondary Sharp Orange Accent) -->
+<g transform="translate(210, 110)">
+<polygon fill="url(#facet-orange-top)" points="35,15 62,30 35,46 8,30" stroke="#ffffff" stroke-width="0.75"></polygon>
+<polygon fill="#fe5c00" points="8,30 35,46 35,76 8,60" stroke="#ffffff" stroke-opacity="0.4" stroke-width="0.5"></polygon>
+<polygon fill="#cc4600" points="62,30 35,46 35,76 62,60" stroke="#ffffff" stroke-opacity="0.3" stroke-width="0.5"></polygon>
+<!-- Wireframe projection shadow under cube -->
+<polygon fill="none" opacity="0.4" points="35,82 55,93 35,104 15,93" stroke="#fe5c00" stroke-dasharray="1 2" stroke-width="0.5"></polygon>
+<line opacity="0.5" stroke="#fe5c00" stroke-dasharray="1 1" stroke-width="0.5" x1="35" x2="35" y1="76" y2="82"></line>
+</g>
+</svg>
+</div>
+<!-- Bottom-Right Complex: High-End Architectural Wireframe Grid & Stepped Topology Platform -->
+<div class="absolute -bottom-8 right-12 w-[380px] h-[380px] floating-anim-subtle">
+<svg class="w-full h-full" fill="none" viewbox="0 0 380 380" xmlns="http://www.w3.org/2000/svg">
+<!-- Ground Projection Grid (Isometric Isometric Plane Matrix) -->
+<g opacity="0.5" stroke="#cbd5e1" stroke-width="0.5">
+<line x1="90" x2="270" y1="180" y2="284"></line>
+<line x1="120" x2="300" y1="163" y2="267"></line>
+<line x1="150" x2="330" y1="146" y2="250"></line>
+<line x1="270" x2="90" y1="146" y2="250"></line>
+<line x1="300" x2="120" y1="163" y2="267"></line>
+<line x1="330" x2="150" y1="180" y2="284"></line>
+</g>
+<!-- Engineering Markers & Status Metrics -->
+<g fill="#94a3b8" font-family="JetBrains Mono, monospace" font-size="8" opacity="0.75">
+<text x="180" y="325">GRID_COORD: 114.88 // 0x4B</text>
+<text x="275" y="150">+ NODAL_04</text>
+<path d="M265 148 h8 M269 144 v8" stroke="#94a3b8" stroke-width="0.75"></path>
+</g>
+<!-- Outer Stepped Polygonal Platform (Sleek Modern White/Gray) -->
+<polygon fill="#ffffff" points="210,130 310,188 210,246 110,188" stroke="#e2e8f0" stroke-width="0.85"></polygon>
+<polygon fill="#f1f5f9" points="110,188 210,246 210,260 110,202" stroke="#cbd5e1" stroke-width="0.75"></polygon>
+<polygon fill="#e2e8f0" points="310,188 210,246 210,260 310,202" stroke="#cbd5e1" stroke-width="0.75"></polygon>
+<!-- Inner Elevated Monolith (Crisp White Chamfer with Precision Wireframe Top) -->
+<polygon fill="url(#facet-neutral-top)" points="210,95 265,127 210,158 155,127" stroke="#cbd5e1" stroke-width="0.85"></polygon>
+<polygon fill="#f8fafc" points="155,127 210,158 210,205 155,174" stroke="#cbd5e1" stroke-width="0.75"></polygon>
+<polygon fill="#ebeef3" points="265,127 210,158 210,205 265,174" stroke="#cbd5e1" stroke-width="0.75"></polygon>
+<!-- Internal Laser Grids on Top Face -->
+<path d="M175,116 L230,147 M192,106 L247,137 M182,142 L238,110 M200,152 L256,120" stroke="#94a3b8" stroke-opacity="0.5" stroke-width="0.5"></path>
+<!-- Vertical Dimension Laser Axis Line -->
+<line opacity="0.7" stroke="#fe5c00" stroke-dasharray="2 3" stroke-width="0.75" x1="210" x2="210" y1="40" y2="95"></line>
+<circle cx="210" cy="40" fill="#fe5c00" r="1.5"></circle>
+<circle cx="210" cy="95" fill="#fe5c00" r="1.5"></circle>
+<!-- Tech Graduation Tick Marks along Lower Rim -->
+<g opacity="0.6" stroke="#64748b" stroke-width="0.75">
+<line x1="160" x2="160" y1="220" y2="225"></line>
+<line x1="175" x2="175" y1="228" y2="233"></line>
+<line x1="190" x2="190" y1="237" y2="242"></line>
+</g>
+</svg>
+</div>
+</div>
+<!-- END: GeometricBackgroundCanvas -->
+<!-- BEGIN: TopBar -->
+<header class="relative z-20 w-full px-10 py-8 flex justify-end items-center" data-purpose="locale-navigation">
+<!-- Locale Switch: ZH / EN text buttons; ZH emphasized high-contrast, EN muted subtle -->
+<div aria-label="语言切换" class="inline-flex items-center space-x-2 text-[13px] tracking-wide" role="navigation">
+<button aria-current="page" class="font-medium text-[#171717] px-1 py-0.5 rounded transition-colors duration-150 hover:text-black focus:outline-none focus:ring-1 focus:ring-black" id="btn-lang-zh" onclick="switchLocale('zh')" type="button">
+        ZH
+      </button>
+<span class="text-[#a8a8a8] text-[11px]">/</span>
+<button class="text-[#8f8f8f] px-1 py-0.5 rounded transition-colors duration-150 hover:text-[#171717] focus:outline-none focus:ring-1 focus:ring-black" id="btn-lang-en" onclick="switchLocale('en')" type="button">
+        EN
+      </button>
+</div>
+</header>
+<!-- END: TopBar -->
+<!-- BEGIN: MainContentWrapper -->
+<main class="relative z-10 flex-1 flex items-center justify-center px-4" data-purpose="login-modal-space">
+<!-- Login Card Container: Width 420px, Pure White, 8px radius, Clean Breathing Room around -->
+<div class="w-full max-w-[420px] bg-white rounded-[8px] elevation-card p-10 flex flex-col items-center transition-all duration-200" data-purpose="login-card">
+<!-- Brand Logo Header Link (Back to Home) -->
+<!-- Spec: Orange Board MWLAB 92x33 + Hairline Rule 1x15 + Noto Serif 万象 17px -->
+<a aria-label="MWLAB 万象 首页" class="inline-flex items-center mb-6 group transition-all duration-200 hover:-translate-y-0.5 hover:opacity-95 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-4 rounded-sm" href="#" id="brand-home-link" title="MWLAB 万象 · 返回首页">
+<!-- Orange Board with Geist Latin (MWLAB) -->
+<span class="bg-[#fe5c00] text-white font-semibold text-[20px] leading-none px-[9px] py-[6.5px] rounded-none tracking-[-0.02em] select-none flex items-center justify-center" style="width: 92px; height: 33px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+          MWLAB
+        </span>
+<!-- Hairline Divider -->
+<span class="w-[1px] h-[15px] bg-[#e2e2e0] mx-[12px]"></span>
+<!-- Chinese Wordmark: 17px Noto Serif SC 700 tone (#111111) -->
+<span class="font-logo-cn font-bold text-[17px] leading-none text-[#111111] select-none">
+          万象
+        </span>
+</a>
+<!-- 3-Line Header Information -->
+<div class="text-center w-full mb-8">
+<!-- Top Micro Note -->
+<p class="text-[13px] text-[#8f8f8f] mb-1 font-normal tracking-wide">
+          Powered by Claude
+        </p>
+<!-- Center Title (CJK 27px, Weight 500 equivalent, strictly no negative tracking) -->
+<h1 class="text-[27px] font-medium text-[#171717] leading-snug tracking-normal">
+          欢迎登录万象系统
+        </h1>
+<!-- Subtitle Note -->
+<p class="text-[13px] text-[#8f8f8f] mt-1 tracking-normal">
+          强战略驱动看板
+        </p>
+</div>
+<!-- State: Error Alert Bar (Dynamically visible in error state) -->
+<div aria-live="assertive" class="hidden w-full mb-5 px-3.5 py-2.5 rounded-[4px] border border-[hsl(0,90%,92%)] bg-[hsl(0,100%,97%)] text-[hsl(358,66%,48%)] text-[12px] flex items-center space-x-2 transition-all duration-150" id="error-banner" role="alert">
+<svg aria-hidden="true" class="w-4 h-4 flex-shrink-0" fill="currentColor" viewbox="0 0 20 20">
+<path clip-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" fill-rule="evenodd"></path>
+</svg>
+<span class="font-medium tracking-normal">邮箱或密码不正确</span>
+</div>
+<!-- BEGIN: LoginForm -->
+<form class="w-full space-y-4" id="login-form" novalidate="" onsubmit="handleFormSubmit(event)">
+<!-- Email Input Group -->
+<div class="space-y-1.5 text-left">
+<label class="block text-[12px] font-normal text-[#4d4d4d]" for="input-email">
+            工作邮箱
+          </label>
+<input autocomplete="username" class="w-full h-[42px] px-3.5 bg-[#f2f2f2] border border-[rgba(0,0,0,0.08)] rounded-[4px] text-[13px] text-[#171717] placeholder-[#a8a8a8] focus:bg-white focus:border-[#171717] focus:ring-1 focus:ring-[#171717] transition-colors duration-150 outline-none" id="input-email" name="email" placeholder="name@mds.cn" required="" type="email"/>
+</div>
+<!-- Password Input Group -->
+<div class="space-y-1.5 text-left">
+<label class="block text-[12px] font-normal text-[#4d4d4d]" for="input-password">
+            账号密码
+          </label>
+<input autocomplete="current-password" class="w-full h-[42px] px-3.5 bg-[#f2f2f2] border border-[rgba(0,0,0,0.08)] rounded-[4px] text-[13px] text-[#171717] placeholder-[#a8a8a8] focus:bg-white focus:border-[#171717] focus:ring-1 focus:ring-[#171717] transition-colors duration-150 outline-none" id="input-password" name="password" placeholder="••••••••" required="" type="password"/>
+</div>
+<!-- Submit Button: Strictly Black (#171717) Background with White Text -->
+<div class="pt-2">
+<button class="w-full h-[42px] bg-[#171717] text-white hover:bg-black rounded-[4px] text-[14px] font-medium tracking-wide flex items-center justify-center transition-colors duration-150 focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed" id="btn-submit" type="submit">
+<span id="btn-text">登 录</span>
+<!-- Spinner icon for loading state -->
+<svg class="hidden animate-spin ml-2 h-4 w-4 text-white" fill="none" id="btn-spinner" viewbox="0 0 24 24">
+<circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3"></circle>
+<path class="opacity-75" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z" fill="currentColor"></path>
+</svg>
+</button>
+</div>
+</form>
+<!-- END: LoginForm -->
+<!-- Bottom Hint Note: Unified internal distribution -->
+<footer class="mt-6 text-center">
+<p class="text-[12px] text-[#8f8f8f] tracking-normal font-normal">
+          账号由管理员统一分配
+        </p>
+</footer>
+</div>
+</main>
+<!-- END: MainContentWrapper -->
+<!-- BEGIN: InteractiveStateSwitcher -->
+<!-- Bottom Floating Switcher: Inspect the 4 mandatory states defined in prompt -->
+<aside aria-label="设计验收状态切换器" class="relative z-20 pb-5 w-full flex flex-col items-center justify-center space-y-2" data-purpose="state-switcher">
+<div class="bg-white/90 backdrop-blur-md px-2 py-1.5 rounded-full border border-[rgba(0,0,0,0.08)] shadow-sm flex items-center space-x-1 text-[11px]">
+<span class="text-[#8f8f8f] px-2 font-mono">状态预览:</span>
+<button class="state-btn active-state px-2.5 py-1 rounded-full text-[#171717] bg-[#f2f2f2] font-medium transition-all" id="tab-state-default" onclick="setDesignState('default')" type="button">
+        ① 默认态
+      </button>
+<button class="state-btn px-2.5 py-1 rounded-full text-[#4d4d4d] hover:text-[#171717] hover:bg-[#fafafa] transition-all" id="tab-state-focused" onclick="setDesignState('focused')" type="button">
+        ② 聚焦态
+      </button>
+<button class="state-btn px-2.5 py-1 rounded-full text-[#4d4d4d] hover:text-[#171717] hover:bg-[#fafafa] transition-all" id="tab-state-error" onclick="setDesignState('error')" type="button">
+        ③ 错误态
+      </button>
+<button class="state-btn px-2.5 py-1 rounded-full text-[#4d4d4d] hover:text-[#171717] hover:bg-[#fafafa] transition-all" id="tab-state-loading" onclick="setDesignState('loading')" type="button">
+        ④ 提交中
+      </button>
+</div>
+</aside>
+<!-- END: InteractiveStateSwitcher -->
+<!-- BEGIN: StateControllerScript -->
+<script data-purpose="interactive-state-management">
+    function setDesignState(state) {
+      const emailInput = document.getElementById('input-email');
+      const passwordInput = document.getElementById('input-password');
+      const errorBanner = document.getElementById('error-banner');
+      const submitBtn = document.getElementById('btn-submit');
+      const submitText = document.getElementById('btn-text');
+      const submitSpinner = document.getElementById('btn-spinner');
+      
+      // Update Switcher tabs styling
+      document.querySelectorAll('.state-btn').forEach(btn => {
+        btn.classList.remove('bg-[#f2f2f2]', 'text-[#171717]', 'font-medium');
+        btn.classList.add('text-[#4d4d4d]');
+      });
+      const activeBtn = document.getElementById(`tab-state-${state}`);
+      if (activeBtn) {
+        activeBtn.classList.add('bg-[#f2f2f2]', 'text-[#171717]', 'font-medium');
+        activeBtn.classList.remove('text-[#4d4d4d]');
+      }
+
+      // Reset base behaviors
+      errorBanner.classList.add('hidden');
+      emailInput.classList.remove('border-[hsl(358,66%,48%)]', 'bg-white', 'border-[#171717]');
+      emailInput.classList.add('bg-[#f2f2f2]', 'border-[rgba(0,0,0,0.08)]');
+      emailInput.removeAttribute('aria-invalid');
+      
+      submitBtn.disabled = false;
+      submitSpinner.classList.add('hidden');
+      submitText.textContent = '登 录';
+
+      if (state === 'default') {
+        emailInput.value = '';
+        passwordInput.value = '';
+        emailInput.blur();
+      } else if (state === 'focused') {
+        emailInput.value = 'alex.wang@mds.cn';
+        passwordInput.value = '';
+        emailInput.focus();
+        emailInput.classList.remove('bg-[#f2f2f2]');
+        emailInput.classList.add('bg-white', 'border-[#171717]');
+      } else if (state === 'error') {
+        emailInput.value = 'alex.wang@mds.cn';
+        passwordInput.value = 'incorrect-password';
+        errorBanner.classList.remove('hidden');
+        emailInput.classList.remove('border-[rgba(0,0,0,0.08)]');
+        emailInput.classList.add('border-[hsl(358,66%,48%)]');
+        emailInput.setAttribute('aria-invalid', 'true');
+      } else if (state === 'loading') {
+        emailInput.value = 'alex.wang@mds.cn';
+        passwordInput.value = 'valid-password';
+        submitBtn.disabled = true;
+        submitText.textContent = '登录中…';
+        submitSpinner.classList.remove('hidden');
+      }
+    }
+
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      setDesignState('loading');
+      setTimeout(() => {
+        setDesignState('error');
+      }, 1200);
+    }
+
+    function switchLocale(lang) {
+      const zhBtn = document.getElementById('btn-lang-zh');
+      const enBtn = document.getElementById('btn-lang-en');
+      if (lang === 'zh') {
+        zhBtn.className = 'font-medium text-[#171717] px-1 py-0.5 rounded transition-colors duration-150 hover:text-black focus:outline-none focus:ring-1 focus:ring-black';
+        enBtn.className = 'text-[#8f8f8f] px-1 py-0.5 rounded transition-colors duration-150 hover:text-[#171717] focus:outline-none focus:ring-1 focus:ring-black';
+      } else {
+        enBtn.className = 'font-medium text-[#171717] px-1 py-0.5 rounded transition-colors duration-150 hover:text-black focus:outline-none focus:ring-1 focus:ring-black';
+        zhBtn.className = 'text-[#8f8f8f] px-1 py-0.5 rounded transition-colors duration-150 hover:text-[#171717] focus:outline-none focus:ring-1 focus:ring-black';
+      }
+    }
+  </script>
+<!-- END: StateControllerScript -->
+</body></html>

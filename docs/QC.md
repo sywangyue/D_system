@@ -24,9 +24,20 @@ Max 可以对单次质检授权「有问题直接修」。
 | 类型 | `npx tsc --noEmit` |
 | 构建 | `npm run build` —— **Turbopack 告警也算失败** |
 | 测试 | `npm test` 与 `python3 -m pytest tests/ -q` |
-| 无硬编码色值 | `grep -rnE '#[0-9a-fA-F]{3,8}' app/ components/ --include="*.tsx"` 应为空 |
+| 无硬编码色值 | `grep -rnE '#[0-9a-fA-F]{3,8}' app/ components/ --include="*.tsx" \| grep -v '//\|\*' \| grep -v LoginBackdrop` 应为空 |
 | 无 Tailwind 内置灰 | `grep -rn 'text-gray-\|bg-white\|bg-gray-' app/ components/` 应为空 |
-| 界面不碰品牌橙 | `grep -rn 'color-brand' app/ components/ --include="*.tsx"` 只应命中 `BrandLockup.tsx` |
+| 品牌橙只进「门面」 | `grep -rln 'color-brand\|bg-brand' app/ components/ --include="*.tsx"` 只应命中 `BrandLockup.tsx`、`login-form.tsx` |
+
+> **第一条加了两个过滤**（2026-09-18）：`grep -v '//\|\*'` 排掉注释里提到的历史色值
+> （当时 7 处命中全是注释）；`grep -v LoginBackdrop` 排掉登录页那张等距几何插画 ——
+> 它的几十个灰阶是插画自身的明暗关系，不是设计令牌，而且渐变 defs 被四块图形共享，
+> 拆成独立 .svg 就得复制四份。
+>
+> **第三条从「界面不碰品牌橙」收窄为「只进门面」**（2026-09-18，V2-18）：
+> 登录页是「门」，用品牌色立身份是对的；每天盯 8 小时的产品界面内部保持中性也是对的。
+> 所以橙色允许出现在 Logo、登录页、落地页，**产品界面内部（盘面 / 机会台 / 公司库 /
+> 调研库 / 知识库 / 展会底图）一律不许**。登录页的橙只在背景几何体与 Logo，
+> 主按钮仍是黑白高对比 —— 页面上唯一的主操作不跟背景抢。
 | 数据未受损 | 对照 §3 基线 |
 
 ### 1.3 返工规则
