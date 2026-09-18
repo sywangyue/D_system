@@ -24,7 +24,6 @@
     "topojson-client": "^3.1.0"
   },
   "devDependencies": {
-    "@opennextjs/cloudflare": "^1.19.6",
     "@tailwindcss/postcss": "^4.2.4",
     "@types/bcryptjs": "^2.4.6",
     "@types/better-sqlite3": "^7.6.13",
