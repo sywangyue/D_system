@@ -328,6 +328,39 @@ ssh -i ~/.ssh/MWlab.pem admin@47.79.17.71 \
 
 ---
 
+## 安全配置
+
+### 已做的（2026-09-18）
+
+| 项 | 位置 |
+|---|---|
+| 会话 cookie `secure`（仅 HTTPS 传输） | `app/api/auth/login/route.ts`，按 `NODE_ENV` 区分 |
+| 登出清除属性与种下时对齐 | `app/api/auth/logout/route.ts` |
+| X-Frame-Options / nosniff / Referrer-Policy / Permissions-Policy / COOP | `next.config.ts` 的 `headers()` |
+| pm2 显式 `NODE_ENV=production` | `NODE_ENV=production pm2 restart mwlab-dashboard --update-env` |
+
+> `secure` 依赖 `NODE_ENV`。`next start` 虽然默认 production，但别赌 ——
+> 万一它不是 production，`secure` 就是 false，会话令牌会在 HTTP 上明文传输。
+> 重启服务时保持 `--update-env` 带上这个变量。
+
+### ⚠️ 还没做：HSTS 要去 Cloudflare 开
+
+线上 `strict-transport-security: max-age=0` —— **这个头不是 Next 发的**
+（Next 默认不发），是 Cloudflare 边缘发的。`next.config.ts` 里那条设置会被它覆盖，
+实测部署后线上仍是 `max-age=0`。
+
+要真正生效：Cloudflare 控制台 → SSL/TLS → Edge Certificates → HSTS → Enable，
+建议 max-age 6 个月起、勾 includeSubDomains。
+**开之前确认所有子域都能上 HTTPS**，开启后浏览器会拒绝任何 HTTP 访问，且有缓存期，
+配错了要等 max-age 过期才能恢复。
+
+### 还没做：CSP
+
+本站有内联样式（令牌变量、SVG 的 style 属性）与 Next 的水合引导脚本，
+直接上强制模式会白屏。要加的话先 `Content-Security-Policy-Report-Only` 观察上报。
+
+---
+
 ## 改账号密码
 
 系统里**没有改密码的界面或接口**。用脚本改本地库，再按上面的流程同步：
