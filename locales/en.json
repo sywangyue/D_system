@@ -567,16 +567,67 @@
     },
     "pipeline": {
       "headline": "Self-assembled,\nself-built, for BD",
-      "body": "Every step from source scrape to dashboard is in our own hands: dual-source collection, conflict merging, industry classification, edition status, display-pool filtering. No outsourced feeds, no numbers of unknown origin.",
-      "cadence": "7th & 27th, 03:00",
-      "sources": "jufair · cnexpo dual source",
-      "steps": [
-        "Collect",
-        "Merge",
-        "Classify",
-        "Edition status",
-        "Display pool",
-        "Review export"
+      "body": "From dual-source raw ingest to corporate graph tracing, MWLAB runs its own data engineering for the China exhibition landscape. Quality-checked end to end, built for fast strategic calls.",
+      "cadence": "Scheduled: incremental update on the 7th and 27th",
+      "overline": "Architecture",
+      "groups": [
+        {
+          "title": "In Review",
+          "count": 3,
+          "icon": "review",
+          "items": [
+            {
+              "id": "ENG-2380",
+              "label": "7,703 editions multimodal alignment"
+            },
+            {
+              "id": "ENG-2498",
+              "label": "jufair/cnexpo dual-source incremental crawl"
+            },
+            {
+              "id": "ENG-2039",
+              "label": "4,990 organizer groups equity tracing"
+            }
+          ]
+        },
+        {
+          "title": "In Progress",
+          "count": 4,
+          "icon": "progress",
+          "items": [
+            {
+              "id": "ENG-2143",
+              "label": "Basemap lightweight tiling"
+            },
+            {
+              "id": "ENG-2108",
+              "label": "12,302 nodes manual review feedback"
+            },
+            {
+              "id": "ENG-2076",
+              "label": "2026 schedule gap auto-alert"
+            },
+            {
+              "id": "ENG-2187",
+              "label": "Cross-city venue capacity normalisation"
+            }
+          ]
+        },
+        {
+          "title": "Todo",
+          "count": 2,
+          "icon": "todo",
+          "items": [
+            {
+              "id": "ENG-2254",
+              "label": "Düsseldorf HQ master DB API mirror"
+            },
+            {
+              "id": "ENG-2291",
+              "label": "M&A target valuation pipeline"
+            }
+          ]
+        }
       ]
     },
     "footer": {

@@ -142,13 +142,49 @@
 
   --blur-glass: 16px;
 
-  /* 管道段的深色终端块。全站唯一的暗色元素 —— 它模拟的是终端，
-     终端就是深底的。别把这组用到别处，界面整体是浅色。 */
-  --color-inkbox:      #090a0f;
-  --color-inkbox-bar:  #0d0f17;
-  --color-inkbox-fg:   #e5e5e5;
-  --color-inkbox-dim:  #6b7280;
-  --color-inkbox-rule: rgb(255 255 255 / 0.08);
+  /* ── 管道段的深色 IDE 窗口 ──────────────────────────────
+     全站唯一的暗色元素。它模拟的是代码评审界面，那类界面就是深底的。
+     **别把这组用到别处**，产品界面整体是浅色。
+     色值来自 Stitch 稿（design/v2-18-landing/stitch/code.html），
+     1:1 收进令牌而不是散在组件里，是为了过「无硬编码色值」门禁。 */
+  --ide-bg:        #090a0f;   /* 窗口底 · diff 区底 */
+  --ide-chrome:    #0d0f17;   /* 顶栏 · 侧栏 · 底部状态条 */
+  --ide-fg:        #ffffff;   /* 当前文件名 · 选中任务 */
+  --ide-fg-strong: #e2e4ea;   /* 任务 hover */
+  --ide-fg-mid:    #c9cbcf;   /* 分支标签 */
+  --ide-fg-dim:    #989fb0;   /* 任务默认 */
+  --ide-fg-faint:  #8c909e;   /* 面包屑 · 顶栏右 */
+  --ide-fg-meta:   #7b8192;   /* 分组标题 */
+  --ide-fg-ghost:  #636a7e;   /* 任务 ID · diff 栏标签 */
+  --ide-fg-status: #6c7387;   /* 底部状态条 */
+  --ide-gutter:    #4b5266;   /* 行号 */
+  --ide-rule:      rgb(255 255 255 / 0.07);
+  --ide-rule-soft: rgb(255 255 255 / 0.04);
+  --ide-fill:      rgb(255 255 255 / 0.06);
+  --ide-fill-hi:   rgb(255 255 255 / 0.08);
+
+  /* 窗口三点与状态色 */
+  --ide-dot-red:    #ef4444;
+  --ide-dot-yellow: #f59e0b;
+  --ide-dot-green:  #10b981;
+  --ide-accent:     #38bdf8;
+
+  /* diff 增删 */
+  --ide-del-bg: rgb(239 68 68 / 0.16);
+  --ide-del-fg: #fca5a5;
+  --ide-add-bg: rgb(16 185 129 / 0.16);
+  --ide-add-fg: #86efac;
+
+  /* 语法高亮九色 */
+  --ide-kw:    #c084fc;   /* import export const from if return async */
+  --ide-type:  #38bdf8;   /* 类型与类名 */
+  --ide-fn:    #facc15;   /* 函数调用 */
+  --ide-str:   #6ee7b7;   /* 字符串 */
+  --ide-prop:  #e2e8f0;   /* 属性 */
+  --ide-cm:    #64748b;   /* 注释 */
+  --ide-bool:  #f97316;   /* 布尔与常量 */
+  --ide-numc:  #fb923c;   /* 数字 */
+  --ide-punct: #94a3b8;   /* 括号冒号 */
 }
 
 /* ============================================================================
@@ -446,4 +482,110 @@
   .flip-face-back { transform: none; border-top: 0; border-top-left-radius: 0; border-top-right-radius: 0; }
   .flip-face:not(.flip-face-back) { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
   .facet-card { transition: none; }
+}
+
+/* ============================================================================
+   落地页 · 管道段 IDE 窗口（V2-18，Stitch 稿 1:1 还原）
+   色值全部走上面的 --ide-* 令牌，这里只放结构与关系。
+   ========================================================================= */
+.ide-window {
+  background: var(--ide-bg);
+  border: 1px solid rgb(255 255 255 / 0.1);
+  box-shadow: var(--shadow-inkbox);
+  color: var(--ide-fg-strong);
+}
+.ide-top-bar {
+  background: var(--ide-chrome);
+  border-bottom: 1px solid var(--ide-rule);
+}
+.ide-branch-tag {
+  background: var(--ide-fill);
+  border: 1px solid var(--ide-fill-hi);
+  color: var(--ide-fg-mid);
+}
+.ide-body { background: var(--ide-bg); }
+.ide-sidebar {
+  background: var(--ide-chrome);
+  border-right: 1px solid var(--ide-rule);
+}
+.ide-group-title {
+  color: var(--ide-fg-meta);
+  border-bottom: 1px solid var(--ide-rule-soft);
+}
+.ide-count { background: var(--ide-fill); }
+
+.ide-task {
+  color: var(--ide-fg-dim);
+  transition: background 150ms ease, color 150ms ease;
+  cursor: default;
+}
+.ide-task:hover { background: var(--ide-rule-soft); color: var(--ide-fg-strong); }
+.ide-task.is-active { background: var(--ide-fill-hi); color: var(--ide-fg); font-weight: 500; }
+.ide-task .num { color: var(--ide-fg-ghost); }
+.ide-task.is-active .num { color: var(--ide-fg-faint); }
+
+/* 双栏 diff */
+.ide-diff-main {
+  background: var(--ide-bg);
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 22px;
+}
+/* 细滚动条，不要系统默认那条粗的横在深色窗口里 */
+.ide-diff-col::-webkit-scrollbar { height: 6px; }
+.ide-diff-col::-webkit-scrollbar-track { background: transparent; }
+.ide-diff-col::-webkit-scrollbar-thumb {
+  background: var(--ide-fill-hi);
+  border-radius: 3px;
+}
+/* 两栏各自独立横向滚动。稿子是单栏 overflow-x，两栏并排时长行会溢出压到邻栏
+   （实测 BASE 第 5 行盖住了 HEAD 第 5 行），所以裁剪下放到列上。 */
+.ide-diff-col {
+  overflow-x: auto;
+  min-width: 0;
+}
+.ide-diff-col:first-child { border-right: 1px solid rgb(255 255 255 / 0.06); }
+.ide-pane-tag {
+  color: var(--ide-fg-ghost);
+  border-bottom: 1px solid var(--ide-rule-soft);
+  margin-bottom: 8px;
+}
+.ide-code-line {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  min-height: 22px;
+  white-space: pre;
+}
+.ide-line-num {
+  color: var(--ide-gutter);
+  width: 28px;
+  flex-shrink: 0;
+  text-align: right;
+  margin-right: 16px;
+  user-select: none;
+}
+.ide-code-line.is-del { background: var(--ide-del-bg); color: var(--ide-del-fg); }
+.ide-code-line.is-del .ide-line-num { color: var(--ide-dot-red); }
+.ide-code-line.is-add { background: var(--ide-add-bg); color: var(--ide-add-fg); }
+.ide-code-line.is-add .ide-line-num { color: var(--ide-dot-green); }
+
+/* 语法高亮。增删行有自己的底色与字色，token 色在那里让位，
+   否则红绿背景上又套九种色会糊成一片 —— 稿子里也是这个处理。 */
+.ide-t-kw    { color: var(--ide-kw); font-weight: 500; }
+.ide-t-type  { color: var(--ide-type); }
+.ide-t-fn    { color: var(--ide-fn); }
+.ide-t-str   { color: var(--ide-str); }
+.ide-t-prop  { color: var(--ide-prop); }
+.ide-t-cm    { color: var(--ide-cm); font-style: italic; }
+.ide-t-bool  { color: var(--ide-bool); }
+.ide-t-numc  { color: var(--ide-numc); }
+.ide-t-punct { color: var(--ide-punct); }
+.ide-code-line.is-add [class^="ide-t-"],
+.ide-code-line.is-del [class^="ide-t-"] { color: inherit; }
+
+.ide-bottom-strip {
+  background: var(--ide-chrome);
+  border-top: 1px solid rgb(255 255 255 / 0.06);
+  color: var(--ide-fg-status);
 }
