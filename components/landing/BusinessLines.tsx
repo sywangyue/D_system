@@ -2,15 +2,20 @@ import { Check } from "lucide-react"
 import type { Dict, Locale } from "@/lib/i18n-shared"
 
 /**
- * §4.5 三条业务线 —— 全页最短的 section。
+ * 三条业务线（V2-18 改版）。
  *
- * 三列：一个淡色序号、标题、两行以内的说明、三个短条目。
- * **只用竖向发丝线分隔**，不用卡片、不填底色、不加圆角（§4.5）。
+ * 旧版是三列纯文字、竖向发丝线分隔。改版后是三张翻转卡片：
+ * 正面放序号 + 标题 + 一行说明，背面放三个短条目。
+ * 旧规范的「不用卡片、不填底色、不加圆角」已作废，见 docs/DESIGN.md 第 6.0 节。
  *
- * 标题直接用字典里现成的 enum.bizLine，不再写一份（§4.5）。
- * 第二列按 §2 的理由把设计稿里的「已终止信号识别」改为「届次断档识别」——
- * 断档是数据事实，终止是品牌状态判断，公开页面上只能写前者。
- * 条目小勾用最深中性色，不用橙（§6.4 —— 页面上除字标外不许有橙）。
+ * **翻转靠 CSS，不用 JS**，所以这仍然是服务端组件。
+ * 触屏没有 hover，`.flip-card` 在 (hover: none) 下退化为常驻双栏，
+ * 背面内容不会变成摸不到的死信息 —— 规则在 globals.css。
+ *
+ * 标题直接用字典里现成的 enum.bizLine，不再写一份。
+ * 第二列写「届次断档识别」而不是「已终止信号识别」：断档是数据事实，
+ * 终止是品牌状态判断，公开页面上只能写前者。
+ * 条目小勾用最深中性色，不用橙 —— 页面上除字标外不许有橙。
  */
 export default function BusinessLines({
   locale, t,
@@ -19,7 +24,7 @@ export default function BusinessLines({
   t: Dict
 }) {
   const l = t.landing.biz
-  const h2 = locale === "zh" ? "text-[42px]" : "text-[44px]"
+  const h2 = locale === "zh" ? "text-[27px]" : "text-[28px]"
 
   const lines: { index: string; title: string; desc: string; items: string[] }[] = [
     { index: "01", title: t.enum.bizLine.ma, desc: l.maDesc, items: l.maItems },
@@ -28,28 +33,35 @@ export default function BusinessLines({
   ]
 
   return (
-    <section id="business" className="mx-auto mt-40 w-full max-w-[1200px] scroll-mt-14 px-6">
-      <div className="text-[11px] uppercase tracking-[0.12em] text-fg-subtle">{l.overline}</div>
-      <h2 className={`${h2} mt-4 font-medium leading-[1.2] text-fg`}>{l.headline}</h2>
+    <section id="business" className="mx-auto w-full max-w-[1240px] scroll-mt-14 px-6 py-20">
+      <div className="text-[11px] font-medium uppercase tracking-[0.05em] text-fg-subtle">
+        {l.overline}
+      </div>
+      <h2 className={`${h2} mt-2 font-semibold leading-[1.2] text-fg`}>{l.headline}</h2>
 
-      <div className="mt-16 grid grid-cols-3">
-        {lines.map((line, i) => (
-          <div
-            key={line.index}
-            className={`${i === 0 ? "pr-8" : i === 2 ? "pl-8" : "px-8"} ${i < 2 ? "hairline-r" : ""}`}
-          >
-            <div className="num text-[44px] leading-none text-fg-faint">{line.index}</div>
-            <h3 className="mt-6 text-[20px] leading-snug text-fg">{line.title}</h3>
-            <p className="mt-3 text-[15px] leading-relaxed text-fg-muted">{line.desc}</p>
-            <ul className="mt-6 space-y-2.5">
-              {line.items.map(item => (
-                <li key={item} className="flex items-center gap-2 text-[13px] text-fg-muted">
-                  {/* 小勾：最深中性色，10px 级别，不用 emoji、不用橙 */}
-                  <Check size={12} strokeWidth={2.5} className="shrink-0 text-fg" />
-                  <span>{item}</span>
-                </li>
-              ))}
-            </ul>
+      <div className="mt-8 grid grid-cols-3 gap-5">
+        {lines.map(line => (
+          <div key={line.index} className="flip-card min-h-[260px]">
+            <div className="flip-card-inner">
+              {/* 正面 */}
+              <div className="flip-face rounded-[8px] border border-hairline bg-surface-elevated p-6">
+                <div className="num text-[32px] leading-none text-fg-faint">{line.index}</div>
+                <h3 className="mt-5 text-[18px] font-semibold leading-snug text-fg">{line.title}</h3>
+                <p className="mt-3 text-[13px] leading-relaxed text-fg-muted">{line.desc}</p>
+              </div>
+              {/* 背面 */}
+              <div className="flip-face flip-face-back rounded-[8px] border border-hairline bg-surface-elevated p-6">
+                <div className="num text-[12px] leading-none text-fg-faint">{line.index}</div>
+                <ul className="mt-5 space-y-3">
+                  {line.items.map(item => (
+                    <li key={item} className="flex items-center gap-2 text-[13px] text-fg-muted">
+                      <Check size={12} strokeWidth={2.5} className="shrink-0 text-fg" />
+                      <span>{item}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         ))}
       </div>

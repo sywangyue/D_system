@@ -6,8 +6,11 @@ import type { LandingData } from "@/lib/queries/landing"
 /**
  * §4.4 数据切面 —— 全页主 section。3×2 六块面板，每块：标题 + 一行说明 + 一个真实数据小图。
  *
- * 图的规矩（§4.4）：不要网格线、不要图内图例，只在两端标数值。
- * 面板之间只用发丝线分隔，不填底色、不加圆角、不带投影（§6.6 禁「带投影的卡片网格」）。
+ * 图的规矩：不要网格线、不要图内图例，只在两端标数值。
+ *
+ * V2-18 起面板改为独立卡片（白底 + 发丝边 + 8px 圆角 + hover 抬起）。
+ * 旧规范的「不填底色、不加圆角、不带投影」已作废 —— 整段现在有 surface 底色，
+ * 面板再不填白就糊成一片。作废记录见 docs/DESIGN.md 第 6.0 节。
  *
  * 第 1、3 块**复用 H 的组件**（MapSvg / IndustryBar）—— 照着重画一份的话，
  * 投影、半径标度、行业口径早晚会与 /expo 不一致。
@@ -25,10 +28,10 @@ function monthLabel(locale: Locale, month: number): string {
 
 function Panel({ title, desc, children }: { title: string; desc: string; children: React.ReactNode }) {
   return (
-    <div className="flex min-h-[280px] flex-col bg-canvas p-8">
-      <h3 className="text-[15px] text-fg">{title}</h3>
-      <p className="mt-1.5 text-[12px] text-fg-subtle">{desc}</p>
-      <div className="mt-7 flex flex-1 flex-col justify-center">{children}</div>
+    <div className="facet-card flex min-h-[280px] flex-col rounded-[8px] border border-hairline bg-surface-elevated p-6">
+      <h3 className="text-[14px] font-semibold text-fg">{title}</h3>
+      <p className="mt-1 text-[11px] text-fg-subtle">{desc}</p>
+      <div className="mt-5 flex flex-1 flex-col justify-center">{children}</div>
     </div>
   )
 }
@@ -52,7 +55,7 @@ export default function DataFacets({
   data: LandingData
 }) {
   const l = t.landing.facets
-  const h2 = locale === "zh" ? "text-[42px]" : "text-[44px]"
+  const h2 = locale === "zh" ? "text-[27px]" : "text-[28px]"
 
   const { organizers, topCities, schedule, no2026, expo } = data
 
@@ -64,11 +67,13 @@ export default function DataFacets({
   const no2026Total = no2026.withCount + no2026.withoutCount || 1
 
   return (
-    <section id="capability" className="mx-auto mt-40 w-full max-w-[1200px] scroll-mt-14 px-6">
-      <div className="text-[11px] uppercase tracking-[0.12em] text-fg-subtle">{l.overline}</div>
-      <h2 className={`${h2} mt-4 font-medium leading-[1.2] text-fg`}>{l.headline}</h2>
+    <div id="capability" className="mt-14 scroll-mt-14">
+      <div className="text-[11px] font-medium uppercase tracking-[0.05em] text-fg-subtle">
+        {l.overline}
+      </div>
+      <h2 className={`${h2} mt-2 mb-8 font-semibold leading-[1.2] text-fg`}>{l.headline}</h2>
 
-      <div className="mt-16 grid grid-cols-3 gap-px bg-hairline">
+      <div className="grid grid-cols-3 gap-5">
         {/* 1 · 地理分布 —— 复用 H 的地图组件，只读 */}
         <Panel title={l.mapTitle} desc={l.mapDesc}>
           <MapSvg points={expo.points} locale={locale} />
@@ -209,6 +214,6 @@ export default function DataFacets({
           </div>
         </Panel>
       </div>
-    </section>
+    </div>
   )
 }

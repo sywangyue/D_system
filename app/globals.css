@@ -126,6 +126,29 @@
   --radius-control: 4px;
   --radius-panel:   6px;
   --radius-card:    8px;
+
+  /* ── 高度与质感（V2-18 落地页改版新增）──────────────────
+     在此之前全站没有任何 shadow / gradient / blur 变量，界面是纯发丝线分隔。
+     这组只服务落地页的 Linear 式层次，**后台看板不要用** —— 看板是工作界面，
+     投影会让密集表格变脏。 */
+  --shadow-hero:   0 32px 72px -12px rgb(0 0 0 / 0.09), 0 12px 28px -6px rgb(0 0 0 / 0.04);
+  --shadow-card:   0 4px 16px rgb(0 0 0 / 0.04);
+  --shadow-raised: 0 8px 24px rgb(0 0 0 / 0.05);
+  --shadow-inkbox: 0 40px 100px -20px rgb(0 0 0 / 0.5), 0 16px 36px -8px rgb(0 0 0 / 0.35);
+
+  /* 首屏与管道段的顶光。收敛在 canvas → surface 两个既有中性色之间，不引入新色。 */
+  --gradient-hero: radial-gradient(120% 80% at 50% 0%, var(--color-surface) 0%, var(--color-canvas) 85%);
+  --gradient-halo: radial-gradient(100% 60% at 50% 10%, var(--color-surface) 0%, var(--color-canvas) 80%);
+
+  --blur-glass: 16px;
+
+  /* 管道段的深色终端块。全站唯一的暗色元素 —— 它模拟的是终端，
+     终端就是深底的。别把这组用到别处，界面整体是浅色。 */
+  --color-inkbox:      #090a0f;
+  --color-inkbox-bar:  #0d0f17;
+  --color-inkbox-fg:   #e5e5e5;
+  --color-inkbox-dim:  #6b7280;
+  --color-inkbox-rule: rgb(255 255 255 / 0.08);
 }
 
 /* ============================================================================
@@ -356,4 +379,71 @@
   .hairline-b { border-bottom: 1px solid var(--color-hairline); }
   .hairline-r { border-right: 1px solid var(--color-hairline); }
   .hairline-t { border-top: 1px solid var(--color-hairline); }
+}
+
+/* ============================================================================
+   落地页 · 翻转卡片与面板 hover（V2-18）
+   ========================================================================= */
+
+/* 数据切面卡片：hover 抬起 1px + 边框加深 + 轻投影 */
+.facet-card {
+  transition: border-color 150ms ease-out, transform 150ms ease-out, box-shadow 150ms ease-out;
+}
+.facet-card:hover {
+  border-color: var(--color-hairline-active);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-card);
+}
+
+/* 三条业务线的翻转卡片。纯 CSS，无 JS，所以 BusinessLines 仍是服务端组件。 */
+.flip-card {
+  perspective: 1200px;
+}
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: inherit;
+  transition: transform 380ms cubic-bezier(0.2, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.flip-card:hover .flip-card-inner,
+.flip-card:focus-within .flip-card-inner {
+  transform: rotateY(180deg);
+}
+.flip-face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color 150ms ease-out, box-shadow 150ms ease-out;
+}
+.flip-card:hover .flip-face {
+  border-color: var(--color-hairline-active);
+  box-shadow: var(--shadow-raised);
+}
+.flip-face-back {
+  transform: rotateY(180deg);
+}
+
+/* 触屏没有 hover：翻不过去的背面等于摸不到的死信息。
+   退化成一张常驻卡片，正反内容上下排开。 */
+@media (hover: none) {
+  .flip-card { perspective: none; }
+  .flip-card-inner { transform: none !important; transform-style: flat; height: auto; }
+  .flip-face { position: relative; inset: auto; backface-visibility: visible; }
+  .flip-face-back { transform: none; border-top: 0; border-top-left-radius: 0; border-top-right-radius: 0; }
+  .flip-face:not(.flip-face-back) { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+}
+
+/* 动效敏感者：不翻转，直接同上面的常驻形态 */
+@media (prefers-reduced-motion: reduce) {
+  .flip-card { perspective: none; }
+  .flip-card-inner { transform: none !important; transform-style: flat; height: auto; transition: none; }
+  .flip-face { position: relative; inset: auto; backface-visibility: visible; }
+  .flip-face-back { transform: none; border-top: 0; border-top-left-radius: 0; border-top-right-radius: 0; }
+  .flip-face:not(.flip-face-back) { border-bottom-left-radius: 0; border-bottom-right-radius: 0; }
+  .facet-card { transition: none; }
 }

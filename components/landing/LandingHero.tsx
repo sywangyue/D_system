@@ -4,10 +4,15 @@ import { fill, fmtNum, type Dict, type Locale } from "@/lib/i18n-shared"
 import type { Coverage } from "@/lib/queries/landing"
 
 /**
- * §4.2 首屏。左对齐，只有三样东西：标题两行、一行副标题、一个主按钮 + 一个文字链接。
- * 数字全部走 fmtNum + 字典插值，**页面里没有任何写死的计数**（§2）。
+ * 首屏（V2-18 改版）。
  *
- * 标题下方是产品截图：1px 发丝边框、12px 圆角、底边渐隐到页面背景（§4.2）。
+ * 从左对齐改为居中，参照 Linear：顶光渐变背景 → 悬浮的真实看板 → 大范围低透明度投影。
+ * 三层都走令牌（--gradient-hero / --shadow-hero），组件里不写色值。
+ *
+ * 截图底边**故意裁掉一截**并向下渐隐到画布色，暗示「下面还有内容」——
+ * 这是 Linear 首屏的关键手法，不要把它当成没对齐的 bug 修掉。
+ *
+ * 数字仍然全部走 fmtNum + 字典插值，页面里没有任何写死的计数。
  */
 export default function LandingHero({
   locale, t, coverage, enterHref,
@@ -18,19 +23,34 @@ export default function LandingHero({
   enterHref: string
 }) {
   const l = t.landing.hero
-  // 字号按语种取一节（设计板的中英配对：72/68）
+  // 中英配对字号：拉丁 72 / 中文 68
   const h1 = locale === "zh" ? "text-[68px]" : "text-[72px]"
 
   return (
-    <section className="mx-auto w-full max-w-[1200px] px-6 pt-[236px]">
-      {/* 236px = 固定导航 56px + 首屏上留白 180px */}
+    <section
+      className="relative flex flex-col items-center overflow-hidden px-6 pt-[144px] text-center"
+      style={{ background: "var(--gradient-hero)" }}
+    >
+      {/* 资质条 —— 说明这是谁的系统，不是口号 */}
+      <span
+        className="mb-7 inline-flex items-center gap-2 rounded-full border border-hairline px-3 py-1 text-[12px] text-fg-muted"
+        style={{
+          background: "color-mix(in srgb, var(--color-canvas) 80%, transparent)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+        }}
+      >
+        <span className="h-1.5 w-1.5 rounded-full bg-fg-subtle" />
+        {l.badge}
+      </span>
+
       <h1 className={`${h1} max-w-[900px] font-medium leading-[1.15] text-fg-muted`}>
         {l.headlineLead}
         <br />
         <span className="text-fg">{l.headlineFocus}</span>
       </h1>
 
-      <p className="mt-6 max-w-[860px] text-[17px] text-fg-muted">
+      <p className="mt-6 max-w-[740px] text-[17px] leading-relaxed text-fg-muted">
         {fill(l.subline, {
           brands: fmtNum(locale, coverage.brands),
           groups: fmtNum(locale, coverage.groups),
@@ -38,29 +58,39 @@ export default function LandingHero({
         })}
       </p>
 
-      <div className="mt-10 flex items-center gap-7">
+      <div className="mt-9 mb-16 flex items-center gap-7">
         <Link
           href={enterHref}
-          className="btn inline-flex h-10 items-center rounded-[4px] bg-accent px-5 text-[14px] font-medium text-accent-fg"
+          className="btn inline-flex h-11 items-center rounded-[4px] bg-accent px-7 text-[15px] font-medium text-accent-fg transition-transform hover:-translate-y-px"
         >
           {l.enter}
         </Link>
-        <a href="#data" className="text-[13px] text-fg-muted transition-colors hover:text-fg">
+        <a
+          href="#data"
+          className="inline-flex items-center gap-1 text-[14px] text-fg-muted transition-all hover:-translate-y-px hover:text-fg"
+        >
           {l.viewCoverage}
         </a>
       </div>
 
-      {/* 产品截图：/expo 主内容区（清空筛选、日历翻到无事项的月份、裁掉侧栏后截取，不含任何内部数据） */}
+      {/* 悬浮看板。外层 1px 渐变描边 + 大投影，内层裁圆角装真实截图 */}
       <div
-        className="relative mt-20 overflow-hidden rounded-[12px] border border-hairline"
-        style={{ aspectRatio: "16 / 10", background: "var(--color-surface)" }}
+        className="relative w-full max-w-[1240px] rounded-t-[8px] p-px pb-0"
+        style={{
+          background: "linear-gradient(180deg, rgb(0 0 0 / 0.12) 0%, rgb(0 0 0 / 0.02) 100%)",
+          boxShadow: "var(--shadow-hero)",
+        }}
       >
-        <ProductShot src="/landing/product.webp" alt={l.shotAlt} note={l.shotPending} />
-        {/* 底边渐隐到页面背景 —— 用的是画布色令牌，不是新色值 */}
-        <div
-          className="pointer-events-none absolute inset-x-0 bottom-0 h-28"
-          style={{ background: "linear-gradient(to top, var(--color-canvas), transparent)" }}
-        />
+        <div className="relative overflow-hidden rounded-t-[7px] bg-canvas">
+          <div style={{ aspectRatio: "16 / 10" }}>
+            <ProductShot src="/landing/product.webp" alt={l.shotAlt} note={l.shotPending} />
+          </div>
+          {/* 底边渐隐 —— 与裁切配合，做出「还有更多」的暗示 */}
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-32"
+            style={{ background: "linear-gradient(to top, var(--color-canvas), transparent)" }}
+          />
+        </div>
       </div>
     </section>
   )

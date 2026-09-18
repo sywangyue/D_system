@@ -508,7 +508,8 @@
       "enter": "Sign in",
       "viewCoverage": "View data coverage →",
       "shotAlt": "MWLAB exhibition basemap interface",
-      "shotPending": "Product screenshot of /expo pending"
+      "shotPending": "Product screenshot of /expo pending",
+      "badge": "Messe Düsseldorf · Shanghai BD"
     },
     "coverage": {
       "brands": "Exhibition brands",
@@ -564,11 +565,29 @@
         "Custom data tools"
       ]
     },
+    "pipeline": {
+      "headline": "Self-assembled,\nself-built, for BD",
+      "body": "Every step from source scrape to dashboard is in our own hands: dual-source collection, conflict merging, industry classification, edition status, display-pool filtering. No outsourced feeds, no numbers of unknown origin.",
+      "cadence": "7th & 27th, 03:00",
+      "sources": "jufair · cnexpo dual source",
+      "steps": [
+        "Collect",
+        "Merge",
+        "Classify",
+        "Edition status",
+        "Display pool",
+        "Review export"
+      ]
+    },
     "footer": {
       "org": "Messe Düsseldorf Shanghai · Business Development",
       "copyright": "© 2026 Messe Düsseldorf (Shanghai) Co., Ltd. · Internal system",
       "enter": "Sign in →",
-      "accessNote": "Internal account required"
+      "accessNote": "Internal account required",
+      "terms": "Terms",
+      "privacy": "Privacy",
+      "like": "Like this system",
+      "confidential": "Internal system · Confidential"
     }
   }
 }

@@ -508,7 +508,8 @@
       "enter": "进入系统",
       "viewCoverage": "查看数据覆盖 →",
       "shotAlt": "MWLAB 万象 展会底图界面",
-      "shotPending": "待补 /expo 截图"
+      "shotPending": "待补 /expo 截图",
+      "badge": "杜塞尔多夫展览（Messe Düsseldorf）· 上海 BD 主办"
     },
     "coverage": {
       "brands": "展会品牌",
@@ -564,11 +565,29 @@
         "定制数据工具"
       ]
     },
+    "pipeline": {
+      "headline": "自组，自建，\n为 BD 而生",
+      "body": "从源站抓取到落进看板的每一步都在自己手里：双源采集、冲突合并、行业归类、届次状态、展示池筛选，全程可溯。没有外包的数据源，也没有说不清来历的数字。",
+      "cadence": "每月 7 / 27 日 03:00",
+      "sources": "jufair · cnexpo 双源",
+      "steps": [
+        "采集",
+        "合并进主库",
+        "行业分类",
+        "刷新届次状态",
+        "重算展示池",
+        "导出复核表"
+      ]
+    },
     "footer": {
       "org": "Messe Düsseldorf Shanghai · Business Development",
       "copyright": "© 2026 杜塞尔多夫展览（上海）有限公司 · 内部系统",
       "enter": "进入系统 →",
-      "accessNote": "访问需内部账号"
+      "accessNote": "访问需内部账号",
+      "terms": "服务条款",
+      "privacy": "隐私政策",
+      "like": "喜欢这个系统",
+      "confidential": "内部系统 · 请勿外传"
     }
   }
 }

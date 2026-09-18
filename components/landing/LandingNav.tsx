@@ -24,7 +24,7 @@ export default function LandingNav({
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 h-14 hairline-b bg-canvas/90 backdrop-blur-md">
-      <div className="mx-auto flex h-full w-full max-w-[1200px] items-center justify-between px-6">
+      <div className="mx-auto flex h-full w-full max-w-[1240px] items-center justify-between px-6">
         <BrandLockup size="standard" showCn={locale === "zh"} />
 
         <nav className="flex items-center gap-7">
