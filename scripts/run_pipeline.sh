@@ -4,8 +4,9 @@
 # 由 crontab 调用。cron 的 PATH 极简，所有解释器/二进制一律用绝对路径。
 #
 # 刻意不包含的两步：
-#   scripts/geo_backfill.py   无条件覆盖 country_cn（会撤销人工修正）、结尾清空全表 notes，
-#                             且在 CWD 乱丢 19MB 备份 —— 一次性治理脚本，不可重入
+#   geo_backfill.py           无条件覆盖 country_cn（会撤销人工修正）、结尾清空全表 notes，
+#                             且在 CWD 乱丢 19MB 备份 —— 不可重入，V2-17 已移出仓库
+#                             （本地 _archive/onetime/scripts/），不要捞回来跑
 #   scripts/dedup.py --execute  品牌合并不可逆，只产出复核 CSV，由人工过完再执行
 
 set -uo pipefail

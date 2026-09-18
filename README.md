@@ -56,6 +56,7 @@ tools/          merge_engine.py（双源合并）· export_*.py · import_tags.p
 scripts/        run_pipeline.sh（月度管道）· classify_all_brands.py · dedup.py 等治理脚本
 schema/         init_db.sql + migrations/（由 db.py:init_db() 打开库时自动应用）
 
+_archive/       一次性治理脚本与历史产物，本地留档不入库（onetime/ 下按原目录分放）
 knowledge/      知识库正文（文件即数据源，图在 public/knowledge/）
 design/         设计稿与预览页
 tests/          vitest（接口，模拟库）+ pytest（Python 工具）

@@ -58,9 +58,11 @@ crawl_log (爬取日志)           users (用户表)
 - `anomaly_flag` ← 目前为一次性标记，无周期任务
 
 **人工修正会被覆盖的字段** —— `city` / `city_en` / `country_cn` / `country_en`：
-`scripts/geo_backfill.py` 无条件 UPDATE 这四个字段（无 `WHERE ... = ''` 保护），
+`geo_backfill.py` 无条件 UPDATE 这四个字段（无 `WHERE ... = ''` 保护），
 且脚本末尾还有一句无条件的 `UPDATE exhibition_brand SET notes = ''` 清空全表备注。
-它是一次性治理脚本，**不可重入、已被排除在 pipeline 之外**。手工修过地理字段后若再跑它，修正会被推断值覆盖。
+它不可重入，V2-17 已连同其余一次性治理脚本移出仓库，存放在本地
+`_archive/onetime/`（不入库）。**不要把它捞回来跑** —— 手工修过地理字段后再跑一次，
+修正会被推断值覆盖，全表备注会被清空。
 
 **必须人工打标（系统无法推断）**: competition_relation, mds_related, strategic_relevance (1-5), ma_potential (1-5), competitor_group, scale_score, yoy_trend
 
