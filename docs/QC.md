@@ -53,8 +53,14 @@ Max 可以对单次质检授权「有问题直接修」。
 
 ## 2. 数据基线（质检时对照）
 
-截至 **2026-09-18**（补跑 pipeline `auto-20260918` 之后），库里 14 张表，
-**全部列在下面**。分两组，验收方式不同。
+截至 **2026-09-18**（补跑 pipeline `auto-20260918`、并归档 11 份 BD 调研之后），
+库里 14 张表，**全部列在下面**。分两组，验收方式不同。
+
+> **2026-09-18 BD 调研归档**：`reports/bd/<slug>/` 下 11 个目录、53 个文件（193 MB），
+> 对应 `intel_report` 11 条（`report_type=industry_research`, `created_by=max-bd`）
+> 与 `resource` 53 条（靠 `report_id` 挂在报告下）。原始素材里的压缩包与巨型会刊合集
+> （约 2.6 GB）**有意未上传**，留在本地 `/Volumes/Maxgo/BD_All/`。
+> `reports/` 在 `.gitignore` 里，这批文件到线上的唯一通道是 rsync（见 `DEPLOY.md`）。
 
 ### 2.1 存量表 —— 任何任务都不该改变它们
 
@@ -66,8 +72,8 @@ brand_geo_tag         8,145
 company                 501      494 来自 CIBS2026 批量线索 + 6 家深度尽调标的 + 1
 data_provenance       9,906
 manual_tag_history   12,302
-resource                 50      report 11 / raw 11 / export 16 / roster 10 / note 2
-intel_report             13      V2-06 回填 11 份历史 docx 后的值
+resource                103      report 49 / roster 18 / export 17 / raw 17 / note 2
+intel_report             24      13（V2-06 回填）+ 11（2026-09-18 BD 调研归档）
 crawl_log                 8      每跑一次 pipeline +1
 user                      3      admin / manager / readonly，就这三个
 schema_version           17      017 = intel_report.report_type 补 company_research
