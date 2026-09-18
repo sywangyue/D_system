@@ -60,7 +60,7 @@ export function fmtDateTime(locale: Locale, s: string | null | undefined, dash =
   }).format(d)
 }
 
-/** 千分位。数字不手拼（docs/DESIGN.md §4）。 */
+/** 千分位。数字不手拼（docs/DESIGN.md 第 2 节 第 5 条）。 */
 export function fmtNum(locale: Locale, n: number | null | undefined, dash = '—'): string {
   if (n === null || n === undefined || !Number.isFinite(n)) return dash
   return new Intl.NumberFormat(LOCALE_TAG[locale]).format(n)

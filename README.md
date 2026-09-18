@@ -134,7 +134,7 @@ python3 -m pytest tests/ -q      # pytest，135 用例
 | 架构：数据模型、鉴权、写接口约定 | `docs/ARCHITECTURE.md` |
 | 质检协议与数据基线 | `docs/QC.md` |
 | 部署运维 | `docs/DEPLOY.md` |
-| 品牌、英文版、设计简报 | `docs/DESIGN.md` |
+| 设计规范（Token · 排版 · 品牌 · i18n） | `docs/DESIGN.md` |
 | 全部历史步骤（V1-xx / V2-xx） | `docs/HISTORY.md` |
 | 待办 | `docs/ROADMAP.md` |
 | 数据层、采集管道、技术约束 | `AGENTS.md` |

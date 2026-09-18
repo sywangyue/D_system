@@ -1,21 +1,108 @@
-# MWLAB 万象 · 设计规范（品牌 / 英文版 / 内容契约 / 设计简报）
+# MWLAB 万象 · 设计规范
 
-> 由四份原文档合并（2026-09-17）。**色值以 `app/globals.css` 为准**：
-> 界面已转为浅色、橙色只留在 Logo，文中暗色与橙色的描述均已作废。V2-18 UI 重做时统一改写本文件。
+**本文件是现行规范，不是任务书。** 色值与尺寸一律**以 `app/globals.css` 为准**，
+本文抄录的是 2026-09-18 的实际值，改了 CSS 就回来同步。
+
+2026-09-17 由四份文档合并而成；2026-09-18 清理：上一轮给 Claude Design 的任务书
+（问题清单、交付要求、字阶改造要求）已执行完毕，连同作废的暗色色板一并删除，
+只保留仍然有效的规范。原文在 `archive/`。
 
 ## 目录
 
-1. 品牌与 Logo
-2. 英文版规范（i18n）
-3. 内容契约：每个文本位的来源
-4. Claude Design 设计简报（色板部分已作废，见文首说明）
-
+1. Design Token —— 当前实际值
+2. 中文排版纪律
+3. 品牌与 Logo
+4. 英文版规范（i18n）
+5. 内容契约 —— 每个文本位的来源
 
 ---
 
-## 品牌与 Logo
+## 1. Design Token —— 当前实际值
 
-<!-- 原文件：docs/DESIGN.md -->
+给 Stitch / Claude Design 的输入就是这张表。**设计稿只能用这里的值**，
+需要新值时先在这里加、说明为什么现有的不够，再落到 `globals.css`。
+
+> 「Design Token」在本项目早期文档里被译作「令牌」，与 JWT 令牌撞词，统一改用 Design Token。
+
+### 1.1 颜色
+
+| Token | 值 | 用途 |
+|---|---|---|
+| `--color-canvas` | `#ffffff` | 页面底 |
+| `--color-sidebar` | `#f2f2f2` | 侧栏 · 输入框底 · 表头 |
+| `--color-surface` | `#fafafa` | 面板 · 卡片 · 抽屉 |
+| `--color-surface-elevated` | `#ffffff` | 浮层 · 下拉 · 选中态 · 徽标 |
+| `--color-surface-hover` | `#e6e6e6` | 卡片上的 hover / 选中 |
+| `--color-hairline` | `#00000014` | 发丝线（8%） |
+| `--color-hairline-active` | `#00000036` | 发丝线 hover（21%） |
+| `--color-fg` | `#171717` | 标题 · 主数据 |
+| `--color-fg-muted` | `#4d4d4d` | 正文 · 表格单元 · 导航项 |
+| `--color-fg-subtle` | `#8f8f8f` | 表头 · 标签 · 提示 |
+| `--color-fg-faint` | `#a8a8a8` | 最弱的元信息，慎用 |
+| `--color-accent` | `#171717` | 主按钮底 |
+| `--color-accent-fg` | `#ffffff` | 主按钮字 |
+| `--color-accent-hover` | `#000000` | 主按钮 hover |
+| `--color-error-bg / -border / -text` | `hsl(0 100% 97%)` / `hsl(0 90% 92%)` / `hsl(358 66% 48%)` | 错误态三件套 |
+
+**品牌橙 `--color-brand` `#fe5c00` 只许出现在 Logo**（`BrandLockup.tsx`）。
+界面里任何地方用它都会被门禁拦下，强调色一律走 `--color-accent`。
+
+### 1.2 字阶
+
+拉丁与中文分两套，**中文比拉丁小一档**（见第 2 节第 4 条）。
+
+| 级别 | 拉丁 | 中文 | 用途 |
+|---|---|---|---|
+| micro | `--text-micro` 11px | `--text-micro-cjk` 11px | 标签 · 表头 |
+| ui | `--text-ui` 13px | `--text-ui-cjk` 12px | 表格 · 控件 |
+| body | `--text-body` 15px | `--text-body-cjk` 14px | 正文 |
+| subhead | `--text-subhead` 18px | `--text-subhead-cjk` 17px | 小标题 |
+| heading | `--text-heading` 24px | `--text-heading-cjk` 23px | 区块标题 |
+| title | `--text-title` 28px | `--text-title-cjk` 27px | 页标题 |
+| hero | `--text-hero` 44px | `--text-hero-cjk` 42px | 登录页主标 |
+| display | `--text-display` 72px | `--text-display-cjk` 68px | 落地页主标 |
+
+### 1.3 圆角
+
+`--radius-badge` 2px · `--radius-control` 4px · `--radius-panel` 6px · `--radius-card` 8px
+
+### 1.4 字体
+
+| Token | 栈 |
+|---|---|
+| `--font-sans` | Geist → system-ui |
+| `--font-mono` | JetBrains Mono → ui-monospace（**所有数字走这个**） |
+| `--font-cjk` | PingFang SC → HarmonyOS Sans SC → 微软雅黑 |
+| `--font-logo-cn` | 衬线，只用于 Logo 里的「万象」二字 |
+
+Logo 的几何尺寸另有 `--logo-*` 共 20 个 Token，三档尺寸（默认 / dense / display），
+改动规则见第 3 节 —— **改了要重跑 `tools/build_logo_svg.py`**，否则静态资产与实渲染对不上。
+
+### 1.5 实时导出
+
+上表是抄录，权威在代码。开新一轮设计前重新导一次：
+
+```bash
+awk '/^[[:space:]]*--/ {gsub(/^[[:space:]]+/,""); print}' app/globals.css | sort -u
+```
+
+---
+
+## 2. 中文排版纪律
+
+**这一节是长期纪律，不随设计轮次变化。** 原项目最大的病灶就在这里。
+
+1. **中文字重永远比拉丁低一档**（Geist 600 ↔ Noto Sans SC 500）
+2. **中文永不使用负字距**。Stitch 给 CJK 也套了 `-0.02em`，中文会挤在一起
+3. **中文行高高于拉丁**（拉丁 1.4 ↔ 中文 1.6；长文中文 1.8）
+4. **中英混排时中文字号比拉丁小 1px**，补偿字面率差异
+5. **数字永远走拉丁等宽字体**，绝不落到 CJK 字体里
+6. **中文标题不用 800 字重** —— 系统字体会触发伪粗体，边缘发毛
+7. 中英之间插入 0.25em 间隙（由样式控制，不靠手打空格）
+
+---
+
+## 3. 品牌与 Logo
 
 ### MWLAB 万象 · 品牌与 Logo 规范
 
@@ -242,9 +329,10 @@ python3 tools/build_logo_svg.py
 
 ---
 
-## 英文版规范（i18n）
 
-<!-- 原文件：docs/DESIGN.md -->
+---
+
+## 4. 英文版规范（i18n）
 
 ### 英文版规范 · 后台看板 + 登录
 
@@ -367,19 +455,11 @@ print('缺失:',set(z)-set(e) or '无'); print('多余:',set(e)-set(z) or '无')
 
 ---
 
-## 内容契约：每个文本位的来源
-
-<!-- 原文件：docs/DESIGN.md -->
-
-### 内容契约 · 六屏每个文本位的来源
-
-**日期**：2026-09-16
-**解决的问题**：精修稿里 43 条假展会名等硬编码文案，必须全部换成「数据 / 可编辑 / 配置」三选一
-**上游**：`docs/archive/V2-plan.md` §1 信息架构 · `design/MWLAB 六屏精修稿.dc.html`
-
 ---
 
-#### §0 四种来源，只能是其中之一
+## 5. 内容契约 —— 每个文本位的来源
+
+界面上每一个字都必须能回答「它从哪来」。四选一，没有第五种。
 
 | 标记 | 含义 | 谁写 | 前端怎么拿 |
 |---|---|---|---|
@@ -389,372 +469,17 @@ print('缺失:',set(z)-set(e) or '无'); print('多余:',set(e)-set(z) or '无')
 | **I18N** | 界面文案 | 写在 locale 文件里 | `t('key')` |
 
 > **硬编码的定义**：任何直接写死在 JSX/HTML 里的中文字符串。
-> 界面标签也不许硬编码 —— 它们是 **I18N**，这是英文版的前提（见 §7）。
+> 界面标签也不许硬编码 —— 它们是 **I18N**，这是英文版的前提（见第 4 节）。
 
 ---
 
-#### §1 一个必须先纠正的认知
-
-**机会台的数据不来自爬虫，来自你自己。**
+### 机会台的数据来自你自己
 
 三条业务线（并购标的 / 全新品类 / 项目组支持）是你的 BD 判断，系统无法推断。
-所以 `opportunity` 表 **100% 是 EDIT**，需要完整的录入与编辑界面 —— 这在精修稿里目前完全没有。
+所以 `opportunity` 表 **100% 是 EDIT**，必须有完整的录入与编辑界面（V2-05 已落地）。
+同理，公司库与调研库的内容也是 EDIT / UP，只是目前走的是脚本导入而不是界面录入。
 
 爬来的展会数据只在两处出现：作为机会的**关联对象**（选一个展会品牌挂上去），
 和 `/expo` 展会底图的**底表**。
 
 ---
-
-#### §2 `/` 落地页
-
-| 位置 | 来源 | 说明 |
-|---|---|---|
-| Nav 链接、语言切换、按钮 | **I18N** | |
-| Hero 标题 / 副标 | **I18N** | 副标里的数字用插值，不写死 |
-| **数字带 6 个数** | **DB** | `SELECT count()` 实时聚合，**绝不能硬编码** |
-| 产品截图 | **UP** | 一张 PNG，改版时换图；不要用 iframe 塞真界面 |
-| 六块数据切面 | **DB** | 见下 |
-| 三条业务线标题与条目 | **I18N** | 这是产品定位文案，不是数据 |
-| Footer | **I18N** | |
-
-> ⚠️ **旧 `pitch.html` 就是栽在这**：硬编码了 `5,941 展会品牌`，实际库里已经 7,401，
-> 数字挂在门面上过期了一年多。数字带必须走接口。
-
-六块数据切面的取数：
-
-| 面板 | 取数 |
-|---|---|
-| 地理分布 | `brand_geo_tag` 按城市聚合 |
-| 主办方集团结构 | `brand_organizer` 按集团归并后取 top 6 |
-| 行业结构 | `exhibition_brand` 按 `industry_l1` 分组（8 类） |
-| 规模排名 | `exhibition_edition` 按 `area_sqm` 降序 top 6 |
-| 档期分布 | `exhibition_edition.date_start` 按月分桶 |
-| 白地信号 | 无 2026+ 届次的品牌数 + 3 条示例 |
-
----
-
-#### §3 `/login` 登录页
-
-| 位置 | 来源 |
-|---|---|
-| 全部文案（标题、标签、按钮、错误提示、底部声明） | **I18N** |
-| 左栏 2×2 数字 | **DB**（同落地页口径） |
-| 语言切换 | **I18N** + 写 cookie |
-
-登录页**不应有任何 EDIT 内容**。当前精修稿此屏是干净的。
-
----
-
-#### §4 `/overview` 盘面
-
-| 区块 | 来源 | 字段 |
-|---|---|---|
-| 四个指标数 | **DB** | `opportunity` 按 `type` / `stage` 计数 |
-| 指标标签 | **I18N** | |
-| 本周待办列表 | **DB** | `opportunity.next_action` + `next_action_due` ≤ 本周 |
-| 最近调研列表 | **DB** | `intel_report` 按 `updated_at` 降序 5 条 |
-| 阶段漏斗 | **DB** | `opportunity` 按 `stage` 分组计数 |
-| **空状态文案** | **I18N** | 「本周没有到期事项」「还没有调研报告」 |
-
----
-
-#### §5 `/opportunity` 机会台
-
-**整屏 43 条假展会名全部删除。** 表格是纯数据渲染。
-
-| 列 | 来源 | 字段 |
-|---|---|---|
-| 机会名称 | **EDIT** | `opportunity.title` |
-| 类型 | **EDIT** | `opportunity.type`，枚举：`ma` / `greenfield` / `project_support` |
-| 阶段 | **EDIT** | `opportunity.stage`，枚举 5 档 |
-| 对标 MD 品牌 | **EDIT** | `opportunity.md_brand`，从固定清单选 |
-| 关联公司 | **EDIT** | `opportunity.company_id` → `company.name`，下拉搜索选择 |
-| 城市 | **DB** | 跟随 `company` 或 `exhibition_brand` 派生，不单独存 |
-| 规模 ㎡ | **DB** | 关联展会的 `exhibition_edition.area_sqm` |
-| 优先级 | **EDIT** | `opportunity.priority` 1–5 |
-| 负责人 | **EDIT** | `opportunity.owner` → `user` 表 |
-| 下一步 | **EDIT** | `opportunity.next_action` |
-| 更新时间 | **DB** | `updated_at` 自动写 |
-
-**必须补的界面（精修稿里没有）**：
-
-1. **录入机会**：右侧抽屉表单，按 `type` 切换差异字段（`detail_json`）
-2. **行内编辑**：至少「阶段 / 优先级 / 下一步」三列点击即改
-3. **空状态**：「还没有机会，点右上角录入第一条」+ 一个 CTA
-4. **加载骨架**：8 行 skeleton，不是转圈
-5. **筛选无结果**：「没有符合条件的机会」+ 清除筛选按钮
-
-**必须删的幻觉元素**（Stitch 遗留）：
-`基准汇率 USD/CNY` · `标的底稿加密级别 CONFIDENTIAL-L2` · `更新引擎 MW-FEED v4.19` ·
-`数据哈希` · `延迟 18ms` · `实时同步 99.8%`
-
----
-
-#### §6 `/opportunity/[id]` 机会详情 与 `/expo` 展会底图
-
-##### 机会详情
-
-| 区块 | 来源 |
-|---|---|
-| 标题 / 类型 / 阶段 / 负责人 | **EDIT** |
-| **深度调研正文** | **UP + EDIT** | `intel_report.report_md` 富文本编辑，或上传 docx 转存 |
-| 关联公司信息块 | **DB** | `company` 企查查字段，只读 |
-| 对标 MD 品牌 / 下一步 | **EDIT** |
-| 时间线 | **DB** | 由 `manual_tag_history` 与编辑记录自动生成 |
-| 关联展会规模三数 | **DB** | `exhibition_edition` |
-
-> 当前精修稿里那份「项目尽调报告：标的运营壁垒、财税真实性与并购整合估值重构」
-> 是 Claude Design 编的样例长文。**留版式，删文字**，换成 `report_md` 渲染 + 空状态。
-> `reports/*.docx` 里已有的历史报告走 **UP** 通道导入。
-
-##### 展会底图
-
-| 区块 | 来源 |
-|---|---|
-| 地图 / 趋势四宫格 / 行业分布 | **DB**，且必须**跟随当前筛选范围**（见重构方案 §1.2 的口径提醒） |
-| **我的行动日历** | **EDIT** | 你自己录的行程，不是展会档期表 |
-| 筛选器选项 | **DB** | 从实际数据 distinct 出来，不写死 |
-
----
-
-#### §7 与英文版的关系（第三步的前提）
-
-**§0 里每一个 I18N 标记，就是英文版的工作量。** 契约执行到位，英文版几乎自动成立：
-
-- 界面文案走 `locales/zh.json` + `locales/en.json`
-- 数字与日期走 `Intl.NumberFormat` / `Intl.DateTimeFormat`，不手拼
-- **EDIT 内容不翻译** —— 你录的机会名称是什么语言就显示什么语言
-- 英文版禁止出现中文字体：`lang="en"` 时字体栈里**移除** `--font-cjk`，
-  只留 `'Geist', system-ui, sans-serif`
-
-> 反过来说：**如果这一步偷懒把标签硬编码成中文，英文版就要重写一遍界面。**
-> 这是为什么去硬编码必须排在英文版前面。
-
----
-
-#### §8 验收标准
-
-```
-grep -rnE '>[^<>{]*[一-龥]{2,}[^<>}]*<' app/ components/
-```
-
-除 `locales/` 外**零命中** = 契约执行到位。
-
----
-
-## Claude Design 设计简报（色板部分已作废，见文首说明）
-
-<!-- 原文件：docs/DESIGN.md -->
-
-### Claude Design 深度设计 Brief · MWLAB 万象
-
-> ⚠️ **本简报的色板部分已作废（2026-09-17）**：看板整体反置为浅色，色值改取
-> **Vercel Geist**（黑白色界面），不再是本文 §1 保留的 `#0A0A0B / #0E0E10 / #141416`
-> 那套暗色。以 `app/globals.css` 的 `@theme` 与 `design/MWLAB 设计系统板.dc.html`
-> 的 Token 表为准。本文其余部分（§2 问题清单、§3 字阶、§4 中文排版 7 条）
-> 仍然有效，未受影响。
-
-**日期**：2026-09-16
-**输入**：`design/stitch/` — Stitch 交付 9 屏（6 个界面 + 登录 4 态）
-**上游**：`docs/archive/V2-plan.md`（§1 信息架构 · §2 品牌 · §5 Stitch prompt）
-**任务**：结构保留，**设计语言与状态系统整体重做**
-
----
-
-#### §0 给 Claude Design 的一句话
-
-> Stitch 把**骨架**搭对了，把**设计语言**做错了。
-> 不要重新布局，不要重排信息架构 —— 那部分已经过审。
-> 你要做的是：**清污染、定字体、立纪律、补状态**。
-
----
-
-#### §1 保留（已过审，不得改动）
-
-| 项 | 说明 |
-|---|---|
-| 9 屏的**页面结构与信息层级** | 侧栏 / tab / 筛选条 / 表格 / 面板网格的骨架全部保留 |
-| `/` 落地页的 6 段结构 | Nav → Hero+产品图 → 数字带 → 六块数据切面 → 三条业务线 → Footer |
-| 机会台的 11 列字段 | 机会名称 / 类型 / 阶段 / 对标MD品牌 / 关联公司 / 城市 / 规模 / 优先级 / 负责人 / 下一步 / 更新时间 |
-| 登录页 58/42 分栏 | 含已交付的 4 个状态帧 |
-| 基础色阶 | `#0A0A0B` / `#0E0E10` / `#141416` / 发丝线 `rgba(255,255,255,.07)` |
-
----
-
-#### §2 必修问题清单（按严重度）
-
-##### 🔴 P0-1 · 品牌锁定语序不一致
-
-| 屏 | 现状 |
-|---|---|
-| `public_landing`、4 个 `sign_in` | `MWLAB │ 万象` ✅ 正确 |
-| `m_a_pipeline`、`overview`、`opportunity_detail`、`exhibition_basemap` | `万象 │ MWLAB` ❌ **反了** |
-
-**规则（不可协商）**：拉丁在前、重一档字重、紧字距；中文在后、轻一档字重、略小一号视觉尺寸；中间一根发丝竖线。图标态取单字「象」。
-兄弟项目同构：`WHENJIN │ 问津`，图标态「津」。
-
-##### 🔴 P0-2 · 四个应用屏完全没有中文字体
-
-实测（grep `Noto Sans SC` / `PingFang` / `Source Han`）：
-
-```
-public_landing        ✅ 2 处
-sign_in × 4           ✅ 各 2 处
-m_a_pipeline          ❌ 0
-overview              ❌ 0
-opportunity_detail    ❌ 0
-exhibition_basemap    ❌ 0
-```
-
-这四屏的中文全部走系统回退 —— **正是本次重构要根治的原项目头号病灶，原样复发**。
-截图里表格中文与拉丁（Electronica / CMEF / Hannover）字重、字面、基线全部对不齐，就是这个原因。
-
-##### 🔴 P0-3 · 等宽字体栈是坏的，所有"等宽数字"都是假的
-
-```css
-/* Stitch 输出 —— Geist 在前，JetBrains Mono 永远不会被命中 */
-font-family: 'Geist', 'JetBrains Mono', monospace;
-```
-
-DESIGN.md 声称 `data-tabular` / `label-code` 用 JetBrains Mono，**实际全部由 Geist 渲染**。
-表格数字列的对齐是靠 `text-right` 硬撑的，不是真的等宽。
-
-**正确写法**：
-```css
-font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
-font-variant-numeric: tabular-nums;
-```
-
-##### 🔴 P0-4 · Material 3 色板污染整个 token 层
-
-`DESIGN.md` 前 50 行是 Stitch 自动注入的 M3 tonal palette，与我们的系统冲突：
-
-| Token | 值 | 问题 |
-|---|---|---|
-| `primary` | `#ffb599` | **粉橙色，不是品牌色**。任何用 `primary` 的组件会渲染成浅粉橙 |
-| `primary-container` | `#fe5c00` | 品牌色被降级藏在这里 |
-| `outline` | `#ab897d` | 棕粉色描边 |
-| `on-surface-variant` | `#e4beb1` | 粉棕文字 |
-| `tertiary` | `#a0caff` | 天蓝色，系统里根本不存在的第三色 |
-| `surface-tint` | `#ffb599` | 粉橙叠加层 |
-
-**处置**：整段删除。只保留这 12 个 token：
-
-```
-bg-canvas #0A0A0B   bg-sidebar #0E0E10   bg-surface #141416
-bg-surface-elevated #1A1A1E              bg-surface-hover #1F1F24
-border-hairline rgba(255,255,255,.07)    border-active rgba(255,255,255,.14)
-text-primary #F5F5F7   text-secondary #8A8A93   text-tertiary #52525A
-accent #FE5C00   accent-hover #FF7324
-```
-
-> 落地时目标是 Tailwind **v4** 的 `@theme`，不是 Stitch 输出的 v3 `tailwind.config`。
-
-##### 🟠 P1-5 · Accent 纪律完全失守
-
-约束是「每屏最多 3 次橙色」。机会台实际：
-
-侧栏 active + 「录入机会」按钮 + 实时同步点 + **阶段进度条 ×24 行** + **优先级方块 ×24 行**
-≈ **200+ 处橙色**，满屏橙点。
-
-更糟的是**阶段**和**优先级**两列用了同一种视觉语言（一串小方块），读者分不清哪列是哪列。
-
-**修法**：
-- 阶段列 → 中性灰进度指示 + 文字（`3/5 意向`），不用橙色
-- 优先级列 → 一个数字或一根 3px 短条，不要 5 个方块
-- 橙色只留给：侧栏 active、唯一主 CTA、当前选中行的 2px 左边框
-
-##### 🟠 P1-6 · 状态系统几乎不存在（你点名的问题）
-
-登录页 4 态是唯一做对的。四个应用屏**只有默认态**。
-
-必须补齐的状态矩阵：
-
-| 组件 | 需要的状态 |
-|---|---|
-| 表格行 | default / hover / **selected** / 多选 checkbox / 键盘焦点 / 当前行 |
-| 表格整体 | 加载 skeleton / **空状态** / 加载失败 / 排序进行中 / 筛选无结果 |
-| 按钮 | default / hover / active / **disabled** / **loading** |
-| 输入框 | default / **focus-visible** / filled / error / disabled |
-| 侧栏项 | default / hover / active / **收起态（64px）** |
-| 数据面板 | 有数据 / 加载中 / 无数据 / 加载失败 |
-| Tab | default / hover / active / 带计数徽标 |
-| 筛选 pill | default / hover / **已选中** / 可清除 |
-
-**交付要求**：每个组件的全部状态画在同一张对照板上，不要散在各屏里。
-
-##### 🟠 P1-7 · 表格行高不齐，扫描节奏被破坏
-
-「独家商业承办」6 个字在类型列换行，那几行行高从 32px 撑到 48px。
-**修法**：类型列固定宽度 + 单行截断，或改用 2–3 字表述（承办 / 收购 / 参股 / 孵化）。
-
-##### 🟠 P1-8 · 右侧内容被裁切
-
-- 机会台：「下一步」列切出画面
-- 落地页：产品截图的地图面板、「行业结构」「白地信号」两块面板都被裁
-
-11 列在 1440px 放不下。需要定**列优先级** + 冻结首列 + 横向滚动，而不是让它无声截断。
-
-##### 🟡 P2-9 · 幻觉内容必须连根清除
-
-Stitch 自己发明的"金融终端"元素，业务上完全不存在：
-
-```
-基准汇率 USD/CNY 7.2405          标的底稿加密级别 CONFIDENTIAL-L2
-更新引擎 MW-FEED v4.19           数据哈希 7f89b4..d901
-延迟 18ms                        实时同步 99.8%
-```
-
-根源在 `DESIGN.md` 的 Layout 段：它虚构了「ultrawide / dual-monitor financial setups」
-和「Entity Master Tree 可调整分区 280–340px」—— 这些我们的 prompt 里没有，是 Stitch 的幻想。
-**连同 DESIGN.md 里这两段一起删。**
-
-我们不是彭博终端，是一家展会公司的内部 BD 工作台。
-
-##### 🟡 P2-10 · 落地页节奏过松
-
-160px 的 section 间距被放大，数字带与下一节之间大片空白，与「简洁 + 密度」的目标相矛盾。
-收到 **120px**，且 Hero 产品截图与数字带之间不留空隙（产品图底边直接接数字带上边框）。
-
-##### 🟡 P2-11 · Hero 中文标题字重过重、第二行没上橙色
-
-prompt 要求第二行「结构化盘面」用 `#FE5C00`，Stitch 做成了全白。
-中文标题字重也压过了拉丁，违反「CJK 轻一档」的规则。
-
----
-
-#### §3 字阶重定（现有的不够用）
-
-Stitch 的字阶最大只到 **24px**，而落地页 Hero 需要 **72px** —— 字阶不覆盖营销域。
-而 `body-md 13px` 与 `body-sm 12px` 只差 1px，是无意义的层级。
-
-**要求产出一套 8 级字阶，同时覆盖应用域与营销域**，并明确每一级的：
-拉丁字号 / 中文字号（比拉丁小 1px）/ 拉丁字重 / 中文字重（低一档）/ 行高（中文比拉丁高）/ 字距（**中文一律 0，不用负字距**）。
-
----
-
-#### §4 中文排版规则（本次最重要的交付物）
-
-这是原项目最大的病灶，Stitch 没有解决，**必须由你定死**：
-
-1. **中文字重永远比拉丁低一档**（Geist 600 ↔ Noto Sans SC 500）
-2. **中文永不使用负字距**。Stitch 给 CJK 也套了 `-0.02em`，中文会挤在一起
-3. **中文行高高于拉丁**（拉丁 1.4 ↔ 中文 1.6；长文中文 1.8）
-4. **中英混排时中文字号比拉丁小 1px**，补偿字面率差异
-5. **数字永远走拉丁等宽字体**，绝不落到 CJK 字体里
-6. **中文标题不用 800 字重** —— 系统字体会触发伪粗体，边缘发毛
-7. 中英之间插入 0.25em 间隙（由样式控制，不靠手打空格）
-
----
-
-#### §5 交付要求
-
-| # | 产出 | 说明 |
-|---|---|---|
-| 1 | **组件状态对照板** | §2 P1-6 的全部状态，画在一张板上 |
-| 2 | **Token 表** | 12 个颜色 + 8 级字阶 + 圆角 + 间距，清掉 M3 污染，Tailwind v4 `@theme` 口径 |
-| 3 | **中文排版规范** | §4 的 7 条落成具体数值 |
-| 4 | 6 屏精修稿 | 结构不动，应用新语言 |
-| 5 | 表格列优先级方案 | 1440 / 1680 / 1920 三档下各显示哪些列 |
-
-**不要做**：重新布局、改信息架构、加新页面、引入第二个强调色、加插画或图标装饰。
