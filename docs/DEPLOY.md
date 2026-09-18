@@ -284,6 +284,63 @@ pm2 reload mwlab-dashboard     # 零停机重载（推荐）
 
 ---
 
+## 同步数据库到服务器
+
+本地库是唯一数据源。改过数据（跑 pipeline、改密码）后要同步才在线上生效。
+
+```bash
+# 1. 生成一致性副本（直接 cp 会漏掉 WAL 里未合并的事务）
+sqlite3 data/mwlab.db ".backup /tmp/mwlab_upload.db"
+sqlite3 /tmp/mwlab_upload.db "PRAGMA integrity_check;"    # 必须回 ok
+
+# 2. 服务器先备份
+ssh -i ~/.ssh/MWlab.pem admin@47.79.17.71 \
+  "cp ~/dashboard/data/mwlab.db ~/backups/mwlab_pre-sync-$(date +%Y%m%d-%H%M).db"
+
+# 3. 上传到临时名，避免覆盖到一半服务读到残缺文件
+rsync -avz -e "ssh -i ~/.ssh/MWlab.pem" /tmp/mwlab_upload.db \
+  admin@47.79.17.71:/home/admin/dashboard/data/mwlab.db.new
+
+# 4. 停服务 → 换库 → 清旧 WAL → 起服务
+ssh -i ~/.ssh/MWlab.pem admin@47.79.17.71 'source ~/.nvm/nvm.sh
+  pm2 stop mwlab-dashboard
+  cd ~/dashboard/data && mv mwlab.db.new mwlab.db && rm -f mwlab.db-wal mwlab.db-shm
+  pm2 start mwlab-dashboard'
+```
+
+> **必须停服务再换。** better-sqlite3 持有旧库的文件句柄，热替换会读出不一致的数据。
+> **`-wal` / `-shm` 必须删。** 它们属于旧库，留着会让新库读出旧事务。
+
+### ⚠️ 换完库要重新构建，否则页面还是旧数字
+
+落地页的数据在**构建时**烘进产物。只换库不重新 build，页面不会变。
+而且 **`.next/cache` 会让 build 复用上一次的预渲染结果** —— 2026-09-18 就踩了这个：
+库换了、服务重启了、`cf-cache-status` 也确认没走 CDN 缓存，页面照样是旧数字。
+
+```bash
+rm -rf .next && npm run build                      # 本地：清掉 Full Route Cache 重建
+ssh -i ~/.ssh/MWlab.pem admin@47.79.17.71 "rm -rf ~/dashboard/.next/cache"
+rsync -avz --delete --exclude dev -e "ssh -i ~/.ssh/MWlab.pem" \
+  .next/ admin@47.79.17.71:/home/admin/dashboard/.next/
+ssh -i ~/.ssh/MWlab.pem admin@47.79.17.71 \
+  "source ~/.nvm/nvm.sh && pm2 reload mwlab-dashboard"
+```
+
+---
+
+## 改账号密码
+
+系统里**没有改密码的界面或接口**。用脚本改本地库，再按上面的流程同步：
+
+```bash
+python3 scripts/set_password.py --list                    # 看有哪些账号
+python3 scripts/set_password.py admin@mwlab.internal      # 交互式输入，不留 shell 历史
+```
+
+密码短于 8 位会被挡（线上是公网可访问的）；确实要用短的加 `--force`。
+
+---
+
 ## 数据库备份
 
 ```bash

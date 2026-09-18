@@ -94,6 +94,10 @@ opportunity_event         0
 造验收数据用完就删，连同 `opportunity_event` 里的 `stage_change` 一起
 （软删除 `is_archived=1` 是给真实机会用的，验收数据要硬删，别留脏行）。
 
+> **线上库已于 2026-09-18 与本地同步**（此前线上停在 09-17 部署那份，连 `user` 表都没跟上）。
+> 换库要停服务：`pm2 stop` → 替换 `.db` → **删掉旧的 `-wal` / `-shm`** → `pm2 start`。
+> 热替换会让 better-sqlite3 拿着旧句柄读出不一致的数据。
+
 ### 2.3 通用规矩
 
 改库前一律 `cp data/mwlab.db data/backups/mwlab_pre-<任务>-$(date +%Y%m%d).db`。
