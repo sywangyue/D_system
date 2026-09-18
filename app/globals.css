@@ -640,3 +640,41 @@
   .floating-anim-alt,
   .floating-anim-subtle { animation: none !important; }
 }
+
+/* ============================================================================
+   盘面 · 卡片与瀑布式布局（V2-19）
+   ----------------------------------------------------------------------------
+   2026-09-18 Max 拍板两件事，都推翻了此前的规矩，在这里记清楚原委：
+
+   1) 看板允许用投影。上面 --shadow-* 那组的注释原本写着「后台看板不要用」，
+      理由是投影让密集表格变脏。这条理由仍然成立，所以投影只给 .board-card
+      这一层**容器**，容器内部的表格行、KPI 格子一律不带投影 —— 脏的是行上投影，
+      不是卡片上投影。
+
+   2) 盘面走真 masonry。代价是 KPI 四数不再与其它块横向对齐，这是已知取舍。
+      把四个数字收进同一张卡（卡内 2×2 网格）是为了保住它们**彼此之间**的
+      可比性 —— 跨卡不可比，卡内仍然可比。
+
+   用 CSS multi-column 而不是 grid：原生 `grid-template-rows: masonry` 还在
+   Firefox 之外没有落地。multicol 的阅读顺序是「先下后右」，盘面各块彼此独立，
+   不构成阅读序问题。
+   ========================================================================== */
+
+.board-masonry {
+  /* 列宽驱动：1180px 容器自动排 3 列，窄屏无媒体查询自然降到 2 / 1 列 */
+  columns: 340px;
+  column-gap: 24px;
+}
+.board-masonry > * {
+  break-inside: avoid;
+  margin-bottom: 24px;
+  /* multicol 里子元素的 margin 会塌陷到列外，flow-root 关掉它 */
+  display: flow-root;
+}
+
+.board-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-hairline);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+}
