@@ -63,8 +63,10 @@ exports/
 logs/
 output/
 
-# Customer reports & raw API data (operational, not code)
-reports/customer/
+# 运营资料目录（不是代码）：资源下载接口读这两个目录，靠 rsync 直接同步到服务器，
+# 不经过 git。见 docs/DEPLOY.md「上传清单」。
+reports/
+research/
 
 # SSH keys / certificates
 *.pem
@@ -74,10 +76,8 @@ reports/customer/
 _archive/
 
 # 分析/导出产出物（由脚本再生成，不入库）
-ma_candidates*.json
 /*_中国境内展会清单.xlsx
 /*_全部品牌展会.xlsx
-reports/*.xlsx
 
 # Backup / temp files
 backups/
