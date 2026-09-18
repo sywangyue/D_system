@@ -42,24 +42,30 @@ Max 可以对单次质检授权「有问题直接修」。
 
 ## 2. 数据基线（质检时对照）
 
-截至 2026-09-17（V2-16 部署时），库里 14 张表，**全部列在下面**。分两组，验收方式不同。
+截至 **2026-09-18**（补跑 pipeline `auto-20260918` 之后），库里 14 张表，
+**全部列在下面**。分两组，验收方式不同。
 
 ### 2.1 存量表 —— 任何任务都不该改变它们
 
 ```
-exhibition_brand      7,401      其中 display_ready=1  7,378
-exhibition_edition    7,703
-brand_organizer       9,740
+exhibition_brand      7,475      其中 display_ready=1  7,452（23 条待补全）
+exhibition_edition    7,778
+brand_organizer       9,740      不随 pipeline 增长，见 AGENTS.md
 brand_geo_tag         8,145
 company                 501      494 来自 CIBS2026 批量线索 + 6 家深度尽调标的 + 1
-data_provenance       9,825
+data_provenance       9,906
 manual_tag_history   12,302
 resource                 50      report 11 / raw 11 / export 16 / roster 10 / note 2
-intel_report             13      任务 D 回填 11 份历史 docx 后的值
-crawl_log                 7
+intel_report             13      V2-06 回填 11 份历史 docx 后的值
+crawl_log                 8      每跑一次 pipeline +1
 user                      3      admin / manager / readonly，就这三个
 schema_version           17      017 = intel_report.report_type 补 company_research
 ```
+
+> **展会四表（brand / edition / provenance 与 raw 库）每月 7/27 号 cron 跑完就会变**，
+> 它们「不该改变」的意思是**任务不该改变它们**，不是「永远是这些数字」。
+> 对不上先问一句「中间跑过 pipeline 吗」，看 `crawl_log` 最后一条的批次号和日期 ——
+> 是 `auto-<日期>` 就属正常增长，照 `logs/pipeline_*.log` 的合并统计核对增量。
 
 **`user` 必须是 3 行。** 验收要造账号就用现成这三个，或者用 `JWT_SECRET` 自己签一个
 令牌（`lib/session.ts` 只认签名，不查建账时间）。往 `user` 表插行的后果是留下一把

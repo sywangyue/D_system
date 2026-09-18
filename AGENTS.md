@@ -146,27 +146,31 @@ V2-17 把一次性治理脚本移到了本地 `_archive/onetime/`（不入库）
 
 ---
 
-## 数据现状（2026-09-18 实测）
+## 数据现状（2026-09-18 补跑 pipeline 后实测）
 
 | 库 | 表 | 行数 |
 |----|----|------|
-| `data/mwlab.db`（22 MB） | exhibition_brand | 7,401 |
-| | 其中 display_ready=1 | 7,378（99.7%） |
-| | exhibition_edition | 7,703 |
-| | data_provenance | 9,825 |
+| `data/mwlab.db`（22 MB） | exhibition_brand | 7,475 |
+| | 其中 display_ready=1 | 7,452（99.7%，23 条待补全） |
+| | exhibition_edition | 7,778 |
+| | data_provenance | 9,906 |
 | | brand_organizer | 9,740 |
 | | brand_geo_tag | 8,145 |
 | | manual_tag_history | 12,302 |
-| `data/jufair_2026.db` | raw_jufair | 7,032 |
+| `data/jufair_2026.db` | raw_jufair | 7,077 |
 | `data/cnexpo_2026.db` | raw_cnexpo | 2,286 |
+
+> `brand_organizer` 不随 pipeline 增长 —— `build_organizer_index.py` 不在管道里，
+> 这次新增的 74 个品牌的主办方还没进索引。要用主办方口径分析前先手动全量重建一次。
 
 公司侧的表（company / opportunity / intel_report / resource）是产品主体，
 数量与验收口径见 `docs/QC.md` §2 数据基线 —— **质检时以 QC.md 为准，别拿这张表对数**，
 这里只覆盖展会数据层。
 
 **行业分类已全部收敛**：8 个 l1 类别，`industry_l1` 为空 0 条（07-30 时还有 33 条待兜底）。
-当前分布：机械和设备 2,551 · 生活方式 1,710 · 休闲 854 · 化工与能源 676 ·
-科技+ 668 · 医疗和健康 435 · 零售贸易和服务 279 · 农业与畜牧 228。
+当前分布：机械和设备 2,569 · 生活方式 1,721 · 休闲 866 · 化工与能源 685 ·
+科技+ 678 · 医疗和健康 442 · 零售贸易和服务 285 · 农业与畜牧 229。
+新品牌靠 jufair 分类映射表落位，关键词兜底这次命中 0 条 —— 映射表够用，别退回子串匹配。
 
 > 2026-07-29 整改（`docs/archive/V1-prd-audits.md`）：
 > jufair 分类改用 217 条显式映射表（改判 1,291 品牌）；合并 29 组重复届次；
@@ -178,7 +182,7 @@ V2-17 把一次性治理脚本移到了本地 `_archive/onetime/`（不入库）
 
 ## 采集进度与全集采集（V1-12，未执行）
 
-Jufair 原始库 7,032 条，继续补齐国内 + 国际全量就是 V1-12，在 `docs/ROADMAP.md` 里挂着，
+Jufair 原始库 7,077 条，继续补齐国内 + 国际全量就是 V1-12，在 `docs/ROADMAP.md` 里挂着，
 **不是当前焦点** —— 当前焦点是 V2-18 UI 重做。
 
 采集的治理链已固化进 `scripts/run_pipeline.sh`，手动执行等价于：
