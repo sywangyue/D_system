@@ -58,6 +58,10 @@ export async function POST(request: Request) {
     })
     response.cookies.set('session', token, {
       httpOnly: true,
+      // 生产环境只允许 HTTPS 传这个 cookie。不加 secure 的话，一旦有任何
+      // HTTP 请求打到本站，会话令牌就会明文上路。开发环境是 localhost 的
+      // HTTP，加了会导致本地登录不上，所以按环境区分。
+      secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
       maxAge: 86400,
