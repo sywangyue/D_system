@@ -87,8 +87,7 @@ crawl_log (爬取日志)           users (用户表)
 
 | 文件 | 说明 |
 |------|------|
-| docs/archive/V1-prd-audits.md | **整合 PRD（当前唯一权威文档）** |
-| docs/archive/V1-prd-audits.md | 脚本质检审计报告 + 整改记录 |
+| docs/archive/V1-prd-audits.md | V1 时代原文：整合 PRD + 脚本质检审计报告 + 整改记录（只读） |
 | crawlers/jufair_crawler.py | Jufair 爬虫（Python，curl 抓取，支持 `--proxy` / `--refresh`） |
 | scripts/run_pipeline.sh | **月度 pipeline**（cron 每月 7/27 号 03:00 调用） |
 | tools/export_dedup_review.py | 去重人工复核表导出（CSV，只读） |
