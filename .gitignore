@@ -68,6 +68,12 @@ output/
 reports/
 research/
 
+# 知识库的 docs/ —— 合同、审批件、商业条件这类。**本仓库是 PUBLIC 的**，
+# 进 git 等于全网可见且 git 历史永久留存。部署靠 rsync 不靠 git（DEPLOY.md
+# 「同步知识库内容」），所以挡掉不影响上线，线上仍然能鉴权下载。
+# 正文 index.md 与 public/knowledge/ 的图片不在此列，照常进 git。
+knowledge/*/docs/
+
 # SSH keys / certificates
 *.pem
 *.key

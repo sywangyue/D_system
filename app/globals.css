@@ -386,6 +386,33 @@
   }
   .prose-cjk pre code { background: none; border: 0; padding: 0; }
 
+  /* 图片：知识库正文的已知缺口（WORKFLOW.md 阶段 B1 第一项）。
+     `urlTransform` + `rewriteAsset` 早就把 `![](images/x.jpg)` 改写到了
+     `/knowledge/<slug>/images/`，但这里一条 img 规则都没有 —— 图片吃浏览器
+     默认样式，原图 1400–1600px 宽会直接撑破正文容器。
+
+     `height: auto` 不能省：只给 max-width 而原图带 height 属性时，比例会被压扁。
+     长图（如邮件页截图 1400×3695）不设 max-height —— 那种图的价值就在能通读，
+     截断反而没用；它在正文里自然占一屏多，是预期行为。 */
+  .prose-cjk img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border: 1px solid var(--color-hairline);
+    border-radius: var(--radius-card);
+  }
+
+  /* figure / figcaption：remark 在 `![alt](src)` 单独成段时不产出 figure，
+     但 Max 手写 HTML 或将来换渲染器时会有，先把样式接上，省得那天又是裸元素。 */
+  .prose-cjk figure { margin-inline: 0; }
+  .prose-cjk figure img { margin-bottom: 0.5em; }
+  .prose-cjk figcaption {
+    font-size: var(--text-micro);
+    color: var(--color-fg-subtle);
+    text-align: center;
+    line-height: 1.6;
+  }
+
   /* 表格：本质检报告正文里表格是主要内容形态，必须给边框。
      单元格加 tabular-nums 让数字列对齐 —— 这里不能上 .num（正文数字混在
      中文句子里，整块换等宽字体反而更难读），只对齐数字宽度。 */
