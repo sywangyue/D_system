@@ -19,4 +19,7 @@ design/stitch/
 > ⚠️ Stitch 输出是 Tailwind **v3** 语法（CDN + `tailwind.config`），本项目是 Tailwind **v4**（`@theme`）。
 > 不可直接复制进 `app/`。转写在阶段 5.2 由 DeepSeek 做。
 
-**下一步**：`docs/DESIGN.md` —— 待修问题清单与深度设计要求。
+`v2-18-landing/` 存 V2-18 落地页改版的输入材料（线上现状截图 + 给 Stitch 的清单），
+见 `v2-18-landing/README.md`。
+
+**下一步**：`docs/DESIGN.md` —— 第 1 节 Design Token、第 2 节中文排版纪律、第 6 节落地页改版规格。
