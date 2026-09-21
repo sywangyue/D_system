@@ -140,7 +140,7 @@ export default function OpportunityDetail({
   }
 
   return (
-    <div className="max-w-[1180px] mx-auto px-8 py-9">
+    <div className="max-w-[1180px] mx-auto px-4 py-6 md:px-8 md:py-9">
       {/* 字典里的 back 自带箭头（"← 机会台" / "← Pipeline"），不要再配一个 lucide 图标 */}
       <Link href="/opportunity"
             className="inline-flex items-center gap-1.5 text-[13px] text-fg-subtle hover:text-fg mb-6">
@@ -148,8 +148,8 @@ export default function OpportunityDetail({
       </Link>
 
       {/* ── 头部 ─────────────────────────────────────────── */}
-      <div className="flex items-start gap-8 flex-wrap hairline-b pb-6 mb-6">
-        <div className="min-w-0 flex-1">
+      <div className="flex flex-col md:flex-row md:flex-wrap items-start gap-4 md:gap-8 hairline-b pb-6 mb-6">
+        <div className="w-full min-w-0 md:flex-1">
           <div className="flex items-baseline gap-2.5 flex-wrap mb-2.5">
             <h1 className="text-[1.5rem] font-medium leading-tight">{o.title}</h1>
             <Tag>{bizLineLabel(t, o.type)}</Tag>
@@ -193,7 +193,7 @@ export default function OpportunityDetail({
           </div>
         </div>
 
-        <div className="flex flex-col items-end gap-2 shrink-0">
+        <div className="w-full md:w-auto flex flex-col items-start md:items-end gap-2 shrink-0">
           <StageStepper value={o.stage} busy={busy} t={t}
                         disabled={!canWrite} onAdvance={advance} />
           <div className="text-[11px] text-fg-faint">
@@ -208,9 +208,9 @@ export default function OpportunityDetail({
       </div>
 
       {/* ── 左 65% / 右 35% ──────────────────────────────── */}
-      <div className="grid grid-cols-[65fr_35fr] gap-8 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-[65fr_35fr] gap-6 md:gap-8 items-start">
         <div className="min-w-0">
-          <div className="flex gap-6 hairline-b mb-5">
+          <div className="flex gap-5 md:gap-6 hairline-b mb-5 overflow-x-auto">
             {tabs.map(t => (
               <button
                 key={t.key}
@@ -278,7 +278,7 @@ function StageStepper({
 }) {
   const idx = stageIndex(value)
   return (
-    <div className="flex items-stretch h-8 rounded-[4px] border border-hairline bg-surface overflow-hidden">
+    <div className="flex items-stretch h-8 max-w-full rounded-[4px] border border-hairline bg-surface overflow-x-auto">
       {STAGES.map((s, i) => {
         const active = s.key === value
         const past = i < idx
@@ -334,7 +334,7 @@ function OverviewTab({ opp, t }: { opp: OppDetailOpportunity; t: Dict }) {
     <div className="rounded-[6px] border border-hairline overflow-hidden">
       {rows.map((r, i) => (
         <div key={r.key}
-             className={`grid grid-cols-[136px_1fr] gap-4 px-3.5 py-3 ${i > 0 ? "hairline-t" : ""}`}>
+             className={`grid grid-cols-[88px_1fr] md:grid-cols-[136px_1fr] gap-3 md:gap-4 px-3.5 py-3 ${i > 0 ? "hairline-t" : ""}`}>
           <div className="text-[12px] text-fg-subtle">{r.label}</div>
           <div className="text-[13px] text-fg-muted break-words">{r.value}</div>
         </div>
@@ -465,7 +465,7 @@ function BrandTab({ brand, locale, t }: { brand: OppDetailBrand; locale: Locale;
       <div className="rounded-[6px] border border-hairline overflow-hidden mb-5">
         {rows.map((r, i) => (
           <div key={r.label}
-               className={`grid grid-cols-[136px_1fr] gap-4 px-3.5 py-3 ${i > 0 ? "hairline-t" : ""}`}>
+               className={`grid grid-cols-[88px_1fr] md:grid-cols-[136px_1fr] gap-3 md:gap-4 px-3.5 py-3 ${i > 0 ? "hairline-t" : ""}`}>
             <div className="text-[12px] text-fg-subtle">{r.label}</div>
             <div className={`text-[13px] text-fg-muted break-words ${r.num ? "num" : ""}`}>
               {r.value}
@@ -568,7 +568,7 @@ function Stat({ label, value, unit }: { label: string; value: string; unit: stri
   return (
     <div className="bg-surface-elevated px-3 py-2.5">
       <div className="text-[11px] text-fg-subtle mb-1.5">{label}</div>
-      <div className="num text-[18px] leading-none">{value}</div>
+      <div className="num text-[15px] md:text-[18px] leading-none">{value}</div>
       <div className="num text-[10px] text-fg-faint mt-1">{unit}</div>
     </div>
   )

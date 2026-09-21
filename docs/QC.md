@@ -69,7 +69,8 @@ exhibition_brand      7,475      其中 display_ready=1  7,452（23 条待补全
 exhibition_edition    7,778
 brand_organizer       9,740      不随 pipeline 增长，见 AGENTS.md
 brand_geo_tag         8,145
-company                 501      494 来自 CIBS2026 批量线索 + 6 家深度尽调标的 + 1
+company                 503      494 来自 CIBS2026 批量线索 + 6 家深度尽调标的 + 1
+                                 + 2 家主办方（2026-09-21 手工补：上海申仕 / 上海艾逖，type=organizer）
 data_provenance       9,906
 manual_tag_history   12,302
 resource                103      report 49 / roster 18 / export 17 / raw 17 / note 2

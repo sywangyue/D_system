@@ -43,7 +43,7 @@ export default async function KnowledgeDetailPage({
   const title = pickContent(locale, item.title, item.titleEn)
 
   return (
-    <div className="max-w-[1180px] mx-auto px-8 py-9">
+    <div className="max-w-[1180px] mx-auto px-4 py-6 md:px-8 md:py-9">
       {/* 字典里的 back 自带箭头，不要再配一个 lucide 图标 */}
       <Link href="/knowledge"
             className="inline-flex items-center text-[13px] text-fg-subtle hover:text-fg mb-5">
@@ -51,13 +51,13 @@ export default async function KnowledgeDetailPage({
       </Link>
 
       <div className="flex items-baseline flex-wrap gap-3 mb-7">
-        <h1 className="text-[1.6875rem] font-medium leading-tight">{title}</h1>
+        <h1 className="text-title-cjk font-medium leading-tight">{title}</h1>
         <span className="num text-[13px] text-fg-subtle">{item.year}</span>
         <Tag>{bizLineLabel(t, item.type)}</Tag>
         {item.status === "archived" && <Tag>{t.knowledge.archived}</Tag>}
       </div>
 
-      <div className="grid grid-cols-[1.9fr_1fr] gap-10 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-[1.9fr_1fr] gap-8 md:gap-10 items-start">
         <KnowledgeBody md={item.body} slug={slug} />
 
         {/* docs/ 为空或不存在时整块不渲染 */}

@@ -26,7 +26,7 @@ export default function DataSection({
   return (
     <section
       id="data"
-      className="hairline-t hairline-b relative scroll-mt-14 overflow-hidden bg-surface px-6 py-20"
+      className="hairline-t hairline-b relative scroll-mt-14 overflow-hidden bg-surface px-4 py-14 md:px-6 md:py-20"
     >
       <FluidBackdrop />
       <div className="relative z-[2] mx-auto w-full max-w-[1240px]">

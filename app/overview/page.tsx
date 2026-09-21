@@ -33,8 +33,8 @@ export default async function OverviewPage() {
   const funnelMax = Math.max(1, ...d.funnel.map(f => f.count))
 
   return (
-    <div className="max-w-[1180px] mx-auto px-8 py-9">
-      <div className="mb-8">
+    <div className="max-w-[1180px] mx-auto px-4 py-6 md:px-8 md:py-9">
+      <div className="mb-6 md:mb-8">
         <h1 className="text-title-cjk font-medium leading-tight">{t.overview.title}</h1>
         <p className="text-ui text-fg-subtle mt-1">
           {user.display_name} {t.overview.weekEnding}{" "}
@@ -43,7 +43,7 @@ export default async function OverviewPage() {
       </div>
 
       {/* ── KPI 四数：卡内发丝线分格 ─────────────────────────── */}
-      <div className="board-card overflow-hidden grid grid-cols-4 gap-px bg-hairline mb-12">
+      <div className="board-card overflow-hidden grid grid-cols-2 md:grid-cols-4 gap-px bg-hairline mb-8 md:mb-12">
         <Kpi n={d.kpi.active}        label={t.overview.kpiActive}     lat="Active"     showLat={!isEn} />
         <Kpi n={d.kpi.ma}            label={t.overview.kpiMa}         lat="M&A"        showLat={!isEn} />
         <Kpi n={d.kpi.greenfield}    label={t.overview.kpiGreenfield} lat="Greenfield" showLat={!isEn} />
@@ -51,7 +51,7 @@ export default async function OverviewPage() {
       </div>
 
       {/* ── 62 / 38 非对称分栏 ─────────────────────────────── */}
-      <div className="grid grid-cols-[1.62fr_1fr] gap-10 mb-12">
+      <div className="grid grid-cols-1 md:grid-cols-[1.62fr_1fr] gap-8 md:gap-10 mb-8 md:mb-12">
         {/* 本周待办 */}
         <section>
           <SectionTitle>{t.overview.tasksTitle}</SectionTitle>
@@ -68,7 +68,7 @@ export default async function OverviewPage() {
                   </span>
                   {/* 机会标题是数据，原样显示 */}
                   <span className="text-ui text-fg-muted truncate flex-1">{tk.title}</span>
-                  <span className="text-ui-cjk text-fg-subtle truncate max-w-[38%]">
+                  <span className="hidden md:block text-ui-cjk text-fg-subtle truncate max-w-[38%]">
                     {tk.next_action || "—"}
                   </span>
                   <StagePip stage={tk.stage} t={t} />
@@ -113,9 +113,9 @@ export default async function OverviewPage() {
       </div>
 
       {/* ── 阶段漏斗 ───────────────────────────────────────── */}
-      <section className="mb-12">
+      <section className="mb-8 md:mb-12">
         <SectionTitle>{t.overview.funnelTitle}</SectionTitle>
-        <div className="board-card overflow-hidden grid grid-cols-5 gap-px bg-hairline">
+        <div className="board-card grid-pair overflow-hidden grid grid-cols-2 md:grid-cols-5 gap-px bg-hairline">
           {d.funnel.map(f => (
             <div key={f.stage} className="bg-surface p-4">
               <div className="num text-heading leading-none mb-2">{f.count}</div>
@@ -141,7 +141,7 @@ export default async function OverviewPage() {
                   </span>}>
           {t.overview.reportsScope}
         </SectionTitle>
-        <div className="board-card overflow-hidden grid grid-cols-5 gap-px bg-hairline">
+        <div className="board-card grid-pair overflow-hidden grid grid-cols-2 md:grid-cols-5 gap-px bg-hairline">
           {d.resources.by_kind.map(k => (
             <div key={k.kind} className="bg-surface p-4">
               <div className="num text-heading leading-none mb-1.5">{k.n}</div>

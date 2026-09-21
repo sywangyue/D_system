@@ -101,9 +101,9 @@ export default function NewDrawer({
   return (
     <>
       <div className="scrim fixed inset-0 z-40" onClick={onClose} />
-      <aside className="overlay fixed right-0 top-0 bottom-0 w-[480px] z-50 bg-surface
+      <aside className="overlay fixed right-0 top-0 bottom-0 w-full md:w-[480px] z-50 bg-surface
                         hairline-l flex flex-col" style={{ borderLeft: "1px solid var(--color-hairline-active)" }}>
-        <div className="flex items-center justify-between h-14 px-6 hairline-b shrink-0">
+        <div className="flex items-center justify-between h-14 px-4 md:px-6 hairline-b shrink-0">
           <h2 className="text-[15px] font-medium">{t.pipeline.create}</h2>
           <button onClick={onClose}
                   className="btn w-7 h-7 flex items-center justify-center rounded-[4px]
@@ -112,7 +112,7 @@ export default function NewDrawer({
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-5">
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-5 flex flex-col gap-5">
           {error && (
             <div className="flex items-center gap-2 px-3 h-9 rounded-[4px] text-[12px] text-[var(--color-error-text)]"
                  style={{ background: "var(--color-error-bg)", border: "1px solid var(--color-error-border)" }}>
@@ -279,7 +279,7 @@ export default function NewDrawer({
           </div>
         </div>
 
-        <div className="flex items-center justify-end gap-2 h-14 px-6 hairline-t shrink-0">
+        <div className="flex items-center justify-end gap-2 h-14 px-4 md:px-6 hairline-t shrink-0">
           <button onClick={onClose}
                   className="btn h-8 px-3.5 rounded-[4px] bg-transparent border border-hairline
                              text-[12px] text-fg-muted cursor-pointer">{t.common.cancel}</button>

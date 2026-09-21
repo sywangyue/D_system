@@ -73,7 +73,7 @@ export default function ProfileContent({
     .toUpperCase();
 
   return (
-    <div className="max-w-lg mx-auto py-12 px-6">
+    <div className="max-w-lg mx-auto py-8 px-4 md:py-12 md:px-6">
       {/* 返回盘面。原来指向旧看板的静态页 —— 那个文件阶段 5 就删了，
           点一下（以及保存后 1.5 秒）会跳到 404（V2-13 §2.1） */}
       <Link

@@ -118,7 +118,7 @@ export default function CompanyDetail({ id, locale, t }: { id: string; locale: L
 
   if (loading) {
     return (
-      <div className="max-w-[1180px] mx-auto px-8 py-9 flex flex-col gap-4">
+      <div className="max-w-[1180px] mx-auto px-4 py-6 md:px-8 md:py-9 flex flex-col gap-4">
         <div className="skeleton h-3.5 w-32" />
         <div className="skeleton h-7 w-96" />
         <div className="skeleton h-40 w-full" />
@@ -128,7 +128,7 @@ export default function CompanyDetail({ id, locale, t }: { id: string; locale: L
 
   if (error) {
     return (
-      <div className="max-w-[1180px] mx-auto px-8 py-9">
+      <div className="max-w-[1180px] mx-auto px-4 py-6 md:px-8 md:py-9">
         <Link href="/company"
               className="inline-flex items-center gap-1.5 text-[13px] text-fg-subtle hover:text-fg mb-6">
           <ArrowLeft size={13} /> {t.nav.entities}
@@ -165,7 +165,7 @@ export default function CompanyDetail({ id, locale, t }: { id: string; locale: L
   })
 
   return (
-    <div className="max-w-[1180px] mx-auto px-8 py-9">
+    <div className="max-w-[1180px] mx-auto px-4 py-6 md:px-8 md:py-9">
       <Link href="/company"
             className="inline-flex items-center gap-1.5 text-[13px] text-fg-subtle hover:text-fg mb-6">
         <ArrowLeft size={13} /> {t.nav.entities}
@@ -186,7 +186,7 @@ export default function CompanyDetail({ id, locale, t }: { id: string; locale: L
         </div>
       </div>
 
-      <div className="grid grid-cols-[65fr_35fr] gap-8 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-[65fr_35fr] gap-6 md:gap-8 items-start">
         {/* ── 左：工商信息 + 资源 ─────────────────────────── */}
         <div className="min-w-0 flex flex-col gap-7">
           <Section label={t.company.registration} lat="Registration">
@@ -196,7 +196,7 @@ export default function CompanyDetail({ id, locale, t }: { id: string; locale: L
               <div className="rounded-[6px] border border-hairline overflow-hidden">
                 {info.map((r, i) => (
                   <div key={r.label}
-                       className={`grid grid-cols-[150px_1fr] gap-4 px-3.5 py-3 ${i > 0 ? "hairline-t" : ""}`}>
+                       className={`grid grid-cols-[96px_1fr] md:grid-cols-[150px_1fr] gap-3 md:gap-4 px-3.5 py-3 ${i > 0 ? "hairline-t" : ""}`}>
                     <div className="text-[12px] text-fg-subtle">{r.label}</div>
                     <div className={`text-[13px] text-fg-muted break-words ${r.mono ? "num" : ""}`}>
                       {r.value}
@@ -298,7 +298,7 @@ function Section({ label, lat, children }: {
 
 function InfoRow({ label, value, lat }: { label: string; value: string; lat?: boolean }) {
   return (
-    <div className="grid grid-cols-[150px_1fr] gap-4 px-3.5 py-3 hairline-t first:border-t-0 border-hairline">
+    <div className="grid grid-cols-[96px_1fr] md:grid-cols-[150px_1fr] gap-3 md:gap-4 px-3.5 py-3 hairline-t first:border-t-0 border-hairline">
       <div className="text-[12px] text-fg-subtle">{label}</div>
       <div className={`text-[13px] text-fg-muted break-words ${lat ? "lat" : ""}`}>{value}</div>
     </div>

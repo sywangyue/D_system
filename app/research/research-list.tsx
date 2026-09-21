@@ -84,7 +84,7 @@ export default function ResearchList({ locale, t }: { locale: Locale; t: Dict })
   return (
     <div className="h-full flex flex-col">
       {/* ── 顶栏 ─────────────────────────────────────────── */}
-      <div className="flex items-center justify-between px-8 h-14 hairline-b shrink-0">
+      <div className="flex items-center justify-between px-4 md:px-8 h-14 hairline-b shrink-0">
         <div className="flex items-baseline gap-3">
           <h1 className="text-[17px] font-medium">{t.research.title}</h1>
           {/* 拉丁字标是中文标题的对照，中文版才需要；英文版标题本身就是 Reports，
@@ -97,7 +97,7 @@ export default function ResearchList({ locale, t }: { locale: Locale; t: Dict })
       </div>
 
       {/* ── 筛选条 ───────────────────────────────────────── */}
-      <div className="flex items-center gap-1.5 px-8 py-2.5 hairline-b shrink-0 flex-wrap">
+      <div className="flex items-center gap-1.5 px-4 md:px-8 py-2.5 hairline-b shrink-0 flex-wrap">
         <Pill active={!type} onClick={() => setType("")}>{t.research.allType}</Pill>
         {REPORT_TYPES.map(v => (
           <Pill key={v} active={type === v} onClick={() => setType(v)}>
@@ -114,13 +114,13 @@ export default function ResearchList({ locale, t }: { locale: Locale; t: Dict })
           </Pill>
         ))}
 
-        <div className="relative ml-auto">
+        <div className="relative w-full md:ml-auto md:w-auto">
           <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-fg-subtle" />
           <input
             value={q}
             onChange={e => setQ(e.target.value)}
             placeholder={t.research.search}
-            className="input h-7 w-64 pl-8 pr-2.5 rounded-[4px] bg-sidebar text-[12px]
+            className="input h-7 w-full md:w-64 pl-8 pr-2.5 rounded-[4px] bg-sidebar text-[12px]
                        border border-hairline placeholder:text-fg-faint"
           />
         </div>
@@ -129,7 +129,7 @@ export default function ResearchList({ locale, t }: { locale: Locale; t: Dict })
       {/* ── 列表 ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-auto">
         {loading && (
-          <div className="px-8 py-3 flex flex-col gap-4">
+          <div className="px-4 md:px-8 py-3 flex flex-col gap-4">
             {Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="flex flex-col gap-2">
                 <div className="skeleton h-3.5" style={{ width: `${70 - i * 4}%` }} />
@@ -144,7 +144,7 @@ export default function ResearchList({ locale, t }: { locale: Locale; t: Dict })
             右边「类型 / 状态 / 关联公司 / 更新时间」四列全被挤出可视区。
             固定布局下列宽以 Th 上的百分比为准，truncate 才会真的省略。 */}
         {!loading && !error && rows.length > 0 && (
-          <table className="w-full table-fixed border-collapse">
+          <table className="table-cards w-full table-fixed border-collapse">
             <thead className="sticky top-0 z-10">
               <tr className="bg-sidebar">
                 <Th className="w-[46%]">{t.research.col.title}</Th>

@@ -24,7 +24,7 @@ export default function BusinessLines({
   t: Dict
 }) {
   const l = t.landing.biz
-  const h2 = locale === "zh" ? "text-[27px]" : "text-[28px]"
+  const h2 = locale === "zh" ? "text-[20px] md:text-[27px]" : "text-[21px] md:text-[28px]"
 
   const lines: { index: string; title: string; desc: string; items: string[] }[] = [
     { index: "01", title: t.enum.bizLine.ma, desc: l.maDesc, items: l.maItems },
@@ -33,15 +33,15 @@ export default function BusinessLines({
   ]
 
   return (
-    <section id="business" className="mx-auto w-full max-w-[1240px] scroll-mt-14 px-6 py-20">
+    <section id="business" className="mx-auto w-full max-w-[1240px] scroll-mt-14 px-4 py-14 md:px-6 md:py-20">
       <div className="text-[11px] font-medium uppercase tracking-[0.05em] text-fg-subtle">
         {l.overline}
       </div>
       <h2 className={`${h2} mt-2 font-semibold leading-[1.2] text-fg`}>{l.headline}</h2>
 
-      <div className="mt-8 grid grid-cols-3 gap-5">
+      <div className="mt-6 grid grid-cols-1 gap-4 md:mt-8 md:grid-cols-3 md:gap-5">
         {lines.map(line => (
-          <div key={line.index} className="flip-card min-h-[260px]">
+          <div key={line.index} className="flip-card min-h-[200px] md:min-h-[260px]">
             <div className="flip-card-inner">
               {/* 正面 */}
               <div className="flip-face rounded-[8px] border border-hairline bg-surface-elevated p-6">

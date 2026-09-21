@@ -75,7 +75,7 @@ export default function ExhibitionContent({ id, t, locale }: {
 
       {/* Header card */}
       <div style={{ background: 'var(--color-surface)', borderRadius: '12px', border: '1px solid var(--color-hairline)', padding: '24px', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px' }}>
+        <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: '16px', flexWrap: 'wrap' }}>
           <div>
             {/* 展会名与英文名都是数据，原样显示 */}
             <h1 style={{ fontSize: '22px', fontWeight: 700, color: 'var(--color-fg)', margin: 0, lineHeight: 1.3 }}>{brand.name_cn}</h1>

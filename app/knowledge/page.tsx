@@ -35,10 +35,10 @@ export default async function KnowledgePage({
   const archivedCount = all.filter(i => i.status === "archived").length
 
   return (
-    <div className="max-w-[1180px] mx-auto px-8 py-9">
+    <div className="max-w-[1180px] mx-auto px-4 py-6 md:px-8 md:py-9">
       <div className="flex items-center justify-between mb-7">
         <div className="flex items-baseline gap-3">
-          <h1 className="text-[1.6875rem] font-medium leading-tight">{t.knowledge.title}</h1>
+          <h1 className="text-title-cjk font-medium leading-tight">{t.knowledge.title}</h1>
           <span className="num text-[12px] text-fg-muted">{items.length}</span>
         </div>
 

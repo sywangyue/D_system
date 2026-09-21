@@ -114,7 +114,7 @@ export default function SettingContent({ t, locale }: { t: Dict; locale: Locale 
   // ─── Loading ──────────────────────────────────────────────────────
   if (isLoading) {
     return (
-      <div className="space-y-6">
+      <div className="space-y-6 px-4 py-6 md:px-8 md:py-9">
         <h1 className="text-xl font-semibold text-fg">{t.settings.title}</h1>
         <DataStatusCard isLoading t={t} locale={locale} />
         <UsersTableSkeleton />
@@ -150,7 +150,7 @@ export default function SettingContent({ t, locale }: { t: Dict; locale: Locale 
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 px-4 py-6 md:px-8 md:py-9">
       <h1 className="text-xl font-semibold text-fg">{t.settings.title}</h1>
 
       {statusError && !dataStatus ? (

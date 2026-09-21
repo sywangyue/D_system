@@ -68,6 +68,28 @@ Logo、登录页、落地页可用；**产品界面内部一律不许** —— �
 | hero | `--text-hero` 44px | `--text-hero-cjk` 42px | 登录页主标 |
 | display | `--text-display` 72px | `--text-display-cjk` 68px | 落地页主标 |
 
+### 1.2b 手机端字阶（V2-21）
+
+断点只有一个：**768px**。`<768px` 覆盖 `:root` 上的 `--text-*`
+（`app/globals.css` 末尾「手机端」一节），字号工具类全都引用这些变量，改一处覆盖全站。
+
+| 级别 | 拉丁 桌面 → 手机 | 中文 桌面 → 手机 |
+|---|---|---|
+| micro | 11 → 11 | 11 → 11 |
+| ui | 13 → 13 | 12 → 12 |
+| body | 15 → 14 | 14 → 13 |
+| subhead | 18 → 16 | 17 → 15 |
+| heading | 24 → 19 | 23 → 18 |
+| title | 28 → 21 | 27 → 20 |
+| hero | 44 → 30 | 42 → 28 |
+| display | 72 → 34 | 68 → 32 |
+
+micro / ui 两档不动 —— 11–13px 已是可读下限。中文仍比拉丁小一档，第 2 节第 4 条在手机上同样成立。
+
+版式降列不走这一层，写在各组件的 `md:` 前缀里（Tailwind 移动优先）。
+两条组件层做不到的规则也在同一节：`.table-cards`（五列表格 → 卡片列表）与
+`.grid-pair`（奇数个格子两列排时，最后一格占满整行）。
+
 ### 1.3 圆角
 
 `--radius-badge` 2px · `--radius-control` 4px · `--radius-panel` 6px · `--radius-card` 8px

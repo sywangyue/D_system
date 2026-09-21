@@ -29,10 +29,10 @@ export default function CoverageBand({
 
   return (
     <div className="hairline-b pb-12">
-      <div className="grid grid-cols-6 gap-5">
+      <div className="grid grid-cols-2 gap-x-4 gap-y-6 sm:grid-cols-3 md:grid-cols-6 md:gap-5">
         {cells.map(c => (
           <div key={c.label}>
-            <div className="num text-[32px] font-medium leading-[1.1] text-fg">
+            <div className="num text-[26px] font-medium leading-[1.1] text-fg md:text-[32px]">
               {fmtNum(locale, c.n)}
             </div>
             <div className="mt-2 text-[12px] text-fg-subtle">{c.label}</div>

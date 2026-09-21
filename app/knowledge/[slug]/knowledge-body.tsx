@@ -20,7 +20,7 @@ import { rewriteAsset } from "@/lib/knowledge-url"
  */
 export default function KnowledgeBody({ md, slug }: { md: string; slug: string }) {
   return (
-    <article className="prose-cjk rounded-[6px] border border-hairline px-6 py-5">
+    <article className="prose-cjk rounded-[6px] border border-hairline px-4 py-4 md:px-6 md:py-5">
       <Markdown
         remarkPlugins={[remarkGfm]}
         // 只改写图片的 src。链接的 href 不动：否则 `mailto:`、`#锚点`、`docs/x.pdf`

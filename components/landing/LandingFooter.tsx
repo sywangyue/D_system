@@ -26,8 +26,8 @@ export default function LandingFooter({
 
   return (
     <footer className="hairline-t bg-surface">
-      <div className="mx-auto w-full max-w-[1240px] px-6 py-14">
-        <div className="flex items-start justify-between gap-12">
+      <div className="mx-auto w-full max-w-[1240px] px-4 py-10 md:px-6 md:py-14">
+        <div className="flex flex-col items-start justify-between gap-10 md:flex-row md:gap-12">
           {/* 左：字标 + 主体 + 两个集团 logo */}
           <div>
             <BrandLockup size="standard" showCn={locale === "zh"} />
@@ -56,7 +56,7 @@ export default function LandingFooter({
           </div>
 
           {/* 右：入口 + 链接 + like */}
-          <div className="flex flex-col items-end gap-4">
+          <div className="flex flex-col items-start gap-4 md:items-end">
             <Link
               href={enterHref}
               className="text-[13px] text-fg transition-colors hover:text-fg-muted"
@@ -74,7 +74,7 @@ export default function LandingFooter({
           </div>
         </div>
 
-        <div className="hairline-t mt-10 flex items-center justify-between pt-6 text-[11px] text-fg-faint">
+        <div className="hairline-t mt-10 flex flex-col gap-1 pt-6 text-[11px] text-fg-faint sm:flex-row sm:items-center sm:justify-between">
           <span>{l.copyright}</span>
           <span>{l.confidential}</span>
         </div>

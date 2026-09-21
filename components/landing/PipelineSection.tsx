@@ -81,22 +81,22 @@ function CodePane({ tag, delta, deltaTone, lines }: {
 
 export default function PipelineSection({ locale, t }: { locale: Locale; t: Dict }) {
   const l = t.landing.pipeline
-  const h2 = locale === "zh" ? "text-[42px]" : "text-[44px]"
+  const h2 = locale === "zh" ? "text-[24px] md:text-[42px]" : "text-[25px] md:text-[44px]"
   // 字典是宽松类型（JSON 进来是 string），这里收窄一次，下面的三分支才有穷尽性保证
   type Group = { title: string; count: number; icon: string; items: { id: string; label: string }[] }
   const groups = l.groups as Group[]
 
   return (
-    <section id="pipeline" className="hairline-t relative overflow-hidden px-12 pb-[140px] pt-[120px]"
+    <section id="pipeline" className="hairline-t relative overflow-hidden px-4 pb-20 pt-16 md:px-12 md:pb-[140px] md:pt-[120px]"
       style={{ background: "var(--gradient-halo)" }}>
       {/* 标题区：左标题右说明 */}
-      <div className="mx-auto mb-13 grid max-w-[1240px] grid-cols-2 items-start gap-12">
+      <div className="mx-auto mb-8 grid max-w-[1240px] grid-cols-1 items-start gap-6 md:mb-13 md:grid-cols-2 md:gap-12">
         <div>
           <div className="text-[11px] font-medium uppercase tracking-[0.05em] text-fg-subtle">{l.overline}</div>
           <h2 className={`${h2} mt-2 whitespace-pre-line font-semibold leading-[1.15] text-fg`}>{l.headline}</h2>
         </div>
         <div className="flex flex-col gap-5">
-          <p className="text-[16px] leading-relaxed text-fg-muted">{l.body}</p>
+          <p className="text-[14px] leading-relaxed text-fg-muted md:text-[16px]">{l.body}</p>
           <div className="flex items-center gap-4">
             <span className="num inline-flex items-center gap-2 rounded-full border border-hairline bg-sidebar px-3.5 py-1.5 text-[12px] text-fg-muted">
               <span style={{ color: "var(--ide-dot-green)" }}>●</span>
@@ -122,16 +122,16 @@ export default function PipelineSection({ locale, t }: { locale: Locale; t: Dict
               </div>
               <div className="num flex items-center gap-2 text-[12px]" style={{ color: "var(--ide-fg-faint)" }}>
                 <FileCode size={14} className="opacity-70" />
-                <span>mwlab-core</span>
-                <span className="opacity-40">/</span>
-                <span>pipeline</span>
-                <span className="opacity-40">/</span>
-                <span>stages</span>
-                <span className="opacity-40">/</span>
+                <span className="hidden md:inline">mwlab-core</span>
+                <span className="hidden opacity-40 md:inline">/</span>
+                <span className="hidden md:inline">pipeline</span>
+                <span className="hidden opacity-40 md:inline">/</span>
+                <span className="hidden md:inline">stages</span>
+                <span className="hidden opacity-40 md:inline">/</span>
                 <span className="font-medium" style={{ color: "var(--ide-fg)" }}>02_entity_resolution.ts</span>
               </div>
             </div>
-            <div className="num flex items-center gap-4 text-[11px]" style={{ color: "var(--ide-fg-faint)" }}>
+            <div className="num hidden items-center gap-4 text-[11px] md:flex" style={{ color: "var(--ide-fg-faint)" }}>
               <span className="ide-branch-tag flex items-center gap-1.5 rounded-[4px] px-2 py-0.5">
                 <GitBranch size={12} />
                 feat/cnexpo-jufair-sync
@@ -141,7 +141,7 @@ export default function PipelineSection({ locale, t }: { locale: Locale; t: Dict
           </div>
 
           {/* 主体：左任务栏 + 右双栏 diff */}
-          <div className="ide-body grid min-h-[520px] grid-cols-[310px_1fr]">
+          <div className="ide-body grid min-h-[380px] grid-cols-1 md:min-h-[520px] md:grid-cols-[310px_1fr]">
             <aside className="ide-sidebar flex flex-col gap-5 px-3 py-4.5">
               {groups.map(g => (
                 <div key={g.title}>
@@ -169,21 +169,21 @@ export default function PipelineSection({ locale, t }: { locale: Locale; t: Dict
               ))}
             </aside>
 
-            <div className="ide-diff-main grid grid-cols-2 overflow-x-auto">
+            <div className="ide-diff-main hidden grid-cols-2 overflow-x-auto md:grid">
               <CodePane tag="BASE REVISION (01_raw_ingest)" delta="- 4 lines" lines={BASE} />
               <CodePane tag="HEAD (feat/cnexpo-jufair-sync)" delta="+ 8 lines" deltaTone="add" lines={HEAD} />
             </div>
           </div>
 
           {/* 底部状态条 */}
-          <div className="ide-bottom-strip num flex h-8 items-center justify-between px-4 text-[11px]">
+          <div className="ide-bottom-strip num flex min-h-8 flex-wrap items-center justify-between gap-x-3 px-4 py-1.5 text-[10px] md:h-8 md:flex-nowrap md:py-0 md:text-[11px]">
             <div className="flex items-center gap-4">
               <span className="flex items-center gap-1.5">
                 <span style={{ color: "var(--ide-dot-green)" }}>●</span>
                 TypeScript 5.4 · Strict Mode
               </span>
-              <span>Encoding: UTF-8</span>
-              <span>Target: ES2024</span>
+              <span className="hidden md:inline">Encoding: UTF-8</span>
+              <span className="hidden md:inline">Target: ES2024</span>
             </div>
             <span>
               CI Checks: <strong className="font-medium" style={{ color: "var(--ide-dot-green)" }}>4 Passed</strong> · 0 Warnings

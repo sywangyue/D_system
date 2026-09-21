@@ -24,11 +24,11 @@ export default function LandingHero({
 }) {
   const l = t.landing.hero
   // 中英配对字号：拉丁 72 / 中文 68
-  const h1 = locale === "zh" ? "text-[68px]" : "text-[72px]"
+  const h1 = locale === "zh" ? "text-[32px] md:text-[68px]" : "text-[34px] md:text-[72px]"
 
   return (
     <section
-      className="relative flex flex-col items-center overflow-hidden px-6 pt-[144px] text-center"
+      className="relative flex flex-col items-center overflow-hidden px-4 pt-24 text-center md:px-6 md:pt-[144px]"
       style={{ background: "var(--gradient-hero)" }}
     >
       {/* 资质条 —— 说明这是谁的系统，不是口号 */}
@@ -50,7 +50,7 @@ export default function LandingHero({
         <span className="text-fg">{l.headlineFocus}</span>
       </h1>
 
-      <p className="mt-6 max-w-[740px] text-[17px] leading-relaxed text-fg-muted">
+      <p className="mt-5 max-w-[740px] text-[15px] leading-relaxed text-fg-muted md:mt-6 md:text-[17px]">
         {fill(l.subline, {
           brands: fmtNum(locale, coverage.brands),
           groups: fmtNum(locale, coverage.groups),
@@ -58,7 +58,7 @@ export default function LandingHero({
         })}
       </p>
 
-      <div className="mt-9 mb-16 flex items-center gap-7">
+      <div className="mt-7 mb-10 flex items-center gap-5 md:mt-9 md:mb-16 md:gap-7">
         <Link
           href={enterHref}
           className="btn inline-flex h-11 items-center rounded-[4px] bg-accent px-7 text-[15px] font-medium text-accent-fg transition-transform hover:-translate-y-px"

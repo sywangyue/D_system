@@ -18,10 +18,13 @@ export default function AppShell({
 }) {
   if (!user) return <>{children}</>
 
+  // 手机上竖着排（顶栏在上、正文在下），≥768px 恢复横排（侧栏在左）。
+  // min-w-0 不能省：flex 子项默认 min-width:auto，里面一张宽表格会把
+  // <main> 撑得比屏还宽，整页就能左右拖。
   return (
-    <div className="flex h-screen overflow-hidden">
+    <div className="flex flex-col md:flex-row h-screen overflow-hidden">
       <Sidebar user={user} locale={locale} t={t} />
-      <main className="flex-1 overflow-y-auto">{children}</main>
+      <main className="flex-1 min-w-0 overflow-y-auto">{children}</main>
     </div>
   )
 }

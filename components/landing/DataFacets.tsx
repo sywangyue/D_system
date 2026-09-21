@@ -28,7 +28,7 @@ function monthLabel(locale: Locale, month: number): string {
 
 function Panel({ title, desc, children }: { title: string; desc: string; children: React.ReactNode }) {
   return (
-    <div className="facet-card flex min-h-[280px] flex-col rounded-[8px] border border-hairline bg-surface-elevated p-6">
+    <div className="facet-card flex min-h-[240px] flex-col rounded-[8px] border border-hairline bg-surface-elevated p-5 md:min-h-[280px] md:p-6">
       <h3 className="text-[14px] font-semibold text-fg">{title}</h3>
       <p className="mt-1 text-[11px] text-fg-subtle">{desc}</p>
       <div className="mt-5 flex flex-1 flex-col justify-center">{children}</div>
@@ -67,13 +67,13 @@ export default function DataFacets({
   const no2026Total = no2026.withCount + no2026.withoutCount || 1
 
   return (
-    <div id="capability" className="mt-14 scroll-mt-14">
+    <div id="capability" className="mt-10 scroll-mt-14 md:mt-14">
       <div className="text-[11px] font-medium uppercase tracking-[0.05em] text-fg-subtle">
         {l.overline}
       </div>
       <h2 className={`${h2} mt-2 mb-8 font-semibold leading-[1.2] text-fg`}>{l.headline}</h2>
 
-      <div className="grid grid-cols-3 gap-5">
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 md:gap-5 xl:grid-cols-3">
         {/* 1 · 地理分布 —— 复用 H 的地图组件，只读 */}
         <Panel title={l.mapTitle} desc={l.mapDesc}>
           <MapSvg points={expo.points} locale={locale} />

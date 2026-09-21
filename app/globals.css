@@ -687,3 +687,94 @@
   border-radius: var(--radius-card);
   box-shadow: var(--shadow-card);
 }
+
+/* ============================================================================
+   手机端（V2-21）
+   ----------------------------------------------------------------------------
+   断点只有一个：768px。<768px 视为手机，≥768px 一律维持原样。
+   版式降列写在各组件的 md: 前缀里（Tailwind 移动优先），这里只放两件
+   组件层做不到的事：字阶整体降一档、横向溢出兜底。
+
+   字阶为什么整档降而不是逐处改：字号工具类（.text-title-cjk 等）全都是
+   `font-size: var(--text-title-cjk)`，覆盖变量就等于覆盖全站，
+   不用去 30 个文件里挨个加 md: 前缀，也不会漏。
+   micro（11）与 ui（12/13）两档不动 —— 那已经是可读下限，再小不是缩小是看不清。
+   中文仍比拉丁小一档，DESIGN.md §2 第 4 条在手机上同样成立。
+   ========================================================================== */
+@media (max-width: 767px) {
+  :root {
+    /* 拉丁 */
+    --text-body:    0.875rem;   /* 15 → 14 */
+    --text-subhead: 1rem;       /* 18 → 16 */
+    --text-heading: 1.1875rem;  /* 24 → 19 */
+    --text-title:   1.3125rem;  /* 28 → 21 */
+    --text-hero:    1.875rem;   /* 44 → 30 */
+    --text-display: 2.125rem;   /* 72 → 34 */
+
+    /* 中文 */
+    --text-body-cjk:    0.8125rem;  /* 14 → 13 */
+    --text-subhead-cjk: 0.9375rem;  /* 17 → 15 */
+    --text-heading-cjk: 1.125rem;   /* 23 → 18 */
+    --text-title-cjk:   1.25rem;    /* 27 → 20 */
+    --text-hero-cjk:    1.75rem;    /* 42 → 28 */
+    --text-display-cjk: 2rem;       /* 68 → 32 */
+  }
+
+  /* 调研报告与知识库正文里的 Markdown 表格没有外层滚动容器（remark 不产出），
+     列一多就顶破正文块 —— 实测 13 张表里最宽的 379px，正文净宽只有 324px。
+     表格自己横滑，正文其余部分照常跟着页面走。
+     `pre` 那边早就有 overflow-x:auto，这里补的是表格。 */
+  .prose-cjk table {
+    display: block;
+    width: max-content;
+    max-width: 100%;
+    overflow-x: auto;
+  }
+
+  /* 三个列表页（机会台 / 公司库 / 调研库）的五列表格 → 卡片列表。
+     五列在 390px 上每列 78px，中文列名和单元格都会一字一行。
+
+     纯 CSS 改排版，不复制一套手机专用 JSX：表头隐藏，每个 <tr> 变成
+     一张 flex 卡片 —— 第一格（名称）独占一行，其余几格在第二行横排，
+     最后一格（更新时间）靠右。列宽百分比（w-[46%] 等）在 display:block 下
+     自动失效，不用逐个去掉。
+
+     三张表的列序一致（名称 / 两三个属性 / 更新时间），这套规则才成立；
+     以后加表要么照这个列序，要么别挂 .table-cards。 */
+  .table-cards thead { display: none; }
+  .table-cards,
+  .table-cards tbody,
+  .table-cards tr { display: block; width: 100%; }
+  .table-cards tr {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 10px;
+    padding: 11px 16px;
+  }
+  .table-cards td {
+    display: block;
+    height: auto;
+    padding: 0;
+    /* 行高在桌面版由 <td> 的 h-9 给，这里改成块级后要自己接回来 */
+    line-height: 1.5;
+    /* flex 子项默认 min-width:auto = 内容的最小宽度。调研库标题格里那行
+       `truncate` 摘要是 nowrap 的，min-content 就等于整条摘要的宽度（实测
+       1367px），flex-basis:100% 会被它顶掉，摘要直接漫到屏幕外。归零才截得住。 */
+    min-width: 0;
+  }
+  .table-cards td:first-child { flex: 0 0 100%; }
+  .table-cards td:last-child { margin-left: auto; }
+
+  /* 盘面那几块「gap-px + 容器底色」的格子阵，两列排时若是奇数个，
+     最后一行会空出一格，空格处露出容器的发丝线底色，看着像块脏斑。
+     让落单的最后一格占满整行。格子数是数据驱动的（资源按 kind 分组），
+     所以用 :nth-child(odd):last-child 判断，不写死格数。 */
+  .grid-pair > *:nth-child(odd):last-child { grid-column: span 2; }
+
+  /* 横向溢出兜底。漏掉一处降列，整页就能左右拖，而且比那一处本身更难发现。
+     在 body 上截断是安全的：落地页的导航是 fixed 不是 sticky，
+     后台页的滚动容器是 AppShell 里的 <main>，都不依赖 body 滚动。
+     真正需要横向滚的（表格、IDE 窗口）各自套 overflow-x-auto。 */
+  body { overflow-x: hidden; }
+}

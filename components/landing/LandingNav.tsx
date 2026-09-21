@@ -24,15 +24,15 @@ export default function LandingNav({
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 h-14 hairline-b bg-canvas/90 backdrop-blur-md">
-      <div className="mx-auto flex h-full w-full max-w-[1240px] items-center justify-between px-6">
+      <div className="mx-auto flex h-full w-full max-w-[1240px] items-center justify-between px-4 md:px-6">
         <BrandLockup size="standard" showCn={locale === "zh"} />
 
-        <nav className="flex items-center gap-7">
+        <nav className="flex items-center gap-3 md:gap-7">
           {anchors.map(a => (
             <a
               key={a.href}
               href={a.href}
-              className="text-[13px] text-fg-muted transition-colors hover:text-fg"
+              className="hidden text-[13px] text-fg-muted transition-colors hover:text-fg md:inline"
             >
               {a.label}
             </a>

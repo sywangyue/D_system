@@ -42,7 +42,7 @@ export function UsersTableSkeleton() {
   return (
     <div className="bg-surface border border-hairline rounded-xl overflow-hidden animate-pulse">
       <div className="h-10 bg-surface-elevated mx-6 mt-5 rounded w-28" />
-      <div className="px-6 py-3 space-y-3">
+      <div className="px-4 md:px-6 py-3 space-y-3">
         {[1, 2, 3, 4, 5].map((i) => (
           <div key={i} className="flex gap-4">
             <div className="h-5 w-48 bg-surface-elevated rounded" />
@@ -73,23 +73,23 @@ export default function UsersTable({
 
   return (
     <div className="bg-surface border border-hairline rounded-xl overflow-hidden">
-      <h2 className="text-base font-semibold text-fg px-6 pt-5 pb-3">
+      <h2 className="text-base font-semibold text-fg px-4 md:px-6 pt-5 pb-3">
         {fill(t.settings.usersTitle, { count: users.length })}
       </h2>
       <div className="overflow-x-auto">
-        <table className="w-full text-sm">
+        <table className="table-cards w-full text-sm">
           <thead>
             <tr className="border-b border-hairline">
-              <th className="text-left px-6 py-3 text-xs font-medium text-fg-muted uppercase">
+              <th className="text-left px-4 md:px-6 py-3 text-xs font-medium text-fg-muted uppercase">
                 {t.settings.colEmail}
               </th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-fg-muted uppercase">
+              <th className="text-left px-4 md:px-6 py-3 text-xs font-medium text-fg-muted uppercase">
                 {t.settings.colRole}
               </th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-fg-muted uppercase">
+              <th className="text-left px-4 md:px-6 py-3 text-xs font-medium text-fg-muted uppercase">
                 {t.settings.colState}
               </th>
-              <th className="text-left px-6 py-3 text-xs font-medium text-fg-muted uppercase">
+              <th className="text-left px-4 md:px-6 py-3 text-xs font-medium text-fg-muted uppercase">
                 {t.settings.colLastLogin}
               </th>
             </tr>
@@ -103,24 +103,24 @@ export default function UsersTable({
                   key={user.user_id}
                   className="border-b border-hairline last:border-0 hover:bg-surface-elevated transition-colors"
                 >
-                  <td className="px-6 py-3 font-mono text-xs text-fg">
+                  <td className="px-4 md:px-6 py-3 font-mono text-xs text-fg">
                     {user.email}
                   </td>
-                  <td className="px-6 py-3">
+                  <td className="px-4 md:px-6 py-3">
                     <span
                       className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${roleBadge.color}`}
                     >
                       {roleBadge.label}
                     </span>
                   </td>
-                  <td className="px-6 py-3">
+                  <td className="px-4 md:px-6 py-3">
                     <span
                       className={`inline-block px-2 py-0.5 rounded-full text-xs font-medium ${status.color}`}
                     >
                       {status.label}
                     </span>
                   </td>
-                  <td className="px-6 py-3 text-fg-muted">
+                  <td className="px-4 md:px-6 py-3 text-fg-muted">
                     {fmtDateTime(locale, user.last_login, "--")}
                   </td>
                 </tr>

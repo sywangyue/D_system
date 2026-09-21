@@ -84,7 +84,7 @@ export default function Pipeline({
   return (
     <div className="h-full flex flex-col">
       {/* ── 顶栏 ─────────────────────────────────────────── */}
-      <div className="flex items-center justify-between px-8 h-14 hairline-b shrink-0">
+      <div className="flex items-center justify-between px-4 md:px-8 h-14 hairline-b shrink-0">
         <div className="flex items-baseline gap-3">
           <h1 className="text-[17px] font-medium">{t.pipeline.title}</h1>
           {/* lat 小字只在中文版出现：英文版标题本身就是 "Pipeline"，再挂一次是重复 */}
@@ -105,7 +105,7 @@ export default function Pipeline({
       </div>
 
       {/* ── 业务线 tab ───────────────────────────────────── */}
-      <div className="flex gap-6 px-8 hairline-b shrink-0">
+      <div className="flex gap-5 md:gap-6 px-4 md:px-8 hairline-b shrink-0 overflow-x-auto">
         {BIZ_LINES.map(l => (
           <button
             key={l.key}
@@ -122,7 +122,7 @@ export default function Pipeline({
       </div>
 
       {/* ── 筛选条 ───────────────────────────────────────── */}
-      <div className="flex items-center gap-1.5 px-8 py-2.5 hairline-b shrink-0 flex-wrap">
+      <div className="flex items-center gap-1.5 px-4 md:px-8 py-2.5 hairline-b shrink-0 flex-wrap">
         <Pill active={!stage} onClick={() => setStage("")}>{t.pipeline.allStages}</Pill>
         {STAGES.map(s => (
           <Pill key={s.key} active={stage === s.key} onClick={() => setStage(s.key)}>
@@ -132,13 +132,13 @@ export default function Pipeline({
         <span className="w-px h-4 bg-hairline mx-1.5" />
         <Pill active={mine} onClick={() => setMine(v => !v)}>{t.pipeline.onlyMine}</Pill>
 
-        <div className="relative ml-auto">
+        <div className="relative w-full md:ml-auto md:w-auto">
           <Search size={13} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-fg-subtle" />
           <input
             value={q}
             onChange={e => setQ(e.target.value)}
             placeholder={t.pipeline.search}
-            className="input h-7 w-64 pl-8 pr-2.5 rounded-[4px] bg-sidebar text-[12px]
+            className="input h-7 w-full md:w-64 pl-8 pr-2.5 rounded-[4px] bg-sidebar text-[12px]
                        border border-[rgb(255_255_255/9%)] placeholder:text-fg-faint"
           />
         </div>
@@ -146,7 +146,7 @@ export default function Pipeline({
 
       {/* ── 表格 ─────────────────────────────────────────── */}
       <div className="flex-1 overflow-auto">
-        <table className="w-full border-collapse">
+        <table className="table-cards w-full border-collapse">
           <thead className="sticky top-0 z-10">
             <tr className="bg-sidebar">
               <Th className="w-[46%]">{t.pipeline.col.name}</Th>
@@ -159,7 +159,7 @@ export default function Pipeline({
           <tbody>
             {loading && Array.from({ length: 8 }).map((_, i) => (
               <tr key={i} className="hairline-b">
-                <td colSpan={5} className="px-8 py-2.5">
+                <td colSpan={5} className="px-4 md:px-8 py-2.5">
                   <div className="skeleton h-3.5" style={{ width: `${88 - i * 6}%` }} />
                 </td>
               </tr>

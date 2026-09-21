@@ -79,7 +79,7 @@ export default function ResearchDetail({ id, locale, t }: {
 
   if (loading) {
     return (
-      <div className="max-w-[1180px] mx-auto px-8 py-9 flex flex-col gap-4">
+      <div className="max-w-[1180px] mx-auto px-4 py-6 md:px-8 md:py-9 flex flex-col gap-4">
         <div className="skeleton h-3.5 w-32" />
         <div className="skeleton h-7 w-[28rem]" />
         <div className="skeleton h-4 w-full" />
@@ -91,7 +91,7 @@ export default function ResearchDetail({ id, locale, t }: {
 
   if (error) {
     return (
-      <div className="max-w-[1180px] mx-auto px-8 py-9">
+      <div className="max-w-[1180px] mx-auto px-4 py-6 md:px-8 md:py-9">
         <Link href="/research"
               className="inline-flex items-center gap-1.5 text-[13px] text-fg-subtle hover:text-fg mb-6">
           <ArrowLeft size={13} /> {t.nav.reports}
@@ -112,7 +112,7 @@ export default function ResearchDetail({ id, locale, t }: {
   const md = (r.report_md || "").trim()
 
   return (
-    <div className="max-w-[1180px] mx-auto px-8 py-9">
+    <div className="max-w-[1180px] mx-auto px-4 py-6 md:px-8 md:py-9">
       <Link href="/research"
             className="inline-flex items-center gap-1.5 text-[13px] text-fg-subtle hover:text-fg mb-6">
         <ArrowLeft size={13} /> {t.nav.reports}
@@ -130,7 +130,7 @@ export default function ResearchDetail({ id, locale, t }: {
         </div>
       </div>
 
-      <div className="grid grid-cols-[65fr_35fr] gap-8 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-[65fr_35fr] gap-6 md:gap-8 items-start">
         {/* ── 左：报告正文 ────────────────────────────────── */}
         <div className="min-w-0">
           {md === "" ? (
@@ -140,7 +140,7 @@ export default function ResearchDetail({ id, locale, t }: {
               <span className="text-[12px] text-fg-faint">{t.research.bodyEmptyHint}</span>
             </div>
           ) : (
-            <article className="prose-cjk rounded-[6px] border border-hairline px-6 py-5">
+            <article className="prose-cjk rounded-[6px] border border-hairline px-4 py-4 md:px-6 md:py-5">
               <Markdown remarkPlugins={[remarkGfm]}>{md}</Markdown>
             </article>
           )}

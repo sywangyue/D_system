@@ -10,7 +10,9 @@
     "knowledge": "Knowledge",
     "basemap": "Basemap",
     "settings": "Settings",
-    "logout": "Sign out"
+    "logout": "Sign out",
+    "menu": "Menu",
+    "closeMenu": "Close"
   },
   "common": {
     "search": "Search opportunities, companies, reports…",

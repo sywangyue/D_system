@@ -113,7 +113,7 @@ export default function ExpoBoard({
   const hasFilter = industry.length > 0 || place !== null || scale !== null
 
   return (
-    <div className="max-w-[1400px] mx-auto px-8 py-7">
+    <div className="max-w-[1400px] mx-auto px-4 py-5 md:px-8 md:py-7">
       {/* ── 筛选条 ───────────────────────────────────────── */}
       <div className="flex items-center flex-wrap gap-x-6 gap-y-3 mb-5">
         <FilterGroup label={t.basemap.filterIndustry}>
@@ -172,7 +172,7 @@ export default function ExpoBoard({
       )}
 
       {/* ── 地图 58% + 日历 42% ──────────────────────────── */}
-      <div className="grid grid-cols-[1.38fr_1fr] gap-6 items-start">
+      <div className="grid grid-cols-1 md:grid-cols-[1.38fr_1fr] gap-5 md:gap-6 items-start">
         <MapPanel t={t} locale={locale} points={stats.points} unlocated={stats.unlocated}
                   active={place} onPick={setPlace} />
 
@@ -183,7 +183,7 @@ export default function ExpoBoard({
       </div>
 
       {/* ── 四宫格（跟随筛选，不做同比）───────────────────── */}
-      <div className="grid grid-cols-4 gap-6 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-5 md:mt-6">
         <MetricPanel t={t} locale={locale} label={t.basemap.trendVisitors}
                      value={stats.totals.visitors} brands={stats.totals.brands} scale={stats.scale} />
         <MetricPanel t={t} locale={locale} label={t.basemap.trendArea}
@@ -288,7 +288,7 @@ function CalendarPanel({
           const items = byDate.get(date) ?? []
           const isToday = date === today
           return (
-            <div key={date} className="min-h-[54px] rounded-[3px] px-1 py-0.5 bg-surface-elevated/40">
+            <div key={date} className="min-h-[44px] md:min-h-[54px] rounded-[3px] px-1 py-0.5 bg-surface-elevated/40">
               <div className="flex items-center gap-1 mb-0.5">
                 {/* 今天用中性色实心方块标记，不用橙色（§6.5） */}
                 {isToday && <span className="w-1.5 h-1.5 bg-fg inline-block" />}
@@ -390,8 +390,8 @@ function IndustryPanel({
 
 function FilterGroup({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <div className="flex items-center gap-2">
-      <span className="text-[11px] text-fg-faint">{label}</span>
+    <div className="flex items-start md:items-center gap-2">
+      <span className="shrink-0 whitespace-nowrap pt-1 md:pt-0 text-[11px] text-fg-faint">{label}</span>
       <div className="flex items-center gap-1 flex-wrap">{children}</div>
     </div>
   )

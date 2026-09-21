@@ -10,7 +10,9 @@
     "knowledge": "知识库",
     "basemap": "展会底图",
     "settings": "设置",
-    "logout": "退出"
+    "logout": "退出",
+    "menu": "菜单",
+    "closeMenu": "关闭"
   },
   "common": {
     "search": "搜索机会、公司、报告…",
