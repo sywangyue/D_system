@@ -16,5 +16,6 @@ export default async function ResearchDetailPage({
   if (!user) redirect("/login")
   const { id } = await params
   const [locale, t] = await Promise.all([getLocale(), getDict()])
-  return <ResearchDetail id={id} locale={locale} t={t} />
+  // readonly 账号看得到关联，但不给关联/取消的入口（接口那边 requireWriter 也会拦）
+  return <ResearchDetail id={id} locale={locale} t={t} canWrite={user.role !== "readonly"} />
 }
