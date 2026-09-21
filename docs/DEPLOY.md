@@ -110,7 +110,8 @@ npm run build
 ### 2. 上传 .next
 
 ```bash
-rsync -avz --delete \
+rm -rf .next/dev                       # ⚠️ 先删，见下
+rsync -avz --delete --exclude 'cache' \
   -e "ssh -i ~/.ssh/MWlab.pem -o StrictHostKeyChecking=no" \
   "/Volumes/databoard/AI Project/D_dashboard/.next/" \
   admin@47.79.17.71:/home/admin/dashboard/.next/
@@ -118,6 +119,10 @@ rsync -avz --delete \
 
 > `--delete` 保证删除服务器上本地已去除的文件。  
 > 不要上传 `node_modules`（已在服务器编译 better-sqlite3 原生 addon）。
+>
+> ⚠️ **跑过 `npm run dev` 就必须先 `rm -rf .next/dev`**。上面「上传清单」里写了要排除它，
+> 但这条命令原先没带 —— 2026-09-21 实测 `.next/dev` 有 **481MB**，照抄就会把它推上
+> 890MB 内存的机器。删掉后实际传的 `.next/` 只有 19MB。`cache` 同理，用 `--exclude` 挡掉。
 
 ### 3. 重启服务
 
